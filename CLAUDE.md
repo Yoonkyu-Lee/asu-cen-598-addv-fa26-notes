@@ -523,8 +523,17 @@ Design Flow 그림, testbench 구성도, "무엇이 언제 일어나는가" 타�
 노트는 `<script src="reader.js" type="module"></script>` 한 줄만 넣는다.
 `reader.css`는 `reader.js`가 직접 주입하므로 `<link>`를 쓰지 않는다.
 
-`file://`로 열면 브라우저가 PDF fetch를 막는다. 로컬에서 리더까지 보려면 서버로 열어야 한다:
-`npx serve .` 또는 `python -m http.server`.
+`file://`로 열면 브라우저가 PDF fetch를 막는다. 로컬에서 리더까지 보려면 서버로 열어야 한다.
+
+```bash
+node scripts/serve.mjs      # http://127.0.0.1:4599/
+```
+
+**`python -m http.server` 를 쓰면 안 된다.** `.mjs` 를 `text/javascript` 로 안 내보내서
+브라우저가 pdf.js 모듈 로드를 거부한다. 리더가 "슬라이드를 불러오지 못했어 /
+Failed to fetch dynamically imported module" 만 띄운다. 실제로 이걸로 한 번 헤맸다.
+`verify.mjs` 는 자기 서버를 띄우면서 MIME 을 직접 지정하므로 영향이 없다.
+GitHub Pages 도 `.mjs` 를 제대로 내보내므로 배포본은 문제없다.
 
 ### 앵커 규칙
 
@@ -638,9 +647,20 @@ Lab overview 강의(3, 7, 12, 16, 19, 23, 27)는 별도 노트를 만들지 않�
    - `shots/` 폴더에 전체 스크린샷 2장과 **도해별 개별 스크린샷** `-fig01.png…`이 생긴다.
    - **도해 스크린샷을 한 장씩 다 열어본다.** 자동 검사가 통과해도 건너뛰지 않는다.
      테두리가 글자를 관통하는 것, 화살표가 엉킨 것, 의미 고정 색상 위반은 눈으로만 잡힌다.
-8. **슬라이드 리더가 실제로 따라오는지 확인한다.** 노트를 위에서 아래로 훑으면서
-   슬라이드가 같이 넘어가는지, `data-slide` 값이 실제 PDF 쪽과 맞는지 본다.
+8. **슬라이드 리더가 실제로 따라오는지 확인한다.** `node scripts/serve.mjs` 로 띄우고
+   노트를 위에서 아래로 훑으면서 슬라이드가 같이 넘어가는지, `data-slide` 값이 실제
+   PDF 쪽과 맞는지 본다. 브라우저 콘솔에서 섹션으로 뛰어 대조하면 빠르다.
+
+   ```js
+   document.getElementById('s12').scrollIntoView();
+   // 잠깐 기다린 뒤 리더의 쪽 번호를 읽는다
+   document.querySelector('aside').innerText.split('
+').slice(0,3).join(' ')
+   ```
+
    **어긋난 앵커는 있으나 마나가 아니라 적극적으로 해롭다.** 근거를 잘못 가리킨다.
+   **포트를 바꿔가며 확인한다.** 한 번 잘못된 MIME 으로 받은 `.mjs` 는 브라우저 캐시에
+   남아서, 서버를 고쳐도 같은 주소로는 계속 실패한다. 실제로 이걸로 한 번 헤맸다.
 9. 문제가 있으면 고치고 7번 반복.
 10. **`index.html`을 갱신한다:**
     - 해당 강의 카드의 `<div class="mod soon">` → `<a class="mod" href="...">`
