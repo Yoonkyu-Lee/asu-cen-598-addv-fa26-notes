@@ -1,0 +1,2468 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV · Lecture 2 — Design and Verification Overview</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 · Advanced Digital Design and Verification · Aman Arora</div>
+  <h1 class="title">Lecture 2<br>Design and Verification Overview</h1>
+  <p class="subtitle" lang="ko">Lecture 1이 그린 지도의 Design과 Synthesis 칸을 확대한다. 그리고 후반부에서 이 과목 2부 전체의 뼈대인 stimulus, checkers, coverage가 처음 나온다.</p>
+  <p class="subtitle" lang="en">A zoom into the Design and Synthesis cells of the map from Lecture 1. The second half introduces stimulus, checkers and coverage, the skeleton of the whole back half of this course.</p>
+  <div class="meta" lang="ko">
+    <span class="chip">슬라이드 59쪽</span>
+    <span class="chip">2026년 8월 26일 (수)</span>
+    <span class="chip hot">이 과목에서 제일 밀도 높은 강의</span>
+    <span class="chip dim">31·34·54·57·58쪽은 강의에서 넘긴 슬라이드</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip">59 slides</span>
+    <span class="chip">Wednesday, August 26, 2026</span>
+    <span class="chip hot">the densest lecture in the course</span>
+    <span class="chip dim">slides 31, 34, 54, 57, 58 were skipped in class</span>
+  </div>
+  <a class="backlink" href="index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="index.html" lang="en">← All lectures</a>
+</header>
+
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="index.html" lang="ko">← 강의 목록</a>
+    <a class="back" href="index.html" lang="en">← All lectures</a>
+    <div class="mod">Lecture 2</div>
+    <div class="name">Design and Verification Overview</div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#s0"><span class="n">00</span><span lang="ko">이 강의가 하는 일</span><span lang="en">What this lecture does</span></a>
+  <a href="#s1"><span class="n">01</span><span lang="ko">추상화 수준</span><span lang="en">Levels of abstraction</span></a>
+  <a href="#s2"><span class="n">02</span><span lang="ko">Data Path와 Control Path</span><span lang="en">Data path and control path</span></a>
+  <a href="#s3"><span class="n">03</span><span lang="ko">설계자의 하루</span><span lang="en">Life of a design engineer</span></a>
+  <a href="#s4"><span class="n">04</span><span>Synthesis</span></a>
+  <a href="#s5"><span class="n">05</span><span lang="ko">Static Timing Analysis</span><span lang="en">Static timing analysis</span></a>
+  <a href="#s6"><span class="n">06</span><span lang="ko">Technology Library</span><span lang="en">Technology library</span></a>
+  <a href="#s7"><span class="n">07</span><span lang="ko">설계 관행과 재사용</span><span lang="en">Design practices and reuse</span></a>
+  <a href="#s8"><span class="n">08</span><span lang="ko">Lint</span><span lang="en">Linting</span></a>
+  <a href="#s9"><span class="n">09</span><span lang="ko">목표와 트레이드오프</span><span lang="en">Goals and trade-offs</span></a>
+  <a href="#s10"><span class="n">10</span><span lang="ko">설계 최적화</span><span lang="en">Design optimisations</span></a>
+  <a href="#s11"><span class="n">11</span><span lang="ko">무엇을 만드나</span><span lang="en">What you actually build</span></a>
+  <a href="#s12"><span class="n">12</span><span lang="ko">왜 verification인가</span><span lang="en">Why verification</span></a>
+  <a href="#s13"><span class="n">13</span><span lang="ko">두 갈래: dynamic과 static</span><span lang="en">Two branches: dynamic and static</span></a>
+  <a href="#s14"><span class="n">14</span><span>Simulation</span></a>
+  <a href="#s15"><span class="n">15</span><span lang="ko">Formal Verification</span><span lang="en">Formal verification</span></a>
+  <a href="#s16"><span class="n">16</span><span lang="ko">검증의 삼각대</span><span lang="en">The trifecta</span></a>
+  <a href="#s17"><span class="n">17</span><span lang="ko">TLM</span><span lang="en">TLM</span></a>
+  <a href="#s18"><span class="n">18</span><span lang="ko">Testbench 조립하기</span><span lang="en">Assembling a testbench</span></a>
+  <a href="#s19"><span class="n">19</span><span lang="ko">직접 조립해보기</span><span lang="en">Assemble it yourself</span></a>
+  <a href="#s20"><span class="n">20</span><span lang="ko">Verification Plan과 검증자의 하루</span><span lang="en">The plan and the verifier's day</span></a>
+  <a href="#s21"><span class="n">21</span><span lang="ko">관심사의 분리</span><span lang="en">Separation of concerns</span></a>
+  <a href="#s22"><span class="n">22</span><span lang="ko">언어와 방법론</span><span lang="en">Languages and methodologies</span></a>
+  <a href="#s23"><span class="n">23</span><span lang="ko">남은 과제와 격차</span><span lang="en">The gap that remains</span></a>
+  <a href="#s24"><span class="n">24</span><span lang="ko">복습 문제</span><span lang="en">Review questions</span></a>
+  <a href="#s25"><span class="n">25</span><span lang="ko">정리 &amp; 다음 강의</span><span lang="en">Recap &amp; next lecture</span></a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════ 00 -->
+<section id="s0">
+  <div class="sec-head"><span class="sec-num">00</span><h2 lang="ko">이 강의가 하는 일</h2><h2 lang="en">What this lecture does</h2></div>
+  <p class="sec-sub" lang="ko">59쪽짜리다. 이 과목에서 가장 밀도 높은 한 시간이고, 앞으로 나올 거의 모든 주제의 씨앗이 여기 한 번씩 뿌려진다.</p>
+  <p class="sec-sub" lang="en">Fifty-nine slides. It is the densest hour in the course, and nearly every topic to come gets planted here once.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">한 줄로</span><span class="tag" lang="en">In one line</span>
+    <p lang="ko">전반부는 <strong>Design</strong>: 어느 추상화 수준에서 쓰고, synthesis가 그걸 무엇으로 바꾸고, 무엇을 목표로 최적화하는가. 후반부는 <strong>Verification</strong>: 왜 하고, 어떻게 하고, 무엇으로 다 했다고 판단하는가.</p>
+    <p lang="en">The first half is <strong>design</strong>: which level of abstraction you write at, what synthesis turns it into, and what you optimise for. The second half is <strong>verification</strong>: why you do it, how you do it, and what tells you it is finished.</p>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>Lecture 1과의 연결.</strong> 지난 강의에서 그린 일곱 단계 지도에서 이 강의는 <strong>Design과 Synthesis 두 칸을 확대</strong>한다. 지난 시간에 이름만 나왔던 netlist, tech library, ECO가 여기서 실제로 무엇인지 밝혀진다. 후반부는 <a href="L01-course-intro.html#s5">Lecture 1의 05절</a>에서 봤던 세 verification 밴드 중 <strong>맨 위 하나</strong>를 열어보는 것이다.</p>
+    <p lang="en"><strong>Where this joins Lecture 1.</strong> On the seven-stage map from last time, this lecture <strong>zooms into the Design and Synthesis cells</strong>. The netlist, the tech library and the ECO, which were only names last time, become concrete here. The second half opens up <strong>the top one</strong> of the three verification bands from <a href="L01-course-intro.html#s5">Lecture 1, §05</a>.</p>
+  </div>
+
+  <h4 lang="ko">오늘 나오는 약어</h4>
+  <h4 lang="en">Abbreviations you will meet today</h4>
+  <p lang="ko">지난 강의보다 훨씬 많다. 전부 한 번에 외우려 하지 말고, <strong>어느 쪽 이야기인지</strong>만 먼저 갈라두면 된다. 알파벳순 전체 목록은 <a href="glossary.html">약어 사전</a>에 있다.</p>
+  <p lang="en">Far more than last time. Do not try to memorise them at once; just sort them by <strong>which half of the lecture they belong to</strong>. The full alphabetical list is in the <a href="glossary.html">glossary</a>.</p>
+  <table>
+    <tr><th lang="ko">설계 쪽</th><th lang="en">Design side</th><th lang="ko">검증 쪽</th><th lang="en">Verification side</th></tr>
+    <tr>
+      <td>HDL, RTL, STA, DVFS, TMR, ECC, DFT, AOI, SVT / HVT / LVT, <code>.lib</code> / <code>.lef</code> / <code>.gds</code> / <code>.db</code></td>
+      <td>DUT, BFM, VIP, LRM, TLM, BDD / ROBDD, SAT, CNF / POS, CTL / LTL, UVM / OVM / VMM, DPI</td>
+    </tr>
+  </table>
+  <p lang="ko">이 중 <strong>DUT, RTL, STA, UVM 넷</strong>이 학기 내내 가장 자주 나온다. 나머지는 오늘 한 번 보고 지나가도 된다.</p>
+  <p lang="en">Of these, <strong>DUT, RTL, STA and UVM</strong> are the four you will see all semester. The rest can be met once today and left alone.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 01 -->
+<section id="s1">
+  <div class="sec-head" data-slide="5"><span class="sec-num">01</span><h2 lang="ko">추상화 수준</h2><h2 lang="en">Levels of abstraction</h2></div>
+  <p class="sec-sub" lang="ko">같은 덧셈기를 네 가지 높이에서 쓸 수 있다. 어느 높이에서 쓰느냐가 곧 무엇을 자동화에 맡기느냐다.</p>
+  <p class="sec-sub" lang="en">The same adder can be written at four heights, and the height you pick decides how much you hand to the tools.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 320" role="img" aria-label="Functional, Behavioral, Structural, Physical 네 추상화 수준과 각 수준의 코드 예시">
+      <defs>
+        <marker id="g1-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <text class="svglab" x="200" y="16" text-anchor="middle" style="fill:var(--ink);font-weight:700">Levels of Abstraction</text>
+
+      <!-- Functional -->
+      <rect x="60" y="26" width="280" height="30" rx="6" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.5"/>
+      <text class="svgtxt" x="200" y="46" text-anchor="middle" style="font-size:13.5px;font-weight:650">Functional</text>
+      <text class="svglab" x="60" y="72" style="font-size:10px">func adder() { result = a + b; }</text>
+      <text class="svglab" x="356" y="40" style="fill:var(--ink2)" lang="ko">C 같은 언어로 쓸 수 있다</text>
+      <text class="svglab" x="356" y="40" style="fill:var(--ink2)" lang="en">you can write this in a language like C</text>
+
+      <!-- Behavioral -->
+      <rect x="60" y="90" width="280" height="30" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="200" y="110" text-anchor="middle" style="font-size:13.5px;font-weight:650">Behavioral</text>
+      <text class="svglab" x="60" y="136" style="font-size:10px">module adder(a,b,enable,clk,result)</text>
+      <text class="svglab" x="60" y="150" style="font-size:10px">{ if (enable and clk) result = a + b; }</text>
+
+      <!-- Structural -->
+      <rect x="60" y="168" width="280" height="30" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="200" y="188" text-anchor="middle" style="font-size:13.5px;font-weight:650">Structural</text>
+      <text class="svglab" x="60" y="214" style="font-size:10px">module adder(a,b,enable,clk,result)</text>
+      <text class="svglab" x="60" y="228" style="font-size:10px">{ and_gate g(...); or_gate h(...); }</text>
+
+      <!-- Physical -->
+      <rect x="60" y="246" width="280" height="30" rx="6" fill="rgba(var(--brown-rgb),.16)" stroke="var(--brown)" stroke-width="1.5"/>
+      <text class="svgtxt" x="200" y="266" text-anchor="middle" style="font-size:13.5px;font-weight:650">Physical</text>
+      <text class="svglab" x="356" y="266" style="fill:var(--ink2)" lang="ko">회로 또는 layout 수준</text>
+      <text class="svglab" x="356" y="266" style="fill:var(--ink2)" lang="en">circuit or layout level</text>
+
+      <!-- Verilog 범위 -->
+      <path d="M348 90 h10 v108 h-10" fill="none" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svglab" x="366" y="130" style="fill:var(--blue);font-weight:700" lang="ko">Verilog로 이 범위를</text>
+      <text class="svglab" x="366" y="146" style="fill:var(--blue);font-weight:700" lang="ko">전부 기술할 수 있다</text>
+      <text class="svglab" x="366" y="130" style="fill:var(--blue);font-weight:700" lang="en">Verilog can describe</text>
+      <text class="svglab" x="366" y="146" style="fill:var(--blue);font-weight:700" lang="en">every one of these</text>
+
+      <!-- RTL 위치 -->
+      <rect x="14" y="122" width="34" height="44" rx="6" fill="rgba(var(--violet-rgb),.2)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="31" y="149" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--violet)">RTL</text>
+      <line x1="48" y1="132" x2="58" y2="118" stroke="var(--violet)" stroke-width="1.3"/>
+      <line x1="48" y1="156" x2="58" y2="170" stroke="var(--violet)" stroke-width="1.3"/>
+
+      <!-- 아래 요약 -->
+      <line x1="60" y1="294" x2="640" y2="294" stroke="var(--rule)" stroke-width="1"/>
+      <text class="svglab" x="60" y="312" lang="ko">위로 갈수록: 합성이 안 될 만큼 추상적</text>
+      <text class="svglab" x="60" y="312" lang="en">higher up: too abstract to synthesise</text>
+      <text class="svglab" x="640" y="312" text-anchor="end" lang="ko">아래로 갈수록: 손으로 쓰기엔 너무 지루함</text>
+      <text class="svglab" x="640" y="312" text-anchor="end" lang="en">further down: too tedious to write by hand</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 5쪽. <strong>RTL은 Behavioral과 Structural 사이에 있다.</strong> 위쪽은 합성이 안 될 수 있고, 아래쪽은 사람이 손으로 쓰기엔 너무 지루해서 합성 도구가 만들어준다. RTL은 그 사이의 <strong>실용적인 타협점</strong>이다. 슬라이드가 마지막 줄에 "이 용어들은 전부 느슨하게 정의돼 있다"고 못 박아뒀다.</figcaption>
+    <figcaption lang="en">Slide 5. <strong>RTL sits between behavioral and structural.</strong> Above it, things may not synthesise; below it, nobody writes by hand and synthesis tools generate it instead. RTL is the <strong>practical compromise</strong> in between. The slide closes by stating flatly that all these terms are loosely defined.</figcaption>
+  </figure>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · behavioral / structural</span><span lang="en">Unpacking the jargon · behavioral and structural</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>behavioral</td><td>"무슨 일이 일어나야 하는가"를 적는다. <code>result = a + b</code> 처럼. 부품 목록이 없다.</td></tr>
+        <tr><td>structural</td><td>"어떤 부품이 어떻게 연결되는가"를 적는다. <code>and_gate g(...)</code> 처럼 인스턴스를 나열한다.</td></tr>
+        <tr><td>구별 기준</td><td><strong>모듈 인스턴스를 나열하고 있으면 structural, 동작을 서술하고 있으면 behavioral.</strong></td></tr>
+        <tr><td>왜 RTL이 사이인가</td><td>RTL은 <code>always_ff</code> 안에서 동작을 서술(behavioral)하면서도, 어느 register에 언제 들어가는지를 못 박아 구조를 사실상 결정한다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>이건 <strong>언어의 구분이 아니다.</strong> 같은 Verilog 파일 안에 behavioral 블록과 structural 인스턴스가 섞여 있을 수 있다. 실제 설계는 대개 섞여 있다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>behavioral</td><td>Writes down what should happen, as in <code>result = a + b</code>. No parts list.</td></tr>
+        <tr><td>structural</td><td>Writes down which parts connect to which, listing instances such as <code>and_gate g(...)</code>.</td></tr>
+        <tr><td>The test</td><td><strong>Listing module instances means structural; describing behaviour means behavioral.</strong></td></tr>
+        <tr><td>Why RTL is in between</td><td>RTL describes behaviour inside an <code>always_ff</code>, yet by pinning down which register gets written and when, it effectively fixes the structure.</td></tr>
+        <tr><td>Easy to misread</td><td>This is <strong>not a distinction between languages.</strong> One Verilog file can hold behavioral blocks and structural instances side by side, and real designs usually do.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정: "합성 가능"은 문법이 아니라 관행이다</span><span class="tag" lang="en">Trap: "synthesisable" is a convention, not grammar</span>
+    <p lang="ko">슬라이드가 "behavioral은 합성이 안 될 수 있다"고 적었는데, 이게 <strong>문법 오류가 난다는 뜻이 아니다.</strong> 시뮬레이터는 멀쩡히 돌린다. 합성 도구가 그 구문을 게이트로 바꾸는 법을 모를 뿐이다.</p>
+    <p lang="ko">그래서 오류가 늦게 터진다. <strong>시뮬레이션은 통과하는데 합성에서 처음 걸린다.</strong> <a href="#s8">08절 lint</a>가 존재하는 이유가 이것이다. 합성까지 가기 전에 미리 잡으려는 것이다.</p>
+    <p lang="en">The slide says behavioral code may not synthesise, and that <strong>does not mean it is a syntax error.</strong> The simulator runs it happily. The synthesis tool simply does not know how to turn that construct into gates.</p>
+    <p lang="en">Which means the error surfaces late: <strong>simulation passes and synthesis is the first thing to complain.</strong> That is exactly why <a href="#s8">§08, linting</a> exists, to catch it before you get that far.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 02 -->
+<section id="s2">
+  <div class="sec-head" data-slide="6"><span class="sec-num">02</span><h2 lang="ko">Data Path와 Control Path</h2><h2 lang="en">Data path and control path</h2></div>
+  <p class="sec-sub" lang="ko">어떤 디지털 시스템이든 이 둘로 쪼개서 본다. 이 습관 하나가 나중에 verification plan을 쓸 때 그대로 쓰인다.</p>
+  <p class="sec-sub" lang="en">Any digital system splits into these two, and that habit carries straight over into writing a verification plan later.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">일반적인 관점</span><span class="tag" lang="en">The general view</span>
+    <ul lang="ko">
+      <li><strong>Data Path</strong> (계산부): 값이 실제로 흘러가며 변형되는 곳. 산술 회로, memory와 storage가 여기 있다.</li>
+      <li><strong>Control Path</strong> (제어부): 언제 무엇을 할지 정하는 곳. state machine이 여기 있다.</li>
+    </ul>
+    <ul lang="en">
+      <li>The <strong>data path</strong>, or computation unit, is where values actually flow and get transformed. Arithmetic circuits, memory and storage live here.</li>
+      <li>The <strong>control path</strong>, or controller, decides when to do what. State machines live here.</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>왜 이 구분이 실무에서 쓸모 있나.</strong> 버그의 성격이 다르기 때문이다. Data path 버그는 <em>값이 틀린다</em>. Control path 버그는 <em>타이밍이나 순서가 틀린다</em>. 그리고 control path 버그가 훨씬 잡기 어렵다. 특정 순서로 사건이 겹쳐야만 드러나기 때문이다.</p>
+    <p lang="ko">이게 <a href="#s16">16절</a>의 랜덤 자극이 왜 필요한지로 이어진다. 값을 다양하게 넣는 것만으로는 control path를 흔들 수 없고, <strong>타이밍과 순서도 같이 흔들어야</strong> 한다.</p>
+    <p lang="en"><strong>Why the split earns its keep.</strong> The bugs differ in kind. A data path bug produces <em>a wrong value</em>. A control path bug produces <em>wrong timing or wrong ordering</em>, and those are far harder to catch because they only appear when events overlap in one particular way.</p>
+    <p lang="en">That leads straight into why <a href="#s16">§16</a> needs random stimulus. Varying values alone will not shake the control path; <strong>you have to randomise timing and ordering too.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 03 -->
+<section id="s3">
+  <div class="sec-head" data-slide="7"><span class="sec-num">03</span><h2 lang="ko">설계자의 하루</h2><h2 lang="en">Life of a design engineer</h2></div>
+  <p class="sec-sub" lang="ko">RTL을 쓰는 시간은 이 여덟 칸 중 한 칸이다. 나머지는 읽고, 계획하고, 남과 맞추는 일이다.</p>
+  <p class="sec-sub" lang="en">Writing RTL is one box out of eight. The rest is reading, planning and reconciling with other people.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="설계 엔지니어의 작업 순서 여덟 단계">
+      <defs>
+        <marker id="g2-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <rect x="16" y="20" width="150" height="46" rx="7" fill="rgba(var(--blue-rgb),.10)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svgtxt" x="91" y="41" text-anchor="middle" style="font-size:11.5px" lang="ko">사양 문서 읽기</text>
+      <text class="svgtxt" x="91" y="41" text-anchor="middle" style="font-size:11.5px" lang="en">Reading</text>
+      <text class="svgtxt" x="91" y="57" text-anchor="middle" style="font-size:11.5px" lang="en">specifications</text>
+      <text class="svglab" x="91" y="57" text-anchor="middle" style="font-size:9.5px" lang="ko">specifications</text>
+
+      <rect x="16" y="88" width="150" height="46" rx="7" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svgtxt" x="91" y="109" text-anchor="middle" style="font-size:11.5px" lang="ko">설계 계획 세우기</text>
+      <text class="svgtxt" x="91" y="109" text-anchor="middle" style="font-size:11.5px" lang="en">Chart a design plan</text>
+      <text class="svglab" x="91" y="125" text-anchor="middle" style="font-size:9.5px">microarchitecture</text>
+
+      <rect x="16" y="156" width="150" height="46" rx="7" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="2"/>
+      <text class="svgtxt" x="91" y="184" text-anchor="middle" style="font-size:12px;font-weight:700">Coding RTL</text>
+
+      <rect x="192" y="156" width="150" height="46" rx="7" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.3"/>
+      <text class="svgtxt" x="267" y="177" text-anchor="middle" style="font-size:11.5px" lang="ko">간단한 testbench로</text>
+      <text class="svgtxt" x="267" y="193" text-anchor="middle" style="font-size:11.5px" lang="ko">sanity 확인</text>
+      <text class="svgtxt" x="267" y="177" text-anchor="middle" style="font-size:11.5px" lang="en">Sanity testing with</text>
+      <text class="svgtxt" x="267" y="193" text-anchor="middle" style="font-size:11.5px" lang="en">simple testbenches</text>
+
+      <rect x="192" y="88" width="150" height="46" rx="7" fill="rgba(var(--pink-rgb),.16)" stroke="var(--pink)" stroke-width="1.3"/>
+      <text class="svgtxt" x="267" y="109" text-anchor="middle" style="font-size:11.5px" lang="ko">검증 엔지니어와</text>
+      <text class="svgtxt" x="267" y="125" text-anchor="middle" style="font-size:11.5px" lang="ko">주고받기</text>
+      <text class="svgtxt" x="267" y="109" text-anchor="middle" style="font-size:11.5px" lang="en">Iterate with</text>
+      <text class="svgtxt" x="267" y="125" text-anchor="middle" style="font-size:11.5px" lang="en">verification engineers</text>
+
+      <rect x="192" y="20" width="150" height="46" rx="7" fill="rgba(var(--violet-rgb),.14)" stroke="var(--violet)" stroke-width="1.3"/>
+      <text class="svgtxt" x="267" y="48" text-anchor="middle" style="font-size:12px">Synthesize</text>
+
+      <rect x="368" y="20" width="150" height="46" rx="7" fill="rgba(var(--violet-rgb),.14)" stroke="var(--violet)" stroke-width="1.3"/>
+      <text class="svgtxt" x="443" y="41" text-anchor="middle" style="font-size:11.5px" lang="ko">STA 엔지니어와</text>
+      <text class="svgtxt" x="443" y="57" text-anchor="middle" style="font-size:11.5px" lang="ko">주고받기</text>
+      <text class="svgtxt" x="443" y="41" text-anchor="middle" style="font-size:11.5px" lang="en">Iterate with</text>
+      <text class="svgtxt" x="443" y="57" text-anchor="middle" style="font-size:11.5px" lang="en">STA engineers</text>
+
+      <rect x="368" y="88" width="150" height="46" rx="7" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)" stroke-width="1.3"/>
+      <text class="svgtxt" x="443" y="116" text-anchor="middle" style="font-size:12px">ECOs</text>
+
+      <!-- 흐름 -->
+      <line x1="91" y1="68" x2="91" y2="84" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g2-ar)"/>
+      <line x1="91" y1="136" x2="91" y2="152" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g2-ar)"/>
+      <line x1="168" y1="179" x2="188" y2="179" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g2-ar)"/>
+      <line x1="267" y1="154" x2="267" y2="138" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g2-ar)"/>
+      <line x1="267" y1="86" x2="267" y2="70" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g2-ar)"/>
+      <line x1="344" y1="43" x2="364" y2="43" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g2-ar)"/>
+      <line x1="443" y1="68" x2="443" y2="84" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g2-ar)"/>
+
+      <text class="svglab" x="540" y="112" style="fill:var(--ink2)" lang="ko">여덟 칸 중 실제로 RTL을</text>
+      <text class="svglab" x="540" y="128" style="fill:var(--ink2)" lang="ko">쓰는 건 한 칸뿐이다</text>
+      <text class="svglab" x="540" y="112" style="fill:var(--ink2)" lang="en">one box out of eight</text>
+      <text class="svglab" x="540" y="128" style="fill:var(--ink2)" lang="en">is actually writing RTL</text>
+
+      <text class="svglab" x="16" y="232" lang="ko">파랑 = 설계 · 분홍 = 검증과 맞추기 · 보라 = 도구 · 갈색 = 물리 쪽 여파</text>
+      <text class="svglab" x="16" y="232" lang="en">blue is design, pink is syncing with verification, violet is tooling, brown is physical fallout</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 7쪽. 눈에 띄는 건 <strong>여덟 칸 중 둘이 "다른 팀과 주고받기"</strong>라는 점이다. 설계는 혼자 하는 일이 아니고, 특히 검증 엔지니어와의 왕복이 정식 단계로 잡혀 있다. <a href="#s20">20절</a>의 검증 엔지니어 쪽 그림과 나란히 놓고 보면 두 직무가 서로의 거울이라는 게 보인다.</figcaption>
+    <figcaption lang="en">Slide 7. What stands out is that <strong>two of the eight boxes are "iterate with another team".</strong> Design is not solitary work, and the round trip with verification is a named stage. Set it beside the verification engineer's version in <a href="#s20">§20</a> and the two roles turn out to mirror each other.</figcaption>
+  </figure>
+
+  <div class="callout">
+    <p lang="ko"><strong>발표자 노트에 이런 말이 적혀 있다.</strong> "하드웨어는 병렬이다. 컴퓨터는 프로그램을 순차적으로 실행한다. 시뮬레이터는 <strong>순차적인 컴퓨터 위에서 병렬 하드웨어를 흉내</strong>내야 한다. 그래서 병렬성을 모델링할 방법이 필요하다." 이게 <a href="#s14">14절</a>의 simulated time과 wall clock time 구분으로 이어진다.</p>
+    <p lang="en"><strong>The speaker notes carry this line:</strong> hardware is parallel, computers run programs sequentially, and a simulator has to <strong>imitate parallel hardware on a sequential machine</strong>, so it needs a way to model that parallelism. It leads directly into the simulated time versus wall clock time distinction in <a href="#s14">§14</a>.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 04 -->
+<section id="s4">
+  <div class="sec-head" data-slide="8-10"><span class="sec-num">04</span><h2>Synthesis</h2></div>
+  <p class="sec-sub" lang="ko">Lecture 1에서 이름만 나왔던 칸이다. 실제로는 <strong>번역기</strong>다. 당신이 쓴 <code>+</code>를 foundry가 만들 수 있는 부품으로 바꾼다.</p>
+  <p class="sec-sub" lang="en">The cell that was only a name in Lecture 1. It is really <strong>a translator</strong>: it turns the <code>+</code> you wrote into parts the foundry can actually manufacture.</p>
+
+  <div class="def">
+    <span class="tag">Synthesis</span>
+    <p lang="ko">상위 수준 HDL 코드를 <strong>netlist</strong>로 바꾸는 것. netlist는 wire로 연결된 building block들의 목록이다.</p>
+    <ul lang="ko">
+      <li>building block은 <strong>foundry가 준다.</strong> 이 묶음을 <strong>tech library</strong> 또는 <strong>standard cell library</strong>라고 부른다. 그 공장이 실제로 만들 수 있는 cell들이다.</li>
+      <li>보통 gate와 flip-flop이다. 이걸 <strong>standard cell</strong>이라고 한다.</li>
+      <li>예: HDL의 <code>+</code> 연산자를 덧셈기를 구성하는 게이트들로 바꾼다.</li>
+      <li>흔한 도구: Synopsys Design Compiler, Cadence Genus</li>
+    </ul>
+    <p lang="en">Turning higher level HDL into a <strong>netlist</strong>, a list of building blocks joined by wires.</p>
+    <ul lang="en">
+      <li>The building blocks <strong>come from the foundry.</strong> The bundle is called a <strong>tech library</strong> or <strong>standard cell library</strong>, and it holds the cells that particular fab can actually make.</li>
+      <li>They are usually gates and flip-flops, known as <strong>standard cells</strong>.</li>
+      <li>For example, a <code>+</code> operator in the HDL becomes the gates that make up an adder.</li>
+      <li>Common tools: Synopsys Design Compiler, Cadence Genus.</li>
+    </ul>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 240" role="img" aria-label="Synthesis의 세 입력과 두 출력">
+      <defs>
+        <marker id="g3-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <!-- 입력 -->
+      <rect x="16" y="26" width="170" height="38" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgtxt" x="101" y="50" text-anchor="middle" style="font-size:12.5px">RTL Design</text>
+      <rect x="16" y="84" width="170" height="38" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgtxt" x="101" y="108" text-anchor="middle" style="font-size:12.5px">Constraints</text>
+      <rect x="16" y="142" width="170" height="38" rx="6" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svgtxt" x="101" y="166" text-anchor="middle" style="font-size:12.5px">Tech Library</text>
+      <text class="svglab" x="101" y="200" text-anchor="middle" style="font-size:10px" lang="ko">foundry가 준다</text>
+      <text class="svglab" x="101" y="200" text-anchor="middle" style="font-size:10px" lang="en">comes from the foundry</text>
+
+      <line x1="190" y1="45" x2="256" y2="90" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+      <line x1="190" y1="103" x2="256" y2="103" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+      <line x1="190" y1="161" x2="256" y2="116" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+
+      <!-- 도구 -->
+      <rect x="262" y="72" width="164" height="62" rx="9" fill="rgba(var(--violet-rgb),.18)" stroke="var(--violet)" stroke-width="2.2"/>
+      <text class="svgtxt" x="344" y="100" text-anchor="middle" style="font-size:15px;font-weight:700">Synthesis</text>
+      <text class="svglab" x="344" y="120" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="ko">도구가 하는 일</text>
+      <text class="svglab" x="344" y="120" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="en">the tool does this</text>
+
+      <line x1="430" y1="90" x2="496" y2="60" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+      <line x1="430" y1="116" x2="496" y2="146" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+
+      <!-- 출력 -->
+      <rect x="502" y="34" width="182" height="38" rx="6" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgtxt" x="593" y="58" text-anchor="middle" style="font-size:12.5px;font-weight:650">Netlist</text>
+      <rect x="502" y="128" width="182" height="52" rx="6" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgtxt" x="593" y="150" text-anchor="middle" style="font-size:11.5px">Area, Timing, Power</text>
+      <text class="svgtxt" x="593" y="167" text-anchor="middle" style="font-size:11.5px">Reports</text>
+
+      <text class="svglab" x="593" y="200" text-anchor="middle" style="font-size:10px" lang="ko">"됐다"가 아니라 "이만큼 들었다"</text>
+      <text class="svglab" x="593" y="200" text-anchor="middle" style="font-size:10px" lang="en">not "it worked" but "here is what it cost"</text>
+      <text class="svglab" x="350" y="228" text-anchor="middle" lang="ko">입력이 셋이고 출력이 둘이다. 셋 중 하나만 바뀌어도 결과 netlist가 달라진다.</text>
+      <text class="svglab" x="350" y="228" text-anchor="middle" lang="en">three inputs, two outputs. Change any one input and the netlist comes out different.</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 9쪽. <strong>입력이 셋이라는 게 핵심이다.</strong> 같은 RTL이라도 constraint를 바꾸거나 tech library를 바꾸면 전혀 다른 netlist가 나온다. 그래서 <a href="L01-course-intro.html#s7">Lecture 1에서 본 ECO</a>가 필요했던 것이다. 합성을 다시 돌리면 "그때 그 netlist"가 재현된다는 보장이 없다.</figcaption>
+    <figcaption lang="en">Slide 9. <strong>The point is that there are three inputs.</strong> The same RTL with different constraints, or a different tech library, produces a completely different netlist. That is precisely why the <a href="L01-course-intro.html#s7">ECO from Lecture 1</a> exists: re-running synthesis gives no guarantee of reproducing the netlist you had.</figcaption>
+  </figure>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · standard cell</span><span lang="en">Unpacking the jargon · standard cell</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>한 줄</td><td>foundry가 미리 만들어 두고 특성까지 재놓은 <strong>부품</strong>. AND 게이트 하나, flip-flop 하나가 각각 하나의 cell이다.</td></tr>
+        <tr><td>왜 "standard"</td><td>높이가 전부 같게 설계돼 있어서 <strong>줄 세워 늘어놓을 수 있기</strong> 때문이다. 그래야 place and route가 자동화된다.</td></tr>
+        <tr><td>누가 만드나</td><td>back-end의 library 엔지니어. 트랜지스터를 직접 배치하고, 특성을 측정하고, 실제 test chip으로 대조한다.</td></tr>
+        <tr><td>왜 설계자가 알아야 하나</td><td>당신의 RTL은 <strong>이 목록에 있는 것으로만</strong> 만들어진다. 목록에 없는 형태를 상상해서 쓰면 도구가 비싼 조합으로 흉내 낸다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>In one line</td><td>A <strong>part</strong> the foundry has already built and already characterised. One AND gate is a cell, one flip-flop is a cell.</td></tr>
+        <tr><td>Why "standard"</td><td>They are all designed to the same height so they can be <strong>laid out in rows</strong>, which is what makes place and route automatable.</td></tr>
+        <tr><td>Who makes them</td><td>Back end library engineers, who lay out the transistors, measure the characteristics, and check them against real test chips.</td></tr>
+        <tr><td>Why a designer cares</td><td>Your RTL can only be built <strong>out of what is on that list.</strong> Imagine a shape that is not on it and the tool will imitate it with an expensive combination.</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 05 -->
+<section id="s5">
+  <div class="sec-head" data-slide="11-12"><span class="sec-num">05</span><h2 lang="ko">Static Timing Analysis</h2><h2 lang="en">Static timing analysis</h2></div>
+  <p class="sec-sub" lang="ko">"입력 벡터 없이" 타이밍을 검증하는 방법. 슬라이드가 "slack이 뭐냐"고 직접 물어보니 그것부터 답한다.</p>
+  <p class="sec-sub" lang="en">Checking timing with no input vectors at all. The slide asks outright what slack is, so that gets answered first.</p>
+
+  <div class="def">
+    <span class="tag">STA</span>
+    <p lang="ko"><strong>모든 timing path를 분석해서</strong> 디지털 회로의 타이밍 성능을 검증하는 방법. <strong>"static"인 이유는 입력 벡터가 관여하지 않기 때문이다.</strong></p>
+    <p lang="en">A way of validating a circuit's timing performance <strong>by analysing every timing path.</strong> It is <strong>static because no input vectors are involved.</strong></p>
+    <table>
+      <tr><th lang="ko">timing path 네 종류</th><th lang="en">Four kinds of timing path</th><th lang="ko">뜻</th><th lang="en">Meaning</th></tr>
+      <tr><td class="hd">PI to Flop</td><td lang="ko">칩 입력 핀에서 첫 flip-flop까지</td><td lang="en">from a primary input pin to the first flip-flop</td></tr>
+      <tr><td class="hd">Flop to Flop</td><td lang="ko">flip-flop에서 flip-flop까지. 클럭 주파수를 결정하는 것이 대개 이것이다</td><td lang="en">flip-flop to flip-flop, usually the one that sets the clock frequency</td></tr>
+      <tr><td class="hd">Flop to PO</td><td lang="ko">마지막 flip-flop에서 칩 출력 핀까지</td><td lang="en">from the last flip-flop to a primary output pin</td></tr>
+      <tr><td class="hd">PI to PO</td><td lang="ko">flip-flop을 하나도 안 거치고 통과하는 조합 경로</td><td lang="en">a combinational path straight through with no flip-flop at all</td></tr>
+    </table>
+  </div>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · slack (슬라이드가 물어본 것)</span><span lang="en">Unpacking the jargon · slack, the question on the slide</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>한 줄</td><td><strong>여유 시간.</strong> 신호가 도착해야 하는 시각에서 실제로 도착한 시각을 뺀 값이다.</td></tr>
+        <tr><td>부호</td><td><strong>양수면 통과</strong>(제때 왔다), <strong>음수면 위반</strong>(늦었다). 음수 slack을 timing violation이라고 부른다.</td></tr>
+        <tr><td>어디에 쓰나</td><td>합성과 STA 리포트의 핵심 숫자다. "worst negative slack이 얼마냐"가 곧 "이 설계가 얼마나 안 되고 있냐"다.</td></tr>
+        <tr><td>왜 static인가</td><td>실제 값을 흘려보지 않고 <strong>경로의 지연만 더해서</strong> 판단하기 때문이다. 그래서 빠르고 빠짐없이 볼 수 있다. 대신 그 경로가 실제로 쓰이는지는 모른다.</td></tr>
+        <tr><td>연결</td><td>그래서 <strong>false path</strong>와 <strong>multicycle path</strong>를 사람이 알려줘야 한다. 다음 항목의 timing constraint가 그 일을 한다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>In one line</td><td><strong>Spare time.</strong> The time a signal was required by, minus the time it actually arrived.</td></tr>
+        <tr><td>Sign</td><td><strong>Positive means it passes</strong>, it got there in time. <strong>Negative means a violation</strong>, it was late. Negative slack is what people call a timing violation.</td></tr>
+        <tr><td>Where it shows up</td><td>It is the headline number in synthesis and STA reports. "What is the worst negative slack" is the same question as "how badly is this design failing".</td></tr>
+        <tr><td>Why static</td><td>Because it <strong>adds up path delays</strong> rather than pushing real values through, which makes it fast and exhaustive. The cost is that it does not know whether the path is ever used.</td></tr>
+        <tr><td>The link</td><td>Which is why a human has to declare <strong>false paths</strong> and <strong>multicycle paths</strong>. That is the job of the timing constraints below.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3 lang="ko">두 가지 타이밍 규칙</h3>
+  <h3 lang="en">The two timing rules</h3>
+  <p lang="ko">슬라이드가 규칙을 두 줄로 적었는데, 언뜻 보면 같은 말을 반복한 것 같다. 아니다. <strong>정반대 방향의 두 실패를 막는 규칙이다.</strong></p>
+  <p lang="en">The slide states the rules in two lines that look at first like the same sentence twice. They are not. <strong>They block two failures pointing in opposite directions.</strong></p>
+  <table>
+    <tr><th lang="ko">슬라이드의 문장</th><th lang="en">What the slide says</th><th lang="ko">막으려는 실패</th><th lang="en">What it prevents</th></tr>
+    <tr>
+      <td lang="ko">FF1이 CLK1의 E1에서 내보낸 데이터는 FF2가 CLK2의 <strong>E2에서</strong> 잡아야 한다</td>
+      <td lang="en">Data launched by FF1 on E1 of CLK1 <strong>should be captured</strong> by FF2 on E2 of CLK2</td>
+      <td lang="ko"><strong>너무 늦게</strong> 도착하는 것. 경로가 길면 다음 엣지 전에 못 온다.</td>
+      <td lang="en">Arriving <strong>too late</strong>: if the path is long it does not make the next edge.</td>
+    </tr>
+    <tr>
+      <td lang="ko">FF1이 CLK1의 E1에서 내보낸 데이터는 FF2가 CLK2의 <strong>E1에서 잡으면 안 된다</strong></td>
+      <td lang="en">Data launched by FF1 on E1 of CLK1 <strong>should not be captured</strong> by FF2 on E1 of CLK2</td>
+      <td lang="ko"><strong>너무 빨리</strong> 도착하는 것. 경로가 짧으면 같은 엣지에 실려서 한 칸을 건너뛴다.</td>
+      <td lang="en">Arriving <strong>too early</strong>: a short path rides the same edge and skips a stage.</td>
+    </tr>
+  </table>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정: 빨라서 나는 버그가 있다</span><span class="tag" lang="en">Trap: being fast can be the bug</span>
+    <p lang="ko">두 번째 규칙이 처음 보면 이상하다. 신호가 빨리 오면 좋은 것 아닌가? <strong>아니다.</strong> flip-flop은 클럭 엣지 <em>직후</em>에도 입력이 잠깐 안정돼 있어야 한다. 앞단의 새 값이 그 창 안에 들이닥치면, 받는 쪽이 <strong>이번 엣지에 이미 그 값을 잡아버린다.</strong> 한 클럭이 통째로 사라진다.</p>
+    <p lang="ko">이게 실무에서 왜 무서우냐면, <strong>클럭을 느리게 해도 안 고쳐진다.</strong> 늦어서 나는 문제는 주파수를 낮추면 사라지지만, 빨라서 나는 문제는 주파수와 무관하다. 그래서 이건 실리콘이 나온 뒤에 발견되면 대개 재제작이다.</p>
+    <p lang="en">The second rule looks wrong at first. Surely arriving early is good? <strong>No.</strong> A flip-flop needs its input to stay steady for a moment <em>after</em> the clock edge too. If the new value from the previous stage barges into that window, the receiving flop <strong>captures it on this edge instead</strong>, and a whole clock cycle disappears.</p>
+    <p lang="en">What makes this frightening in practice is that <strong>slowing the clock does not fix it.</strong> Problems from being late go away when you drop the frequency; problems from being early do not care about frequency at all. So finding one after silicon usually means a respin.</p>
+  </div>
+
+  <div class="def">
+    <span class="tag" lang="ko">Timing Constraints</span><span class="tag" lang="en">Timing constraints</span>
+    <p lang="ko">요구되는 타이밍 동작을 명시한 것. <strong>합성 도구의 입력이다.</strong> 즉 사람이 써서 도구에게 넘겨주는 것이지 도구가 알아서 아는 게 아니다.</p>
+    <ul lang="ko">
+      <li><strong>Clock period</strong> — 목표 주파수</li>
+      <li><strong>Input과 output delay</strong> — 칩 바깥에서 얼마나 걸려서 오고 가는지</li>
+      <li><strong>Timing exception</strong> — false path(실제로는 안 쓰이는 경로), multicycle path(한 클럭 안에 안 끝나도 되는 경로)</li>
+      <li><strong>Clock uncertainty</strong> — clock skew 같은 것</li>
+    </ul>
+    <p lang="en">A statement of the timing behaviour that is required. <strong>They are an input to the synthesis tool</strong>, which is to say a human writes them and hands them over. The tool does not work them out on its own.</p>
+    <ul lang="en">
+      <li><strong>Clock period</strong>, the target frequency.</li>
+      <li><strong>Input and output delays</strong>, how long things take outside the chip.</li>
+      <li><strong>Timing exceptions</strong>: false paths that are never really used, and multicycle paths that are allowed more than one clock.</li>
+      <li><strong>Clock uncertainty</strong>, such as clock skew.</li>
+    </ul>
+  </div>
+
+  <div class="ex">
+    <span class="tag" lang="ko">현장 감각</span><span class="tag" lang="en">On the job</span>
+    <p lang="ko">합성 리포트에 worst negative slack이 <code>-0.4 ns</code>로 찍혔다. 경로를 따라가 보니 <strong>configuration register에서 나와 데이터 경로 깊숙이 들어가는 길</strong>인데, 그 register는 칩이 부팅될 때 한 번 쓰고 그 뒤로는 안 바뀐다. 무엇을 해야 하나?</p>
+    <p lang="en">The synthesis report shows a worst negative slack of <code>-0.4 ns</code>. Following the path, it runs <strong>from a configuration register deep into the data path</strong>, and that register is written once at boot and never changes afterwards. What now?</p>
+    <details>
+      <summary><span lang="ko">생각해본 뒤 펼치기</span><span lang="en">Think first, then open</span></summary>
+      <div class="body">
+        <p lang="ko">회로를 고치기 전에 <strong>constraint를 의심한다.</strong> 부팅 때 한 번 쓰고 안 바뀌는 신호라면, 그 경로가 <strong>한 클럭 안에 끝나야 할 이유가 없다.</strong> multicycle path로 선언하면 STA가 여러 클럭을 허용하고 slack이 양수가 된다.</p>
+        <p lang="ko">이게 STA가 "static"인 것의 대가다. <strong>도구는 그 경로가 실제로 언제 쓰이는지 모른다.</strong> 모든 경로를 똑같이 "매 클럭 동작한다"고 가정하고 잰다. 그 가정이 틀린 곳을 사람이 알려줘야 한다.</p>
+        <p lang="ko"><strong>단, 여기가 위험한 지점이다.</strong> multicycle path나 false path를 잘못 선언하면 <strong>진짜 위반을 도구가 조용히 무시한다.</strong> 리포트는 깨끗해지는데 실물이 안 돈다. 그래서 timing exception은 리뷰 대상이고, 왜 그렇게 선언했는지를 근거와 함께 남긴다.</p>
+        <p lang="en">Before touching the circuit, <strong>suspect the constraints.</strong> A signal written once at boot and then left alone has <strong>no reason to settle within one clock.</strong> Declare it a multicycle path, STA allows several clocks, and the slack goes positive.</p>
+        <p lang="en">This is the price of STA being static. <strong>The tool has no idea when a path is actually exercised</strong>; it measures every path as though it runs every clock. Where that assumption is wrong, a human has to say so.</p>
+        <p lang="en"><strong>And this is where it gets dangerous.</strong> Declare a multicycle or false path wrongly and <strong>the tool quietly ignores a real violation.</strong> The report goes clean and the physical part does not work. Timing exceptions therefore get reviewed, and the reasoning behind each one gets written down.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 06 -->
+<section id="s6">
+  <div class="sec-head" data-slide="13-14"><span class="sec-num">06</span><h2 lang="ko">Technology Library</h2><h2 lang="en">Technology library</h2></div>
+  <p class="sec-sub" lang="ko">04절 그림의 세 번째 입력. foundry가 "우리 공장은 이런 부품을 이 정도 성능으로 만들 수 있다"고 건네는 카탈로그다.</p>
+  <p class="sec-sub" lang="en">The third input in the §04 picture. It is the catalogue a foundry hands over saying "these are the parts we can make, and this is how they perform".</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">무엇이 들어 있나</span><span class="tag" lang="en">What is in it</span>
+    <p lang="ko">특정 반도체 공정에서 <strong>미리 설계되고 미리 특성이 측정된</strong> cell들의 모음. standard cell library라고도 한다.</p>
+    <p lang="en">A collection of cells that have been <strong>pre-designed and pre-characterised</strong> for one semiconductor process. Also called a standard cell library.</p>
+    <table>
+      <tr><th lang="ko">cell 종류</th><th lang="en">Kinds of cell</th><th lang="ko">예</th><th lang="en">Examples</th></tr>
+      <tr><td class="hd">Logic Cells</td><td>AND, OR, NAND, NOR, XOR, INV, Mux, AOI</td></tr>
+      <tr><td class="hd">Sequential Cells</td><td lang="ko">여러 종류의 flip-flop, latch</td><td lang="en">flip-flops of various kinds, latches</td></tr>
+      <tr><td class="hd">Special Cells</td><td lang="ko">buffer, clock gating cell, tie cell</td><td lang="en">buffers, clock gating cells, tie cells</td></tr>
+    </table>
+    <table>
+      <tr><th lang="ko">데이터 종류</th><th lang="en">Kinds of data</th><th lang="ko">내용</th><th lang="en">Contents</th></tr>
+      <tr><td class="hd" lang="ko">물리 데이터</td><td class="hd" lang="en">Physical</td><td lang="ko">cell 크기, 핀 위치</td><td lang="en">cell dimensions, pin locations</td></tr>
+      <tr><td class="hd" lang="ko">타이밍 데이터</td><td class="hd" lang="en">Timing</td><td lang="ko">지연, setup/hold 시간, slew rate</td><td lang="en">delay, setup and hold times, slew rates</td></tr>
+      <tr><td class="hd" lang="ko">전력 데이터</td><td class="hd" lang="en">Power</td><td lang="ko">동적 전력, 누설 전력</td><td lang="en">dynamic and leakage power</td></tr>
+    </table>
+  </div>
+
+  <h3 lang="ko">파일 확장자 네 개</h3>
+  <h3 lang="en">Four file extensions</h3>
+  <p lang="ko">현장 문서에서 그냥 확장자로만 부른다. "lib 좀 줘"라고 하면 이 얘기다.</p>
+  <p lang="en">People refer to these by extension alone. "Send me the lib" means this.</p>
+  <table>
+    <tr><th lang="ko">형식</th><th lang="en">Format</th><th lang="ko">용도</th><th lang="en">Purpose</th></tr>
+    <tr><td class="hd"><code>.lib</code></td><td lang="ko">타이밍과 전력. synthesis와 STA가 쓴다</td><td lang="en">timing and power, used by synthesis and STA</td></tr>
+    <tr><td class="hd"><code>.lef</code></td><td lang="ko">물리 layout 정보. place and route가 쓴다</td><td lang="en">physical layout information, used by place and route</td></tr>
+    <tr><td class="hd"><code>.gds</code></td><td lang="ko">제조로 넘어가는 최종 layout</td><td lang="en">the final layout that goes to manufacturing</td></tr>
+    <tr><td class="hd"><code>.db</code></td><td lang="ko"><code>.lib</code>의 바이너리 버전. 도구가 빨리 읽으려고 쓴다</td><td lang="en">the binary form of <code>.lib</code>, so tools can read it fast</td></tr>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>library는 사람이 만든다.</strong> 공정마다(40nm, 20nm, 14nm, 7nm…) 트랜지스터를 어떻게 눕힐지 규칙이 다르고, back-end의 <strong>library 엔지니어</strong>가 트랜지스터를 직접 배치하고, 면적과 지연 같은 특성을 뽑아내고, <strong>실제로 만든 test chip으로 그 수치를 대조한 다음</strong> library를 만든다. 즉 <code>.lib</code>의 숫자는 계산값이 아니라 <strong>측정으로 뒷받침된 값</strong>이다.</p>
+    <p lang="en"><strong>Libraries are built by people.</strong> Every process node, 40nm, 20nm, 14nm, 7nm, has its own rules for laying transistors down, and back end <strong>library engineers</strong> place those transistors by hand, extract characteristics such as area and delay, <strong>corroborate the numbers against a manufactured test chip</strong>, and only then publish the library. The numbers in a <code>.lib</code> are not calculated, they are <strong>backed by measurement.</strong></p>
+  </div>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · SVT / HVT / LVT · HP / LP</span><span lang="en">Unpacking the jargon · SVT, HVT, LVT, HP, LP</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>VT</td><td>Threshold Voltage. 트랜지스터가 켜지기 시작하는 문턱 전압.</td></tr>
+        <tr><td>SVT</td><td>Standard VT. 기본형.</td></tr>
+        <tr><td>HVT</td><td>High VT. 문턱이 높아서 <strong>느리지만 누설 전력이 적다.</strong></td></tr>
+        <tr><td>LVT</td><td>Low VT. 문턱이 낮아서 <strong>빠르지만 누설 전력이 많다.</strong></td></tr>
+        <tr><td>HP / LP</td><td>High Performance / Low Power. 같은 축을 다른 이름으로 부른 것.</td></tr>
+        <tr><td>왜 여러 벌인가</td><td>같은 논리 함수의 cell을 <strong>속도와 누설이 다른 여러 버전으로</strong> 준비해두고, 도구가 경로마다 골라 쓴다. 급한 경로에만 LVT를 쓰고 나머지는 HVT로 채우는 식이다. 이게 <a href="#s9">09절</a>의 트레이드오프가 실제로 실행되는 방식이다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>VT</td><td>Threshold voltage, where a transistor starts to turn on.</td></tr>
+        <tr><td>SVT</td><td>Standard VT, the default.</td></tr>
+        <tr><td>HVT</td><td>High VT: a higher threshold, so <strong>slower but with less leakage.</strong></td></tr>
+        <tr><td>LVT</td><td>Low VT: a lower threshold, so <strong>faster but leakier.</strong></td></tr>
+        <tr><td>HP / LP</td><td>High performance and low power, the same axis under different names.</td></tr>
+        <tr><td>Why several versions</td><td>The same logic function is stocked <strong>in variants with different speed and leakage</strong>, and the tool picks per path: LVT only where timing is tight, HVT everywhere else. This is how the trade-off in <a href="#s9">§09</a> actually gets executed.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="trap">
+    <span class="tag" lang="ko">복습 문제 1번의 답이 여기 있다</span><span class="tag" lang="en">This answers review question 1</span>
+    <p lang="ko">슬라이드 59쪽이 <strong>"synthesis 과정에서 technology library의 역할은 무엇인가"</strong>를 묻는다. 답의 뼈대는 이렇다.</p>
+    <ul lang="ko">
+      <li>합성은 RTL을 <strong>부품으로</strong> 바꾸는 일인데, 그 부품 목록을 주는 것이 tech library다. 목록이 없으면 무엇으로 만들지를 정할 수 없다.</li>
+      <li>동시에 <strong>각 부품의 지연·면적·전력 수치</strong>를 주기 때문에, 도구가 여러 후보 중에서 constraint를 만족하는 조합을 고를 수 있다.</li>
+      <li>따라서 tech library는 <strong>"무엇으로 만들 수 있는가"와 "그것이 얼마나 드는가"를 동시에 정의한다.</strong></li>
+    </ul>
+    <p lang="en">Slide 59 asks <strong>what role a technology library plays in synthesis.</strong> The skeleton of the answer:</p>
+    <ul lang="en">
+      <li>Synthesis turns RTL into <strong>parts</strong>, and the tech library is what supplies the parts list. Without it there is nothing to build out of.</li>
+      <li>It also supplies <strong>the delay, area and power figures for each part</strong>, which is what lets the tool choose among candidate implementations and still meet the constraints.</li>
+      <li>So the tech library defines <strong>both what can be built and what it costs</strong>, at the same time.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 07 -->
+<section id="s7">
+  <div class="sec-head" data-slide="15-16"><span class="sec-num">07</span><h2 lang="ko">설계 관행과 재사용</h2><h2 lang="en">Design practices and reuse</h2></div>
+  <p class="sec-sub" lang="ko">여섯 가지 관행이 나열되는데, 슬라이드가 그 옆에 한 단어를 크게 적어놨다: <strong>REUSE</strong>.</p>
+  <p class="sec-sub" lang="en">Six practices get listed, and beside them the slide puts one word in large type: <strong>REUSE</strong>.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>슬라이드 15쪽은 Lecture 1의 그림을 다시 띄운 것이다.</strong> "Verification is Everywhere" 도해가 제목 없이 한 번 더 나온다. 지금 우리가 흐름도의 어디에 있는지 상기시키려는 것이니, 내용은 <a href="L01-course-intro.html#s5">Lecture 1의 05절</a>과 같다.</p>
+    <p lang="en"><strong>Slide 15 is a rerun of a picture from Lecture 1.</strong> The "Verification is Everywhere" diagram appears again, this time without a title, simply to remind you where on the flow we currently are. The content is the same as <a href="L01-course-intro.html#s5">Lecture 1, §05</a>.</p>
+  </div>
+
+  <table>
+    <tr><th lang="ko">관행</th><th lang="en">Practice</th><th lang="ko">무엇을 재사용하게 되나</th><th lang="en">What it makes reusable</th></tr>
+    <tr><td class="hd" lang="ko">모듈화 설계</td><td class="hd" lang="en">Modular design</td>
+      <td lang="ko">기능 단위를 잘라내서 다른 곳에 그대로 옮길 수 있게 한다</td>
+      <td lang="en">cuts out functional units that can be carried elsewhere intact</td></tr>
+    <tr><td class="hd" lang="ko">계층적 설계</td><td class="hd" lang="en">Hierarchical design</td>
+      <td lang="ko">큰 블록을 작은 블록의 조합으로 짠다. 검증도 같은 계층으로 따라간다</td>
+      <td lang="en">builds big blocks from small ones, and verification follows the same hierarchy</td></tr>
+    <tr><td class="hd" lang="ko">파라미터화</td><td class="hd" lang="en">Parameterization</td>
+      <td lang="ko">폭이나 깊이만 바꿔서 같은 코드를 여러 곳에 쓴다</td>
+      <td lang="en">the same code in many places, with only a width or depth changed</td></tr>
+    <tr><td class="hd" lang="ko">IP 기반 설계</td><td class="hd" lang="en">IP based design</td>
+      <td lang="ko">이미 검증된 블록을 통째로 사 오거나 가져다 쓴다</td>
+      <td lang="en">buying or importing an already verified block whole</td></tr>
+    <tr><td class="hd" lang="ko">인터페이스 표준화</td><td class="hd" lang="en">Standardised interfaces</td>
+      <td lang="ko">붙이는 규격을 맞춰두면 블록을 갈아 끼울 수 있다. APB, AXI가 이것이다</td>
+      <td lang="en">a common connector means blocks can be swapped. APB and AXI are this.</td></tr>
+    <tr><td class="hd" lang="ko">생성기</td><td class="hd" lang="en">Generators</td>
+      <td lang="ko">RTL을 손으로 쓰지 않고 프로그램으로 찍어낸다</td>
+      <td lang="en">RTL emitted by a program instead of typed by hand</td></tr>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>이 여섯 개는 학기 후반의 지도이기도 하다.</strong> 인터페이스 표준화는 Lecture 14(SoC architecture and on-chip interfaces)와 Lab 6의 APB agent로, IP 기반 설계는 Lecture 15(interconnect case study)로 이어진다. <strong>재사용은 검증 쪽에서 더 중요해진다.</strong> <a href="#s22">22절</a>의 UVM과 VIP가 정확히 "검증 자산을 재사용하자"는 답이다.</p>
+    <p lang="en"><strong>These six double as a map of the rest of the semester.</strong> Standardised interfaces lead to Lecture 14 on SoC architecture and on-chip interfaces, and to the APB agent in Lab 6; IP based design leads to the interconnect case study in Lecture 15. <strong>Reuse matters even more on the verification side:</strong> UVM and VIP in <a href="#s22">§22</a> are exactly the answer to "let us reuse verification assets".</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 08 -->
+<section id="s8">
+  <div class="sec-head" data-slide="17"><span class="sec-num">08</span><h2 lang="ko">Lint</h2><h2 lang="en">Linting</h2></div>
+  <p class="sec-sub" lang="ko">코드를 돌리지 않고 읽기만 해서 문제를 찾는 것. 소프트웨어의 linter와 같은 발상인데, <strong>잡는 것의 성격이 다르다.</strong></p>
+  <p class="sec-sub" lang="en">Finding problems by reading the code rather than running it. The same idea as a software linter, but <strong>what it catches is different in kind.</strong></p>
+
+  <div class="def">
+    <span class="tag">Lint</span>
+    <p lang="ko">설계가 미리 정해둔 가이드라인을 지키는지 확인하는 <strong>정적 코드 분석</strong>. 도구로는 Synopsys Spyglass가 언급된다.</p>
+    <p lang="en">A <strong>static code analysis</strong> that checks whether a design follows pre-defined guidelines. The tool named is Synopsys Spyglass.</p>
+    <table>
+      <tr><th lang="ko">잡는 것</th><th lang="en">What it catches</th><th lang="ko">왜 문제인가</th><th lang="en">Why it is a problem</th></tr>
+      <tr><td class="hd" lang="ko">도달할 수 없는 코드</td><td class="hd" lang="en">Unreachable code</td>
+        <td lang="ko">의도한 조건이 실제로는 성립하지 않는다는 신호다</td>
+        <td lang="en">a sign that the condition you intended never actually holds</td></tr>
+      <tr><td class="hd" lang="ko">명명 규칙 위반</td><td class="hd" lang="en">Naming conventions</td>
+        <td lang="ko">기능은 멀쩡하지만 팀 규모에서 유지가 안 된다</td>
+        <td lang="en">works fine, but does not survive at team scale</td></tr>
+      <tr><td class="hd" lang="ko">blocking과 non-blocking 혼용</td><td class="hd" lang="en">Mixing blocking and non-blocking</td>
+        <td lang="ko"><strong>시뮬레이션과 합성 결과가 갈라지는</strong> 대표적 원인이다</td>
+        <td lang="en">a classic cause of <strong>simulation and synthesis disagreeing</strong></td></tr>
+      <tr><td class="hd" lang="ko">합성 불가 구문</td><td class="hd" lang="en">Un-synthesisable constructs</td>
+        <td lang="ko">시뮬레이션은 통과하고 합성에서 처음 터진다 (<a href="#s1">01절</a>)</td>
+        <td lang="en">passes simulation and fails first at synthesis (see <a href="#s1">§01</a>)</td></tr>
+      <tr><td class="hd" lang="ko">다중 driver</td><td class="hd" lang="en">Multiple drivers</td>
+        <td lang="ko">한 신호를 둘이 몰면 실물에서 무슨 값이 될지 정해지지 않는다</td>
+        <td lang="en">two things driving one signal leaves the real value undefined</td></tr>
+      <tr><td class="hd" lang="ko">의도치 않은 latch</td><td class="hd" lang="en">Unintended latches</td>
+        <td lang="ko"><code>always_comb</code>에서 분기를 빠뜨리면 조합 회로를 쓰려다 기억 소자가 생긴다</td>
+        <td lang="en">a missing branch in <code>always_comb</code> creates memory where you meant combinational logic</td></tr>
+    </table>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">함정: lint 경고는 "스타일 지적"이 아니다</span><span class="tag" lang="en">Trap: a lint warning is not a style nit</span>
+    <p lang="ko">소프트웨어 습관으로 보면 linter는 대체로 취향 문제라 무시해도 되는 것처럼 느껴진다. <strong>하드웨어에서는 다르다.</strong> 위 여섯 중 넷은 <em>실물이 코드와 다르게 동작하게 만드는</em> 원인이다.</p>
+    <p lang="ko">특히 <strong>의도치 않은 latch</strong>가 위험하다. 코드는 멀쩡해 보이고, 시뮬레이션도 대부분의 경우 맞는 값을 낸다. 그런데 합성하면 없어야 할 기억 소자가 생기고, 그게 타이밍을 깨거나 값을 붙들고 있다가 나중에 이상한 동작으로 나타난다.</p>
+    <p lang="ko"><strong>lint는 verification이 아니다.</strong> "코드가 규칙을 지키는가"를 볼 뿐, "설계가 사양대로인가"는 못 본다. 값싸고 빠르게 거르는 <strong>첫 번째 그물</strong>로 생각하는 게 맞다.</p>
+    <p lang="en">Coming from software, linters feel like taste and therefore skippable. <strong>Hardware is different.</strong> Four of the six above are causes of <em>the physical part behaving differently from the code.</em></p>
+    <p lang="en">The <strong>unintended latch</strong> is the nastiest. The code looks fine and simulation gives the right answer most of the time. Then synthesis creates a storage element that should not exist, and it breaks timing or holds a stale value that shows up later as strange behaviour.</p>
+    <p lang="en"><strong>Lint is not verification.</strong> It only asks whether the code follows rules, never whether the design matches the spec. Think of it as <strong>the first net</strong>, cheap and fast.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 09 -->
+<section id="s9">
+  <div class="sec-head" data-slide="18-19"><span class="sec-num">09</span><h2 lang="ko">목표와 트레이드오프</h2><h2 lang="en">Goals and trade-offs</h2></div>
+  <p class="sec-sub" lang="ko">일곱 가지 목표가 있고, 슬라이드가 한 줄로 정리한다: <strong>"공짜 점심은 없다."</strong></p>
+  <p class="sec-sub" lang="en">Seven goals, and the slide sums the situation up in one line: <strong>there is no free lunch.</strong></p>
+
+  <div class="def">
+    <span class="tag" lang="ko">설계의 일곱 목표</span><span class="tag" lang="en">The seven goals of design</span>
+    <p lang="ko">Area · Timing · Performance · Power · Security · Safety/Reliability · Testability</p>
+    <p lang="ko"><strong>Timing과 Performance가 따로 적혀 있는 게 눈에 띈다.</strong> 같은 말이 아니다. Timing은 "클럭 주기 안에 들어오는가"이고, Performance는 "단위 시간에 일을 얼마나 하는가"다. 파이프라인을 깊게 하면 timing은 좋아지는데(각 단이 짧아지므로) 한 건의 지연은 오히려 늘어난다.</p>
+    <p lang="en">Area, timing, performance, power, security, safety and reliability, testability.</p>
+    <p lang="en"><strong>Notice that timing and performance are listed separately.</strong> They are not the same. Timing asks whether you fit inside the clock period; performance asks how much work gets done per unit time. Deepening a pipeline improves timing, because each stage gets shorter, while making the latency of a single item worse.</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 240" role="img" aria-label="면적과 지연의 트레이드오프 곡선, Ripple Carry Adder와 Carry Lookahead Adder의 위치">
+      <defs>
+        <marker id="g4-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+      <line x1="90" y1="200" x2="470" y2="200" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g4-ar)"/>
+      <line x1="90" y1="200" x2="90" y2="24" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g4-ar)"/>
+      <text class="svglab" x="480" y="204" style="fill:var(--ink)">Area</text>
+      <text class="svglab" x="90" y="16" text-anchor="middle" style="fill:var(--ink)">Delay</text>
+
+      <path d="M120 46 C 190 150, 250 178, 440 188" fill="none" stroke="var(--blue)" stroke-width="2.2"/>
+
+      <circle cx="132" cy="58" r="6" fill="var(--blue)"/>
+      <text class="svglab" x="146" y="50" style="fill:var(--ink);font-weight:650">Ripple Carry Adder</text>
+      <text class="svglab" x="146" y="66" style="font-size:10px" lang="ko">면적은 작고 느리다</text>
+      <text class="svglab" x="146" y="66" style="font-size:10px" lang="en">small area, slow</text>
+
+      <circle cx="400" cy="186" r="6" fill="var(--blue)"/>
+      <text class="svglab" x="300" y="160" style="fill:var(--ink);font-weight:650">Carry Lookahead Adder</text>
+      <text class="svglab" x="300" y="176" style="font-size:10px" lang="ko">빠르지만 면적을 많이 쓴다</text>
+      <text class="svglab" x="300" y="176" style="font-size:10px" lang="en">fast, but it costs area</text>
+
+      <text class="svglab" x="516" y="86" style="fill:var(--ink2)" lang="ko">같은 덧셈을 하는데</text>
+      <text class="svglab" x="516" y="102" style="fill:var(--ink2)" lang="ko">둘은 곡선 위의</text>
+      <text class="svglab" x="516" y="118" style="fill:var(--ink2)" lang="ko">다른 점일 뿐이다</text>
+      <text class="svglab" x="516" y="86" style="fill:var(--ink2)" lang="en">same addition,</text>
+      <text class="svglab" x="516" y="102" style="fill:var(--ink2)" lang="en">two different points</text>
+      <text class="svglab" x="516" y="118" style="fill:var(--ink2)" lang="en">on one curve</text>
+
+      <text class="svglab" x="90" y="228" lang="ko">Area Delay Product는 이 곡선 위의 점들을 하나의 숫자로 비교하려는 시도다</text>
+      <text class="svglab" x="90" y="228" lang="en">Area delay product is an attempt to compare points on this curve with a single number</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 19쪽. <strong>디지털 설계와 컴퓨터 아키텍처의 근본 트레이드오프.</strong> 빠르게 하려면 면적을 더 써야 하고, 면적을 줄이면 시간이 더 걸린다. 두 설계를 비교할 때 <strong>Area Delay Product</strong>를 흔히 쓴다.</figcaption>
+    <figcaption lang="en">Slide 19. <strong>The fundamental trade-off in digital design and computer architecture.</strong> Going faster costs area; saving area costs time. To compare two designs, people commonly use the <strong>area delay product.</strong></figcaption>
+  </figure>
+
+  <div class="trap">
+    <span class="tag" lang="ko">복습 문제 2번: 목표들이 어떻게 서로 충돌하나</span><span class="tag" lang="en">Review question 2: how the goals conflict</span>
+    <p lang="ko">슬라이드 59쪽이 <strong>"디지털 설계의 흔한 목표들은 무엇이고 서로 어떻게 충돌하는가"</strong>를 묻는다. 일곱 개를 나열만 하면 절반짜리 답이다. 충돌하는 짝을 들어야 한다.</p>
+    <ul lang="ko">
+      <li><strong>Timing ↔ Area</strong>: 위 곡선 그대로. 빠른 회로가 더 크다.</li>
+      <li><strong>Performance ↔ Power</strong>: 병렬로 더 많이 돌리면 전력이 는다. DVFS는 성능을 깎아 전력을 아끼는 장치다.</li>
+      <li><strong>Testability ↔ Area와 Timing</strong>: scan chain을 넣으면 flip-flop마다 mux가 붙어서 면적이 늘고 경로가 길어진다. <strong>테스트를 쉽게 하려고 설계를 느리게 만드는 것이다.</strong></li>
+      <li><strong>Reliability ↔ Area</strong>: TMR은 같은 논리를 세 벌 만들어 다수결한다. 면적이 3배가 넘는다.</li>
+      <li><strong>Security ↔ Performance</strong>: side-channel 대응은 대개 동작 시간을 일정하게 만드는 것이라, 빠를 수 있는 경우에도 못 빠르게 한다.</li>
+    </ul>
+    <p lang="ko"><strong>이게 왜 중요한가:</strong> 이 충돌들이 <a href="#s16">검증 계획</a>에도 그대로 나타난다. "성능이 목표치를 만족하는가"와 "기능이 맞는가"는 서로 다른 테스트고, 하나를 통과해도 다른 하나를 모른다.</p>
+    <p lang="en">Slide 59 asks <strong>what the common goals of digital design are and how they conflict.</strong> Listing seven of them is half an answer; you have to name the conflicting pairs.</p>
+    <ul lang="en">
+      <li><strong>Timing against area:</strong> the curve above. Faster circuits are bigger.</li>
+      <li><strong>Performance against power:</strong> more parallel work draws more power. DVFS exists to trade performance away for power.</li>
+      <li><strong>Testability against area and timing:</strong> scan chains put a mux on every flip-flop, adding area and lengthening paths. <strong>You slow the design down in order to make it testable.</strong></li>
+      <li><strong>Reliability against area:</strong> TMR builds the same logic three times and votes. That is more than triple the area.</li>
+      <li><strong>Security against performance:</strong> side channel defences usually mean making operations take constant time, so you cannot be fast even when you could be.</li>
+    </ul>
+    <p lang="en"><strong>Why it matters:</strong> the same conflicts reappear in <a href="#s16">the verification plan</a>. "Does it hit the performance target" and "is it functionally correct" are different tests, and passing one tells you nothing about the other.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 10 -->
+<section id="s10">
+  <div class="sec-head" data-slide="20-23"><span class="sec-num">10</span><h2 lang="ko">설계 최적화</h2><h2 lang="en">Design optimisations</h2></div>
+  <p class="sec-sub" lang="ko">앞 절의 목표 하나하나에 대응하는 수단들. 지금은 이름만 알아두고, 각각은 나중 강의에서 다시 나온다.</p>
+  <p class="sec-sub" lang="en">One set of levers per goal from the previous section. Learn the names for now; each comes back in a later lecture.</p>
+
+  <table>
+    <tr><th lang="ko">목표</th><th lang="en">Goal</th><th lang="ko">수단</th><th lang="en">Lever</th><th lang="ko">무엇을 하는가</th><th lang="en">What it does</th></tr>
+    <tr><td class="hd" rowspan="2">Area</td><td class="hd">Resource Sharing</td>
+      <td lang="ko">같은 하드웨어를 여러 연산에 돌려쓴다</td><td lang="en">use the same hardware for several operations</td></tr>
+    <tr><td class="hd">Logic Minimization</td>
+      <td lang="ko">논리식을 줄여 게이트 수를 줄인다</td><td lang="en">simplify the logic to use fewer gates</td></tr>
+    <tr><td class="hd" rowspan="2">Timing</td><td class="hd">Critical Path Reduction</td>
+      <td lang="ko">가장 긴 경로를 찾아 줄인다</td><td lang="en">find the longest path and shorten it</td></tr>
+    <tr><td class="hd">Retiming</td>
+      <td lang="ko">register 위치를 옮겨 단 사이 지연을 고르게 만든다</td><td lang="en">move registers so the delay per stage evens out</td></tr>
+    <tr><td class="hd" rowspan="2">Performance</td><td class="hd">Pipelining</td>
+      <td lang="ko">단계로 쪼개고 사이에 register를 넣어 throughput을 올린다</td><td lang="en">split into stages with registers between, raising throughput</td></tr>
+    <tr><td class="hd">Parallelism</td>
+      <td lang="ko">여러 연산을 동시에 한다</td><td lang="en">do several operations at once</td></tr>
+    <tr><td class="hd" rowspan="3">Power</td><td class="hd">Clock Gating</td>
+      <td lang="ko">안 쓰는 부분에 클럭을 끊는다</td><td lang="en">stop the clock to inactive parts</td></tr>
+    <tr><td class="hd">Power Gating</td>
+      <td lang="ko">안 쓰는 블록의 전원을 통째로 끈다</td><td lang="en">shut whole blocks down entirely</td></tr>
+    <tr><td class="hd">DVFS</td>
+      <td lang="ko">부하에 맞춰 전압과 주파수를 조절한다</td><td lang="en">scale voltage and frequency to the workload</td></tr>
+    <tr><td class="hd" rowspan="4">Security</td><td class="hd" lang="ko">Secure Boot과 암호화</td><td class="hd" lang="en">Secure boot and encryption</td>
+      <td lang="ko">인증된 펌웨어와 데이터만 실행·접근되게 한다</td><td lang="en">only authenticated firmware and data run or get read</td></tr>
+    <tr><td class="hd" lang="ko">하드웨어 난독화</td><td class="hd" lang="en">Hardware obfuscation</td>
+      <td lang="ko">역공학을 어렵게 만든다 (예: FPGA fabric 사용)</td><td lang="en">make reverse engineering harder, for example by using FPGA fabric</td></tr>
+    <tr><td class="hd" lang="ko">Side-Channel 대응</td><td class="hd" lang="en">Side channel mitigation</td>
+      <td lang="ko">전력·타이밍·전자파 분석으로 비밀이 새지 않게 한다</td><td lang="en">stop secrets leaking through power, timing or EM analysis</td></tr>
+    <tr><td class="hd" lang="ko">접근 제어</td><td class="hd" lang="en">Access control</td>
+      <td lang="ko">민감한 영역 접근을 제한한다 (예: ARM TrustZone)</td><td lang="en">restrict access to sensitive regions, for example ARM TrustZone</td></tr>
+    <tr><td class="hd" rowspan="2" lang="ko">Reliability<br>Safety</td><td class="hd" rowspan="2" lang="en">Reliability<br>and safety</td><td class="hd" lang="ko">오류 검출과 정정</td><td class="hd" lang="en">Error detection and correction</td>
+      <td lang="ko">parity bit, ECC</td><td lang="en">parity bits, ECC</td></tr>
+    <tr><td class="hd" lang="ko">중복화</td><td class="hd" lang="en">Redundancy</td>
+      <td lang="ko">TMR처럼 같은 것을 여러 벌 두고 다수결한다</td><td lang="en">several copies and a vote, as in TMR</td></tr>
+    <tr><td class="hd">Testability</td><td class="hd">DFT</td>
+      <td lang="ko">scan chain, BIST, boundary scan을 미리 넣어둔다</td><td lang="en">build in scan chains, BIST and boundary scan up front</td></tr>
+  </table>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · DFx</span><span lang="en">Unpacking the jargon · DFx</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>한 줄</td><td>"Design For __"의 총칭. x 자리에 목적이 들어간다.</td></tr>
+        <tr><td>종류</td><td>DFD (Debuggability), DFM (Manufacturability), DFT (Testability), Design For Performance Evaluation</td></tr>
+        <tr><td>공통점</td><td>전부 <strong>"본래 기능과 무관한데 나중을 위해 미리 넣어두는 것"</strong>이다. 그래서 전부 면적과 타이밍을 잡아먹는다.</td></tr>
+        <tr><td>왜 미리 넣나</td><td>나중에는 못 넣기 때문이다. 칩이 만들어진 뒤에 "안이 안 보이네"라고 해봐야 방법이 없다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>DFT의 T는 <strong>Testability</strong>지 Test가 아니다. 그런데 <a href="L01-course-intro.html#s13">Lecture 1의 13절</a>에서 봤듯 회사에 따라 manufacturing test 조직 전체를 DFT라고 부른다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>In one line</td><td>An umbrella for "design for __", with the purpose filling the x.</td></tr>
+        <tr><td>The family</td><td>DFD for debuggability, DFM for manufacturability, DFT for testability, and design for performance evaluation.</td></tr>
+        <tr><td>What they share</td><td>All of them are <strong>things unrelated to the function, put in now for later.</strong> All of them therefore cost area and timing.</td></tr>
+        <tr><td>Why up front</td><td>Because later is not an option. Noticing after the chip exists that you cannot see inside it leaves you nothing to do.</td></tr>
+        <tr><td>Easy to misread</td><td>The T in DFT is <strong>testability</strong>, not test. Although, as <a href="L01-course-intro.html#s13">Lecture 1, §13</a> showed, some companies use DFT for the entire manufacturing test organisation.</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 11 -->
+<section id="s11">
+  <div class="sec-head" data-slide="24-26"><span class="sec-num">11</span><h2 lang="ko">무엇을 만드나</h2><h2 lang="en">What you actually build</h2></div>
+  <p class="sec-sub" lang="ko">설계 파트를 닫는 세 목록: 흔한 시스템, 흔한 부품, 그리고 그것을 쓰는 언어.</p>
+  <p class="sec-sub" lang="en">Three lists that close out the design half: common systems, common components, and the languages you write them in.</p>
+
+  <div class="grid2">
+    <div class="mini">
+      <p class="cap" lang="ko">흔한 디지털 시스템</p>
+      <p class="cap" lang="en">Common digital systems</p>
+      <ul style="font-size:14px;margin-top:10px">
+        <li>Processors</li>
+        <li>Accelerators</li>
+        <li>Switches / Routers</li>
+        <li>Memories</li>
+        <li>I/O Controllers</li>
+      </ul>
+    </div>
+    <div class="mini">
+      <p class="cap" lang="ko">흔한 부품</p>
+      <p class="cap" lang="en">Common components</p>
+      <ul style="font-size:14px;margin-top:10px">
+        <li lang="ko"><strong>Datapath</strong>: ALU, mux, register, bus</li>
+        <li lang="en"><strong>Datapath</strong>: ALUs, muxes, registers, buses</li>
+        <li lang="ko"><strong>Control</strong>: FSM, 제어 신호, microcode</li>
+        <li lang="en"><strong>Control</strong>: FSMs, control signals, microcode</li>
+        <li lang="ko"><strong>Memory</strong>: buffer, FIFO, cache</li>
+        <li lang="en"><strong>Memory</strong>: buffers, FIFOs, caches</li>
+        <li lang="ko"><strong>Communication</strong>: interconnect, arbitration, protocol handler</li>
+        <li lang="en"><strong>Communication</strong>: interconnects, arbitration logic, protocol handlers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>이 두 목록이 학기 일정표와 거의 그대로 겹친다.</strong> FIFO는 Lecture 6과 Lab 1, pipelined CPU는 Lecture 8과 Lab 2, matrix multiplication accelerator는 Lecture 13과 Lab 3, interconnect는 Lecture 15, memory와 I/O controller는 Lecture 25. <strong>오늘의 목록은 앞으로 만들 것의 목차다.</strong></p>
+    <p lang="en"><strong>These two lists overlap almost exactly with the semester schedule.</strong> FIFOs are Lecture 6 and Lab 1, the pipelined CPU is Lecture 8 and Lab 2, the matrix multiplication accelerator is Lecture 13 and Lab 3, interconnects are Lecture 15, memory and I/O controllers are Lecture 25. <strong>Today's list is a table of contents for what you will build.</strong></p>
+  </div>
+
+  <h3 lang="ko">설계 언어</h3>
+  <h3 lang="en">Design languages</h3>
+  <p lang="ko"><strong>Verilog(SystemVerilog)가 가장 널리 쓰인다.</strong> 새 언어도 여럿 있다: Chisel, SpinalHDL, PyMTL, Amaranth, HardCaml.</p>
+  <p lang="ko">그리고 슬라이드가 덧붙인 현실적인 한 줄: <strong>회사들은 대개 언어 위에 자기들 레이어를 얹어 쓴다.</strong> NVIDIA의 VIVA가 예로 나온다.</p>
+  <p lang="en"><strong>Verilog, meaning SystemVerilog, is the most popular by far.</strong> Several newer languages exist: Chisel, SpinalHDL, PyMTL, Amaranth, HardCaml.</p>
+  <p lang="en">And the practical line the slide adds: <strong>companies typically build their own layer on top of the language.</strong> VIVA at NVIDIA is the example given.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이게 실무에서 뜻하는 것</span><span class="tag" lang="en">What this means on the job</span>
+    <p lang="ko">"회사마다 자기 레이어가 있다"는 말은 <strong>입사하면 배운 것을 그대로 쓰지 못한다</strong>는 뜻처럼 들린다. 절반만 맞다. 레이어는 대개 <strong>반복적인 것을 자동화</strong>하는 것이라(연결 배선 생성, 인터페이스 정의, 테스트 실행), <strong>밑에 깔린 SystemVerilog 개념은 그대로 필요하다.</strong></p>
+    <p lang="ko">그래서 이 수업의 방향이 옳다. 특정 도구 사용법이 아니라 <strong>SystemVerilog와 UVM이라는 표준</strong>을 가르친다. 회사 레이어는 그 위에 얹히는 것이라 입사 후에 배우면 된다.</p>
+    <p lang="en">"Every company has its own layer" sounds like <strong>none of what you learn will transfer.</strong> Only half true. Those layers mostly <strong>automate the repetitive parts</strong>, generating connection wiring, defining interfaces, running tests, and <strong>the SystemVerilog underneath is still needed.</strong></p>
+    <p lang="en">Which is why this course is pointed the right way: it teaches <strong>the standards, SystemVerilog and UVM</strong>, not one vendor's buttons. A company layer sits on top of those and can be learned after you arrive.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 12 -->
+<section id="s12">
+  <div class="sec-head" data-slide="29-31"><span class="sec-num">12</span><h2 lang="ko">왜 verification인가</h2><h2 lang="en">Why verification</h2></div>
+  <p class="sec-sub" lang="ko">여기서부터 강의 후반부다. 답은 감정이 아니라 숫자로 나온다: <strong>Rule of 10</strong>, 그리고 <strong>설계 노력의 50~80%</strong>.</p>
+  <p class="sec-sub" lang="en">The second half of the lecture starts here, and the answer arrives as numbers, not sentiment: <strong>the rule of 10</strong>, and <strong>50 to 80 percent of the design effort.</strong></p>
+
+  <figure>
+    <svg viewBox="0 0 700 270" role="img" aria-label="버그를 어느 단계에서 찾느냐에 따라 비용이 10배씩 뛰는 Rule of 10">
+      <rect x="30" y="20" width="120" height="34" rx="5" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="90" y="42" text-anchor="middle" style="fill:var(--green)">1</text>
+      <rect x="166" y="20" width="180" height="34" rx="5" fill="rgba(var(--blue-rgb),.10)" stroke="var(--blue)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="42" text-anchor="middle" style="font-size:13px">Design</text>
+
+      <rect x="30" y="68" width="120" height="34" rx="5" fill="rgba(var(--amber-rgb),.12)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svgnum" x="90" y="90" text-anchor="middle" style="fill:var(--amber)">10</text>
+      <rect x="166" y="68" width="180" height="34" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="90" text-anchor="middle" style="font-size:13px">Wafer</text>
+
+      <rect x="30" y="116" width="120" height="34" rx="5" fill="rgba(var(--amber-rgb),.18)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svgnum" x="90" y="138" text-anchor="middle" style="fill:var(--amber)">100</text>
+      <rect x="166" y="116" width="180" height="34" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="138" text-anchor="middle" style="font-size:13px">Chip</text>
+
+      <rect x="30" y="164" width="120" height="34" rx="5" fill="rgba(var(--amber-rgb),.24)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svgnum" x="90" y="186" text-anchor="middle" style="fill:var(--amber)">1000</text>
+      <rect x="166" y="164" width="180" height="34" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="186" text-anchor="middle" style="font-size:13px">System</text>
+
+      <rect x="30" y="212" width="120" height="34" rx="5" fill="rgba(var(--amber-rgb),.32)" stroke="var(--amber)" stroke-width="2"/>
+      <text class="svgnum" x="90" y="234" text-anchor="middle" style="fill:var(--amber)">10000</text>
+      <rect x="166" y="212" width="180" height="34" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="234" text-anchor="middle" style="font-size:13px">Application</text>
+
+      <text class="svglab" x="90" y="14" text-anchor="middle" style="font-size:10px" lang="ko">상대 비용</text>
+      <text class="svglab" x="90" y="14" text-anchor="middle" style="font-size:10px" lang="en">relative cost</text>
+      <text class="svglab" x="256" y="14" text-anchor="middle" style="font-size:10px" lang="ko">버그를 발견한 곳</text>
+      <text class="svglab" x="256" y="14" text-anchor="middle" style="font-size:10px" lang="en">where the bug was found</text>
+
+      <text class="svglab" x="380" y="50" style="fill:var(--green);font-weight:700" lang="ko">여기서 잡으면 제일 싸다</text>
+      <text class="svglab" x="380" y="50" style="fill:var(--green);font-weight:700" lang="en">cheapest to catch here</text>
+      <text class="svglab" x="380" y="66" style="font-size:10px" lang="ko">이 수업 2부가 하려는 일</text>
+      <text class="svglab" x="380" y="66" style="font-size:10px" lang="en">this is what part 2 of the course is for</text>
+
+      <text class="svglab" x="380" y="232" style="fill:var(--amber);font-weight:700" lang="ko">고객이 먼저 찾으면 여기다</text>
+      <text class="svglab" x="380" y="232" style="fill:var(--amber);font-weight:700" lang="en">this is where the customer finds it</text>
+      <text class="svglab" x="380" y="248" style="font-size:10px" lang="ko">한 칸 내려갈 때마다 10배</text>
+      <text class="svglab" x="380" y="248" style="font-size:10px" lang="en">ten times worse per row</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 29쪽. 왼쪽 숫자는 <strong>상대 비용</strong>이다. 설계 단계에서 잡으면 1, 응용 단계에서 잡으면 10000. 발표자 노트가 구체적인 예를 적어놨다: <strong>Intel 프로세서의 부동소수점 유닛 버그가 약 10억 달러를 물렸다.</strong></figcaption>
+    <figcaption lang="en">Slide 29. The numbers on the left are <strong>relative cost</strong>: one if you catch it during design, ten thousand if it surfaces in the application. The speaker notes give the concrete case: <strong>the floating point bug in Intel processors cost around a billion dollars.</strong></figcaption>
+  </figure>
+
+  <div class="def">
+    <span class="tag" lang="ko">규모의 숫자</span><span class="tag" lang="en">The numbers on scale</span>
+    <ul lang="ko">
+      <li>설계 노력의 <strong>50%에서 80% 이상이 verification</strong>이다.</li>
+      <li>설계 엔지니어 1명당 <strong>검증 엔지니어가 3~5명</strong>이다.</li>
+    </ul>
+    <p lang="ko">이건 강의계획서가 이 과목을 만든 이유이기도 하다. 강사가 첫 강의에서 "대부분은 검증 쪽 일자리를 갖게 된다"고 발표자 노트에 적어뒀다.</p>
+    <ul lang="en">
+      <li><strong>Over 50 to 80 percent of design effort is verification.</strong></li>
+      <li><strong>Three to five verification engineers per design engineer.</strong></li>
+    </ul>
+    <p lang="en">This is also why the course exists. The speaker notes on the first slide say plainly that most of the class will end up in verification jobs.</p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 슬라이드는 강의에서 넘어갔다 (31쪽)</span><span class="tag" lang="en">This slide was skipped in class (31)</span>
+    <p lang="ko">슬라이드 31쪽 <em>Design and Verification Gap</em>은 덱에 숨김 처리되어 있다. 그래도 여기 적는 건, 이 그래프가 <strong>"왜 verification이 계속 어려워지는가"</strong>에 답하기 때문이다.</p>
+    <p lang="ko">그래프는 시간에 따라 세 곡선을 그린다. <strong>Manufacture</strong>(만들 수 있는 트랜지스터 수)가 제일 가파르게 오르고, <strong>Design</strong>(설계할 수 있는 양)이 그보다 완만하고, <strong>Verify</strong>(검증할 수 있는 양)가 가장 느리다. 셋 사이의 간격이 해마다 벌어진다.</p>
+    <p lang="ko"><strong>읽는 법:</strong> 공정은 계속 좋아지는데 그걸 다 채워 넣을 만큼 설계를 못 하고, 설계한 것을 다 검증하지도 못한다. 이게 <a href="#s23">23절</a>의 "designs are getting larger, tools are not scaling accordingly"와 같은 이야기다. 출처는 Harry Foster.</p>
+    <p lang="en">Slide 31, <em>Design and Verification Gap</em>, is hidden in the deck. It is worth recording anyway, because the chart answers <strong>why verification keeps getting harder.</strong></p>
+    <p lang="en">It plots three curves over time. <strong>Manufacture</strong>, the number of transistors that can be made, climbs fastest; <strong>Design</strong>, how much can be designed, climbs more slowly; and <strong>Verify</strong>, how much can be verified, climbs slowest of all. The gaps widen year on year.</p>
+    <p lang="en"><strong>How to read it:</strong> the process keeps improving faster than anyone can fill it with design, and design outruns anyone's ability to verify it. That is the same story as "designs are getting larger, tools are not scaling accordingly" in <a href="#s23">§23</a>. The source is Harry Foster.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 13 -->
+<section id="s13">
+  <div class="sec-head" data-slide="32"><span class="sec-num">13</span><h2 lang="ko">두 갈래: dynamic과 static</h2><h2 lang="en">Two branches: dynamic and static</h2></div>
+  <p class="sec-sub" lang="ko">Verification 전체가 두 갈래로 갈린다. 각각 별칭이 있는데, <strong>그 별칭이 더 자주 쓰인다.</strong></p>
+  <p class="sec-sub" lang="en">All of verification splits in two, and each branch has an alias that gets used more often than the name itself.</p>
+
+  <table>
+    <tr><th lang="ko">이름</th><th lang="en">Name</th><th lang="ko">별칭</th><th lang="en">Also called</th><th lang="ko">방식</th><th lang="en">How it works</th></tr>
+    <tr>
+      <td class="hd cV" lang="ko">Dynamic verification</td><td class="hd cV" lang="en">Dynamic verification</td>
+      <td lang="ko">Simulation-based verification</td><td lang="en">simulation based verification</td>
+      <td lang="ko">값을 실제로 흘려보고 결과를 본다</td><td lang="en">push real values through and look at the result</td>
+    </tr>
+    <tr>
+      <td class="hd cT" lang="ko">Static verification</td><td class="hd cT" lang="en">Static verification</td>
+      <td lang="ko">Formal verification</td><td lang="en">formal verification</td>
+      <td lang="ko">값을 안 흘리고 수학으로 증명한다</td><td lang="en">prove it mathematically without pushing values</td>
+    </tr>
+  </table>
+
+  <p lang="ko">슬라이드가 마지막 줄에 <strong>"대개 둘을 섞어 쓴다"</strong>고 적었다. 어느 하나를 고르는 문제가 아니다.</p>
+  <p lang="en">The last line of the slide says <strong>"generally, a combination of both is used".</strong> It is not a choice between them.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>"static"이라는 말이 이 과목에서 두 번째로 나왔다.</strong> <a href="#s5">05절의 STA</a>도 "입력 벡터 없이"라는 뜻으로 static이었다. <strong>둘 다 같은 뜻이다: 값을 흘려보지 않고 구조만 보고 판단한다.</strong> 다만 STA는 <em>타이밍</em>을 보고, formal verification은 <em>기능</em>을 본다.</p>
+    <p lang="en"><strong>This is the second time "static" has appeared.</strong> <a href="#s5">STA in §05</a> was static in the sense of using no input vectors. <strong>The word means the same thing both times: judge from the structure without running values through.</strong> The difference is that STA looks at <em>timing</em> while formal verification looks at <em>function</em>.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 14 -->
+<section id="s14">
+  <div class="sec-head" data-slide="33-35"><span class="sec-num">14</span><h2>Simulation</h2></div>
+  <p class="sec-sub" lang="ko">이 과목 2부의 거의 전부가 여기 위에서 벌어진다. 그래서 <strong>느리다는 사실과 그 이유</strong>를 먼저 잡아둔다.</p>
+  <p class="sec-sub" lang="en">Almost everything in the back half of this course happens on top of this, so the place to start is <strong>that it is slow, and why.</strong></p>
+
+  <div class="def">
+    <span class="tag">Simulation</span>
+    <ul lang="ko">
+      <li>입력을 넣고 출력을 본다.</li>
+      <li>파형(wave)을 덤프해서 뷰어에 띄운다.</li>
+      <li>3대 EDA 벤더의 시뮬레이터: Siemens ModelSim/QuestaSim, Synopsys VCS, Cadence Xcelium</li>
+      <li>시뮬레이션의 <strong>의미론은 언어의 LRM</strong>(Language Reference Manual)에 정의돼 있다. 벤더가 구현은 마음대로 해도 되지만 LRM은 지켜야 한다.</li>
+    </ul>
+    <ul lang="en">
+      <li>Apply inputs, observe outputs.</li>
+      <li>Dump waves and load them into a viewer.</li>
+      <li>Simulators from the top three EDA vendors: Siemens ModelSim and QuestaSim, Synopsys VCS, Cadence Xcelium.</li>
+      <li>Simulation <strong>semantics are defined in the language's LRM</strong>, its Language Reference Manual. A vendor may implement the simulator however it likes but must obey the LRM.</li>
+    </ul>
+  </div>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · LRM</span><span lang="en">Unpacking the jargon · LRM</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>Language Reference Manual</td></tr>
+        <tr><td>한 줄</td><td>언어의 <strong>표준 문서</strong>. SystemVerilog의 것은 IEEE 1800이다.</td></tr>
+        <tr><td>왜 중요한가</td><td>시뮬레이터 셋이 있는데 결과가 다르면 곤란하다. LRM이 "이 코드는 이렇게 동작해야 한다"를 정해준다.</td></tr>
+        <tr><td>실무에서</td><td>도구마다 결과가 갈릴 때 <strong>최종 심판이 LRM이다.</strong> "VCS에서는 되는데 Xcelium에서는 안 돼요"라는 상황에서 누가 맞는지를 여기서 찾는다.</td></tr>
+        <tr><td>주의</td><td>LRM이 <strong>정하지 않은 것</strong>도 있다. 그런 구간에서는 도구마다 달라도 둘 다 맞다. 그래서 그런 코드를 안 쓰는 게 관행이고, <a href="#s8">lint</a>가 그런 것을 잡아준다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>Language Reference Manual</td></tr>
+        <tr><td>In one line</td><td>The <strong>standard document</strong> for a language. For SystemVerilog it is IEEE 1800.</td></tr>
+        <tr><td>Why it matters</td><td>Three simulators giving three answers would be intolerable. The LRM fixes what a piece of code has to do.</td></tr>
+        <tr><td>On the job</td><td>When tools disagree, <strong>the LRM is the final referee.</strong> "It works in VCS but not in Xcelium" gets settled by looking it up.</td></tr>
+        <tr><td>Careful</td><td>Some things the LRM <strong>deliberately leaves undefined.</strong> There, two tools can differ and both be right, which is why nobody writes such code on purpose and why <a href="#s8">lint</a> flags it.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3 lang="ko">왜 느린가</h3>
+  <h3 lang="en">Why it is slow</h3>
+  <ul lang="ko">
+    <li><strong>시뮬레이션은 아주 느리다.</strong> 그리고 설계가 복잡해질수록 더 느려진다. 크기(게이트 수)와 추상화 수준(gate-level이 RTL보다 훨씬 느리다) 둘 다에 비례한다.</li>
+    <li><strong>Simulation time과 wall clock time은 다르다.</strong> 슬라이드의 표현대로 <em>5분 동안 돌려서 5 ns를 본다</em>. 앞의 5분은 당신이 기다린 시간이고 뒤의 5 ns는 회로 안에서 흐른 시간이다.</li>
+    <li><strong>효과는 검증 엔지니어의 상상력에 달려 있다.</strong> 테스트할 시나리오를 사람이 생각해내야 하기 때문이다.</li>
+    <li><strong>전체 상태 공간을 다 훑는 건 사실상 불가능하다.</strong> 랜덤 벡터가 도움이 된다.</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Simulation is very slow</strong>, and it gets slower as the design grows. It scales with size in gate count and with abstraction level, since gate level is far slower than RTL.</li>
+    <li><strong>Simulation time is not wall clock time.</strong> As the slide puts it, <em>five nanoseconds in five minutes</em>. The five minutes is what you waited; the five nanoseconds is what elapsed inside the circuit.</li>
+    <li><strong>Its effectiveness rests on the verification engineer's imagination</strong>, because a person has to think of the scenarios.</li>
+    <li><strong>Exercising the whole state space is essentially impossible.</strong> Random vectors help.</li>
+  </ul>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 슬라이드는 강의에서 넘어갔다 (34쪽): 시뮬레이터 내부</span><span class="tag" lang="en">Skipped in class (slide 34): inside the simulator</span>
+    <p lang="ko">숨김 슬라이드지만 <strong>"왜 느린가"의 진짜 답</strong>이라 적어둔다. 시뮬레이터는 두 단계로 나뉜다.</p>
+    <ol lang="ko">
+      <li><strong>Compile</strong>: Analyze(문법 해석) → Elaborate(계층을 펼치고 연결을 확정)</li>
+      <li><strong>Simulation 루프</strong>: Determine events → Active Events → NBA events → Advance simulation time → 다시 처음으로. 이벤트가 더 없으면 Done.</li>
+    </ol>
+    <p lang="ko">이벤트 처리는 <strong>Evaluate → Update → Schedule</strong> 세 동작이다. 여기서 두 가지가 보인다.</p>
+    <ul lang="ko">
+      <li><strong>시간이 이벤트 단위로 흐른다.</strong> 신호가 바뀌는 곳마다 이벤트가 생기므로, 설계가 크면 한 클럭을 넘기는 데 처리할 이벤트가 폭증한다. 이게 느린 이유다.</li>
+      <li><strong>NBA events가 따로 있다.</strong> non-blocking assignment(<code>&lt;=</code>)를 다른 큐에서 처리한다는 뜻이다. blocking(<code>=</code>)과 섞어 쓰면 안 되는 이유가 여기 있다. <a href="#s8">08절 lint</a>가 그걸 잡는 것도 같은 이유다.</li>
+    </ul>
+    <p lang="en">Hidden, but recorded here because it is <strong>the real answer to why simulation is slow.</strong> A simulator has two phases.</p>
+    <ol lang="en">
+      <li><strong>Compile</strong>: analyze, meaning parse, then elaborate, meaning flatten the hierarchy and fix the connections.</li>
+      <li><strong>The simulation loop</strong>: determine events, active events, NBA events, advance simulation time, and back to the start. When no events remain, done.</li>
+    </ol>
+    <p lang="en">Event handling itself is three moves: <strong>evaluate, update, schedule.</strong> Two things follow.</p>
+    <ul lang="en">
+      <li><strong>Time advances event by event.</strong> Every signal that changes creates an event, so on a large design the number of events needed to get through one clock explodes. That is the slowness.</li>
+      <li><strong>NBA events are a separate stage</strong>, which is to say non-blocking assignments (<code>&lt;=</code>) are processed from a different queue. That is exactly why mixing them with blocking assignments (<code>=</code>) is a hazard, and why <a href="#s8">lint in §08</a> flags it.</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>이게 <a href="L01-course-intro.html#s11">Lecture 1의 emulation</a>과 이어진다.</strong> 시뮬레이션이 느리다는 이 사실 하나 때문에 전용 하드웨어를 사는 산업이 생겼다. 그리고 그 대가가 "안이 안 보인다"였다. 지금 보면 왜 그런지도 알 수 있다. <strong>시뮬레이터가 느린 이유가 곧 모든 이벤트를 하나씩 처리하기 때문이고, 그래서 모든 것을 볼 수 있는 것이다.</strong></p>
+    <p lang="en"><strong>This connects to <a href="L01-course-intro.html#s11">emulation in Lecture 1</a>.</strong> An entire industry sells dedicated hardware because of this one fact, and the price was losing visibility. Now you can see why: <strong>the simulator is slow precisely because it processes every event one at a time, and that is the same reason it can show you everything.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 15 -->
+<section id="s15">
+  <div class="sec-head" data-slide="36-40"><span class="sec-num">15</span><h2 lang="ko">Formal Verification</h2><h2 lang="en">Formal verification</h2></div>
+  <p class="sec-sub" lang="ko">슬라이드가 대놓고 <strong>"이 과목의 초점이 아니다"</strong>라고 적어놨다. 그래도 다섯 장을 쓴다. 이름만이라도 알아두라는 뜻이다.</p>
+  <p class="sec-sub" lang="en">The slide states outright that this is <strong>not a focus of this course</strong>, and then spends five slides on it. The point is to know the names.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">정의와 한계</span><span class="tag" lang="en">Definition and limits</span>
+    <p lang="ko">검증 문제를 <strong>수학으로</strong> 푼다. 설계를 수식으로 표현하고, 주어진 제약 아래 그것이 성립함을 <strong>증명</strong>한다.</p>
+    <ul lang="ko">
+      <li><strong>Exhaustive</strong>하다. 모든 경우를 다 본 것과 같다. 시뮬레이션이 절대 못 하는 것이다.</li>
+      <li>대신 <strong>state explosion problem</strong>에 걸린다. 상태 수가 폭발해서 계산이 불가능해진다.</li>
+      <li><strong>확장성이 나쁘다.</strong> 어느 정도 복잡한 설계만 되어도 불가능해진다.</li>
+    </ul>
+    <p lang="en">It solves the verification problem <strong>with mathematics</strong>: express the design as a formula and <strong>prove</strong> that it holds under the given constraints.</p>
+    <ul lang="en">
+      <li>It is <strong>exhaustive</strong>, equivalent to having checked every case. Simulation can never do that.</li>
+      <li>In exchange it runs into the <strong>state explosion problem</strong>, where the number of states blows up beyond computation.</li>
+      <li><strong>It does not scale.</strong> Even a fairly complicated design puts it out of reach.</li>
+    </ul>
+  </div>
+
+  <h3 data-slide="37-39"><span lang="ko">밑에 깔린 세 가지 도구</span><span lang="en">The three machines underneath</span></h3>
+  <table>
+    <tr><th lang="ko">이름</th><th lang="en">Name</th><th lang="ko">무엇인가</th><th lang="en">What it is</th><th lang="ko">한계</th><th lang="en">Limit</th></tr>
+    <tr>
+      <td class="hd">BDD<br>ROBDD</td>
+      <td lang="ko">Binary Decision Diagram. boolean 함수를 표현하고 조작하는 자료구조. Reduced Ordered BDD는 <strong>canonical</strong>하다.</td>
+      <td lang="en">Binary Decision Diagram, a data structure for representing and manipulating boolean functions. Reduced ordered BDDs are <strong>canonical</strong>.</td>
+      <td lang="ko" rowspan="2">둘 다 <strong>조합 논리에만</strong> 적용된다</td>
+      <td lang="en" rowspan="2">both apply <strong>only to combinational logic</strong></td>
+    </tr>
+    <tr>
+      <td class="hd">SAT</td>
+      <td lang="ko">Satisfiability. boolean 함수를 참으로 만들 수 있는지 본다. CNF(=POS) 형태로 바꾼 뒤 만족하는 대입을 찾는다. 하나라도 있으면 satisfiable, 하나도 없으면 unsatisfiable.</td>
+      <td lang="en">Satisfiability: can this boolean function ever be true? Convert it to CNF, also called product of sums, then look for a satisfying assignment. One is enough to call it satisfiable; none makes it unsatisfiable.</td>
+    </tr>
+    <tr>
+      <td class="hd" lang="ko">Temporal<br>logic</td><td class="hd" lang="en">Temporal<br>logic</td>
+      <td lang="ko">순차적 동작을 표현하려고 쓴다. CTL, CTL*, LTL이 있다. 예: "req가 발생하면 언젠가는 ack가 온다" = <code>AG(req &rarr; F ack)</code></td>
+      <td lang="en">Used to express sequential behaviour. CTL, CTL* and LTL. For example "when a req occurs it will eventually be acknowledged" is <code>AG(req &rarr; F ack)</code>.</td>
+      <td lang="ko">시간을 다루려고 도입된 것이다</td>
+      <td lang="en">introduced precisely to handle time</td>
+    </tr>
+  </table>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · canonical · AG · F</span><span lang="en">Unpacking the jargon · canonical, AG, F</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>canonical</td><td>발표자 노트의 설명 그대로: <strong>표현이 하나뿐이라는 뜻</strong>. 중복도 반복도 없고 애매함이 없다. 그래서 두 ROBDD가 같은 모양이면 <strong>두 함수가 같다는 것이 즉시 증명된다.</strong> equivalence checking이 여기서 나온다.</td></tr>
+        <tr><td>AG</td><td>A는 <strong>모든 경로에서</strong>(on All paths), G는 <strong>항상</strong>(Globally). 합쳐서 "어떤 일이 벌어지든 언제나".</td></tr>
+        <tr><td>F</td><td><strong>결국은</strong>(Finally). 지금은 아니어도 언젠가 참이 된다.</td></tr>
+        <tr><td>그래서 <code>AG(req &rarr; F ack)</code>는</td><td>"어떤 실행 경로에서든, 언제 req가 뜨더라도, 그 뒤 언젠가는 ack가 뜬다." 이걸 한국어로 읽으면 그냥 <strong>"요청은 반드시 응답받는다"</strong>다.</td></tr>
+        <tr><td>왜 알아둘 가치가 있나</td><td>Lecture 10의 assertion이 이 발상의 실용판이다. SystemVerilog assertion은 temporal logic을 하드웨어 엔지니어가 쓸 수 있게 만든 것이다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>canonical</td><td>As the speaker notes put it, <strong>there is exactly one representation.</strong> No redundancy, no repetition, no ambiguity. So if two ROBDDs have the same shape, <strong>the two functions are immediately proven equal.</strong> Equivalence checking comes from this.</td></tr>
+        <tr><td>AG</td><td>A means <strong>on all paths</strong>, G means <strong>globally</strong>. Together: no matter what happens, always.</td></tr>
+        <tr><td>F</td><td><strong>Finally</strong>, meaning eventually. Not necessarily now, but at some point.</td></tr>
+        <tr><td>So <code>AG(req &rarr; F ack)</code> reads</td><td>"On every execution path, whenever req rises, ack rises at some later point." In plain words, <strong>every request gets answered.</strong></td></tr>
+        <tr><td>Why it is worth knowing</td><td>Assertions in Lecture 10 are the practical version of this idea. SystemVerilog assertions are temporal logic packaged so hardware engineers can use it.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h3 data-slide="40"><span lang="ko">세 가지 기법</span><span lang="en">Three techniques</span></h3>
+  <table>
+    <tr><th lang="ko">기법</th><th lang="en">Technique</th><th lang="ko">무엇을 비교/확인하나</th><th lang="en">What it compares or checks</th><th lang="ko">실무 위치</th><th lang="en">Where it stands</th></tr>
+    <tr>
+      <td class="hd">Equivalence<br>Checking</td>
+      <td lang="ko">서로 다른 두 표현/모델을 비교한다. 보통 추상화 수준이 다른 둘, 예를 들어 RTL과 gate, 또는 RTL과 C++.</td>
+      <td lang="en">Compares two different representations or models, typically at two levels of abstraction such as RTL against gates, or RTL against C++.</td>
+      <td lang="ko"><strong>업계에서 매우 널리 쓰인다.</strong> RTL 대 합성된 netlist 비교가 대표적이고, 이건 통상적인 design verification이 아니다.</td>
+      <td lang="en"><strong>Very popular in industry.</strong> The classic use is RTL against the synthesised netlist, which is not "typical" design verification.</td>
+    </tr>
+    <tr>
+      <td class="hd">Model Checking<br><span lang="ko">(Property Checking)</span></td>
+      <td lang="ko">주어진 모델(설계)이 주어진 제약 아래 주어진 property를 만족하는지 확인한다. 유한 상태 모델에 대해 temporal logic 식을 검사하는 알고리즘이 여럿 있다.</td>
+      <td lang="en">Checks whether a given model satisfies a given property under given constraints. Several efficient algorithms exist for checking temporal logic formulas on finite state models.</td>
+      <td lang="ko">보통 시뮬레이션 기반 design verification을 <strong>보조</strong>하는 데 쓴다.</td>
+      <td lang="en">Usually used <strong>to aid</strong> simulation based design verification.</td>
+    </tr>
+    <tr>
+      <td class="hd">Theorem<br>Proving</td>
+      <td lang="ko">사양과 구현의 관계를 정리(theorem)로 보고, 기호 표현·수리 논리·귀납 증명으로 증명한다.</td>
+      <td lang="en">Treats the relation between specification and implementation as a theorem and proves it with symbolic representations, mathematical logic and inductive proofs.</td>
+      <td lang="ko">도구가 대부분 <strong>학술용</strong>이다. 대신 무한 상태 시스템도 다룰 수 있다.</td>
+      <td lang="en">The tools are <strong>mostly academic.</strong> In exchange it can handle infinite state systems.</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>이 표에서 실무적으로 중요한 줄은 첫 줄이다.</strong> Equivalence checking은 "매우 널리 쓰인다"고 적혀 있고, 용도가 <strong>합성 결과 검증</strong>이다. <a href="L01-course-intro.html#s7">Lecture 1의 ECO</a>가 왜 승인이 필요한지도 여기와 이어진다. netlist를 손으로 고치면 <strong>RTL과 netlist가 같다는 보장이 깨지므로</strong>, equivalence checking을 다시 돌려서 의도한 변경만 들어갔는지 확인해야 한다.</p>
+    <p lang="ko"><strong>Lecture 28이 이 주제 하나에 배정돼 있다</strong> (11월 25일, Amin Rezai). 지금은 세 이름만 갈라두면 된다.</p>
+    <p lang="en"><strong>The row that matters in practice is the first one.</strong> Equivalence checking is described as very popular, and its use is <strong>verifying the result of synthesis.</strong> It also explains why the <a href="L01-course-intro.html#s7">ECO in Lecture 1</a> needs approval: editing the netlist by hand <strong>breaks the guarantee that RTL and netlist agree</strong>, so equivalence checking gets re-run to confirm that only the intended change went in.</p>
+    <p lang="en"><strong>Lecture 28 is devoted to this topic</strong> (November 25, Amin Rezai). For now, just keep the three names apart.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 16 -->
+<section id="s16">
+  <div class="sec-head" data-slide="42-45"><span class="sec-num">16</span><h2 lang="ko">검증의 삼각대</h2><h2 lang="en">The trifecta</h2></div>
+  <p class="sec-sub" lang="ko"><strong>Stimulus · Checkers · Coverage.</strong> 이 과목 2부 전체가 이 세 단어 위에 올라간다. Lab 4·5·6도 각각 이 셋 중 하나씩을 다룬다.</p>
+  <p class="sec-sub" lang="en"><strong>Stimulus, checkers, coverage.</strong> The entire back half of this course stands on these three words, and labs 4, 5 and 6 take one each.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">셋이 함께여야 하는 이유</span><span class="tag" lang="en">Why all three or none</span>
+    <ul lang="ko">
+      <li><strong>Stimulus</strong>만 있으면: 자극은 들어가는데 <strong>아무도 결과가 옳은지 안 본다.</strong> 시뮬레이션은 항상 통과한다.</li>
+      <li><strong>Stimulus + Checkers</strong>면: 틀리면 잡는다. 그런데 <strong>무엇을 안 해봤는지 모른다.</strong></li>
+      <li><strong>셋 다 있으면</strong>: 자극을 넣고, 틀리면 잡고, 무엇을 아직 안 해봤는지 안다. 그제야 "다 했다"고 말할 근거가 생긴다.</li>
+    </ul>
+    <ul lang="en">
+      <li>With <strong>stimulus alone</strong>: things go in, but <strong>nobody checks whether the answer is right.</strong> The simulation always passes.</li>
+      <li>With <strong>stimulus and checkers</strong>: mistakes get caught, but <strong>you have no idea what you never tried.</strong></li>
+      <li>With <strong>all three</strong>: you drive it, you catch mistakes, and you know what is still untouched. Only then is there any basis for saying you are done.</li>
+    </ul>
+  </div>
+
+  <h3 data-slide="43"><span>Stimulus</span></h3>
+  <p lang="ko">DUT를 자극하려고 입력을 넣는 것. 두 종류가 있다.</p>
+  <ul lang="ko">
+    <li><strong>Active</strong>: DUT에 값을 밀어 넣는다.</li>
+    <li><strong>Reactive</strong>: DUT에서 무슨 일이 벌어지면 그에 반응한다.</li>
+  </ul>
+  <p lang="en">Inputs applied to stimulate the DUT. There are two kinds.</p>
+  <ul lang="en">
+    <li><strong>Active</strong>: drive values into the DUT.</li>
+    <li><strong>Reactive</strong>: respond to something that happened inside the DUT.</li>
+  </ul>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · DUT</span><span lang="en">Unpacking the jargon · DUT</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>Design Under Test</td></tr>
+        <tr><td>한 줄</td><td>지금 검증하고 있는 그 설계. testbench가 둘러싸고 두들기는 대상.</td></tr>
+        <tr><td>왜 이 이름인가</td><td>testbench 코드 안에서 <strong>"이건 우리가 만든 게 아니라 검사 대상"</strong>이라는 걸 이름으로 구별하기 위해서다. 실제 인스턴스 이름을 <code>dut</code>로 쓰는 관행이 있다.</td></tr>
+        <tr><td>범위가 바뀐다</td><td>DUT는 고정된 크기가 아니다. FIFO 하나가 DUT일 수도 있고 SoC 전체가 DUT일 수도 있다. 이 과목이 unit / sub-system / top level로 나눠 배우는 게 그 얘기다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>이름에 Test가 들어가지만 <a href="L01-course-intro.html#s9">Lecture 1의 Testing</a>과 무관하다. DUT는 verification 쪽 용어다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>Design Under Test</td></tr>
+        <tr><td>In one line</td><td>The design currently being verified: the thing the testbench surrounds and hammers.</td></tr>
+        <tr><td>Why that name</td><td>So that inside testbench code the name itself says <strong>"this is not ours, this is the thing being examined".</strong> Naming the instance <code>dut</code> is the convention.</td></tr>
+        <tr><td>Its scope moves</td><td>A DUT has no fixed size. It can be one FIFO or an entire SoC. That is what this course means by unit, sub-system and top level verification.</td></tr>
+        <tr><td>Easy to misread</td><td>The word test is in the name but it has nothing to do with <a href="L01-course-intro.html#s9">Testing in Lecture 1</a>. DUT is a verification word.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="trap">
+    <span class="tag" lang="ko">directed test와 randomization</span><span class="tag" lang="en">Directed tests and randomisation</span>
+    <p lang="ko">슬라이드가 directed test를 <strong>"좋기도 하고 나쁘기도 하다"</strong>고 적었다. 발표자 노트가 양쪽을 다 풀어놨다.</p>
+    <ul lang="ko">
+      <li><strong>좋은 점</strong>: 아주 잘 제어된다. 원하는 특정 시나리오를 정확히 만들어낼 수 있다.</li>
+      <li><strong>나쁜 점</strong>: 몇 개나 쓸 수 있겠나? <strong>가능한 시나리오를 사람이 다 생각해낼 수 없다.</strong></li>
+    </ul>
+    <p lang="ko">그래서 <strong>randomization이 예상 못 한 버그를 찾는 데 좋다.</strong> 대신 <strong>constraint</strong>로 불법 입력값이 들어가는 걸 막아야 한다. 아무거나 넣으면 설계가 애초에 대응할 필요 없는 상황에서 실패하고, 그건 버그가 아니다.</p>
+    <h4 lang="ko">무엇을 randomize 하나</h4>
+    <ul lang="ko">
+      <li><strong>값</strong>: data, addr 같은 것. 다만 <strong>값 자체보다 값의 분포가 더 중요한 경우가 많다.</strong></li>
+      <li>randomize 대상은 DUT의 입력일 수도 있고 <strong>DUT의 상태</strong>일 수도 있다.</li>
+      <li><strong>타이밍과 순서</strong>: Pkt1 → 지연 → Pkt2 처럼.</li>
+      <li><strong>몇 개의 인터페이스를 동시에 흔들지.</strong></li>
+    </ul>
+    <p lang="ko"><strong>뒤의 둘이 핵심이다.</strong> <a href="#s2">02절</a>에서 control path 버그는 순서와 타이밍이 겹칠 때만 드러난다고 했다. 값만 랜덤하게 넣으면 그 버그는 영원히 안 나온다.</p>
+    <p lang="en">The slide calls directed tests <strong>"good and bad"</strong>, and the speaker notes unpack both halves.</p>
+    <ul lang="en">
+      <li><strong>Good:</strong> extremely controllable. You can construct exactly the scenario you want.</li>
+      <li><strong>Bad:</strong> how many can you write? <strong>You cannot think of all the possible scenarios.</strong></li>
+    </ul>
+    <p lang="en">Hence <strong>randomisation is great for finding unexpected bugs</strong>, with <strong>constraints</strong> to stop illegal input values getting through. Throw anything at it and the design fails in a situation it was never required to handle, and that is not a bug.</p>
+    <h4 lang="en">What you can randomise</h4>
+    <ul lang="en">
+      <li><strong>Values</strong>, such as data and addresses. Though <strong>the distribution of values often matters more than the values themselves.</strong></li>
+      <li>What you randomise can be an input to the DUT or <strong>the state of the DUT.</strong></li>
+      <li><strong>Timing and ordering</strong>, as in packet 1, then a delay, then packet 2.</li>
+      <li><strong>How many interfaces to wiggle at once.</strong></li>
+    </ul>
+    <p lang="en"><strong>The last two are the important ones.</strong> <a href="#s2">§02</a> said control path bugs only appear when ordering and timing overlap a certain way. Randomising values alone will never surface them.</p>
+  </div>
+
+  <h3 data-slide="44"><span>Checkers</span></h3>
+  <p lang="ko">DUT가 제대로 동작하는지 확인하고, <strong>불법적인 일이 벌어지면 오류를 띄운다.</strong> 두 층이 있다.</p>
+  <p lang="en">Confirming the DUT behaves correctly and <strong>raising an error when something illegal happens.</strong> There are two layers.</p>
+
+  <table>
+    <tr><th lang="ko">층</th><th lang="en">Layer</th><th lang="ko">무엇을 보나</th><th lang="en">What it watches</th><th lang="ko">형태</th><th lang="en">Form</th></tr>
+    <tr>
+      <td class="hd" lang="ko">신호 수준</td><td class="hd" lang="en">Signal level</td>
+      <td lang="ko"><strong>"항상 켜져 있는(always on)" 검사.</strong> 매 클럭 감시한다.</td>
+      <td lang="en"><strong>Always-on checks</strong>, watching every clock.</td>
+      <td lang="ko">Assertion. 설계가 반드시 보여야 하거나 절대 보이면 안 되는 동작을 명시한다.</td>
+      <td lang="en">Assertions: statements of behaviour the design must, or must never, exhibit.</td>
+    </tr>
+    <tr>
+      <td class="hd" lang="ko">동작 수준</td><td class="hd" lang="en">Behavioural</td>
+      <td lang="ko">거래(transaction) 단위로 들어간 것과 나온 것을 맞춰본다.</td>
+      <td lang="en">Matches what went in against what came out, transaction by transaction.</td>
+      <td lang="ko">Scoreboard. 그 밖에 register checker, state machine checker 등.</td>
+      <td lang="en">Scoreboards, plus register checkers, state machine checkers and so on.</td>
+    </tr>
+  </table>
+
+  <p lang="ko">슬라이드가 든 assertion 예시 셋을 그대로 옮긴다.</p>
+  <p lang="en">The three examples the slide gives, verbatim.</p>
+  <pre class="code"><span class="c">// FIFO는 overflow 하거나 underflow 하면 안 된다 (말로 쓴 property)</span>
+<span class="k">assert property</span> (@(<span class="k">posedge</span> clk)  start  ##<span class="n">2</span>  transfer);
+<span class="k">assert property</span> (@(<span class="k">posedge</span> clk)  !(grant0 &amp; grant1));</pre>
+  <p lang="ko">둘째 줄은 <strong>"start가 뜨면 2클럭 뒤에 transfer가 떠야 한다"</strong>, 셋째 줄은 <strong>"grant0과 grant1이 동시에 뜨면 안 된다"</strong>이다. 두 번째가 arbiter의 전형적인 안전 조건이다.</p>
+  <p lang="ko">Scoreboard의 예는 이렇다: <strong>데이터 X를 담은 transaction을 DUT에 넣었으니, 응답 transaction은 데이터 Y여야 한다.</strong></p>
+  <p lang="en">The second line says <strong>"if start rises, transfer must rise two clocks later"</strong>, and the third says <strong>"grant0 and grant1 must never be high together"</strong>, which is the classic safety condition for an arbiter.</p>
+  <p lang="en">The scoreboard example: <strong>a transaction carrying data X went into the DUT, so the response transaction should carry data Y.</strong></p>
+
+  <div class="callout">
+    <p lang="ko"><strong>Lecture 10이 Assertion Based Verification 하나에 배정돼 있고</strong> (10월 19일), Lab 4가 FIFO checker, Lab 6이 assertion을 다룬다. 지금은 <strong>"항상 켜져 있다"</strong>는 성질만 붙잡아두면 된다. 그게 assertion과 일반 테스트 코드의 결정적 차이다. 테스트는 그 시나리오에서만 확인하지만 assertion은 <strong>어떤 테스트를 돌리든 계속 감시한다.</strong></p>
+    <p lang="en"><strong>Lecture 10 is devoted to assertion based verification</strong> (October 19), Lab 4 covers a FIFO checker and Lab 6 covers assertions. For now, hold onto the <strong>always on</strong> property. That is the decisive difference between an assertion and ordinary test code: a test checks within its own scenario, while an assertion <strong>keeps watching no matter which test is running.</strong></p>
+  </div>
+
+  <h3 data-slide="45"><span>Coverage</span></h3>
+  <p lang="ko"><strong>DUT를 얼마나 잘 두들겼는지를 정량화</strong>한 것. 모든 테스트를 돌리고, 커버리지 결과를 합치고(merge), 점수를 낸다. <strong>점수가 높을수록 stimulus의 품질이 높다.</strong></p>
+  <p lang="en">A <strong>quantitative measure of how well the DUT was exercised.</strong> Run all the tests, merge the coverage results, produce a score. <strong>The higher the score, the better the quality of the stimulus.</strong></p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">실패한 테스트는 커버리지에서 뺀다</span><span class="tag" lang="en">Drop failing tests from coverage</span>
+    <p lang="ko">슬라이드가 짧게 한 줄로 적었지만 실무에서 계속 사고 나는 지점이다. <strong>실패한 테스트의 커버리지를 세면 안 된다.</strong> 그 테스트는 도중에 죽었거나 잘못된 상태로 갔을 수 있는데, 그 경로를 "확인했다"고 세면 <strong>커버리지 점수가 거짓말을 한다.</strong></p>
+    <p lang="en">One line on the slide, but a recurring accident in practice. <strong>Never count coverage from a failing test.</strong> That run may have died partway or wandered into a bad state, and counting the path as "checked" makes <strong>the coverage score lie to you.</strong></p>
+  </div>
+
+  <table>
+    <tr><th lang="ko">종류</th><th lang="en">Kind</th><th lang="ko">세부</th><th lang="en">Detail</th><th lang="ko">무엇을 알려주나</th><th lang="en">What it tells you</th></tr>
+    <tr>
+      <td class="hd">Code Coverage</td>
+      <td>Line, State Machine, Toggle, Branch</td>
+      <td lang="ko">코드의 그 줄·분기·상태·신호가 <strong>실행되거나 바뀌었다</strong>는 것</td>
+      <td lang="en">that the line, branch, state or signal <strong>was executed or toggled</strong></td>
+    </tr>
+    <tr>
+      <td class="hd">Functional Coverage</td>
+      <td lang="ko">보고 싶은 시나리오를 <strong>코드로 직접 적는다</strong></td>
+      <td lang="en">the scenarios you want to see, <strong>written out as code</strong></td>
+      <td lang="ko">그 <strong>상황이 실제로 벌어졌다</strong>는 것</td>
+      <td lang="en">that the <strong>situation actually occurred</strong></td>
+    </tr>
+  </table>
+
+  <div class="trap">
+    <span class="tag" lang="ko">복습 문제 6번: code coverage의 한계</span><span class="tag" lang="en">Review question 6: the limits of code coverage</span>
+    <p lang="ko">슬라이드가 code coverage 항목 아래에 <strong>"Limitations?"</strong>이라고만 적어놓고 넘어갔다. 복습 문제 6번이 같은 걸 다시 묻는다. 답은 셋이다.</p>
+    <ol lang="ko">
+      <li><strong>실행된 것과 옳은 것은 다르다.</strong> line coverage 100%는 모든 줄이 한 번씩 돌았다는 뜻일 뿐이다. checker가 없으면 그 줄이 틀린 값을 내도 커버리지는 100%다.</li>
+      <li><strong>코드에 없는 시나리오는 셀 수 없다.</strong> "FIFO가 가득 찬 상태에서 write가 들어왔다"는 상황은 코드 어느 줄에도 대응하지 않는다. 각 줄은 다 돌았어도 그 <strong>조합</strong>은 한 번도 안 일어났을 수 있다.</li>
+      <li><strong>도달할 수 없는 코드가 점수를 깎는다.</strong> 반대 방향의 문제다. 실제로 절대 안 도는 코드가 있으면 100%가 영원히 안 나오고, 그걸 일일이 면제(waive) 처리해야 한다.</li>
+    </ol>
+    <p lang="ko"><strong>functional coverage가 2번을 해결한다.</strong> "이런 상황을 보고 싶다"를 직접 적어두면, 그 상황이 실제로 벌어졌는지를 센다. 대신 <strong>사람이 무엇을 볼지 미리 정해야 하므로</strong> 상상력의 한계가 다시 들어온다. 그래서 둘을 같이 쓴다.</p>
+    <p lang="en">The slide writes <strong>"Limitations?"</strong> under code coverage and moves on, and review question 6 asks it again. Three answers.</p>
+    <ol lang="en">
+      <li><strong>Executed is not the same as correct.</strong> 100% line coverage only says every line ran once. With no checker, a line can produce a wrong value and coverage is still 100%.</li>
+      <li><strong>It cannot count scenarios that are not lines of code.</strong> "A write arrived while the FIFO was full" corresponds to no single line. Every line may have run and that <strong>combination</strong> never occurred.</li>
+      <li><strong>Unreachable code drags the score down.</strong> The opposite problem: if code genuinely never runs, 100% is unattainable and each case has to be waived by hand.</li>
+    </ol>
+    <p lang="en"><strong>Functional coverage solves the second one.</strong> Write down the situation you want to see and it counts whether that situation actually happened. The cost is that <strong>a person must decide in advance what to look for</strong>, so the imagination limit comes back. Which is why both are used together.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 17 -->
+<section id="s17">
+  <div class="sec-head" data-slide="46"><span class="sec-num">17</span><h2>TLM</h2></div>
+  <p class="sec-sub" lang="ko">신호를 하나하나 흔드는 대신 <strong>"쓰기 한 건"</strong>을 통째로 다루는 방식. Testbench가 왜 그렇게 생겼는지의 배경이다.</p>
+  <p class="sec-sub" lang="en">Handling <strong>"one write"</strong> as a whole instead of wiggling signals one at a time. It is the background to why testbenches look the way they do.</p>
+
+  <div class="def">
+    <span class="tag">Transaction Level Modeling</span>
+    <p lang="ko">디지털 시스템을 <strong>RTL보다 높은 추상화 수준</strong>에서 모델링하는 것.</p>
+    <ul lang="ko">
+      <li>세부가 적다 · 코딩이 쉽다 · 시뮬레이션이 빠르다</li>
+      <li>기존 방식: 블록 A(RTL) ↔ 블록 B(RTL)를 <strong>신호 다발로</strong> 연결</li>
+      <li>TLM 방식: 블록 A ↔ 블록 B를 <strong><code>write(address, data)</code> 같은 호출로</strong> 연결</li>
+    </ul>
+    <p lang="en">Modelling digital systems at <strong>a higher level of abstraction than RTL.</strong></p>
+    <ul lang="en">
+      <li>Fewer details, easier to code, faster to simulate.</li>
+      <li>Traditional: block A in RTL wired to block B in RTL by <strong>a bundle of signals.</strong></li>
+      <li>TLM: block A talks to block B through <strong>a call such as <code>write(address, data)</code>.</strong></li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>발표자 노트가 이 대목을 이렇게 요약했다:</strong> "개별 신호를 다루는 대신 transaction 단위로 이야기하라. pin accurate하고 cycle accurate한 것과 대비된다."</p>
+    <p lang="ko"><strong>왜 이게 testbench 이야기의 앞에 나오나.</strong> 다음 절의 testbench 구성도를 보면 <strong>Stimulus와 Driver가 분리되어 있다.</strong> 그 경계가 정확히 여기다. Stimulus는 "주소 0x40에 0xDEAD를 써라"라는 <strong>transaction</strong>을 만들고, Driver가 그것을 <strong>실제 신호 흔들기</strong>로 번역한다. TLM을 모르면 왜 두 칸으로 나눴는지가 안 보인다.</p>
+    <p lang="en"><strong>The speaker notes summarise it as:</strong> talk in terms of transactions rather than handling individual signals, as opposed to being pin accurate and cycle accurate.</p>
+    <p lang="en"><strong>Why this comes just before the testbench.</strong> In the next section's diagram, <strong>stimulus and driver are separate boxes</strong>, and this is exactly the boundary between them. Stimulus produces a <strong>transaction</strong> that says "write 0xDEAD to address 0x40", and the driver translates that into <strong>actual signal wiggling.</strong> Without TLM the split looks arbitrary.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 18 -->
+<section id="s18">
+  <div class="sec-head" data-slide="47-51"><span class="sec-num">18</span><h2 lang="ko">Testbench 조립하기</h2><h2 lang="en">Assembling a testbench</h2></div>
+  <p class="sec-sub" lang="ko">슬라이드 다섯 장이 <strong>같은 그림에 한 칸씩 얹어가며</strong> 완성한다. 이 순서 자체가 설명이다. 각 칸이 없으면 무엇을 못 하는지가 순서에서 나온다.</p>
+  <p class="sec-sub" lang="en">Five slides build <strong>one picture, adding a box at a time.</strong> The order is the explanation: what each box is for shows up as what you could not do before it arrived.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 340" role="img" aria-label="완성된 testbench 구성도: Stimulus, Driver, DUT, Monitor, Checker, Coverage, Assertions">
+      <defs>
+        <marker id="g5-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <!-- Coverage / Checker -->
+      <rect x="272" y="14" width="156" height="34" rx="6" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.5"/>
+      <text class="svgtxt" x="350" y="36" text-anchor="middle" style="font-size:13px;font-weight:650">Coverage</text>
+      <rect x="272" y="60" width="156" height="34" rx="6" fill="rgba(var(--pink-rgb),.16)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="350" y="82" text-anchor="middle" style="font-size:13px;font-weight:650">Checker</text>
+
+      <!-- agent 경계 -->
+      <rect x="108" y="112" width="484" height="140" rx="10" fill="rgba(var(--ink-rgb),.03)" stroke="var(--rule)" stroke-width="1.4"/>
+
+      <!-- Monitor -->
+      <rect x="150" y="124" width="120" height="32" rx="6" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.4"/>
+      <text class="svgtxt" x="210" y="145" text-anchor="middle" style="font-size:12px">Monitor</text>
+      <rect x="430" y="124" width="120" height="32" rx="6" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.4"/>
+      <text class="svgtxt" x="490" y="145" text-anchor="middle" style="font-size:12px">Monitor</text>
+
+      <!-- Driver / DUT -->
+      <rect x="150" y="180" width="120" height="52" rx="6" fill="rgba(var(--pink-rgb),.2)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="210" y="211" text-anchor="middle" style="font-size:12.5px">Driver</text>
+      <rect x="430" y="180" width="120" height="52" rx="6" fill="rgba(var(--pink-rgb),.2)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="490" y="211" text-anchor="middle" style="font-size:12.5px">Driver</text>
+
+      <rect x="298" y="180" width="104" height="52" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="2.2"/>
+      <text class="svgtxt" x="350" y="211" text-anchor="middle" style="font-size:14px;font-weight:750">DUT</text>
+
+      <!-- Stimulus -->
+      <rect x="14" y="180" width="112" height="52" rx="6" fill="rgba(var(--violet-rgb),.16)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="70" y="211" text-anchor="middle" style="font-size:12.5px">Stimulus</text>
+      <rect x="574" y="180" width="112" height="52" rx="6" fill="rgba(var(--violet-rgb),.16)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="630" y="211" text-anchor="middle" style="font-size:12.5px">Stimulus</text>
+
+      <!-- Assertions -->
+      <rect x="272" y="272" width="156" height="34" rx="6" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.5"/>
+      <text class="svgtxt" x="350" y="294" text-anchor="middle" style="font-size:13px;font-weight:650">Assertions</text>
+
+      <!-- 연결 -->
+      <line x1="128" y1="206" x2="146" y2="206" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g5-ar)"/>
+      <line x1="572" y1="206" x2="554" y2="206" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g5-ar)"/>
+      <line x1="272" y1="206" x2="294" y2="206" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g5-ar)"/>
+      <line x1="428" y1="206" x2="406" y2="206" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g5-ar)"/>
+      <line x1="210" y1="178" x2="210" y2="160" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g5-ar)"/>
+      <line x1="490" y1="178" x2="490" y2="160" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g5-ar)"/>
+      <path d="M210 122 V102 H268" fill="none" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g5-ar)"/>
+      <path d="M490 122 V102 H432" fill="none" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g5-ar)"/>
+      <path d="M280 77 H262 V31 H268" fill="none" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#g5-ar)"/>
+      <line x1="350" y1="234" x2="350" y2="268" stroke="var(--amber)" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#g5-ar)"/>
+
+      <!-- 라벨 -->
+      <text class="svglab" x="580" y="246" text-anchor="end" style="fill:var(--ink2);font-size:10px" lang="ko">이 테두리 = Driver + Monitor = Agent (= BFM = Transactor)</text>
+      <text class="svglab" x="580" y="246" text-anchor="end" style="fill:var(--ink2);font-size:10px" lang="en">this border: driver + monitor = Agent (= BFM = Transactor)</text>
+      <text class="svglab" x="14" y="264" style="font-size:10px" lang="ko">transaction 수준</text>
+      <text class="svglab" x="14" y="264" style="font-size:10px" lang="en">transaction level</text>
+      <text class="svglab" x="150" y="264" style="font-size:10px" lang="ko">신호 수준으로 번역</text>
+      <text class="svglab" x="150" y="264" style="font-size:10px" lang="en">translated to signal level</text>
+      <text class="svglab" x="350" y="324" text-anchor="middle" style="font-size:10px;fill:var(--amber)" lang="ko">DUT 안에 박혀서 항상 감시한다</text>
+      <text class="svglab" x="350" y="324" text-anchor="middle" style="font-size:10px;fill:var(--amber)" lang="en">bound inside the DUT, watching always</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 47~51쪽을 합친 것. <strong>인터페이스가 둘이라 Driver와 Monitor도 둘이다.</strong> Checker와 Coverage는 양쪽 Monitor에서 다 받는다. 한쪽만 보면 "들어간 것"이나 "나온 것" 중 하나밖에 모르기 때문이다.</figcaption>
+    <figcaption lang="en">Slides 47 to 51 combined. <strong>Two interfaces means two drivers and two monitors.</strong> The checker and the coverage collector both feed from both monitors, because one side alone tells you only what went in, or only what came out.</figcaption>
+  </figure>
+
+  <h3 lang="ko">쌓인 순서와 그 이유</h3>
+  <h3 lang="en">The order it was stacked, and why</h3>
+  <table>
+    <tr><th lang="ko">슬라이드</th><th lang="en">Slide</th><th lang="ko">추가된 것</th><th lang="en">What was added</th><th lang="ko">그 전에는 못 하던 것</th><th lang="en">What you could not do before it</th></tr>
+    <tr><td class="hd">47</td><td>Stimulus, Driver, DUT, Interfaces</td>
+      <td lang="ko">아무것도. 자극은 들어가지만 <strong>결과를 보는 사람이 없다.</strong> 시뮬레이션은 무조건 통과한다.</td>
+      <td lang="en">nothing. Things go in but <strong>nobody looks at the result.</strong> The simulation passes unconditionally.</td></tr>
+    <tr><td class="hd">48</td><td>Monitor</td>
+      <td lang="ko"><strong>신호를 관측</strong>할 수 있게 됐다. 다만 관측만 하지 판단은 안 한다.</td>
+      <td lang="en">now the signals can be <strong>observed.</strong> Observed only, not judged.</td></tr>
+    <tr><td class="hd">49</td><td>Checker</td>
+      <td lang="ko"><strong>틀리면 잡는다.</strong> 그런데 무엇을 안 해봤는지는 여전히 모른다.</td>
+      <td lang="en"><strong>mistakes get caught.</strong> Still no idea what was never tried.</td></tr>
+    <tr><td class="hd">50</td><td>Coverage</td>
+      <td lang="ko"><strong>무엇을 안 해봤는지 안다.</strong> 이제 "다 했다"고 말할 근거가 생긴다.</td>
+      <td lang="en"><strong>now you know what is untouched</strong>, and can start to justify saying you are done.</td></tr>
+    <tr><td class="hd">51</td><td>Assertions</td>
+      <td lang="ko">DUT <strong>내부</strong>의 불변식을 항상 감시한다. 밖에서만 보면 안 보이는 위반을 잡는다.</td>
+      <td lang="en">invariants <strong>inside</strong> the DUT get watched at all times, catching violations invisible from outside.</td></tr>
+  </table>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · Driver · Monitor · Agent · BFM</span><span lang="en">Unpacking the jargon · driver, monitor, agent, BFM</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>Driver</td><td>transaction을 받아서 <strong>실제 신호로 번역해 DUT에 밀어 넣는다.</strong> 프로토콜을 아는 쪽이다. 능동.</td></tr>
+        <tr><td>Monitor</td><td>인터페이스의 신호를 <strong>읽어서 transaction으로 되돌린다.</strong> DUT를 건드리지 않는다. 수동.</td></tr>
+        <tr><td>왜 둘로 나누나</td><td>같은 프로토콜을 아는데 방향이 반대다. 그리고 <strong>Monitor는 Driver가 없는 곳에도 붙일 수 있다.</strong> 실제 DUT끼리 붙은 인터페이스를 엿볼 때가 그렇다.</td></tr>
+        <tr><td>Agent / BFM / Transactor</td><td>Driver와 Monitor(그리고 인터페이스)를 <strong>한 부품으로 묶은 것.</strong> 세 이름이 같은 것을 가리킨다. BFM은 Bus Functional Model.</td></tr>
+        <tr><td>왜 묶나</td><td><strong>재사용 단위이기 때문이다.</strong> APB agent를 한 번 만들어두면 APB를 쓰는 어떤 DUT에도 그대로 붙는다. Lab 6이 APB agent를 만드는 이유가 이것이다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>회사와 팀마다 셋 중 아무거나 쓴다. UVM에서는 <code>uvm_agent</code>라서 <strong>Agent가 가장 표준적인 이름</strong>이다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Driver</td><td>Takes a transaction and <strong>translates it into real signals pushed into the DUT.</strong> It is the side that knows the protocol. Active.</td></tr>
+        <tr><td>Monitor</td><td><strong>Reads the interface signals and reconstructs transactions.</strong> It never touches the DUT. Passive.</td></tr>
+        <tr><td>Why split them</td><td>Same protocol knowledge, opposite direction. And <strong>a monitor can be attached where no driver exists</strong>, for instance to eavesdrop on an interface between two real DUTs.</td></tr>
+        <tr><td>Agent / BFM / Transactor</td><td>The driver and monitor, plus the interface, <strong>bundled as one component.</strong> Three names for the same thing. BFM stands for Bus Functional Model.</td></tr>
+        <tr><td>Why bundle</td><td><strong>Because that is the unit of reuse.</strong> Build an APB agent once and it plugs into any DUT that speaks APB, which is exactly what Lab 6 has you build.</td></tr>
+        <tr><td>Easy to misread</td><td>Companies and teams use all three names. UVM calls it <code>uvm_agent</code>, so <strong>Agent is the most standard.</strong></td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 19 -->
+<section id="s19">
+  <div class="sec-head"><span class="sec-num">19</span><h2 lang="ko">직접 조립해보기</h2><h2 lang="en">Assemble it yourself</h2></div>
+  <p class="sec-sub" lang="ko">부품을 하나씩 붙여보면서 <strong>그게 없을 때 무엇을 못 잡는지</strong>를 확인한다. 빈 상태에서 시작해서 하나씩 켜볼 것.</p>
+  <p class="sec-sub" lang="en">Add the parts one at a time and watch <strong>what you cannot catch without each one.</strong> Start from empty and switch them on.</p>
+
+  <div class="play">
+    <div class="plab" lang="ko">부품 붙이기</div>
+    <div class="plab" lang="en">Add components</div>
+    <div class="presets" id="tbbtn"></div>
+
+    <svg id="tbsvg" viewBox="0 0 700 300" role="img" aria-label="부품을 켜고 끌 수 있는 testbench 구성도" style="margin-top:18px">
+      <defs>
+        <marker id="g6-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <!-- 항상 있는 것 -->
+      <rect x="20" y="150" width="118" height="52" rx="6" fill="rgba(var(--violet-rgb),.16)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="79" y="181" text-anchor="middle" style="font-size:12.5px">Stimulus</text>
+      <rect x="176" y="150" width="118" height="52" rx="6" fill="rgba(var(--pink-rgb),.2)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="235" y="181" text-anchor="middle" style="font-size:12.5px">Driver</text>
+      <rect x="332" y="150" width="118" height="52" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="2.2"/>
+      <text class="svgtxt" x="391" y="181" text-anchor="middle" style="font-size:14px;font-weight:750">DUT</text>
+      <line x1="140" y1="176" x2="172" y2="176" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g6-ar)"/>
+      <line x1="296" y1="176" x2="328" y2="176" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g6-ar)"/>
+
+      <!-- 켜고 끄는 것 -->
+      <g data-part="monitor">
+        <rect x="488" y="150" width="118" height="52" rx="6" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.5"/>
+        <text class="svgtxt" x="547" y="181" text-anchor="middle" style="font-size:12.5px">Monitor</text>
+        <line x1="452" y1="176" x2="484" y2="176" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g6-ar)"/>
+      </g>
+      <g data-part="checker">
+        <rect x="488" y="78" width="118" height="44" rx="6" fill="rgba(var(--pink-rgb),.18)" stroke="var(--pink)" stroke-width="1.5"/>
+        <text class="svgtxt" x="547" y="105" text-anchor="middle" style="font-size:12.5px">Checker</text>
+        <line x1="547" y1="148" x2="547" y2="126" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g6-ar)"/>
+      </g>
+      <g data-part="coverage">
+        <rect x="488" y="14" width="118" height="44" rx="6" fill="rgba(var(--green-rgb),.18)" stroke="var(--green)" stroke-width="1.5"/>
+        <text class="svgtxt" x="547" y="41" text-anchor="middle" style="font-size:12.5px">Coverage</text>
+        <path d="M620 176 V36 H610" fill="none" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#g6-ar)"/>
+        <line x1="606" y1="176" x2="620" y2="176" stroke="var(--ink3)" stroke-width="1.3"/>
+      </g>
+      <g data-part="assert">
+        <rect x="332" y="238" width="118" height="44" rx="6" fill="rgba(var(--amber-rgb),.18)" stroke="var(--amber)" stroke-width="1.5"/>
+        <text class="svgtxt" x="391" y="265" text-anchor="middle" style="font-size:12.5px">Assertions</text>
+        <line x1="391" y1="204" x2="391" y2="234" stroke="var(--amber)" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#g6-ar)"/>
+      </g>
+    </svg>
+
+    <div class="verdict" id="tbv" style="margin-top:18px"></div>
+    <div class="hintline" lang="ko"><strong>순서를 지켜야 한다:</strong> Checker와 Coverage는 Monitor 없이 못 붙는다. 관측을 안 하는데 판단하거나 셀 수는 없기 때문이다. Assertion은 DUT 안에 박히는 것이라 Monitor와 무관하게 붙는다.</div>
+    <div class="hintline" lang="en"><strong>Order matters:</strong> checker and coverage cannot attach without a monitor, because you cannot judge or count what nobody observed. Assertions bind inside the DUT, so they attach independently.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 20 -->
+<section id="s20">
+  <div class="sec-head" data-slide="52-53"><span class="sec-num">20</span><h2 lang="ko">Verification Plan과 검증자의 하루</h2><h2 lang="en">The plan and the verifier's day</h2></div>
+  <p class="sec-sub" lang="ko">앞의 삼각대가 문서로 굳으면 verification plan이 된다. 그리고 그 문서가 검증 엔지니어의 하루를 만든다.</p>
+  <p class="sec-sub" lang="en">The trifecta written down becomes a verification plan, and that document shapes the verification engineer's day.</p>
+
+  <div class="def">
+    <span class="tag">Verification Plan</span>
+    <p lang="ko">DUT를 <strong>어떻게 검증할 것인지</strong>를 적은 문서. 담기는 것은 이렇다.</p>
+    <ul lang="ko">
+      <li><strong>전략</strong></li>
+      <li><strong>방법론</strong>: simulation인지 formal인지</li>
+      <li><strong>testbench 구성 요소</strong></li>
+      <li><strong>sign-off 기준</strong>: 무엇을 만족하면 끝났다고 할 것인가</li>
+      <li><strong>기능 목록</strong>, 그리고 <strong>기능마다 세 가지</strong>:
+        <ul>
+          <li>Stimulus: "입력 A → B → C를 넣고 D는 0으로 유지한다"</li>
+          <li>Checking: "상태 X에 들어갈 때마다 E가 1이 되는지 확인한다"</li>
+          <li>Coverage: "상태 X에 도달했다"</li>
+        </ul>
+      </li>
+    </ul>
+    <p lang="ko">형식은 여러 가지다. Word, Excel, Synopsys HVP, Cadence VPlan.</p>
+    <p lang="en">A document describing <strong>how you will verify a DUT.</strong> It holds:</p>
+    <ul lang="en">
+      <li><strong>Strategy.</strong></li>
+      <li><strong>Methodology</strong>: simulation, formal, or both.</li>
+      <li><strong>Testbench components.</strong></li>
+      <li><strong>Sign-off metrics</strong>: what has to hold before you call it finished.</li>
+      <li><strong>Features</strong>, and for every feature <strong>three things</strong>:
+        <ul>
+          <li>Stimulus: "apply inputs A then B then C, holding D at 0".</li>
+          <li>Checking: "check that E goes to 1 every time we enter state X".</li>
+          <li>Coverage: "state X was reached".</li>
+        </ul>
+      </li>
+    </ul>
+    <p lang="en">Formats vary: Word, Excel, Synopsys HVP, Cadence VPlan.</p>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>기능마다 세 줄이 곧 삼각대다.</strong> <a href="#s16">16절</a>의 stimulus·checkers·coverage가 문서 양식으로 굳은 것이 verification plan이다. 그래서 plan을 쓰는 일은 형식 작업이 아니라 <strong>"이 기능을 어떻게 두들기고, 무엇으로 옳다고 판정하고, 무엇을 보면 다 했다고 할지"를 미리 정하는 일</strong>이다.</p>
+    <p lang="en"><strong>Three lines per feature is the trifecta.</strong> Stimulus, checkers and coverage from <a href="#s16">§16</a>, frozen into a document format. Writing a plan is therefore not paperwork: it is <strong>deciding up front how you will exercise a feature, what will judge it correct, and what will tell you it is finished.</strong></p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="검증 엔지니어의 작업 순서와 언제 멈추는지의 기준">
+      <defs>
+        <marker id="g7-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+        <marker id="g7-ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--pink)"/>
+        </marker>
+      </defs>
+
+      <rect x="16" y="20" width="150" height="46" rx="7" fill="rgba(var(--blue-rgb),.10)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svgtxt" x="91" y="48" text-anchor="middle" style="font-size:11.5px" lang="ko">사양 문서 읽기</text>
+      <text class="svgtxt" x="91" y="48" text-anchor="middle" style="font-size:11.5px" lang="en">Reading specifications</text>
+
+      <rect x="16" y="88" width="150" height="46" rx="7" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.3"/>
+      <text class="svgtxt" x="91" y="109" text-anchor="middle" style="font-size:11.5px" lang="ko">verification plan</text>
+      <text class="svgtxt" x="91" y="125" text-anchor="middle" style="font-size:11.5px" lang="ko">작성</text>
+      <text class="svgtxt" x="91" y="109" text-anchor="middle" style="font-size:11.5px" lang="en">Charting out a</text>
+      <text class="svgtxt" x="91" y="125" text-anchor="middle" style="font-size:11.5px" lang="en">verification plan</text>
+
+      <rect x="16" y="156" width="150" height="46" rx="7" fill="rgba(var(--pink-rgb),.16)" stroke="var(--pink)" stroke-width="1.3"/>
+      <text class="svgtxt" x="91" y="184" text-anchor="middle" style="font-size:11.5px" lang="ko">testbench 만들기</text>
+      <text class="svgtxt" x="91" y="184" text-anchor="middle" style="font-size:11.5px" lang="en">Building a testbench</text>
+
+      <rect x="192" y="156" width="150" height="46" rx="7" fill="rgba(var(--pink-rgb),.16)" stroke="var(--pink)" stroke-width="1.3"/>
+      <text class="svgtxt" x="267" y="177" text-anchor="middle" style="font-size:11.5px" lang="ko">testbench와 DUT</text>
+      <text class="svgtxt" x="267" y="193" text-anchor="middle" style="font-size:11.5px" lang="ko">bring-up</text>
+      <text class="svgtxt" x="267" y="177" text-anchor="middle" style="font-size:11.5px" lang="en">Testbench and DUT</text>
+      <text class="svgtxt" x="267" y="193" text-anchor="middle" style="font-size:11.5px" lang="en">bringup</text>
+
+      <rect x="192" y="88" width="150" height="46" rx="7" fill="rgba(var(--pink-rgb),.2)" stroke="var(--pink)" stroke-width="1.4"/>
+      <text class="svgtxt" x="267" y="109" text-anchor="middle" style="font-size:11.5px" lang="ko">checker와 functional</text>
+      <text class="svgtxt" x="267" y="125" text-anchor="middle" style="font-size:11.5px" lang="ko">coverage 작성</text>
+      <text class="svgtxt" x="267" y="109" text-anchor="middle" style="font-size:11.5px" lang="en">Write checkers and</text>
+      <text class="svgtxt" x="267" y="125" text-anchor="middle" style="font-size:11.5px" lang="en">functional coverage</text>
+
+      <rect x="192" y="20" width="150" height="46" rx="7" fill="rgba(var(--pink-rgb),.2)" stroke="var(--pink)" stroke-width="1.4"/>
+      <text class="svgtxt" x="267" y="41" text-anchor="middle" style="font-size:11.5px" lang="ko">constrained random</text>
+      <text class="svgtxt" x="267" y="57" text-anchor="middle" style="font-size:11.5px" lang="ko">test 작성</text>
+      <text class="svgtxt" x="267" y="41" text-anchor="middle" style="font-size:11.5px" lang="en">Writing constrained</text>
+      <text class="svgtxt" x="267" y="57" text-anchor="middle" style="font-size:11.5px" lang="en">random tests</text>
+
+      <rect x="368" y="20" width="150" height="46" rx="7" fill="rgba(var(--pink-rgb),.2)" stroke="var(--pink)" stroke-width="1.4"/>
+      <text class="svgtxt" x="443" y="41" text-anchor="middle" style="font-size:11.5px" lang="ko">커버리지 분석</text>
+      <text class="svgtxt" x="443" y="57" text-anchor="middle" style="font-size:11.5px" lang="ko">실패 디버깅</text>
+      <text class="svgtxt" x="443" y="41" text-anchor="middle" style="font-size:11.5px" lang="en">Analyzing coverage</text>
+      <text class="svgtxt" x="443" y="57" text-anchor="middle" style="font-size:11.5px" lang="en">Debug failures</text>
+
+      <rect x="368" y="88" width="150" height="70" rx="7" fill="rgba(var(--green-rgb),.10)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svglab" x="443" y="106" text-anchor="middle" style="fill:var(--green);font-weight:700;font-size:10px" lang="ko">멈추는 조건</text>
+      <text class="svglab" x="443" y="106" text-anchor="middle" style="fill:var(--green);font-weight:700;font-size:10px" lang="en">stop when</text>
+      <text class="svglab" x="443" y="123" text-anchor="middle" style="font-size:10px" lang="ko">커버리지 목표 달성</text>
+      <text class="svglab" x="443" y="123" text-anchor="middle" style="font-size:10px" lang="en">coverage goals met</text>
+      <text class="svglab" x="443" y="137" text-anchor="middle" style="font-size:10px" lang="ko">테스트 통과율이 높음</text>
+      <text class="svglab" x="443" y="137" text-anchor="middle" style="font-size:10px" lang="en">test pass rate is high</text>
+      <text class="svglab" x="443" y="151" text-anchor="middle" style="font-size:10px" lang="ko">버그 발견율이 평평해짐</text>
+      <text class="svglab" x="443" y="151" text-anchor="middle" style="font-size:10px" lang="en">bug rate has flattened</text>
+
+      <line x1="91" y1="68" x2="91" y2="84" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g7-ar)"/>
+      <line x1="91" y1="136" x2="91" y2="152" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g7-ar)"/>
+      <line x1="168" y1="179" x2="188" y2="179" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g7-ar)"/>
+      <line x1="267" y1="154" x2="267" y2="138" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g7-ar)"/>
+      <line x1="267" y1="86" x2="267" y2="70" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g7-ar)"/>
+      <line x1="344" y1="43" x2="364" y2="43" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g7-ar)"/>
+      <path d="M420 70 C 400 84, 340 84, 320 70" fill="none" stroke="var(--pink)" stroke-width="1.8" marker-end="url(#g7-ap)" marker-start="url(#g7-ap)"/>
+
+      <text class="svglab" x="546" y="40" style="fill:var(--pink);font-weight:700" lang="ko">사실은</text>
+      <text class="svglab" x="546" y="56" style="fill:var(--pink);font-weight:700" lang="ko">절대 안 멈춘다</text>
+      <text class="svglab" x="546" y="40" style="fill:var(--pink);font-weight:700" lang="en">actually,</text>
+      <text class="svglab" x="546" y="56" style="fill:var(--pink);font-weight:700" lang="en">never stop</text>
+      <text class="svglab" x="546" y="110" style="font-size:10px" lang="ko">여기에 리뷰와</text>
+      <text class="svglab" x="546" y="126" style="font-size:10px" lang="ko">체크리스트가 더 붙는다</text>
+      <text class="svglab" x="546" y="110" style="font-size:10px" lang="en">plus reviews and</text>
+      <text class="svglab" x="546" y="126" style="font-size:10px" lang="en">checklists on top</text>
+
+      <text class="svglab" x="16" y="230" lang="ko">설계자 쪽(03절)과 비교해 볼 것. 앞의 두 칸이 똑같고, 뒤로 갈수록 갈라진다.</text>
+      <text class="svglab" x="16" y="230" lang="en">Compare with the designer's version in §03. The first two boxes are identical; they diverge from there.</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 53쪽. <strong>분홍 화살표가 양방향인 게 핵심이다.</strong> 랜덤 테스트를 돌리고 커버리지를 분석하는 사이를 계속 왕복한다. 커버리지에 구멍이 보이면 그 구멍을 메울 constraint를 다시 쓰고, 다시 돌리고, 다시 본다. 그리고 슬라이드가 멈추는 조건을 셋 적어놓고 그 옆에 <strong>"사실은 절대 안 멈춘다"</strong>고 덧붙였다.</figcaption>
+    <figcaption lang="en">Slide 53. <strong>The point is that the pink arrow runs both ways.</strong> You shuttle between running random tests and analysing coverage: a hole shows up, you rewrite constraints to fill it, run again, look again. And after listing three stopping conditions the slide adds <strong>"actually, never stop".</strong></figcaption>
+  </figure>
+
+  <div class="callout">
+    <p lang="ko"><strong><a href="#s3">03절의 설계자 그림</a>과 나란히 놓으면 두 직무가 거울이다.</strong> 둘 다 "사양 읽기"에서 시작해서 "계획 세우기"로 간다. 그다음이 갈린다. 설계자는 RTL을 쓰고, 검증자는 testbench를 쓴다. 그리고 <strong>둘 다 "상대와 주고받기"가 정식 단계로 들어 있다.</strong></p>
+    <p lang="en"><strong>Set beside <a href="#s3">the designer's picture in §03</a>, the two roles mirror each other.</strong> Both start at "read the spec" and move to "make a plan". Then they split: one writes RTL, the other writes a testbench. And <strong>both have "iterate with the other side" as a named stage.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 21 -->
+<section id="s21">
+  <div class="sec-head" data-slide="54"><span class="sec-num">21</span><h2 lang="ko">관심사의 분리</h2><h2 lang="en">Separation of concerns</h2></div>
+  <p class="sec-sub" lang="ko">숨김 슬라이드지만 <strong>이 강의에서 가장 실용적인 조언</strong>이라 옮긴다. 세 가지 흔한 함정이 구체적으로 적혀 있다.</p>
+  <p class="sec-sub" lang="en">A hidden slide, but <strong>the most practical advice in the lecture</strong>, so it goes in. It names three specific pitfalls.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 슬라이드는 강의에서 넘어갔다 (54쪽)</span><span class="tag" lang="en">This slide was skipped in class (54)</span>
+    <p lang="ko">quiz에 나올 가능성은 낮다. 다만 Lab 4~6에서 직접 부딪힐 내용이라 실었다.</p>
+    <p lang="en">Unlikely to be on a quiz, but you will run into all of it in labs 4 through 6, so it is recorded here.</p>
+  </div>
+
+  <div class="def">
+    <span class="tag" lang="ko">원칙</span><span class="tag" lang="en">The principle</span>
+    <p lang="ko">시스템을 <strong>각각 하나의 고유한 목적만 갖는 부분들로</strong> 쪼개는 것.</p>
+    <p lang="en">Splitting a system into parts that each serve one single, unique purpose.</p>
+  </div>
+
+  <table>
+    <tr><th lang="ko">무엇을 무엇에서 떼나</th><th lang="en">What gets separated</th><th lang="ko">안 떼면 생기는 일</th><th lang="en">What happens if you do not</th></tr>
+    <tr>
+      <td class="hd" lang="ko">Checking을 Stimulus에서</td><td class="hd" lang="en">Checking from stimulus</td>
+      <td lang="ko"><strong>스스로 검사하는 stimulus는 "항상 켜져" 있지 않다.</strong> 그 테스트를 돌릴 때만 검사한다. 다른 테스트가 같은 버그를 밟아도 안 잡힌다.</td>
+      <td lang="en"><strong>Self-checking stimulus is not always on.</strong> It checks only while that test runs, so another test can step on the same bug and nothing fires.</td>
+    </tr>
+    <tr>
+      <td class="hd" lang="ko">Coverage를 Stimulus에서</td><td class="hd" lang="en">Coverage from stimulus</td>
+      <td lang="ko">흔한 함정: <strong>"내가 stimulus를 썼으니 어떤 시나리오를 커버하는지 안다."</strong> 아니다. 설계나 testbench가 바뀌면 <strong>같은 stimulus가 다른 커버리지를 낸다.</strong> FIFO 깊이나 클럭 주파수만 바뀌어도 그렇다.</td>
+      <td lang="en">The classic trap: <strong>"I wrote the stimulus, so I know what it covers."</strong> You do not. If the design or testbench changes, <strong>the same stimulus achieves different coverage.</strong> A FIFO depth or a clock frequency is enough.</td>
+    </tr>
+    <tr>
+      <td class="hd" lang="ko">Testbench를 Stimulus에서</td><td class="hd" lang="en">Testbench from stimulus</td>
+      <td lang="ko">흔한 함정: <strong>testbench 부품을 특정 DUT 전용으로 만든다.</strong> 그러면 다음 프로젝트에서 통째로 다시 써야 한다.</td>
+      <td lang="en">The classic trap: <strong>making a testbench component specific to one DUT.</strong> Then the next project starts from zero.</td>
+    </tr>
+  </table>
+
+  <p lang="ko">슬라이드는 <strong>사람도 나눈다</strong>고 적었다. Stimulus / Checkers / Coverage를 서로 다른 엔지니어가 맡고, Architecture / Design / Verification도 서로 다른 사람이 맡는다.</p>
+  <p lang="en">The slide extends it to <strong>people</strong>: different engineers own stimulus, checkers and coverage, and architecture, design and verification go to different people too.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>왜 사람까지 나누나.</strong> <a href="L01-course-intro.html#s9">Lecture 1</a>에서 verification의 목적이 "설계가 사양대로인지"를 확인하는 것이라고 했다. 설계한 사람이 검증하면 <strong>사양을 잘못 읽었을 때 같은 오해를 두 번 한다.</strong> 검증이 독립적이어야 하는 이유가 게으름 방지가 아니라 <strong>같은 착각을 반복하지 않기 위해서</strong>다.</p>
+    <p lang="en"><strong>Why separate the people too.</strong> <a href="L01-course-intro.html#s9">Lecture 1</a> said verification exists to confirm the design matches the spec. If the designer verifies their own work, <strong>a misreading of the spec gets made twice.</strong> Independence is not about preventing laziness, it is about <strong>not repeating the same misunderstanding.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 22 -->
+<section id="s22">
+  <div class="sec-head" data-slide="55-56"><span class="sec-num">22</span><h2 lang="ko">언어와 방법론</h2><h2 lang="en">Languages and methodologies</h2></div>
+  <p class="sec-sub" lang="ko">왜 Verilog만으로는 부족한가, 그리고 왜 UVM 같은 것이 생겼는가. 학기 후반 세 강의(20·21·22)의 예고편이다.</p>
+  <p class="sec-sub" lang="en">Why Verilog alone is not enough, and why something like UVM exists. A trailer for lectures 20, 21 and 22.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">HDL로는 왜 부족한가</span><span class="tag" lang="en">Why HDLs are not sufficient</span>
+    <ul lang="ko">
+      <li><strong>프로그래밍 세계의 기능</strong>이 없다. class, enum 같은 것.</li>
+      <li><strong>assertion, randomization, coverage에 대한 native 지원</strong>이 없다.</li>
+    </ul>
+    <p lang="ko">그래서 검증 전용 언어가 생겼다: SpecMan e, OpenVera, 그리고 <strong>SystemVerilog</strong>. 슬라이드가 SystemVerilog를 <strong>"Verilog++"</strong>라고 부르고, 표준 번호가 <strong>IEEE 1800</strong>이라고 적었다.</p>
+    <ul lang="en">
+      <li>No <strong>features from the programming world</strong>, such as classes and enums.</li>
+      <li>No <strong>native support for assertions, randomisation and coverage.</strong></li>
+    </ul>
+    <p lang="en">Hence dedicated verification languages: SpecMan e, OpenVera, and <strong>SystemVerilog</strong>. The slide calls SystemVerilog <strong>"Verilog++"</strong> and gives the standard number as <strong>IEEE 1800.</strong></p>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>강의계획서가 선수과목으로 객체지향 프로그래밍(CSE 205)을 요구하는 이유가 여기 있다.</strong> 검증 파트에서 class, inheritance, polymorphism, factory pattern, virtual class를 그대로 쓴다. Verilog를 아는 것과 UVM을 쓰는 것 사이의 간극은 하드웨어 지식이 아니라 <strong>객체지향 지식</strong>이다.</p>
+    <p lang="en"><strong>This is why the syllabus lists object oriented programming, CSE 205, as a prerequisite.</strong> The verification half uses classes, inheritance, polymorphism, the factory pattern and virtual classes directly. The gap between knowing Verilog and using UVM is not hardware knowledge, it is <strong>object oriented knowledge.</strong></p>
+  </div>
+
+  <div class="def">
+    <span class="tag" lang="ko">방법론</span><span class="tag" lang="en">Methodologies</span>
+    <p lang="ko"><strong>표준화가 핵심이고, 재사용이 아주 중요한 측면이다.</strong> 그래서 <strong>VIP</strong>(Verification IP)라는 말이 나온다. 예를 들어 EDA 벤더에게서 checker를 사서 우리 testbench에 끼워 넣는 식이다.</p>
+    <p lang="ko">표준으로는 셋이 언급된다: <strong>VMM</strong>(Verification Methodology Manual), <strong>OVM</strong>(Open Verification Methodology), <strong>UVM</strong>(Universal Verification Methodology).</p>
+    <p lang="en"><strong>Standardisation is the key, and reuse is a very important aspect</strong>, which is where the term <strong>VIP</strong>, verification IP, comes from: you can buy a checker from an EDA vendor and plug it into your testbench.</p>
+    <p lang="en">Three standards get named: <strong>VMM</strong>, the Verification Methodology Manual, <strong>OVM</strong>, Open Verification Methodology, and <strong>UVM</strong>, Universal Verification Methodology.</p>
+  </div>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · 방법론이란 무엇인가</span><span lang="en">Unpacking the jargon · what a methodology even is</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>한 줄</td><td>언어가 아니라 <strong>라이브러리 + 관행의 묶음</strong>. UVM은 SystemVerilog로 쓰인 class 라이브러리다.</td></tr>
+        <tr><td>무엇을 정하나</td><td>testbench 부품의 <strong>이름과 모양과 붙이는 방법</strong>을 정한다. agent는 이렇게 생겼고, driver는 이 함수를 가져야 하고, 하는 식이다.</td></tr>
+        <tr><td>왜 필요한가</td><td>정해진 모양이 있어야 <strong>남이 만든 것을 가져다 쓸 수 있다.</strong> VIP를 사서 끼워 넣는다는 게 이 뜻이다.</td></tr>
+        <tr><td>순서</td><td>VMM과 OVM이 먼저 있었고 <strong>UVM이 그 둘을 합쳐 표준이 됐다.</strong> 지금 새로 배우는 건 UVM이고, 나머지 둘은 예전 코드에서 마주칠 이름이다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>UVM은 <strong>언어가 아니다.</strong> SystemVerilog를 모른 채로 UVM만 배울 수 없고, 그래서 이 과목이 Lecture 17에서 SystemVerilog for Verification을 먼저 한다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>In one line</td><td>Not a language but <strong>a library plus a set of conventions.</strong> UVM is a class library written in SystemVerilog.</td></tr>
+        <tr><td>What it fixes</td><td>The <strong>names, shapes and connection rules</strong> of testbench components: this is what an agent looks like, this is the method a driver must have.</td></tr>
+        <tr><td>Why it is needed</td><td>Agreed shapes are what make it possible to <strong>use something somebody else built.</strong> That is what plugging in a purchased VIP means.</td></tr>
+        <tr><td>The order</td><td>VMM and OVM came first and <strong>UVM merged them into the standard.</strong> UVM is what you learn now; the other two are names you meet in older code.</td></tr>
+        <tr><td>Easy to misread</td><td>UVM is <strong>not a language.</strong> You cannot learn UVM without SystemVerilog, which is why this course does SystemVerilog for Verification first, in Lecture 17.</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 23 -->
+<section id="s23">
+  <div class="sec-head" data-slide="57-58"><span class="sec-num">23</span><h2 lang="ko">남은 과제와 격차</h2><h2 lang="en">The gap that remains</h2></div>
+  <p class="sec-sub" lang="ko">두 장 다 숨김 슬라이드다. 그래도 <strong>이 분야가 왜 계속 일자리를 만드는지</strong>의 답이라 실었다.</p>
+  <p class="sec-sub" lang="en">Both hidden slides. Recorded anyway, because they answer <strong>why this field keeps producing jobs.</strong></p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 두 장은 강의에서 넘어갔다 (57·58쪽)</span><span class="tag" lang="en">Both skipped in class (57, 58)</span>
+    <p lang="ko">quiz 대상은 아니다. 읽어두면 학기 전체의 지도가 완성된다.</p>
+    <p lang="en">Not quiz material. Reading them completes the map of the semester.</p>
+  </div>
+
+  <h3 lang="ko">검증의 과제 (57쪽)</h3>
+  <h3 lang="en">Challenges in verification (slide 57)</h3>
+  <ul lang="ko">
+    <li><strong>설계는 커지고, 사이클 타임은 짧아지고, 도구는 그만큼 확장되지 않는다.</strong> 12절의 productivity gap 그래프가 이 문장의 그림 버전이다.</li>
+    <li><strong>사양을 붙잡고 문서화하는 일</strong> 자체가 어렵다.</li>
+    <li><strong>use case를 찾아내는 일</strong>이 어렵다. 무엇을 테스트해야 하는지를 아는 것이 곧 문제다.</li>
+    <li><strong>Security verification</strong>: 칩이 <em>해서는 안 되는 일을 하지 않는지</em>를 검증하는 것.</li>
+    <li><strong>Safety verification</strong>: 고장이 났을 때 시스템이 안전한지.</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>Designs get larger, cycle times get shorter, and tools do not scale to match.</strong> The productivity gap chart in §12 is the picture version of this sentence.</li>
+    <li><strong>Capturing and documenting the specification</strong> is itself hard.</li>
+    <li><strong>Identifying use cases</strong> is hard. Knowing what to test is the problem.</li>
+    <li><strong>Security verification</strong>: verifying that a chip <em>does nothing it is not supposed to do.</em></li>
+    <li><strong>Safety verification</strong>: is the system safe when something fails?</li>
+  </ul>
+
+  <div class="trap">
+    <span class="tag" lang="ko">네 번째 항목이 가장 어려운 이유</span><span class="tag" lang="en">Why the fourth one is the hardest</span>
+    <p lang="ko"><strong>"해야 할 일을 하는가"와 "해서는 안 될 일을 안 하는가"는 검증 난이도가 근본적으로 다르다.</strong></p>
+    <p lang="ko">앞의 것은 <strong>목록이 있다.</strong> 사양에 적힌 기능을 하나씩 확인하면 된다. 뒤의 것은 <strong>목록이 없다.</strong> "이 칩이 하면 안 되는 일"을 다 적을 수가 없기 때문이다. 커버리지로 "다 했다"고 말할 수도 없다. 무엇을 다 했다는 건지 정의가 안 되기 때문이다.</p>
+    <p lang="ko">이게 <a href="#s16">16절</a>의 coverage 논의와 직결된다. functional coverage는 <strong>보고 싶은 것</strong>을 적는 도구지, <strong>보면 안 되는 것</strong>을 적는 도구가 아니다. 그건 assertion 쪽 일이고, 그래서 security verification은 assertion에 많이 의존한다.</p>
+    <p lang="en"><strong>"Does it do what it should" and "does it avoid what it must not" are fundamentally different verification problems.</strong></p>
+    <p lang="en">The first <strong>has a list</strong>: walk the features in the spec. The second <strong>has no list</strong>, because you cannot enumerate everything a chip must not do. Nor can coverage say you are finished, because there is nothing to define finished against.</p>
+    <p lang="en">This ties straight back to <a href="#s16">§16</a>. Functional coverage is a tool for writing down <strong>what you want to see</strong>, not <strong>what must never appear.</strong> That belongs to assertions, which is why security verification leans on them heavily.</p>
+  </div>
+
+  <h3 lang="ko">격차를 좁히는 네 가지 (58쪽)</h3>
+  <h3 lang="en">Four levers for closing the gap (slide 58)</h3>
+  <div class="grid2">
+    <div class="mini">
+      <p class="cap"><strong>Reuse</strong></p>
+      <p style="font-size:13.5px;margin-top:8px" lang="ko">같은 것을 두 번 만들지 않는다. VIP, agent, UVM이 여기 속한다. <a href="#s7">07절</a>의 REUSE가 검증 쪽에서 반복된다.</p>
+      <p style="font-size:13.5px;margin-top:8px" lang="en">Never build the same thing twice. VIP, agents and UVM live here. The REUSE from <a href="#s7">§07</a>, repeated on the verification side.</p>
+    </div>
+    <div class="mini">
+      <p class="cap"><strong>Abstraction</strong></p>
+      <p style="font-size:13.5px;margin-top:8px" lang="ko">신호 대신 transaction으로 다룬다. <a href="#s17">17절의 TLM</a>이 이것이다.</p>
+      <p style="font-size:13.5px;margin-top:8px" lang="en">Work in transactions instead of signals. That is <a href="#s17">TLM in §17</a>.</p>
+    </div>
+    <div class="mini">
+      <p class="cap"><strong>Acceleration</strong></p>
+      <p style="font-size:13.5px;margin-top:8px" lang="ko">더 빠른 하드웨어로 돌린다. <a href="L01-course-intro.html#s11">Lecture 1의 emulation</a>이 이것이다.</p>
+      <p style="font-size:13.5px;margin-top:8px" lang="en">Run it on faster hardware. That is <a href="L01-course-intro.html#s11">emulation in Lecture 1</a>.</p>
+    </div>
+    <div class="mini">
+      <p class="cap"><strong>Methodology</strong></p>
+      <p style="font-size:13.5px;margin-top:8px" lang="ko">모양을 표준화해서 사람과 코드를 갈아 끼울 수 있게 한다. <a href="#s22">22절의 UVM</a>이 이것이다.</p>
+      <p style="font-size:13.5px;margin-top:8px" lang="en">Standardise shapes so people and code become interchangeable. That is <a href="#s22">UVM in §22</a>.</p>
+    </div>
+  </div>
+  <p lang="ko" style="margin-top:14px"><strong>네 가지 전부 이 강의에 이미 나왔다.</strong> 즉 오늘 배운 개별 항목들이 흩어진 지식이 아니라 <strong>하나의 문제에 대한 네 방향의 답</strong>이었다는 뜻이다. 출처는 Harry Foster.</p>
+  <p lang="en" style="margin-top:14px"><strong>All four already appeared in this lecture.</strong> The pieces you learned today are not scattered facts but <strong>four directions of attack on one problem.</strong> Source: Harry Foster.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 24 -->
+<section id="s24">
+  <div class="sec-head" data-slide="59"><span class="sec-num">24</span><h2 lang="ko">복습 문제</h2><h2 lang="en">Review questions</h2></div>
+  <p class="sec-sub" lang="ko">슬라이드 마지막 장의 여섯 문제. <strong>quiz의 예고편으로 보는 게 맞다.</strong> 답을 보기 전에 먼저 말로 설명해볼 것.</p>
+  <p class="sec-sub" lang="en">The six questions on the last slide. <strong>Treat them as a preview of the quiz.</strong> Try saying each answer out loud before opening it.</p>
+
+  <div class="ex">
+    <span class="tag" lang="ko">여섯 문제</span><span class="tag" lang="en">Six questions</span>
+    <ol lang="ko">
+      <li>synthesis 과정에서 technology library의 역할은 무엇인가?</li>
+      <li>디지털 설계의 흔한 목표들은 무엇이고, 서로 어떻게 충돌하는가?</li>
+      <li>static timing analysis란 무엇이고, 왜 "static"인가?</li>
+      <li>simulation은 formal verification과 어떻게 다른가?</li>
+      <li>verification의 세 기둥은 무엇인가?</li>
+      <li>code coverage의 한계는 무엇이고, functional coverage는 그것을 어떻게 해결하는가?</li>
+    </ol>
+    <ol lang="en">
+      <li>What is the role of a technology library in the synthesis process?</li>
+      <li>What are some common goals of digital design, and how do they conflict with each other?</li>
+      <li>What is static timing analysis, and why is it "static"?</li>
+      <li>How does simulation differ from formal verification?</li>
+      <li>What are the three pillars of verification?</li>
+      <li>What are the limitations of code coverage, and how does functional coverage address them?</li>
+    </ol>
+    <details>
+      <summary><span lang="ko">답이 어디에 있는지 보기</span><span lang="en">Where each answer lives</span></summary>
+      <div class="body">
+        <table>
+          <tr><th>#</th><th lang="ko">답</th><th lang="en">Answer</th></tr>
+          <tr><td class="hd">1</td>
+            <td lang="ko"><a href="#s6">06절</a>에 답의 뼈대를 적어뒀다. 핵심은 tech library가 <strong>"무엇으로 만들 수 있는가"와 "그것이 얼마나 드는가"를 동시에</strong> 준다는 것.</td>
+            <td lang="en">The skeleton is in <a href="#s6">§06</a>. The core: a tech library supplies <strong>both what can be built and what it costs.</strong></td></tr>
+          <tr><td class="hd">2</td>
+            <td lang="ko"><a href="#s9">09절</a>. 일곱 개를 나열만 하면 절반이다. <strong>충돌하는 짝</strong>을 들어야 한다.</td>
+            <td lang="en"><a href="#s9">§09</a>. Listing seven is half an answer; name <strong>the conflicting pairs.</strong></td></tr>
+          <tr><td class="hd">3</td>
+            <td lang="ko"><a href="#s5">05절</a>. 모든 timing path를 분석한다는 것, 그리고 <strong>입력 벡터가 관여하지 않아서</strong> static이라는 것.</td>
+            <td lang="en"><a href="#s5">§05</a>. It analyses every timing path, and it is static <strong>because no input vectors are involved.</strong></td></tr>
+          <tr><td class="hd">4</td>
+            <td lang="ko"><a href="#s13">13절</a>과 <a href="#s15">15절</a>. 값을 흘리느냐 안 흘리느냐, 그리고 <strong>exhaustive하지만 확장이 안 된다</strong>는 대가.</td>
+            <td lang="en"><a href="#s13">§13</a> and <a href="#s15">§15</a>. Whether values get pushed through, and the trade: <strong>exhaustive but it does not scale.</strong></td></tr>
+          <tr><td class="hd">5</td>
+            <td lang="ko"><a href="#s16">16절</a>. <strong>Stimulus, Checkers, Coverage.</strong> 셋 중 하나만 빠져도 무엇을 못 하는지까지 말할 수 있으면 완전한 답이다.</td>
+            <td lang="en"><a href="#s16">§16</a>. <strong>Stimulus, checkers, coverage.</strong> A full answer also says what breaks when any one is missing.</td></tr>
+          <tr><td class="hd">6</td>
+            <td lang="ko"><a href="#s16">16절</a> 끝의 함정 블록. 한계 세 가지와, functional coverage가 그중 <strong>두 번째</strong>를 해결한다는 것.</td>
+            <td lang="en">The trap block at the end of <a href="#s16">§16</a>. Three limitations, and functional coverage solves <strong>the second one.</strong></td></tr>
+        </table>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 25 -->
+<section id="s25">
+  <div class="sec-head"><span class="sec-num">25</span><h2 lang="ko">정리 &amp; 다음 강의</h2><h2 lang="en">Recap &amp; next lecture</h2></div>
+
+  <h3 lang="ko">한 장 요약</h3>
+  <h3 lang="en">One-page recap</h3>
+  <table>
+    <tr><th lang="ko">기억할 것</th><th lang="en">Keep</th><th lang="ko">한 줄</th><th lang="en">In one line</th></tr>
+    <tr><td class="hd" lang="ko">추상화 네 단</td><td class="hd" lang="en">Four levels</td>
+      <td lang="ko">Functional → Behavioral → Structural → Physical. RTL은 가운데 둘 사이. Verilog는 가운데 둘을 다 쓸 수 있다.</td>
+      <td lang="en">Functional, behavioral, structural, physical. RTL sits between the middle two, and Verilog covers both of them.</td></tr>
+    <tr><td class="hd">Synthesis</td>
+      <td lang="ko">입력이 셋(RTL, constraint, tech library), 출력이 둘(netlist, 리포트). 입력 하나만 바뀌어도 netlist가 달라진다.</td>
+      <td lang="en">Three inputs, RTL, constraints and a tech library; two outputs, a netlist and reports. Change any input and the netlist changes.</td></tr>
+    <tr><td class="hd">STA</td>
+      <td lang="ko">입력 벡터 없이 모든 path의 지연을 더해서 본다. slack = 요구 시각 − 도착 시각. 음수면 위반.</td>
+      <td lang="en">Adds path delays with no input vectors. Slack is required time minus arrival time; negative means a violation.</td></tr>
+    <tr><td class="hd" lang="ko">트레이드오프</td><td class="hd" lang="en">Trade-offs</td>
+      <td lang="ko">공짜 점심은 없다. Area ↔ Delay가 근본이고, testability와 reliability도 면적과 타이밍을 먹는다.</td>
+      <td lang="en">No free lunch. Area against delay is the fundamental one, and testability and reliability also eat area and timing.</td></tr>
+    <tr><td class="hd" lang="ko">Rule of 10</td><td class="hd" lang="en">Rule of 10</td>
+      <td lang="ko">버그를 한 단계 늦게 찾을 때마다 비용이 10배. 설계 1, 응용 10000.</td>
+      <td lang="en">Each stage later costs ten times more. One at design, ten thousand at the application.</td></tr>
+    <tr><td class="hd" lang="ko">두 갈래</td><td class="hd" lang="en">Two branches</td>
+      <td lang="ko">Dynamic(=simulation)과 static(=formal). 대개 섞어 쓴다. formal은 이 과목의 초점이 아니다.</td>
+      <td lang="en">Dynamic, meaning simulation, and static, meaning formal. Usually combined. Formal is not this course's focus.</td></tr>
+    <tr><td class="hd" lang="ko">삼각대</td><td class="hd" lang="en">The trifecta</td>
+      <td lang="ko"><strong>Stimulus · Checkers · Coverage.</strong> 자극이 없으면 아무 일도 안 나고, checker가 없으면 항상 통과하고, coverage가 없으면 끝났는지 모른다.</td>
+      <td lang="en"><strong>Stimulus, checkers, coverage.</strong> Without stimulus nothing happens, without checkers everything passes, without coverage you never know when you are done.</td></tr>
+    <tr><td class="hd">Testbench</td>
+      <td lang="ko">Stimulus → Driver → DUT → Monitor → Checker/Coverage, 그리고 DUT 안에 Assertions. Driver+Monitor를 묶으면 Agent(=BFM=Transactor).</td>
+      <td lang="en">Stimulus, driver, DUT, monitor, then checker and coverage, with assertions bound inside the DUT. Driver plus monitor is an agent, also called a BFM or transactor.</td></tr>
+    <tr><td class="hd" lang="ko">격차 좁히기</td><td class="hd" lang="en">Closing the gap</td>
+      <td lang="ko">Reuse · Abstraction · Acceleration · Methodology. 넷 다 이 강의에 이미 나왔다.</td>
+      <td lang="en">Reuse, abstraction, acceleration, methodology. All four already appeared in this lecture.</td></tr>
+  </table>
+
+  <h3 lang="ko">quiz에 나올 만한 것</h3>
+  <h3 lang="en">What a quiz could ask</h3>
+  <ul lang="ko">
+    <li><strong>복습 문제 여섯 개가 사실상 예고다.</strong> <a href="#s24">24절</a>을 먼저 볼 것.</li>
+    <li>slack의 정의와 부호. "worst negative slack이 −0.2 ns라는 건 무슨 뜻인가" 형태.</li>
+    <li>"STA가 static인 이유는?" 오답 선택지로 <em>"설계가 변하지 않아서"</em>가 나오기 좋다. 정답은 <strong>입력 벡터가 없어서</strong>다.</li>
+    <li>삼각대 이름 대기, 그리고 하나가 빠졌을 때 무엇이 안 되는지.</li>
+    <li>code coverage 100%인데 버그가 남을 수 있는 이유.</li>
+    <li>testbench 부품 이름 대기. 특히 <strong>Driver와 Monitor의 차이</strong>(능동 대 수동).</li>
+    <li>Agent = BFM = Transactor가 같은 것을 가리킨다는 것.</li>
+  </ul>
+  <ul lang="en">
+    <li><strong>The six review questions are effectively the preview.</strong> Start at <a href="#s24">§24</a>.</li>
+    <li>The definition and sign of slack: "what does a worst negative slack of −0.2 ns mean?"</li>
+    <li>"Why is STA static?" A likely distractor is <em>"because the design does not change"</em>. The answer is <strong>because there are no input vectors.</strong></li>
+    <li>Name the trifecta, and say what stops working when one is missing.</li>
+    <li>Why bugs can survive 100% code coverage.</li>
+    <li>Name the testbench components, especially <strong>the difference between a driver and a monitor</strong>, active versus passive.</li>
+    <li>That agent, BFM and transactor are three names for one thing.</li>
+  </ul>
+
+  <div class="callout">
+    <p lang="ko"><strong>다음 강의 (Lecture 3, 8월 31일): Lab 0 (EDA Tools) overview.</strong> 강의 노트가 아니라 <strong>lab 안내</strong>라 별도 노트를 만들지 않는다. Apporto로 EDA 도구에 접속해서 시뮬레이션과 합성을 돌려보는 것이 내용이다. 오늘 04절에서 개념으로 본 synthesis를 <strong>실제로 돌려보는 것</strong>이 Lab 0이다.</p>
+    <p lang="ko"><strong>그다음 (Lecture 4, 9월 2일): System Verilog for Design.</strong> 오늘 01절에서 "어느 추상화 수준에서 쓰는가"를 이야기했다면, 거기서는 <strong>그 수준에서 실제로 어떻게 쓰는가</strong>를 배운다.</p>
+    <p lang="en"><strong>Next up (Lecture 3, August 31): Lab 0, EDA tools overview.</strong> It is a <strong>lab briefing</strong> rather than a lecture, so it gets no note of its own. The content is reaching the EDA tools through Apporto and running simulation and synthesis. Lab 0 is where the synthesis you met conceptually in §04 today <strong>actually gets run.</strong></p>
+    <p lang="en"><strong>Then (Lecture 4, September 2): SystemVerilog for Design.</strong> Today's §01 asked which level of abstraction you write at; that lecture teaches <strong>how to actually write at it.</strong></p>
+  </div>
+</section>
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 2 개인 학습 노트<br>
+  강의: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 2 personal study notes<br>
+  Course: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// Testbench 조립기. 부품을 하나씩 켜면서 "그게 없으면 무엇을 못 잡는지"를 보여준다.
+// 결과를 나열하는 게 아니라 사용자가 눌러서 발견하게 하는 것이 목적이다.
+(function () {
+  var svg = document.getElementById('tbsvg');
+  if (!svg) return;
+  var box = document.getElementById('tbbtn');
+  var verdict = document.getElementById('tbv');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var on = { monitor: false, checker: false, coverage: false, assert: false };
+
+  var PARTS = [
+    { key: 'monitor',  ko: 'Monitor',    en: 'Monitor' },
+    { key: 'checker',  ko: 'Checker',    en: 'Checker' },
+    { key: 'coverage', ko: 'Coverage',   en: 'Coverage' },
+    { key: 'assert',   ko: 'Assertions', en: 'Assertions' }
+  ];
+
+  // Checker와 Coverage는 Monitor 없이 못 붙는다. 관측을 안 하는데 판단하거나 셀 수 없다.
+  function needsMonitor(k) { return k === 'checker' || k === 'coverage'; }
+
+  var btns = {};
+  PARTS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.addEventListener('click', function () {
+      if (needsMonitor(p.key) && !on.monitor) { flash(p.key); return; }
+      on[p.key] = !on[p.key];
+      // Monitor를 끄면 그것에 매달린 것도 같이 떨어진다.
+      if (p.key === 'monitor' && !on.monitor) { on.checker = false; on.coverage = false; }
+      render();
+    });
+    box.appendChild(b);
+    btns[p.key] = b;
+  });
+
+  var clr = document.createElement('button');
+  clr.type = 'button';
+  clr.addEventListener('click', function () {
+    on = { monitor: false, checker: false, coverage: false, assert: false };
+    render();
+  });
+  box.appendChild(clr);
+
+  var flashing = null;
+  function flash(k) {
+    flashing = k;
+    render();
+    setTimeout(function () { flashing = null; render(); }, 1400);
+  }
+
+  function verdictText() {
+    if (flashing) {
+      return { cls: 'bad', hd: L('아직 못 붙인다', 'not yet'),
+        body: L('<strong>Monitor가 먼저다.</strong> 인터페이스의 신호를 읽어서 transaction으로 되돌리는 부품이 없으면, ' +
+                'Checker는 무엇을 판정할지 알 수 없고 Coverage는 무엇을 셀지 알 수 없다.',
+                '<strong>The monitor comes first.</strong> Without the component that reads interface signals back into transactions, ' +
+                'a checker has nothing to judge and a coverage collector has nothing to count.') };
+    }
+    if (!on.monitor && !on.assert) {
+      return { cls: 'bad', hd: L('아무도 안 보고 있다', 'nobody is watching'),
+        body: L('자극은 DUT에 들어가고 있다. 그런데 <strong>결과가 옳은지 보는 사람이 없다.</strong> ' +
+                '이 상태에서 시뮬레이션을 아무리 오래 돌려도 <strong>항상 통과한다.</strong> 버그가 있어도 아무 일도 안 일어난다.',
+                'Stimulus is going into the DUT, but <strong>nobody looks at whether the result is right.</strong> ' +
+                'Run this for as long as you like and it <strong>always passes.</strong> A bug produces no event at all.') };
+    }
+    if (on.monitor && !on.checker && !on.assert) {
+      return { cls: 'bad', hd: L('보기는 하는데 판단은 안 한다', 'observed, not judged'),
+        body: L('Monitor가 신호를 읽어서 transaction으로 되돌리고 있다. 파형도 뜬다. ' +
+                '<strong>하지만 옳은지 틀린지를 말하는 부품이 아직 없다.</strong> 사람이 파형을 눈으로 보고 판단해야 한다.',
+                'The monitor is reading signals back into transactions and the waves are there. ' +
+                '<strong>But no component says whether any of it is right.</strong> A human has to read the waveform and decide.') };
+    }
+    if (on.checker && !on.coverage) {
+      return { cls: 'bad', hd: L('틀리면 잡는다. 그런데 얼마나 했는지 모른다', 'catches mistakes, but you cannot tell how far you got'),
+        body: L('이제 DUT가 틀리게 동작하면 Checker가 오류를 띄운다. ' +
+                '<strong>그런데 무엇을 아직 안 해봤는지 알 방법이 없다.</strong> ' +
+                '테스트가 전부 통과했다는 게 "버그가 없다"는 뜻인지 "그 버그를 밟는 자극을 안 넣었다"는 뜻인지 구별이 안 된다.',
+                'Now the checker raises an error when the DUT misbehaves. ' +
+                '<strong>But there is no way to know what has not been tried.</strong> ' +
+                'All tests passing could mean there are no bugs, or it could mean you never drove the stimulus that steps on one.') };
+    }
+    if (on.checker && on.coverage && !on.assert) {
+      return { cls: 'ok', hd: L('삼각대가 섰다', 'the trifecta stands'),
+        body: L('Stimulus · Checkers · Coverage 셋이 다 있다. 자극을 넣고, 틀리면 잡고, 무엇을 안 해봤는지 안다. ' +
+                '<strong>이제 "다 했다"고 말할 근거가 생긴다.</strong><br>' +
+                '남은 하나는 Assertions다. Checker는 인터페이스 <em>밖에서</em> 보는 것이라, ' +
+                'DUT <strong>안쪽의</strong> 불변식이 깨져도 겉으로 안 드러나면 못 잡는다.',
+                'Stimulus, checkers and coverage are all present. You drive it, you catch mistakes, and you know what is untouched. ' +
+                '<strong>Now there is a basis for saying you are done.</strong><br>' +
+                'One thing is left: assertions. A checker watches from <em>outside</em> the interface, so an invariant broken ' +
+                '<strong>inside</strong> the DUT goes unnoticed if it never shows on the outside.') };
+    }
+    if (on.assert && !on.monitor) {
+      return { cls: 'bad', hd: L('내부는 보는데 바깥은 안 본다', 'watching inside, blind outside'),
+        body: L('Assertion은 DUT 안에 박혀서 <strong>항상 켜진</strong> 상태로 불변식을 감시한다. ' +
+                '두 grant가 동시에 뜨는 것 같은 위반은 이제 잡힌다. ' +
+                '<strong>하지만 "들어간 것에 맞는 결과가 나왔는가"는 못 본다.</strong> 그건 Monitor와 Checker의 일이다.',
+                'Assertions bind inside the DUT and watch invariants with the check <strong>always on</strong>. ' +
+                'A violation such as two grants rising together now gets caught. ' +
+                '<strong>But "did the right result come out for what went in" is invisible to them.</strong> That belongs to the monitor and checker.') };
+    }
+    if (on.monitor && on.checker && on.coverage && on.assert) {
+      return { cls: 'ok', hd: L('완성. 슬라이드 51쪽의 그림이다', 'complete: this is slide 51'),
+        body: L('두 층이 함께 일한다. <strong>Assertion은 안에서 항상</strong> 감시하고, ' +
+                '<strong>Checker는 밖에서 transaction 단위로</strong> 맞춰본다. Coverage가 얼마나 두들겼는지를 재고, ' +
+                'Driver와 Monitor를 묶은 것이 Agent(=BFM=Transactor)다.<br>' +
+                '<strong>Lab 4·5·6이 이 그림을 하나씩 만들어보는 과제다.</strong>',
+                'Two layers working together. <strong>Assertions watch from inside, always</strong>, and ' +
+                '<strong>the checker matches transactions from outside.</strong> Coverage measures how hard it was exercised, ' +
+                'and the driver plus monitor bundle is the agent, also called a BFM or transactor.<br>' +
+                '<strong>Labs 4, 5 and 6 build this picture one piece at a time.</strong>') };
+    }
+    return { cls: 'ok', hd: L('감시 두 층이 붙었다', 'both watchers attached'),
+      body: L('Assertion이 안에서, Monitor가 밖에서 본다. Checker나 Coverage를 더 붙여보면 무엇이 달라지는지 확인할 것.',
+              'Assertions watch from inside and the monitor from outside. Add the checker or coverage and see what changes.') };
+  }
+
+  function render() {
+    PARTS.forEach(function (p) {
+      var g = svg.querySelector('[data-part="' + p.key + '"]');
+      if (g) g.style.opacity = on[p.key] ? '1' : '.13';
+      var b = btns[p.key];
+      b.textContent = (on[p.key] ? '✓ ' : '+ ') + L(p.ko, p.en);
+      b.className = on[p.key] ? 'act' : '';
+    });
+    clr.textContent = L('지우기', 'clear');
+    var v = verdictText();
+    verdict.className = 'verdict ' + v.cls;
+    verdict.innerHTML = "<span class='hd'>" + v.hd + '</span>' + v.body;
+  }
+
+  window.addEventListener('langchange', render);
+  render();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<script src="reader.js" type="module"></script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
+

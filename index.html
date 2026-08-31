@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV · 학습 노트</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+<style>
+/* ── 허브 전용 ────────────────────────────────────────────────
+   노트 페이지는 3단(목차 + 본문 + 슬라이드)이지만 여기는 목록 한 장이다.
+   .wrap 의 grid 를 풀고 좁은 단으로 되돌린다. */
+.wrap.hub{display:block;max-width:900px;padding:0 24px 110px}
+@media(max-width:640px){.wrap.hub{padding:0 18px 70px}}
+.hub header.top{border-bottom:none;margin-bottom:0;padding:70px 0 30px}
+.mark{display:block;margin-bottom:26px}
+.hub h1.title{font-size:clamp(32px,6vw,54px);line-height:1.05;letter-spacing:-.03em;margin:14px 0 10px}
+.lede{font-size:17px;color:var(--ink2);margin:0;max-width:52ch}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+
+/* 공지 배너. 유효기간이 있는 운영 정보는 전부 여기 모은다.
+   강의 노트에 넣으면 학기가 지난 뒤에도 남아서 거짓말이 된다. */
+.notice{margin:30px 0 0;background:var(--amber-bg);border:1px solid var(--amber-line);border-radius:10px;padding:16px 20px}
+.notice .nh{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:9px}
+.notice ul{margin:0;padding-left:19px}
+.notice li{font-size:14px;color:var(--amber-deep);line-height:1.6;margin-bottom:6px}
+.notice li:last-child{margin-bottom:0}
+.notice li strong{color:var(--amber)}
+
+/* 사전으로 가는 카드 */
+a.gloss-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:12px;padding:16px 20px;
+  background:var(--card);border:1px solid var(--rule);border-radius:10px;text-decoration:none;color:inherit;transition:.15s}
+a.gloss-card:hover{border-color:var(--blue);box-shadow:0 3px 14px var(--shadow)}
+a.gloss-card .gi{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--blue);letter-spacing:-.03em;line-height:1}
+a.gloss-card .gt{flex:1;min-width:200px;font-size:14.5px;color:var(--ink2);line-height:1.55}
+a.gloss-card .gt b{color:var(--ink)}
+a.gloss-card .go{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--blue);white-space:nowrap;font-weight:600}
+
+h2.grp{font-size:13px;font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);
+  font-weight:500;margin:56px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+
+/* 강의 줄 */
+.mod{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:18px;align-items:start;padding:16px 18px;
+  background:var(--card);border:1px solid var(--rule);border-radius:10px;margin-bottom:8px;
+  text-decoration:none;color:inherit;transition:.15s}
+a.mod:hover{border-color:var(--blue);transform:translateY(-1px);box-shadow:0 3px 14px var(--shadow)}
+.mod.soon{opacity:.58;cursor:default}
+.mod .num{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--ink3);letter-spacing:-.03em;padding-top:1px}
+a.mod:hover .num{color:var(--blue)}
+.mod h3{font-size:16.5px;font-weight:700;letter-spacing:-.01em;margin:0 0 4px;line-height:1.35}
+.mod .when{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--ink3);margin-bottom:6px}
+.mod .when .who{color:var(--pink)}
+.mod p{margin:0;font-size:14px;color:var(--ink2);line-height:1.6}
+.mod .tags{margin-top:9px;display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;padding:3px 8px;border-radius:5px;background:var(--chip);color:var(--ink2)}
+.tag.d{background:rgba(var(--blue-rgb),.1);color:var(--blue)}
+.tag.v{background:rgba(var(--pink-rgb),.1);color:var(--pink)}
+.tag.t{background:rgba(var(--violet-rgb),.1);color:var(--violet)}
+.tag.p{background:rgba(var(--brown-rgb),.12);color:var(--brown)}
+.status{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;padding:4px 10px;border-radius:999px;white-space:nowrap;margin-top:3px}
+.status.done{background:rgba(var(--green-rgb),.12);color:var(--green)}
+.status.wait{background:var(--chip);color:var(--ink3)}
+.status.lab{background:rgba(var(--violet-rgb),.12);color:var(--violet)}
+@media(max-width:600px){
+  .mod{grid-template-columns:36px minmax(0,1fr);gap:12px;padding:14px 14px}
+  .mod .num{font-size:16px}
+  .status{grid-column:2;justify-self:start;margin-top:9px}
+}
+
+.note{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;
+  padding:16px 20px;font-size:14.5px;color:var(--ink2);line-height:1.65;margin-bottom:10px}
+.note strong{color:var(--ink)}
+.note p{margin:0 0 10px}
+.note p:last-child{margin-bottom:0}
+.note ul{margin:10px 0 0;padding-left:20px}
+.note li{font-size:14.5px;margin-bottom:6px}
+.hub footer{border-top:1px solid var(--rule);margin-top:64px}
+</style>
+</head>
+<body>
+<div class="wrap hub">
+
+<header class="top">
+  <svg class="mark" width="164" height="66" viewBox="0 0 164 66" role="img" aria-label="RTL에서 netlist를 거쳐 실리콘으로 가는 세 단계 표식">
+    <rect x="2" y="14" width="34" height="34" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.5"/>
+    <rect x="44" y="14" width="34" height="34" rx="6" fill="rgba(var(--violet-rgb),.16)" stroke="var(--violet)" stroke-width="1.5"/>
+    <rect x="86" y="14" width="34" height="34" rx="6" fill="rgba(var(--brown-rgb),.16)" stroke="var(--brown)" stroke-width="1.5"/>
+    <path d="M36 31 h8" stroke="var(--ink3)" stroke-width="1.4"/>
+    <path d="M78 31 h8" stroke="var(--ink3)" stroke-width="1.4"/>
+    <text x="130" y="26" font-family="ui-monospace,Consolas,monospace" font-size="10" letter-spacing="1.4" fill="var(--ink3)">CEN</text>
+    <text x="130" y="42" font-family="ui-monospace,Consolas,monospace" font-size="15" font-weight="700" letter-spacing=".5" fill="var(--ink)">598</text>
+  </svg>
+
+  <div class="eyebrow">Arizona State University · Fall 2026 · Aman Arora</div>
+  <h1 class="title">Advanced Digital<br>Design and Verification</h1>
+  <p class="lede" lang="ko">강의 슬라이드를 한 장씩 뜯어서 다시 쓴 개인 학습 노트. 이 과목은 수식이 아니라 <strong>업계 용어</strong>로 막힌다. 그래서 용어마다 풀네임과 "누가 언제 쓰는 말인지"를 같이 붙였다.</p>
+  <p class="lede" lang="en">Personal study notes rebuilt slide by slide from the lecture deck. What blocks you in this course is not maths but <strong>industry vocabulary</strong>, so every term comes with its full name and a note on who says it and when.</p>
+
+  <div class="facts" lang="ko">
+    <span class="chip">2 / 30강 완료</span>
+    <span class="chip">약어 사전 79항목</span>
+    <span class="chip">슬라이드 동기화</span>
+    <span class="chip">한국어 · English</span>
+  </div>
+  <div class="facts" lang="en">
+    <span class="chip">2 of 30 lectures</span>
+    <span class="chip">79 glossary entries</span>
+    <span class="chip">slide sync</span>
+    <span class="chip">Korean &amp; English</span>
+  </div>
+
+  <div class="notice">
+    <div class="nh" lang="ko">학기 운영 공지</div>
+    <div class="nh" lang="en">Course logistics</div>
+    <ul lang="ko">
+      <li><strong>9월 7일 주간 강의는 Zoom 또는 녹화 영상</strong>으로 대체된다. 강사가 출장이라 교실에 오지 말 것.</li>
+      <li><strong>Lab 제출 정책이 양방향이다.</strong> 늦으면 24시간당 15% 감점(최대 3구간, 그 뒤 0점), <strong>일찍 내면 24시간당 5% 가산점</strong>(최대 10%). 48시간 전에 내면 그냥 10%를 얻는다.</li>
+      <li><strong>Synopsys 트레이닝이 유료로 보이면</strong> 먼저 로그인할 것. 강사가 확인한 사항이다.</li>
+      <li>Pre-Req Test는 <strong>성적에 반영되지 않고</strong> 여러 번 응시할 수 있다.</li>
+      <li>Quiz와 Exam에서는 <strong>AI 도구 사용 금지</strong>. Lab에서는 허용되지만 <strong>사용 내역을 제출물에 적어야 한다.</strong></li>
+    </ul>
+    <ul lang="en">
+      <li><strong>Lectures in the week of September 7 move to Zoom or a recording.</strong> The instructor is travelling; do not come to the classroom.</li>
+      <li><strong>Lab submission runs both ways.</strong> Late costs 15% per 24 hours, up to three periods, then a zero. <strong>Early pays 5% per 24 hours</strong>, up to 10%. Submitting 48 hours ahead is simply worth ten points.</li>
+      <li><strong>If the Synopsys training looks paywalled</strong>, log in first. The instructor confirmed this.</li>
+      <li>The pre-req test <strong>does not count toward the grade</strong> and allows multiple attempts.</li>
+      <li><strong>No AI tools in quizzes or exams.</strong> They are allowed in labs, but <strong>you must record how you used them in the deliverables.</strong></li>
+    </ul>
+  </div>
+
+  <a class="gloss-card" href="glossary.html">
+    <span class="gi">A–Z</span>
+    <span class="gt" lang="ko"><b>약어 사전</b> · RTL, ECO, slack, DUT, BFM, VIP, DFT… 문서나 코드를 펴놓고 "이게 뭐였지" 할 때 오는 곳. 알파벳순, 검색 가능.</span>
+    <span class="gt" lang="en"><b>Glossary</b> · RTL, ECO, slack, DUT, BFM, VIP, DFT and the rest. The page you open with a document in front of you. Alphabetical and searchable.</span>
+    <span class="go" lang="ko">찾아보기 →</span>
+    <span class="go" lang="en">Look it up →</span>
+  </a>
+</header>
+
+<h2 class="grp" lang="ko">1부 · 설계</h2>
+<h2 class="grp" lang="en">Part 1 · Design</h2>
+
+<a class="mod" href="L01-course-intro.html">
+  <div class="num">01</div>
+  <div>
+    <div class="when">8/24 (Mon) · Aman Arora</div>
+    <h3>Course Intro and Design Flow</h3>
+    <p lang="ko">칩이 문서에서 실물까지 가는 일곱 단계, front-end와 back-end의 경계, ECO. 그리고 verification / validation / testing / emulation 네 단어를 갈라놓는다. 상황을 주고 직접 분류해보는 도구가 들어 있다.</p>
+    <p lang="en">The seven stages from document to physical part, where front end ends and back end begins, and the ECO. Then it separates the four words verification, validation, testing and emulation. Includes a tool that hands you a situation and makes you classify it.</p>
+    <div class="tags">
+      <span class="tag d">design flow</span>
+      <span class="tag d">RTL</span>
+      <span class="tag p">tapeout</span>
+      <span class="tag p">ECO</span>
+      <span class="tag v">verification vs. testing</span>
+      <span class="tag">microarchitecture</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+
+<a class="mod" href="L02-design-and-verification-overview.html">
+  <div class="num">02</div>
+  <div>
+    <div class="when">8/26 (Wed) · Aman Arora</div>
+    <h3>Design and Verification Overview</h3>
+    <p lang="ko">59쪽짜리, 이 과목에서 가장 밀도 높은 강의. 앞은 추상화 수준·synthesis·STA·tech library, 뒤는 검증의 삼각대(stimulus, checkers, coverage)와 testbench 구조. 부품을 하나씩 붙여보며 "그게 없으면 무엇을 못 잡는지" 확인하는 도구가 들어 있다.</p>
+    <p lang="en">Fifty-nine slides, the densest hour in the course. Levels of abstraction, synthesis, STA and tech libraries up front; the trifecta of stimulus, checkers and coverage plus testbench structure after. Includes a tool that adds one component at a time so you can see what each one catches.</p>
+    <div class="tags">
+      <span class="tag d">abstraction levels</span>
+      <span class="tag t">synthesis</span>
+      <span class="tag t">STA · slack</span>
+      <span class="tag p">tech library</span>
+      <span class="tag v">stimulus · checkers · coverage</span>
+      <span class="tag v">testbench</span>
+    </div>
+  </div>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+
+<div class="mod soon">
+  <div class="num">03</div>
+  <div>
+    <div class="when">8/31 (Mon) · Aman Arora</div>
+    <h3>Lab 0 (EDA Tools) overview</h3>
+    <p lang="ko">Apporto로 EDA 도구에 접속해서 시뮬레이션과 합성을 돌려본다. 강의 노트 대신 <strong>Lab 공략 페이지</strong>로 정리할 예정.</p>
+    <p lang="en">Reaching the EDA tools through Apporto and running simulation and synthesis. This will get a <strong>lab guide page</strong> rather than a lecture note.</p>
+  </div>
+  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">04</div>
+  <div>
+    <div class="when">9/2 (Wed) · Aman Arora</div>
+    <h3>System Verilog for Design</h3>
+    <p lang="ko">Lecture 2가 "어느 추상화 수준에서 쓰는가"였다면, 여기서는 그 수준에서 실제로 어떻게 쓰는지를 배운다.</p>
+    <p lang="en">Lecture 2 asked which level of abstraction you write at; this one teaches how to actually write at it.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">05</div>
+  <div>
+    <div class="when">9/7 (Mon) · <span class="who">Chetan Sudarshan</span></div>
+    <h3>Clock and Reset (Timing, CDC, RDC)</h3>
+    <p lang="ko">SoC의 globals. Lecture 2의 STA가 여기서 실제 설계 문제로 돌아온다.</p>
+    <p lang="en">The globals of an SoC. The STA from Lecture 2 comes back here as a real design problem.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">06</div>
+  <div>
+    <div class="when">9/9 (Wed) · <span class="who">Igor Miranda</span></div>
+    <h3>FIFO design</h3>
+    <p lang="ko">Lab 1의 대상. Lecture 2에서 assertion 예시로 나왔던 "FIFO는 overflow 하면 안 된다"가 여기서 설계 문제가 된다.</p>
+    <p lang="en">The subject of Lab 1. The assertion example from Lecture 2, that a FIFO must not overflow, becomes a design problem here.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">07</div>
+  <div>
+    <div class="when">9/14 (Mon) · Aman Arora</div>
+    <h3>Lab 1 (FIFO) overview</h3>
+  </div>
+  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">08</div>
+  <div>
+    <div class="when">9/16 (Wed) · Aman Arora</div>
+    <h3>Pipelined CPU design</h3>
+    <p lang="ko">Lab 2의 대상. Lecture 2의 pipelining과 retiming이 여기서 실제 MIPS 설계로 이어진다.</p>
+    <p lang="en">The subject of Lab 2. Pipelining and retiming from Lecture 2 turn into an actual MIPS design here.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">09</div>
+  <div>
+    <div class="when">9/21 (Mon) · <span class="who">Prashant Joshi</span></div>
+    <h3>Floating point arithmetic unit design</h3>
+    <p lang="ko">Lecture 2의 Rule of 10에서 언급된 Intel 부동소수점 버그가 바로 이 종류의 유닛에서 났다.</p>
+    <p lang="en">The Intel floating point bug mentioned in Lecture 2's rule of 10 happened in exactly this kind of unit.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">11</div>
+  <div>
+    <div class="when">9/23 (Wed) · Aman Arora</div>
+    <h3>Efficient design tips + Catch up</h3>
+    <p lang="ko">Schedule 표에서 10번과 11번의 번호가 날짜순과 어긋나 있다. 강사가 guest speaker 사정으로 순서가 바뀔 수 있다고 밝혔다.</p>
+    <p lang="en">Lectures 10 and 11 are out of date order in the schedule table. The instructor said guest speaker availability shifts the order.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">12</div>
+  <div>
+    <div class="when">9/28 (Mon) · Aman Arora</div>
+    <h3>Lab 2 (Pipelined MIPS) overview</h3>
+  </div>
+  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">13</div>
+  <div>
+    <div class="when">9/30 (Wed) · Aman Arora</div>
+    <h3>Matrix multiplication accelerator design</h3>
+    <p lang="ko">Lab 3의 대상. systolic array다.</p>
+    <p lang="en">The subject of Lab 3: a systolic array.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">14</div>
+  <div>
+    <div class="when">10/5 (Mon) · Aman Arora</div>
+    <h3>SoC architecture and on-chip interfaces</h3>
+    <p lang="ko">Lecture 2의 "인터페이스 표준화"가 여기서 APB, AXI, valid-ready로 구체화된다.</p>
+    <p lang="en">"Standardised interfaces" from Lecture 2 becomes concrete here as APB, AXI and valid-ready.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">15</div>
+  <div>
+    <div class="when">10/7 (Wed) · <span class="who">Eric Taylor</span></div>
+    <h3>Case study: SoC interconnect design</h3>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">16</div>
+  <div>
+    <div class="when">10/12 (Mon) · Aman Arora</div>
+    <h3>Lab 3 (Systolic Matmul) overview</h3>
+  </div>
+  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
+</div>
+
+<h2 class="grp" lang="ko">2부 · 검증</h2>
+<h2 class="grp" lang="en">Part 2 · Verification</h2>
+
+<div class="mod soon">
+  <div class="num">17</div>
+  <div>
+    <div class="when">10/14 (Wed) · Aman Arora</div>
+    <h3>System Verilog for Verification</h3>
+    <p lang="ko">여기서부터 객체지향 지식이 필요하다. class, inheritance, polymorphism, factory pattern, virtual class.</p>
+    <p lang="en">Object oriented knowledge starts mattering here: classes, inheritance, polymorphism, the factory pattern, virtual classes.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">10</div>
+  <div>
+    <div class="when">10/19 (Mon) · Aman Arora</div>
+    <h3>Assertion Based Verification</h3>
+    <p lang="ko">Lecture 2에서 "항상 켜져 있다"는 성질로 소개된 assertion을 제대로 다룬다. Lab 6의 재료이기도 하다.</p>
+    <p lang="en">The proper treatment of assertions, introduced in Lecture 2 by their always-on property. Also the material for Lab 6.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">18</div>
+  <div>
+    <div class="when">10/21 (Wed) · Aman Arora</div>
+    <h3>Case study: CPU verification</h3>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">19</div>
+  <div>
+    <div class="when">10/26 (Mon) · Aman Arora</div>
+    <h3>Lab 4 (FIFO Checker, DPI) overview</h3>
+  </div>
+  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">20</div>
+  <div>
+    <div class="when">10/28 (Wed) · <span class="who">Joel Feldman</span></div>
+    <h3>UVM 1</h3>
+    <p lang="ko">Lecture 2에서 이름만 나온 방법론. 세 강의에 걸쳐 다룬다.</p>
+    <p lang="en">The methodology that was only a name in Lecture 2, spread over three lectures.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">21</div>
+  <div>
+    <div class="when">11/2 (Mon) · <span class="who">Joel Feldman</span></div>
+    <h3>UVM 2</h3>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">22</div>
+  <div>
+    <div class="when">11/4 (Wed) · <span class="who">Joel Feldman</span></div>
+    <h3>UVM 3</h3>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">23</div>
+  <div>
+    <div class="when">11/9 (Mon) · Aman Arora</div>
+    <h3>Lab 5 (MIPS Random Stimulus, Coverage) overview</h3>
+  </div>
+  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">24</div>
+  <div>
+    <div class="when">11/11 (Wed) · Aman Arora</div>
+    <h3>Efficient verification tips + Catch up</h3>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">25</div>
+  <div>
+    <div class="when">11/16 (Mon) · Aman Arora</div>
+    <h3>Case study: High-speed I/O design and verification</h3>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">26</div>
+  <div>
+    <div class="when">11/18 (Wed) · <span class="who">Brendan Donahe</span></div>
+    <h3>Case study: SoC verification</h3>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">27</div>
+  <div>
+    <div class="when">11/23 (Mon) · Aman Arora</div>
+    <h3>Lab 6 (Systolic Matmul, APB agent, Assertions) overview</h3>
+  </div>
+  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
+</div>
+
+<h2 class="grp" lang="ko">3부 · 시야 넓히기</h2>
+<h2 class="grp" lang="en">Part 3 · Wider view</h2>
+
+<div class="mod soon">
+  <div class="num">28</div>
+  <div>
+    <div class="when">11/25 (Wed) · <span class="who">Amin Rezai</span></div>
+    <h3>Formal verification overview</h3>
+    <p lang="ko">Equivalence checking, model checking, theorem proving. Lecture 2에서 세 이름만 갈라뒀던 것을 제대로 다룬다.</p>
+    <p lang="en">Equivalence checking, model checking, theorem proving. The proper treatment of the three names Lecture 2 only separated.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">29</div>
+  <div>
+    <div class="when">11/30 (Mon) · <span class="who">Vivek Tiwari</span></div>
+    <h3>Emulation</h3>
+    <p lang="ko">Lecture 1에서 "verification과 validation 사이에 끼어 있는 것"으로 소개된 주제.</p>
+    <p lang="en">The topic introduced in Lecture 1 as the thing sitting between verification and validation.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<div class="mod soon">
+  <div class="num">30</div>
+  <div>
+    <div class="when">12/2 (Wed) · Aman Arora</div>
+    <h3>Testing</h3>
+    <p lang="ko">학기의 마지막 강의. Lecture 1에서 verification과 갈라놓았던 그 Testing이다. 여기까지 배운 것은 거의 전부 verification이었다.</p>
+    <p lang="en">The last lecture of the semester, and the Testing that Lecture 1 separated from verification. Everything before it was essentially verification.</p>
+  </div>
+  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+</div>
+
+<h2 class="grp" lang="ko">노트 구조</h2>
+<h2 class="grp" lang="en">How the notes are built</h2>
+<div class="note" lang="ko">
+  <p>이 과목은 수식으로 막히는 과목이 아니다. <strong>업계 용어가 설명 없이 지나가서</strong> 막힌다. 그래서 각 절이 이 순서를 반복한다.</p>
+  <ul>
+    <li><strong>용어 정리</strong> — 슬라이드의 정의를 그대로. 여기까지는 원본과 크게 다르지 않다</li>
+    <li><strong>용어 뜯어보기</strong> — 풀네임 / 한 줄 정의 / <strong>언제</strong> / <strong>누가</strong> / 헷갈리는 것. 이 중 "언제"와 "누가"가 핵심이다. 같은 단어가 단계에 따라 다른 뜻이 되고, 직군에 따라 다른 이름으로 불린다</li>
+    <li><strong>비주얼</strong> — 무엇이 무엇으로 변환되는지, 누가 누구에게 무엇을 넘기는지. 흐름과 경계를 그린다</li>
+    <li><strong>현장 감각</strong> — 계산이 아니라 판단 문제. "이 상황에서 어떻게 하나"를 접어뒀다</li>
+    <li><strong>함정과 혼동</strong> — 헷갈리는 이웃 용어, 회사마다 다른 이름, 흔한 오해</li>
+  </ul>
+</div>
+<div class="note" lang="en">
+  <p>This course does not block you with mathematics. It blocks you because <strong>industry terms go past without explanation.</strong> So every section repeats this order.</p>
+  <ul>
+    <li><strong>Definitions</strong> — the slide definitions as they stand. Up to here it stays close to the original.</li>
+    <li><strong>Unpacking the jargon</strong> — full name, one-line definition, <strong>when</strong>, <strong>who</strong>, and what it gets confused with. The when and the who are the point: one word shifts meaning by stage and carries different names by job function.</li>
+    <li><strong>Pictures</strong> — what turns into what, and who hands what to whom. Flows and boundaries.</li>
+    <li><strong>On the job</strong> — judgement rather than calculation. "What do you do here" with the answer folded away.</li>
+    <li><strong>Traps</strong> — neighbouring terms that blur, names that change by company, the common misreadings.</li>
+  </ul>
+</div>
+
+<h2 class="grp" lang="ko">이 노트 쓰는 법</h2>
+<h2 class="grp" lang="en">How to use these notes</h2>
+<div class="note" lang="ko">
+  <p><strong>용어 뜯어보기는 펼쳐진 채로 시작한다.</strong> 모르는 사람에게 안 보이면 있으나 마나이기 때문이다. 알고 나면 접어두면 된다.</p>
+  <p><strong>함정 섹션이 quiz를 지킨다.</strong> Quiz가 MCQ라서 verification / validation / testing / emulation처럼 <strong>헷갈리는 짝</strong>이 그대로 문제로 나온다. 시험 전날 함정만 훑는 것도 방법이다.</p>
+  <p><strong>회사마다 이름이 다르다는 걸 계속 짚는다.</strong> "Pre-Si Validation"이 Intel에서는 design verification이고 NXP에서는 emulation이다. 이건 시험보다 면접에서 사고 나는 지점이다.</p>
+  <p><strong>오른쪽에 슬라이드가 따라온다.</strong> 넓은 화면에서 강의 노트를 열면 원본 슬라이드가 옆에 붙는다. 노트를 스크롤하면 슬라이드가 지금 읽는 대목으로 넘어가서, 이 문단이 몇 쪽에서 나온 것인지 바로 보인다. 1220px 아래에서는 슬라이드를 아예 받지 않고 노트만 뜬다.</p>
+  <p><strong>제목 오른쪽의 "슬라이드 N쪽"은 손으로 적은 게 아니다.</strong> 노트에 박아둔 앵커에서 자동으로 만들어지므로 라벨과 실제 위치가 어긋날 수 없다. 앵커가 없는 구간은 슬라이드 밖 보충 내용이라는 뜻이다.</p>
+</div>
+<div class="note" lang="en">
+  <p><strong>The jargon blocks start open</strong>, because a definition nobody can see is no use to the person who needs it. Fold them away once you know them.</p>
+  <p><strong>The trap sections are what protect your quiz marks.</strong> The quizzes are multiple choice, so <strong>the confusable pairs</strong>, verification against validation against testing against emulation, turn up as questions almost verbatim. Skimming only the traps the night before is a reasonable plan.</p>
+  <p><strong>The notes keep pointing out that companies rename things.</strong> "Pre-Si Validation" is design verification at Intel and emulation at NXP. That costs you interviews more than exams.</p>
+  <p><strong>The slides follow along on the right.</strong> Open a lecture note on a wide screen and the original deck docks beside it. Scrolling the notes moves the deck to whatever you are reading, so you can see at once which slide a passage came from. Below 1220px the deck is never downloaded and you get the notes alone.</p>
+  <p><strong>The "slide N" label beside each heading is not typed by hand.</strong> It is generated from the anchor embedded in the note, so the label and the real position cannot drift apart. A stretch with no anchor is material that is not on the slides.</p>
+</div>
+
+<footer>
+  <span lang="ko">강의: Aman Arora · School of Computing and Augmented Intelligence, Arizona State University · Fall 2026<br>
+  강의 사이트: <a href="https://adventlab.notion.site/addv-fall2026-website">adventlab.notion.site/addv-fall2026-website</a><br>
+  이 과목에는 지정 교재가 없습니다. 노트는 강의 슬라이드와 강의 사이트가 지정한 자료를 근거로 썼습니다.<br>
+  이 사이트의 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">Course: Aman Arora · School of Computing and Augmented Intelligence, Arizona State University · Fall 2026<br>
+  Course website: <a href="https://adventlab.notion.site/addv-fall2026-website">adventlab.notion.site/addv-fall2026-website</a><br>
+  This course has no assigned textbook. These notes are written from the lecture slides and the material the course website points to.<br>
+  The notes on this site were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</div>
+
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

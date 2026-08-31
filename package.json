@@ -1,0 +1,14 @@
+{
+  "name": "asu-cen-598-addv-fa26-notes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ASU CEN 598 Advanced Digital Design and Verification - personal study notes",
+  "scripts": {
+    "verify": "node scripts/verify.mjs"
+  },
+  "devDependencies": {
+    "pdfjs-dist": "^6.2.108",
+    "playwright": "^1.62.1"
+  }
+}

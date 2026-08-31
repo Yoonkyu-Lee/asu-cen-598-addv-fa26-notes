@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV · 약어 사전</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+<style>
+/* ── 약어 사전 전용 ──────────────────────────────────────────────
+   강의 노트의 .jargon 은 "강의 → 용어" 방향이다. 읽다가 마주친 말을 푼다.
+   이 페이지는 반대 방향이다. 용어를 이미 알고 있고 뜻을 찾으러 온다.
+   그래서 알파벳순이고, 설명은 짧고, 자세한 건 노트로 링크한다.
+   설명을 양쪽에 복제하지 않는다. 복제하면 반드시 갈라진다. */
+.wrap.gloss{grid-template-columns:minmax(0,1fr);max-width:900px}
+.tools{position:sticky;top:0;z-index:20;background:var(--paper);padding:14px 0 12px;border-bottom:1px solid var(--rule);margin-bottom:8px}
+.tools input{width:100%;font-family:var(--sans);font-size:15px;padding:11px 14px;border:1px solid var(--rule);
+  border-radius:8px;background:var(--card);color:var(--ink)}
+.tools input:focus{outline:2px solid var(--blue);outline-offset:1px}
+.tools .count{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:9px;letter-spacing:.05em}
+.alpha{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.alpha a{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:5px;background:var(--chip);
+  color:var(--ink2);text-decoration:none;border-bottom:none}
+.alpha a:hover{background:rgba(var(--blue-rgb),.12);color:var(--blue)}
+.gletter{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--ink3);
+  margin:38px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--rule);scroll-margin-top:96px}
+.gterm{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:15px 18px;margin-bottom:9px}
+.gterm .t{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.gterm .f{font-size:13px;color:var(--ink3);margin-top:2px}
+.gterm .d{font-size:14.5px;color:var(--ink2);line-height:1.65;margin-top:9px}
+.gterm .d strong{color:var(--ink)}
+.gterm .src{margin-top:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em}
+.gterm .src a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.35)}
+.gterm .src a:hover{background:rgba(var(--blue-rgb),.09)}
+.gterm.hide{display:none}
+.gletter.hide{display:none}
+.noresult{padding:40px 0;text-align:center;color:var(--ink3);font-size:14.5px}
+</style>
+</head>
+<body>
+<div class="wrap gloss">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 · Advanced Digital Design and Verification · Aman Arora</div>
+  <h1 class="title" lang="ko">약어 사전</h1>
+  <h1 class="title" lang="en">Glossary</h1>
+  <p class="subtitle" lang="ko">문서나 코드를 펴놓고 "이게 뭐였지" 할 때 오는 곳. 알파벳순이고, 자세한 설명은 해당 강의 노트로 보낸다.</p>
+  <p class="subtitle" lang="en">The page you open with a document in front of you asking "what was that again". Alphabetical, with the detail left to the lecture notes.</p>
+  <a class="backlink" href="index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="index.html" lang="en">← All lectures</a>
+</header>
+
+<main>
+<div class="tools">
+  <input type="search" id="q" autocomplete="off" spellcheck="false">
+  <div class="count" id="cnt"></div>
+  <nav class="alpha" id="alpha"></nav>
+</div>
+
+<div id="list">
+
+<h2 class="gletter" id="gA">A</h2>
+
+<div class="gterm">
+  <div class="t">Agent</div>
+  <div class="d" lang="ko">Testbench에서 <strong>Driver와 Monitor를 (인터페이스와 함께) 한 부품으로 묶은 것.</strong> BFM, Transactor와 같은 것을 가리킨다. UVM에서 <code>uvm_agent</code>라서 이 이름이 가장 표준적이다. <strong>재사용의 단위다.</strong> APB agent를 한 번 만들면 APB를 쓰는 어떤 DUT에도 붙는다.</div>
+  <div class="d" lang="en">In a testbench, <strong>the driver and monitor bundled into one component</strong> along with the interface. The same thing as a BFM or transactor. UVM calls it <code>uvm_agent</code>, which makes this the standard name. <strong>It is the unit of reuse:</strong> build an APB agent once and it plugs into any DUT that speaks APB.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">AOI</div>
+  <div class="f">And-Or-Invert</div>
+  <div class="d" lang="ko">Standard cell library에 들어 있는 복합 논리 cell. AND와 OR와 반전을 한 cell 안에서 처리한다. 게이트를 따로 쓰는 것보다 작고 빠른 경우가 많아 합성 도구가 즐겨 쓴다.</div>
+  <div class="d" lang="en">A compound logic cell found in standard cell libraries, doing AND, OR and inversion inside one cell. It is often smaller and faster than separate gates, so synthesis tools reach for it.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s6">Lecture 2 · 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">ASIC</div>
+  <div class="f">Application Specific Integrated Circuit</div>
+  <div class="d" lang="ko">한 가지 용도로 고정해서 만든 칩. 만들고 나면 회로가 안 바뀐다. FPGA의 반대편이다. <strong>틀리면 되돌릴 수 없다</strong>는 이 한 문장이 이 과목의 verification 전체를 설명한다.</div>
+  <div class="d" lang="en">A chip frozen to one purpose; once made, the circuit does not change. The opposite of an FPGA. <strong>It cannot be taken back once it is wrong</strong>, and that one sentence explains this course's entire attitude to verification.</div>
+  <div class="src"><a href="L01-course-intro.html#s1">Lecture 1 · 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Assertion</div>
+  <div class="d" lang="ko">설계가 <strong>반드시 보여야 하거나 절대 보이면 안 되는 동작</strong>을 코드로 명시한 것. 결정적인 성질은 <strong>"항상 켜져 있다"</strong>는 것이다. 어떤 테스트를 돌리든 계속 감시한다. 예: <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
+  <div class="d" lang="en">Code that states behaviour the design <strong>must, or must never, exhibit.</strong> The decisive property is that it is <strong>always on</strong>: it keeps watching no matter which test is running. For example <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 10 전체</span><span lang="en">all of Lecture 10</span></div>
+</div>
+
+<h2 class="gletter" id="gB">B</h2>
+
+<div class="gterm">
+  <div class="t">Back-End</div>
+  <div class="d" lang="ko">설계 흐름에서 <strong>모양과 물성을 다루는 구간.</strong> Place and Route, Fabrication, Board/Product. 구별 기준은 <strong>산출물이 파일이면 front-end, 모양이면 back-end.</strong> Synthesis는 경계에 걸쳐 있다.</div>
+  <div class="d" lang="en">The part of the flow that <strong>deals in shapes and physics</strong>: place and route, fabrication, board and product. The test is simple: <strong>file output means front end, shape output means back end.</strong> Synthesis straddles the line.</div>
+  <div class="src"><a href="L01-course-intro.html#s3">Lecture 1 · 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">BDD · ROBDD</div>
+  <div class="f">(Reduced Ordered) Binary Decision Diagram</div>
+  <div class="d" lang="ko">Boolean 함수를 표현하고 조작하는 자료구조. ROBDD는 <strong>canonical</strong>하다. 즉 같은 함수는 반드시 같은 모양이 된다. 그래서 두 ROBDD를 비교하면 <strong>두 함수가 같은지가 즉시 증명된다.</strong> Equivalence checking의 바탕이다. 조합 논리에만 쓴다.</div>
+  <div class="d" lang="en">A data structure for representing and manipulating boolean functions. ROBDDs are <strong>canonical</strong>: the same function always produces the same shape, so comparing two of them <strong>immediately proves whether the functions are equal.</strong> It underpins equivalence checking. Combinational logic only.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">BFM</div>
+  <div class="f">Bus Functional Model</div>
+  <div class="d" lang="ko">Agent와 같은 것. Driver와 Monitor를 묶은 testbench 부품을 부르는 다른 이름이다. 회사와 팀마다 Agent, BFM, Transactor 중 아무거나 쓴다.</div>
+  <div class="d" lang="en">The same thing as an agent: another name for the testbench component that bundles a driver and a monitor. Companies and teams use agent, BFM and transactor interchangeably.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">BIST</div>
+  <div class="f">Built-In Self-Test</div>
+  <div class="d" lang="ko">칩 안에 <strong>스스로를 테스트하는 회로를 미리 넣어두는 것.</strong> DFT 기법 중 하나다. 바깥에서 핀으로만 접근할 수 있는 manufacturing test의 한계를 안쪽에서 보완한다.</div>
+  <div class="d" lang="en">Building <strong>circuitry that tests the chip itself</strong> into the chip. One of the DFT techniques, it compensates from inside for the fact that manufacturing test can only reach the pins.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Bring-up</div>
+  <div class="d" lang="ko">새 칩이 처음 도착했을 때 <strong>동작하게 만들어가는 과정.</strong> 전원을 넣고 클럭이 도는지부터 확인한다. NVIDIA에는 이 단계에 붙는 고유 이름이 없어서 그냥 bringup이라고 부른다고 슬라이드가 적어놨다. Testbench 쪽에서도 "testbench and DUT bringup"이라는 표현을 같은 뜻으로 쓴다.</div>
+  <div class="d" lang="en">The process of <strong>getting a brand new chip to do anything at all</strong>, starting from whether the clock runs when power goes in. The slides note that NVIDIA has no specific name for this stage and just calls it bringup. The same word is used on the testbench side, as in "testbench and DUT bringup".</div>
+  <div class="src"><a href="L01-course-intro.html#s10">Lecture 1 · 10</a></div>
+</div>
+
+<h2 class="gletter" id="gC">C</h2>
+
+<div class="gterm">
+  <div class="t">Canonical</div>
+  <div class="d" lang="ko"><strong>표현이 하나뿐이라는 뜻.</strong> 중복도 반복도 애매함도 없다. 어떤 표현이 canonical이면, 두 대상이 같은지를 <strong>모양만 비교해서</strong> 판정할 수 있다. ROBDD가 그렇다.</div>
+  <div class="d" lang="en"><strong>There is exactly one representation.</strong> No redundancy, no repetition, no ambiguity. When a representation is canonical, you can decide whether two things are equal <strong>by comparing shapes alone.</strong> ROBDDs are the example.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Checker</div>
+  <div class="d" lang="ko">DUT가 제대로 동작하는지 확인하고 <strong>불법적인 일이 벌어지면 오류를 띄우는</strong> testbench 부품. 두 층이 있다. 신호 수준(assertion)과 동작 수준(scoreboard). 검증의 세 기둥 중 하나.</div>
+  <div class="d" lang="en">The testbench component that confirms the DUT behaves correctly and <strong>raises an error when something illegal happens.</strong> It has two layers: signal level, meaning assertions, and behavioural, meaning scoreboards. One of the three pillars of verification.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Clock Gating</div>
+  <div class="d" lang="ko">회로에서 <strong>지금 쓰지 않는 부분에 클럭을 끊어</strong> 전력을 아끼는 기법. 클럭이 안 도는 flip-flop은 동적 전력을 거의 안 쓴다. 전원을 통째로 끄는 power gating과 다르다.</div>
+  <div class="d" lang="en">Saving power by <strong>stopping the clock to parts of the circuit that are idle.</strong> A flip-flop with no clock burns almost no dynamic power. Distinct from power gating, which shuts the supply off entirely.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">CNF · POS</div>
+  <div class="f">Conjunctive Normal Form · Product Of Sums</div>
+  <div class="d" lang="ko">Boolean 식을 <strong>OR로 묶은 항들을 AND로 이어붙인 형태</strong>로 정규화한 것. 두 이름이 같은 것을 가리킨다. SAT 풀이의 입력 형식이다.</div>
+  <div class="d" lang="en">A boolean expression normalised into <strong>a conjunction of disjunctions</strong>, that is, ANDs of ORs. Two names for one form. It is the input format for SAT solving.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Code Coverage</div>
+  <div class="d" lang="ko">코드의 줄·분기·상태·신호가 <strong>실행되거나 바뀌었다</strong>는 것을 세는 커버리지. Line, Branch, State Machine, Toggle coverage가 있다. <strong>한계:</strong> 실행된 것과 옳은 것은 다르고, 코드 줄에 대응하지 않는 시나리오는 셀 수 없다. Functional coverage가 뒤쪽을 보완한다.</div>
+  <div class="d" lang="en">Coverage that counts whether lines, branches, states and signals <strong>were executed or toggled.</strong> Line, branch, state machine and toggle coverage. <strong>Its limits:</strong> executed is not correct, and scenarios that correspond to no single line cannot be counted. Functional coverage covers the latter.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Constrained Random</div>
+  <div class="d" lang="ko">랜덤 자극을 넣되 <strong>constraint로 불법 입력을 걸러내는</strong> 방식. 아무 값이나 넣으면 설계가 애초에 대응할 필요 없는 상황에서 실패하고, 그건 버그가 아니다. 값뿐 아니라 <strong>타이밍과 순서</strong>도 randomize 하는 것이 핵심이다.</div>
+  <div class="d" lang="en">Random stimulus with <strong>constraints filtering out illegal inputs.</strong> Throw anything in and the design fails in a situation it was never required to handle, which is not a bug. The important part is randomising <strong>timing and ordering</strong>, not just values.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Coverage</div>
+  <div class="d" lang="ko">DUT를 <strong>얼마나 잘 두들겼는지를 정량화</strong>한 것. 점수가 높을수록 stimulus의 품질이 높다. <strong>실패한 테스트의 커버리지는 세지 않는다.</strong> Code coverage와 functional coverage 두 갈래가 있다.</div>
+  <div class="d" lang="en">A <strong>quantitative measure of how well the DUT was exercised.</strong> A higher score means better stimulus. <strong>Never count coverage from a failing test.</strong> It splits into code coverage and functional coverage.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">CTL · LTL</div>
+  <div class="f">Computation Tree Logic · Linear Temporal Logic</div>
+  <div class="d" lang="ko">Temporal logic의 종류. <strong>순차적 동작을 분석 가능한 형태로 표현</strong>하려고 쓴다. <code>AG(req &rarr; F ack)</code>는 "어떤 경로에서든(A), 언제나(G), req가 뜨면 언젠가(F) ack가 뜬다", 즉 <strong>요청은 반드시 응답받는다</strong>는 뜻이다.</div>
+  <div class="d" lang="en">Kinds of temporal logic, used to <strong>express sequential behaviour in an analysable form.</strong> <code>AG(req &rarr; F ack)</code> reads: on all paths (A), globally (G), if req rises then finally (F) ack rises. In plain words, <strong>every request gets answered.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<h2 class="gletter" id="gD">D</h2>
+
+<div class="gterm">
+  <div class="t">Data Path</div>
+  <div class="d" lang="ko">값이 실제로 흘러가며 변형되는 곳. 산술 회로, memory, storage가 여기 있다. Control path와 짝을 이룬다. <strong>Data path 버그는 값이 틀리고, control path 버그는 타이밍이나 순서가 틀린다.</strong> 뒤쪽이 훨씬 잡기 어렵다.</div>
+  <div class="d" lang="en">Where values actually flow and get transformed: arithmetic circuits, memory, storage. It pairs with the control path. <strong>A data path bug gives a wrong value; a control path bug gives wrong timing or ordering</strong>, and the latter is far harder to catch.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s2">Lecture 2 · 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DFx · DFT · DFM · DFD</div>
+  <div class="f">Design For Testability / Manufacturability / Debuggability</div>
+  <div class="d" lang="ko">"Design For __"의 총칭. 전부 <strong>본래 기능과 무관한데 나중을 위해 미리 넣어두는 것</strong>이고, 그래서 전부 면적과 타이밍을 잡아먹는다. 나중에는 못 넣기 때문에 미리 넣는다. <strong>DFT의 T는 Testability이지 Test가 아니다.</strong> 다만 Freescale/NXP와 NVIDIA에서는 manufacturing test 조직 전체를 DFT라고 부른다.</div>
+  <div class="d" lang="en">An umbrella for "design for __". All of them are <strong>things unrelated to the function, put in now for later</strong>, and all of them cost area and timing. They go in early because later is not an option. <strong>The T in DFT is testability, not test</strong>, although Freescale, NXP and NVIDIA use DFT for the whole manufacturing test organisation.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a> · <a href="L01-course-intro.html#s13">Lecture 1 · 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DPI</div>
+  <div class="f">Direct Programming Interface</div>
+  <div class="d" lang="ko">SystemVerilog에서 <strong>C/C++ 함수를 직접 부르고 반대로 불리게 하는</strong> 인터페이스. 검증에서 <strong>C로 짠 참조 모델(golden model)을 testbench에 붙일 때</strong> 쓴다. 강의계획서가 "model based verification (C model integration using PLI/DPI)"으로 적어둔 것이 이것이고, Lab 4의 주제 중 하나다.</div>
+  <div class="d" lang="en">The SystemVerilog interface for <strong>calling C and C++ functions directly, and being called back.</strong> In verification it is how <strong>a reference model written in C gets attached to a testbench.</strong> The syllabus lists it as "model based verification, C model integration using PLI/DPI", and it is one of the topics in Lab 4.</div>
+  <div class="src"><span lang="ko">Lecture 17 · Lab 4에서 다룬다</span><span lang="en">covered in Lecture 17 and Lab 4</span></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Directed Test</div>
+  <div class="d" lang="ko">시나리오를 사람이 정해서 정확히 그것만 만들어내는 테스트. <strong>좋은 점:</strong> 아주 잘 제어된다. <strong>나쁜 점:</strong> 몇 개나 쓸 수 있겠나. 가능한 시나리오를 사람이 다 생각해낼 수 없다. 그래서 randomization과 같이 쓴다.</div>
+  <div class="d" lang="en">A test where a person fixes the scenario and produces exactly that. <strong>Good:</strong> extremely controllable. <strong>Bad:</strong> how many can you write? Nobody can think of every possible scenario. Hence it is paired with randomisation.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Driver</div>
+  <div class="d" lang="ko">Testbench에서 transaction을 받아 <strong>실제 신호로 번역해 DUT에 밀어 넣는</strong> 부품. 프로토콜을 아는 쪽이고 <strong>능동</strong>이다. Monitor와 짝을 이루며, 둘을 묶으면 Agent가 된다.</div>
+  <div class="d" lang="en">The testbench component that takes a transaction and <strong>translates it into real signals pushed into the DUT.</strong> It knows the protocol and it is <strong>active.</strong> It pairs with the monitor, and the two bundled make an agent.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DUT</div>
+  <div class="f">Design Under Test</div>
+  <div class="d" lang="ko">지금 검증하고 있는 그 설계. testbench가 둘러싸고 두들기는 대상이다. <strong>크기가 고정돼 있지 않다.</strong> FIFO 하나일 수도 SoC 전체일 수도 있다. 이름에 Test가 들어가지만 <strong>manufacturing test와 무관한 verification 용어다.</strong></div>
+  <div class="d" lang="en">The design currently being verified: the thing the testbench surrounds and hammers. <strong>It has no fixed size</strong>, from one FIFO to an entire SoC. The word test is in the name but <strong>it is a verification term with nothing to do with manufacturing test.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DVFS</div>
+  <div class="f">Dynamic Voltage and Frequency Scaling</div>
+  <div class="d" lang="ko">부하에 맞춰 <strong>전압과 주파수를 실시간으로 조절</strong>해 전력을 아끼는 기법. 성능을 깎아서 전력을 얻는 장치라, 목표 사이 트레이드오프의 대표 사례다.</div>
+  <div class="d" lang="en">Saving power by <strong>scaling voltage and frequency to the workload in real time.</strong> It buys power by giving up performance, making it the standard example of the trade-offs between design goals.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<h2 class="gletter" id="gE">E</h2>
+
+<div class="gterm">
+  <div class="t">ECC</div>
+  <div class="f">Error-Correcting Code</div>
+  <div class="d" lang="ko">데이터에 여분 비트를 붙여 <strong>오류를 검출하고 정정하는</strong> 기법. parity bit가 검출만 하는 데 비해 ECC는 정정까지 한다. Reliability 목표에 대응하는 수단이다.</div>
+  <div class="d" lang="en">Extra bits attached to data so that errors can be <strong>detected and corrected.</strong> A parity bit only detects; ECC also corrects. It is the lever for the reliability goal.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">ECO</div>
+  <div class="f">Engineering Change Order</div>
+  <div class="d" lang="ko"><strong>합성을 다시 돌리지 않고 netlist를 직접 고치는 것.</strong> Logic Freeze 이후에 RTL 버그가 나오면 이렇게 처리한다. 승인이 필요하다. 합성을 다시 돌리면 결과 netlist가 통째로 달라져 이미 끝낸 place and route와 timing closure가 무효가 되기 때문이다. <strong>고치는 대상이 RTL이 아니라 netlist다.</strong> 크기는 gate 몇 개 또는 배선 정도이고, 구조가 바뀌는 변경은 못 덮는다.</div>
+  <div class="d" lang="en"><strong>Patching the netlist directly instead of re-running synthesis.</strong> It is how an RTL bug found after logic freeze gets handled, and it needs approval, because re-running synthesis produces a wholly different netlist and invalidates the place and route and timing closure already done. <strong>What gets edited is the netlist, not the RTL.</strong> Its natural size is a few gates or some rerouting; structural changes do not fit.</div>
+  <div class="src"><a href="L01-course-intro.html#s7">Lecture 1 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">EDA</div>
+  <div class="f">Electronic Design Automation</div>
+  <div class="d" lang="ko">칩 설계에 쓰는 소프트웨어 도구를 통칭하는 말, 그리고 그것을 파는 산업. 3대 벤더는 <strong>Synopsys, Cadence, Siemens</strong>다. 이 과목은 Apporto를 통해 EDA 도구에 접속한다.</div>
+  <div class="d" lang="en">The umbrella term for the software used to design chips, and for the industry that sells it. The big three are <strong>Synopsys, Cadence and Siemens.</strong> This course reaches the EDA tools through Apporto.</div>
+  <div class="src"><a href="L01-course-intro.html#s1">Lecture 1 · 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Elaborate</div>
+  <div class="d" lang="ko">시뮬레이터의 compile 단계 중 하나. Analyze(문법 해석) 다음에 오며, <strong>모듈 계층을 펼치고 인스턴스 사이 연결을 확정한다.</strong> 여기서 파라미터 값이 정해지고 실제 회로 구조가 만들어진다.</div>
+  <div class="d" lang="en">One of the simulator's compile phases, following analyze, which parses. Elaboration <strong>flattens the module hierarchy and fixes the connections between instances.</strong> Parameter values get resolved here and the actual structure comes into being.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s14">Lecture 2 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Emulation</div>
+  <div class="d" lang="ko">진짜 실리콘이 나오기 전에 <strong>전용 하드웨어로 설계를 실현</strong>해 돌려보는 것. FPGA 기반(Siemens Veloce)과 프로세서 기반(Cadence Palladium)이 있다. 시뮬레이션 가속이 목적이고 validation을 미리 준비한다. <strong>한계:</strong> 아날로그 블록 불가, 진짜 clocking/reset이 아님, 진짜 timing verification이 아님, <strong>디버깅이 아주 어려움.</strong> 시뮬레이션은 느리지만 전부 볼 수 있다는 것과의 맞교환이다.</div>
+  <div class="d" lang="en">Realising the design <strong>on dedicated hardware</strong> and running it before real silicon exists. FPGA based, such as Siemens Veloce, or processor based, such as Cadence Palladium. The purpose is simulation acceleration and getting validation ready early. <strong>Limits:</strong> no analog blocks, the clocking and reset are not real, it is not real timing verification, and <strong>debugging is hard.</strong> The trade against simulation, which is slow but shows you everything.</div>
+  <div class="src"><a href="L01-course-intro.html#s11">Lecture 1 · 11</a> · <span lang="ko">Lecture 29 전체</span><span lang="en">all of Lecture 29</span></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Equivalence Checking</div>
+  <div class="d" lang="ko">서로 다른 두 표현을 비교해 <strong>논리적으로 같은지 증명하는</strong> formal verification 기법. 보통 추상화 수준이 다른 둘, 예를 들어 RTL과 합성된 netlist를 비교한다. <strong>업계에서 매우 널리 쓰인다.</strong> 통상적인 design verification과는 다른 일이다.</div>
+  <div class="d" lang="en">A formal technique that compares two different representations and <strong>proves they are logically the same.</strong> Typically two levels of abstraction, such as RTL against the synthesised netlist. <strong>Very popular in industry</strong>, and a different job from ordinary design verification.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">EVB</div>
+  <div class="f">Evaluation Board</div>
+  <div class="d" lang="ko">칩을 꽂아 전원과 클럭을 주고 인터페이스를 뽑아낸 <strong>평가용 보드.</strong> 최종 제품 보드가 아니라 칩을 실험하려고 만든 것이다. Validation에서 쓴다.</div>
+  <div class="d" lang="en">A board built to hold the chip, feed it power and a clock and break out its interfaces. Not the product board, <strong>a rig for experimenting on the part.</strong> It is what validation runs on.</div>
+  <div class="src"><a href="L01-course-intro.html#s10">Lecture 1 · 10</a></div>
+</div>
+
+<h2 class="gletter" id="gF">F</h2>
+
+<div class="gterm">
+  <div class="t">False Path</div>
+  <div class="d" lang="ko">회로에는 있지만 <strong>실제로는 절대 활성화되지 않는 timing path.</strong> STA는 모든 경로를 똑같이 "매 클럭 동작한다"고 가정하므로, 이런 경로는 사람이 timing constraint로 알려줘야 한다. <strong>잘못 선언하면 진짜 위반을 도구가 조용히 무시한다.</strong></div>
+  <div class="d" lang="en">A timing path that exists in the circuit but <strong>is never actually activated.</strong> STA assumes every path runs every clock, so a human must declare these through timing constraints. <strong>Declare one wrongly and the tool quietly ignores a real violation.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s5">Lecture 2 · 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Formal Verification</div>
+  <div class="d" lang="ko">검증 문제를 <strong>수학으로</strong> 푸는 것. 설계를 수식으로 표현하고 제약 아래 성립함을 증명한다. Static verification이라고도 한다. <strong>Exhaustive하지만 state explosion problem 때문에 확장이 안 된다.</strong> 슬라이드가 "이 과목의 초점이 아니다"라고 명시했다. 기법은 equivalence checking, model checking, theorem proving 셋.</div>
+  <div class="d" lang="en">Solving the verification problem <strong>with mathematics</strong>: express the design as a formula and prove it holds under constraints. Also called static verification. <strong>Exhaustive, but it does not scale, because of the state explosion problem.</strong> The slides state outright that it is not a focus of this course. The three techniques are equivalence checking, model checking and theorem proving.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <span lang="ko">Lecture 28 전체</span><span lang="en">all of Lecture 28</span></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Front-End</div>
+  <div class="d" lang="ko">설계 흐름에서 <strong>코드와 문서를 다루는 구간.</strong> Specification, Architecture, Design(RTL). 산출물이 전부 텍스트 파일이다. Synthesis는 출력이 파일이지만 만들 때 물리 라이브러리를 쓰므로 경계에 걸쳐 있다.</div>
+  <div class="d" lang="en">The part of the flow that <strong>deals in code and documents</strong>: specification, architecture and design in RTL. Everything it produces is a text file. Synthesis produces a file but uses a physical library to do it, so it straddles the line.</div>
+  <div class="src"><a href="L01-course-intro.html#s3">Lecture 1 · 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Functional Coverage</div>
+  <div class="d" lang="ko"><strong>보고 싶은 시나리오를 코드로 직접 적어두고</strong> 그 상황이 실제로 벌어졌는지 세는 것. Code coverage가 못 세는 <strong>조합 상황</strong>("FIFO가 가득 찬 상태에서 write가 들어왔다")을 잡아낸다. 대신 사람이 무엇을 볼지 미리 정해야 하므로 상상력의 한계가 다시 들어온다.</div>
+  <div class="d" lang="en"><strong>Writing the scenarios you want to see as code</strong> and counting whether they actually occurred. It catches the <strong>combinations</strong> code coverage cannot, such as "a write arrived while the FIFO was full". The cost is that a person must decide in advance what to look for, so the imagination limit returns.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<h2 class="gletter" id="gG">G</h2>
+
+<div class="gterm">
+  <div class="t">GDSII · <code>.gds</code></div>
+  <div class="d" lang="ko">Place and Route가 만들어내는 <strong>최종 layout 파일 형식.</strong> 이것이 mask가 되어 제조로 넘어간다. Tech library의 네 확장자(<code>.lib</code>, <code>.lef</code>, <code>.gds</code>, <code>.db</code>) 중 하나이기도 하다.</div>
+  <div class="d" lang="en">The <strong>final layout format</strong> that place and route produces. It becomes the masks and goes to manufacturing. It is also one of the four tech library extensions, alongside <code>.lib</code>, <code>.lef</code> and <code>.db</code>.</div>
+  <div class="src"><a href="L01-course-intro.html#s6">Lecture 1 · 06</a> · <a href="L02-design-and-verification-overview.html#s6">Lecture 2 · 06</a></div>
+</div>
+
+<h2 class="gletter" id="gH">H</h2>
+
+<div class="gterm">
+  <div class="t">HDL</div>
+  <div class="f">Hardware Description Language</div>
+  <div class="d" lang="ko">하드웨어를 기술하는 언어. Verilog와 VHDL이 대표적이다. <strong>HDL만으로는 검증에 부족하다.</strong> class와 enum 같은 프로그래밍 기능이 없고, assertion·randomization·coverage에 대한 native 지원이 없기 때문이다. 그래서 SystemVerilog가 생겼다.</div>
+  <div class="d" lang="en">A language for describing hardware, chiefly Verilog and VHDL. <strong>An HDL alone is not enough for verification:</strong> it lacks programming features such as classes and enums, and it has no native support for assertions, randomisation or coverage. Hence SystemVerilog.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s1">Lecture 2 · 01</a> · <a href="L02-design-and-verification-overview.html#s22">22</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">HVT · LVT · SVT</div>
+  <div class="f">High / Low / Standard Threshold Voltage</div>
+  <div class="d" lang="ko">Standard cell library의 변형들. VT는 트랜지스터가 켜지는 문턱 전압이다. <strong>HVT는 느리지만 누설이 적고, LVT는 빠르지만 누설이 많다.</strong> HP(High Performance)와 LP(Low Power)도 같은 축의 다른 이름이다. 도구가 <strong>급한 경로에만 LVT를 쓰고 나머지는 HVT로 채우는</strong> 식으로 트레이드오프를 실행한다.</div>
+  <div class="d" lang="en">Variants of a standard cell library. VT is the threshold voltage at which a transistor turns on. <strong>HVT is slower with less leakage; LVT is faster and leakier.</strong> HP for high performance and LP for low power name the same axis. Tools execute the trade-off by <strong>using LVT only on tight paths and filling the rest with HVT.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s6">Lecture 2 · 06</a></div>
+</div>
+
+<h2 class="gletter" id="gI">I</h2>
+
+<div class="gterm">
+  <div class="t">IP</div>
+  <div class="f">Intellectual Property</div>
+  <div class="d" lang="ko">이 분야에서는 <strong>이미 만들어지고 검증된 설계 블록</strong>을 가리키는 말로 쓴다. 사 오거나 재사용한다. 검증 쪽 대응물이 <strong>VIP</strong>(Verification IP)로, 예를 들어 EDA 벤더에게서 checker를 사서 testbench에 끼워 넣는다.</div>
+  <div class="d" lang="en">In this field the word means <strong>an already built and verified design block</strong>, bought in or reused. Its verification counterpart is <strong>VIP</strong>, verification IP: buying a checker from an EDA vendor and plugging it into your testbench.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s7">Lecture 2 · 07</a> · <a href="L02-design-and-verification-overview.html#s22">22</a></div>
+</div>
+
+<h2 class="gletter" id="gL">L</h2>
+
+<div class="gterm">
+  <div class="t"><code>.lib</code> · <code>.lef</code> · <code>.db</code></div>
+  <div class="d" lang="ko">Tech library 파일 형식. <strong><code>.lib</code></strong>는 타이밍과 전력으로 synthesis와 STA가 쓰고, <strong><code>.lef</code></strong>는 물리 layout 정보로 place and route가 쓰고, <strong><code>.db</code></strong>는 <code>.lib</code>의 바이너리 버전이다. 현장에서는 확장자만으로 부른다.</div>
+  <div class="d" lang="en">Tech library file formats. <strong><code>.lib</code></strong> holds timing and power for synthesis and STA, <strong><code>.lef</code></strong> holds physical layout for place and route, and <strong><code>.db</code></strong> is the binary form of <code>.lib</code>. People refer to them by extension alone.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s6">Lecture 2 · 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Lint</div>
+  <div class="d" lang="ko">코드를 돌리지 않고 읽어서 <strong>가이드라인 위반을 찾는</strong> 정적 분석. 도구는 Synopsys Spyglass. 잡는 것: 도달할 수 없는 코드, 명명 규칙, blocking과 non-blocking 혼용, 합성 불가 구문, 다중 driver, <strong>의도치 않은 latch.</strong> <strong>스타일 지적이 아니다.</strong> 절반 이상이 실물이 코드와 다르게 동작하게 만드는 원인이다. 다만 lint는 verification이 아니다. "규칙을 지키는가"만 볼 뿐 "사양대로인가"는 못 본다.</div>
+  <div class="d" lang="en">Static analysis that reads the code without running it and <strong>finds guideline violations.</strong> The tool named is Synopsys Spyglass. It catches unreachable code, naming conventions, mixed blocking and non-blocking assignments, un-synthesisable constructs, multiple drivers and <strong>unintended latches.</strong> <strong>These are not style nits:</strong> more than half of them cause the physical part to behave differently from the code. But lint is not verification; it only asks whether rules are followed, never whether the design matches the spec.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s8">Lecture 2 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Logic Freeze</div>
+  <div class="d" lang="ko">RTL을 더 이상 바꾸지 않기로 못 박는 시점. Spec Freeze 다음이고 Tapeout 전이다. <strong>이 지점 이후에 발견된 RTL 버그는 ECO로 처리한다.</strong></div>
+  <div class="d" lang="en">The milestone at which the RTL stops changing. It follows spec freeze and precedes tapeout. <strong>An RTL bug found after this point gets handled as an ECO.</strong></div>
+  <div class="src"><a href="L01-course-intro.html#s7">Lecture 1 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">LRM</div>
+  <div class="f">Language Reference Manual</div>
+  <div class="d" lang="ko">언어의 <strong>표준 문서.</strong> SystemVerilog의 것은 IEEE 1800이다. 시뮬레이터 벤더는 구현을 마음대로 해도 되지만 LRM은 지켜야 한다. <strong>도구마다 결과가 갈릴 때 최종 심판이다.</strong> 단, LRM이 정하지 않은 구간에서는 도구마다 달라도 둘 다 맞다. 그래서 그런 코드는 안 쓰는 게 관행이고 lint가 잡아준다.</div>
+  <div class="d" lang="en">The <strong>standard document</strong> for a language; for SystemVerilog it is IEEE 1800. A vendor may implement the simulator however it likes but must obey the LRM. <strong>It is the final referee when tools disagree.</strong> Where the LRM deliberately leaves things undefined, though, two tools can differ and both be right, which is why nobody writes such code on purpose and lint flags it.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s14">Lecture 2 · 14</a></div>
+</div>
+
+<h2 class="gletter" id="gM">M</h2>
+
+<div class="gterm">
+  <div class="t">Mask</div>
+  <div class="d" lang="ko">웨이퍼에 패턴을 찍기 위한 판. Place and Route가 끝나면 layout이 나오고 그것이 mask가 된다. <strong>Base layer</strong>는 트랜지스터 자체를 만드는 아래쪽 층으로, 고치면 mask를 거의 다 새로 만들어야 한다. <strong>Metal layer</strong>는 위쪽 배선 층으로, 여기만 고치는 metal-only ECO는 훨씬 싸고 빠르다.</div>
+  <div class="d" lang="en">The plates used to print patterns onto a wafer. Place and route produces a layout, and that layout becomes the masks. The <strong>base layers</strong> form the transistors themselves, and touching them means remaking nearly all the masks. The <strong>metal layers</strong> are the upper wiring, and a metal-only ECO that touches just those is far cheaper and faster.</div>
+  <div class="src"><a href="L01-course-intro.html#s7">Lecture 1 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Microarchitecture</div>
+  <div class="d" lang="ko">Architecture가 정의한 동작을 <strong>register, memory, gate, control path, data path로 구현한 구체적 형태.</strong> Architecture가 "무엇을"이라면 microarchitecture는 "어떻게"다. <strong>같은 architecture를 여러 microarchitecture로 만들 수 있다.</strong> x86 하나에 Intel과 AMD의 서로 다른 microarchitecture가 붙는 것이 그 예다.</div>
+  <div class="d" lang="en">The behaviour defined by an architecture, <strong>made concrete with registers, memories, gates, control paths and data paths.</strong> Architecture says what; microarchitecture says how. <strong>One architecture can carry many microarchitectures</strong>, as x86 carries quite different ones at Intel and AMD.</div>
+  <div class="src"><a href="L01-course-intro.html#s8">Lecture 1 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Model Checking</div>
+  <div class="d" lang="ko">주어진 모델(설계)이 <strong>주어진 제약 아래 주어진 property를 만족하는지</strong> 확인하는 formal 기법. Property checking이라고도 한다. 유한 상태 모델에 대해 temporal logic 식을 검사한다. 보통 시뮬레이션 기반 design verification을 <strong>보조</strong>하는 데 쓴다.</div>
+  <div class="d" lang="en">A formal technique that checks whether a given model <strong>satisfies a given property under given constraints.</strong> Also called property checking. It evaluates temporal logic formulas on finite state models, and is usually used <strong>to aid</strong> simulation based design verification.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Monitor</div>
+  <div class="d" lang="ko">Testbench에서 인터페이스 신호를 <strong>읽어서 transaction으로 되돌리는</strong> 부품. DUT를 건드리지 않는 <strong>수동</strong> 부품이다. <strong>Checker와 Coverage는 Monitor 없이 붙을 수 없다.</strong> 관측을 안 하는데 판정하거나 셀 수 없기 때문이다. Driver가 없는 곳에도 붙일 수 있다.</div>
+  <div class="d" lang="en">The testbench component that <strong>reads interface signals back into transactions.</strong> It never touches the DUT and is <strong>passive.</strong> <strong>Neither a checker nor coverage can attach without one</strong>, because nothing can be judged or counted that was never observed. It can be placed where no driver exists.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Multicycle Path</div>
+  <div class="d" lang="ko">한 클럭 안에 끝나지 않아도 되는 timing path. 예를 들어 부팅 때 한 번 쓰고 안 바뀌는 configuration register에서 나오는 경로가 그렇다. Timing constraint로 선언하면 STA가 여러 클럭을 허용한다. <strong>잘못 선언하면 진짜 위반이 조용히 무시되므로</strong> 리뷰 대상이다.</div>
+  <div class="d" lang="en">A timing path allowed more than one clock to settle, such as one starting from a configuration register written once at boot. Declaring it in the timing constraints makes STA allow the extra clocks. <strong>Declared wrongly it silently hides a real violation</strong>, so these get reviewed.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s5">Lecture 2 · 05</a></div>
+</div>
+
+<h2 class="gletter" id="gN">N</h2>
+
+<div class="gterm">
+  <div class="t">NBA</div>
+  <div class="f">Non-Blocking Assignment</div>
+  <div class="d" lang="ko">Verilog의 <code>&lt;=</code> 대입. 시뮬레이터가 <strong>별도의 이벤트 큐에서 처리한다.</strong> Blocking 대입(<code>=</code>)과 같은 always 블록에서 섞어 쓰면 안 되는 이유가 이것이고, lint가 그것을 잡는다.</div>
+  <div class="d" lang="en">The <code>&lt;=</code> assignment in Verilog. The simulator processes these <strong>from a separate event queue</strong>, which is why mixing them with blocking assignments (<code>=</code>) in one always block is a hazard, and why lint flags it.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s14">Lecture 2 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Netlist</div>
+  <div class="d" lang="ko">gate와 flip-flop이 wire로 연결된 목록. Synthesis가 RTL을 씹어서 뱉어내는 것이다. <strong>"무엇을 하고 싶은지"는 남지 않고 "어떤 부품이 어떻게 연결되는지"만 남는다.</strong> ECO가 손대는 대상이 바로 이것이다.</div>
+  <div class="d" lang="en">A list of gates and flip-flops joined by wires, produced when synthesis chews the RTL down. <strong>Nothing about intent survives, only which parts connect to which.</strong> It is the thing an ECO edits.</div>
+  <div class="src"><a href="L01-course-intro.html#s2">Lecture 1 · 02</a> · <a href="L02-design-and-verification-overview.html#s4">Lecture 2 · 04</a></div>
+</div>
+
+<h2 class="gletter" id="gO">O</h2>
+
+<div class="gterm">
+  <div class="t">OVM · VMM</div>
+  <div class="f">Open Verification Methodology · Verification Methodology Manual</div>
+  <div class="d" lang="ko">UVM 이전의 검증 방법론들. <strong>UVM이 이 둘을 합쳐 표준이 됐다.</strong> 지금 새로 배우는 건 UVM이고, 이 둘은 예전 코드에서 마주칠 이름이다.</div>
+  <div class="d" lang="en">Verification methodologies that predate UVM. <strong>UVM merged them into the standard.</strong> UVM is what you learn now; these two are names you meet in older code.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+</div>
+
+<h2 class="gletter" id="gP">P</h2>
+
+<div class="gterm">
+  <div class="t">Pipelining</div>
+  <div class="d" lang="ko">처리를 단계로 쪼개고 사이에 register를 넣어 <strong>throughput을 올리는</strong> 기법. 주의할 점은 <strong>timing과 performance가 다르다</strong>는 것이다. 파이프라인을 깊게 하면 각 단이 짧아져 timing은 좋아지지만 한 건의 지연은 오히려 늘어난다.</div>
+  <div class="d" lang="en">Splitting processing into stages with registers between them, <strong>raising throughput.</strong> Note that <strong>timing and performance are not the same thing:</strong> deepening a pipeline shortens each stage and improves timing while making the latency of a single item worse.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<h2 class="gletter" id="gR">R</h2>
+
+<div class="gterm">
+  <div class="t">Retiming</div>
+  <div class="d" lang="ko">회로의 기능을 바꾸지 않고 <strong>register의 위치를 옮겨</strong> 단 사이 지연을 고르게 만드는 최적화. Timing 목표에 대응하는 수단이다.</div>
+  <div class="d" lang="en">An optimisation that <strong>moves registers</strong> without changing what the circuit does, evening out the delay per stage. It is a lever for the timing goal.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">RTL</div>
+  <div class="f">Register Transfer Level</div>
+  <div class="d" lang="ko">매 클럭마다 데이터가 어느 register에서 어느 register로 옮겨가는지로 하드웨어를 기술하는 방식. <strong>언어 이름이 아니라 추상화 수준이다.</strong> Verilog와 VHDL이 언어고, 같은 언어로 더 추상적으로도 더 구체적으로도 쓸 수 있다. Behavioral과 structural 사이에 있는 <strong>실용적 타협점</strong>이다.</div>
+  <div class="d" lang="en">Describing hardware by which register the data moves to, on each clock. <strong>It is a level of abstraction, not the name of a language.</strong> Verilog and VHDL are the languages, and either can be written more abstractly or more concretely. RTL is the <strong>practical compromise</strong> between behavioral and structural.</div>
+  <div class="src"><a href="L01-course-intro.html#s2">Lecture 1 · 02</a> · <a href="L02-design-and-verification-overview.html#s1">Lecture 2 · 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Rule of 10</div>
+  <div class="d" lang="ko">버그를 찾는 단계가 <strong>한 칸 늦어질 때마다 비용이 10배</strong>가 된다는 경험칙. Design 1, Wafer 10, Chip 100, System 1000, Application 10000. 발표자 노트가 구체적 사례를 적어놨다: Intel 프로세서의 부동소수점 유닛 버그가 약 10억 달러를 물렸다.</div>
+  <div class="d" lang="en">The rule of thumb that <strong>each stage later costs ten times more</strong> to find a bug: 1 at design, 10 at wafer, 100 at chip, 1000 at system, 10000 at the application. The speaker notes give the concrete case: the floating point bug in Intel processors cost around a billion dollars.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s12">Lecture 2 · 12</a></div>
+</div>
+
+<h2 class="gletter" id="gS">S</h2>
+
+<div class="gterm">
+  <div class="t">SAT</div>
+  <div class="f">Satisfiability</div>
+  <div class="d" lang="ko">Boolean 함수를 <strong>참으로 만들 수 있는지</strong> 확인하는 문제. CNF(=POS) 형태로 바꾼 뒤 만족하는 대입을 찾는다. 하나라도 있으면 satisfiable, 하나도 없으면 unsatisfiable. BDD와 마찬가지로 조합 논리에만 적용된다.</div>
+  <div class="d" lang="en">The question of whether a boolean function <strong>can ever be true.</strong> Convert it to CNF, also called product of sums, and look for a satisfying assignment. One is enough to call it satisfiable; none makes it unsatisfiable. Like BDDs, it applies only to combinational logic.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Scan Chain</div>
+  <div class="d" lang="ko">DFT의 대표 장치. 설계 안의 flip-flop들을 <strong>사슬처럼 이어두고, 그 사슬로 내부 값을 밖으로 밀어내거나 안으로 밀어넣는다.</strong> 목적은 제조된 칩에서 <strong>핀만으로 안을 들여다보는 것</strong>이다. 대가는 flip-flop마다 mux가 붙어 면적이 늘고 경로가 길어지는 것이다. <strong>넣는 시점은 설계 때지만 쓰는 곳은 Testing이다.</strong></div>
+  <div class="d" lang="en">The signature DFT structure: the flip-flops of a design are <strong>strung together in a chain</strong> so values can be shifted out of, or into, the chip through it. The purpose is <strong>seeing inside a manufactured part using only its pins.</strong> The price is a mux on every flip-flop, adding area and lengthening paths. <strong>Inserted at design time, used in testing.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a> · <a href="L01-course-intro.html#s13">Lecture 1 · 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Scoreboard</div>
+  <div class="d" lang="ko">동작 수준 checker. <strong>DUT에 들어간 transaction과 나온 transaction을 맞춰본다.</strong> "데이터 X를 담은 transaction을 넣었으니 응답은 데이터 Y여야 한다" 같은 검사다. 신호 수준의 assertion과 층이 다르다.</div>
+  <div class="d" lang="en">A behavioural checker that <strong>matches transactions going into the DUT against those coming out</strong>, as in "a transaction carrying X went in, so the response should carry Y". It sits at a different layer from signal level assertions.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Slack</div>
+  <div class="d" lang="ko"><strong>여유 시간.</strong> 신호가 도착해야 하는 시각에서 실제로 도착한 시각을 뺀 값이다. <strong>양수면 통과, 음수면 위반</strong>이고 음수 slack을 timing violation이라고 부른다. 합성과 STA 리포트의 핵심 숫자이며, "worst negative slack이 얼마냐"가 곧 "이 설계가 얼마나 안 되고 있냐"다.</div>
+  <div class="d" lang="en"><strong>Spare time:</strong> the time a signal was required by, minus the time it actually arrived. <strong>Positive passes, negative is a violation</strong>, and negative slack is what people call a timing violation. It is the headline number in synthesis and STA reports, so "what is the worst negative slack" is the same question as "how badly is this failing".</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s5">Lecture 2 · 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">SoC</div>
+  <div class="f">System on Chip</div>
+  <div class="d" lang="ko">예전에 보드 위에 여러 칩으로 흩어져 있던 것을 <strong>칩 하나에 다 넣은 것.</strong> CPU, accelerator, interconnect, I/O와 memory controller, clock과 reset 같은 globals가 들어간다. <strong>특정 제품 이름이 아니라 구조를 부르는 말이다.</strong> 이 과목의 뼈대이기도 하다.</div>
+  <div class="d" lang="en">Everything that used to sit as separate chips on a board, <strong>pulled onto one die</strong>: a CPU, accelerators, an interconnect, I/O and memory controllers, and globals such as clock and reset. <strong>It names a shape, not a product</strong>, and it is the skeleton of this course.</div>
+  <div class="src"><a href="L01-course-intro.html#s1">Lecture 1 · 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Spec Freeze</div>
+  <div class="d" lang="ko">사양을 더 이상 바꾸지 않기로 못 박는 시점. Logic Freeze와 Tapeout 앞에 온다.</div>
+  <div class="d" lang="en">The milestone at which the specification stops changing. It comes before logic freeze and tapeout.</div>
+  <div class="src"><a href="L01-course-intro.html#s7">Lecture 1 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">STA</div>
+  <div class="f">Static Timing Analysis</div>
+  <div class="d" lang="ko"><strong>모든 timing path를 분석해</strong> 회로의 타이밍 성능을 검증하는 방법. <strong>"static"인 이유는 입력 벡터가 관여하지 않기 때문이다.</strong> 값을 흘려보지 않고 경로 지연만 더해서 판단하므로 빠르고 빠짐없지만, 그 경로가 실제로 쓰이는지는 모른다. 그래서 false path와 multicycle path를 사람이 알려줘야 한다. Path는 네 종류: PI to Flop, Flop to Flop, Flop to PO, PI to PO.</div>
+  <div class="d" lang="en">Validating a circuit's timing <strong>by analysing every timing path.</strong> <strong>It is static because no input vectors are involved:</strong> it adds path delays rather than pushing values through, which makes it fast and exhaustive but blind to whether a path is ever used. Hence false paths and multicycle paths have to be declared by a human. Four kinds of path: PI to flop, flop to flop, flop to PO, PI to PO.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s5">Lecture 2 · 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Standard Cell</div>
+  <div class="d" lang="ko">Foundry가 미리 만들어 두고 특성까지 재놓은 <strong>부품.</strong> AND 게이트 하나, flip-flop 하나가 각각 하나의 cell이다. <strong>"standard"인 이유는 높이가 전부 같게 설계돼 줄 세워 늘어놓을 수 있기 때문</strong>이고, 그래야 place and route가 자동화된다. 당신의 RTL은 이 목록에 있는 것으로만 만들어진다.</div>
+  <div class="d" lang="en">A <strong>part</strong> the foundry has already built and characterised: one AND gate is a cell, one flip-flop is a cell. <strong>They are standard because they share a height and can be laid out in rows</strong>, which is what makes place and route automatable. Your RTL can only be built from what is on that list.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s4">Lecture 2 · 04</a> · <a href="L02-design-and-verification-overview.html#s6">06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Stimulus</div>
+  <div class="d" lang="ko">DUT를 자극하려고 넣는 입력. <strong>Active</strong>는 값을 밀어 넣는 것, <strong>Reactive</strong>는 DUT에서 벌어진 일에 반응하는 것이다. 검증의 세 기둥 중 하나이고, <strong>이것만 있으면 시뮬레이션이 항상 통과한다.</strong> 결과를 보는 사람이 없기 때문이다.</div>
+  <div class="d" lang="en">The inputs applied to stimulate the DUT. <strong>Active</strong> means driving values in; <strong>reactive</strong> means responding to something that happened inside. One of the three pillars, and <strong>on its own it makes every simulation pass</strong>, because nobody is looking at the result.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Synthesis</div>
+  <div class="d" lang="ko">상위 수준 HDL 코드를 <strong>netlist로 바꾸는 것.</strong> 입력이 셋(RTL, constraint, tech library)이고 출력이 둘(netlist, area/timing/power 리포트)이다. <strong>입력 하나만 바뀌어도 결과 netlist가 달라진다.</strong> 그래서 ECO가 필요하다. 도구는 Synopsys Design Compiler, Cadence Genus.</div>
+  <div class="d" lang="en">Turning higher level HDL into <strong>a netlist.</strong> Three inputs, RTL, constraints and a tech library; two outputs, the netlist and reports on area, timing and power. <strong>Change any one input and the netlist comes out different</strong>, which is why ECOs exist. Tools: Synopsys Design Compiler, Cadence Genus.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s4">Lecture 2 · 04</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">SystemVerilog</div>
+  <div class="d" lang="ko">설계와 검증에 모두 쓰는 언어. 슬라이드가 <strong>"Verilog++"</strong>라고 부르고, 표준은 <strong>IEEE 1800</strong>이다. HDL에 없던 class와 enum 같은 프로그래밍 기능, 그리고 assertion·randomization·coverage에 대한 native 지원이 들어 있다. <strong>UVM은 SystemVerilog로 쓰인 class 라이브러리이므로 SystemVerilog 없이 UVM만 배울 수 없다.</strong></div>
+  <div class="d" lang="en">The language used for both design and verification. The slides call it <strong>"Verilog++"</strong> and the standard is <strong>IEEE 1800.</strong> It adds programming features an HDL lacked, such as classes and enums, plus native support for assertions, randomisation and coverage. <strong>UVM is a class library written in it, so there is no learning UVM without it.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+</div>
+
+<h2 class="gletter" id="gT">T</h2>
+
+<div class="gterm">
+  <div class="t">Tapeout</div>
+  <div class="d" lang="ko">설계 데이터를 <strong>foundry로 넘기는 순간.</strong> 이름은 예전에 자기 테이프에 담아 보냈던 데서 왔다. 여기를 넘으면 되돌리는 비용이 완전히 달라진다. <strong>한 번에 끝나는 사건이 아니다.</strong> base layer를 먼저 넘기고 metal layer를 나중에 넘겨 ECO 여지를 남기는 일이 있다.</div>
+  <div class="d" lang="en">The moment design data is <strong>handed to the foundry.</strong> The name comes from when it went out on magnetic tape. Past this point the cost of going back changes entirely. <strong>It is not one single event:</strong> teams sometimes send base layers first and metal layers later, deliberately keeping room for an ECO.</div>
+  <div class="src"><a href="L01-course-intro.html#s7">Lecture 1 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Technology Library</div>
+  <div class="d" lang="ko">특정 공정에서 <strong>미리 설계되고 미리 특성이 측정된 cell들의 모음.</strong> Standard cell library라고도 한다. Synthesis에서의 역할은 <strong>"무엇으로 만들 수 있는가"와 "그것이 얼마나 드는가"를 동시에 정의하는 것</strong>이다. 물리·타이밍·전력 데이터를 담고, 형식은 <code>.lib</code>, <code>.lef</code>, <code>.gds</code>, <code>.db</code>. <strong>숫자는 계산값이 아니라 실제 test chip으로 대조한 값이다.</strong></div>
+  <div class="d" lang="en">A collection of cells <strong>pre-designed and pre-characterised for one process.</strong> Also called a standard cell library. Its role in synthesis is <strong>defining both what can be built and what it costs.</strong> It carries physical, timing and power data in the formats <code>.lib</code>, <code>.lef</code>, <code>.gds</code> and <code>.db</code>. <strong>The numbers are not calculated but corroborated against real test chips.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s6">Lecture 2 · 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Testbench</div>
+  <div class="d" lang="ko">DUT를 둘러싸고 자극하고 관측하고 판정하는 코드 전체. 구성은 <strong>Stimulus → Driver → DUT → Monitor → Checker와 Coverage</strong>, 그리고 DUT 안에 박히는 <strong>Assertions</strong>. Driver와 Monitor를 묶으면 Agent다. <strong>부품이 하나씩 빠지면 무엇을 못 하는지가 이 구조의 설명이다.</strong></div>
+  <div class="d" lang="en">All the code that surrounds, drives, observes and judges a DUT: <strong>stimulus, driver, DUT, monitor, then checker and coverage</strong>, with <strong>assertions</strong> bound inside the DUT. Driver plus monitor makes an agent. <strong>The structure is best explained by what stops working when each piece is removed.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Testing</div>
+  <div class="d" lang="ko">이 과목에서는 거의 고유명사다. <strong>제조된 칩 하나하나에 하는 manufacturing test</strong>를 가리킨다. 잡는 것은 설계 버그가 아니라 <strong>제조 결함</strong>이고, 바깥 핀으로만 접근할 수 있다. Verification이 testbench와 test를 쓴다고 해서 Testing인 것은 아니다. 구별 기준은 하나: <strong>칩을 만들기 전이냐 후냐.</strong></div>
+  <div class="d" lang="en">In this course it is close to a proper noun: <strong>the manufacturing test done on every fabricated part.</strong> It catches <strong>process defects</strong> rather than design bugs, and it can only reach the outside pins. Verification uses testbenches and runs tests, but that does not make it Testing. One test settles it: <strong>before the chip is made, or after.</strong></div>
+  <div class="src"><a href="L01-course-intro.html#s9">Lecture 1 · 09</a> · <span lang="ko">Lecture 30 전체</span><span lang="en">all of Lecture 30</span></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Theorem Proving</div>
+  <div class="d" lang="ko">사양과 구현의 관계를 <strong>정리(theorem)로 보고</strong> 기호 표현·수리 논리·귀납 증명으로 증명하는 formal 기법. 도구가 대부분 <strong>학술용</strong>이다. 대신 무한 상태 시스템도 다룰 수 있다.</div>
+  <div class="d" lang="en">A formal technique that <strong>treats the relation between specification and implementation as a theorem</strong> and proves it with symbolic representations, mathematical logic and inductive proofs. The tools are <strong>mostly academic</strong>, but it can handle infinite state systems.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TLM</div>
+  <div class="f">Transaction Level Modeling</div>
+  <div class="d" lang="ko">디지털 시스템을 <strong>RTL보다 높은 추상화 수준</strong>에서 모델링하는 것. 신호 다발 대신 <code>write(address, data)</code> 같은 호출로 블록을 잇는다. 세부가 적고, 코딩이 쉽고, 시뮬레이션이 빠르다. <strong>Testbench에서 Stimulus와 Driver가 나뉘는 경계가 정확히 여기다.</strong></div>
+  <div class="d" lang="en">Modelling digital systems <strong>above RTL</strong>, connecting blocks by calls such as <code>write(address, data)</code> instead of bundles of signals. Fewer details, easier to code, faster to simulate. <strong>It is exactly the boundary at which a testbench splits stimulus from driver.</strong></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s17">Lecture 2 · 17</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TMR</div>
+  <div class="f">Triple Modular Redundancy</div>
+  <div class="d" lang="ko">같은 논리를 <strong>세 벌 만들어 다수결</strong>로 결과를 내는 신뢰성 기법. 하나가 고장 나도 나머지 둘이 이긴다. 대가는 면적이 3배가 넘는다는 것이고, reliability와 area 사이 트레이드오프의 대표 사례다.</div>
+  <div class="d" lang="en">A reliability technique that <strong>builds the same logic three times and votes.</strong> One failure loses to the other two. The price is more than triple the area, making it the standard example of the reliability against area trade-off.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Transactor</div>
+  <div class="d" lang="ko">Agent, BFM과 같은 것. Driver와 Monitor를 묶은 testbench 부품의 또 다른 이름이다.</div>
+  <div class="d" lang="en">The same thing as an agent or BFM: another name for the testbench component bundling a driver and a monitor.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+</div>
+
+<h2 class="gletter" id="gU">U</h2>
+
+<div class="gterm">
+  <div class="t">UVM</div>
+  <div class="f">Universal Verification Methodology</div>
+  <div class="d" lang="ko">검증 방법론의 사실상 표준. <strong>언어가 아니라 SystemVerilog로 쓰인 class 라이브러리 + 관행의 묶음이다.</strong> testbench 부품의 이름과 모양과 붙이는 방법을 정해두어 <strong>남이 만든 것(VIP)을 가져다 쓸 수 있게</strong> 한다. VMM과 OVM을 합친 것이다. 이 과목에서는 Lecture 20~22와 Lab 6에서 다룬다.</div>
+  <div class="d" lang="en">The de facto standard verification methodology. <strong>Not a language but a class library written in SystemVerilog, plus a set of conventions.</strong> By fixing the names, shapes and connection rules of testbench components it makes it possible <strong>to use what somebody else built</strong>, that is, VIP. It merged VMM and OVM. This course covers it in lectures 20 to 22 and Lab 6.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+</div>
+
+<h2 class="gletter" id="gV">V</h2>
+
+<div class="gterm">
+  <div class="t">Validation</div>
+  <div class="d" lang="ko"><strong>"살아 있는" 실리콘에서 하는 일.</strong> manufacturing test를 통과한 물건으로 한다. EVB를 만들고, 간단한 기능 확인부터 시작해 OS를 부팅하고 실제 테스트나 벤치마크를 돌리고, 전력과 전기적 특성을 실측한다. <strong>순서상 Testing 다음이다.</strong> 제조 결함이 있는 칩으로 OS를 부팅해봐야 뭐가 문제인지 알 수 없기 때문이다.</div>
+  <div class="d" lang="en">The work done on <strong>silicon that is already alive</strong>, meaning parts that passed manufacturing test. You build an EVB, start with simple functional checks, go as far as booting an OS and running real benchmarks, and measure power and electrical characteristics for real. <strong>It comes after testing</strong>, because booting an OS on a defective part tells you nothing about where the problem is.</div>
+  <div class="src"><a href="L01-course-intro.html#s10">Lecture 1 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Verification</div>
+  <div class="d" lang="ko"><strong>설계가 사양을 올바르게 구현했는지</strong> 확인하는 일. 제조 전에 하고, 한 번만 하고, 설계 파일을 들고 있으므로 <strong>모든 내부 노드를 보고 조작할 수 있다.</strong> 잡는 것은 설계 버그이고, 설계의 품질을 책임진다. 설계 노력의 50~80%를 차지하며, 설계자 1명당 검증자 3~5명이 붙는다.</div>
+  <div class="d" lang="en">Checking that <strong>the design correctly implements the specification.</strong> It happens before manufacturing, once, and since you hold the design files <strong>every internal node is visible and drivable.</strong> It catches design bugs and owns the quality of the design. It takes 50 to 80 percent of design effort, with three to five verification engineers per design engineer.</div>
+  <div class="src"><a href="L01-course-intro.html#s9">Lecture 1 · 09</a> · <a href="L02-design-and-verification-overview.html#s12">Lecture 2 · 12</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Verification Plan</div>
+  <div class="d" lang="ko">DUT를 <strong>어떻게 검증할 것인지</strong>를 적은 문서. 전략, 방법론, testbench 구성 요소, sign-off 기준, 그리고 기능 목록이 들어간다. <strong>기능마다 stimulus·checking·coverage 세 줄을 적는데, 그게 곧 검증의 삼각대다.</strong> 형식은 Word, Excel, Synopsys HVP, Cadence VPlan 등.</div>
+  <div class="d" lang="en">A document describing <strong>how you will verify a DUT</strong>: strategy, methodology, testbench components, sign-off metrics and a list of features. <strong>Each feature gets three lines, stimulus, checking and coverage, which is the trifecta itself.</strong> Formats include Word, Excel, Synopsys HVP and Cadence VPlan.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s20">Lecture 2 · 20</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">VIP</div>
+  <div class="f">Verification IP</div>
+  <div class="d" lang="ko">재사용 가능한 검증 자산. 예를 들어 EDA 벤더에게서 checker나 agent를 <strong>사서 우리 testbench에 끼워 넣는다.</strong> 이게 가능하려면 부품의 모양이 표준화돼 있어야 하고, 그래서 UVM 같은 방법론이 필요하다.</div>
+  <div class="d" lang="en">A reusable verification asset: <strong>buy a checker or an agent from an EDA vendor and plug it into your testbench.</strong> That only works if component shapes are standardised, which is what a methodology such as UVM is for.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+</div>
+
+</div>
+<div class="noresult" id="none" style="display:none"></div>
+</main>
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · 약어 사전<br>
+  강의: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 사전의 뜻풀이는 수강생이 강의 슬라이드를 근거로 정리한 개인 학습 자료이며, 공식 강의 자료가 아닙니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · glossary<br>
+  Course: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These definitions were written by a student from the lecture slides. They are not official course material.</span>
+</footer>
+
+</div>
+
+<script>
+// 검색과 알파벳 점프. 목록이 길어지면 스크롤로는 못 찾는다.
+// 브라우저 저장소는 쓰지 않는다. 상태는 전부 JS 변수와 DOM 에만 둔다.
+(function () {
+  var q = document.getElementById('q');
+  var cnt = document.getElementById('cnt');
+  var none = document.getElementById('none');
+  var alpha = document.getElementById('alpha');
+  var terms = [].slice.call(document.querySelectorAll('.gterm'));
+  var letters = [].slice.call(document.querySelectorAll('.gletter'));
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  letters.forEach(function (h) {
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent;
+    alpha.appendChild(a);
+  });
+
+  function apply() {
+    var s = q.value.trim().toLowerCase();
+    var shown = 0;
+    terms.forEach(function (t) {
+      var hit = !s || t.textContent.toLowerCase().indexOf(s) !== -1;
+      t.classList.toggle('hide', !hit);
+      if (hit) shown++;
+    });
+    // 항목이 하나도 안 남은 글자 머리는 같이 숨긴다.
+    letters.forEach(function (h) {
+      var any = false, n = h.nextElementSibling;
+      while (n && !n.classList.contains('gletter')) {
+        if (n.classList.contains('gterm') && !n.classList.contains('hide')) { any = true; break; }
+        n = n.nextElementSibling;
+      }
+      h.classList.toggle('hide', !any);
+    });
+    none.style.display = shown ? 'none' : 'block';
+    none.textContent = L('검색 결과가 없다.', 'Nothing matched.');
+    cnt.textContent = s
+      ? L(shown + ' / ' + terms.length + ' 항목', shown + ' of ' + terms.length + ' entries')
+      : L('전체 ' + terms.length + ' 항목', terms.length + ' entries');
+  }
+
+  function paintPlaceholder() {
+    q.placeholder = L('용어 검색 (예: slack, DUT, ECO)', 'Search a term, for example slack, DUT, ECO');
+    q.setAttribute('aria-label', L('용어 검색', 'Search terms'));
+  }
+
+  q.addEventListener('input', apply);
+  window.addEventListener('langchange', function () { paintPlaceholder(); apply(); });
+  paintPlaceholder();
+  apply();
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
