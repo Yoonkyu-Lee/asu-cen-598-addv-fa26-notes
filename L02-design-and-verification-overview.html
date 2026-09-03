@@ -1569,7 +1569,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 
   <p lang="ko">슬라이드가 든 assertion 예시 셋을 그대로 옮긴다.</p>
   <p lang="en">The three examples the slide gives, verbatim.</p>
-  <pre class="code"><span class="c">// FIFO는 overflow 하거나 underflow 하면 안 된다 (말로 쓴 property)</span>
+  <pre class="code"><span class="c"><span lang="ko">// FIFO는 overflow 하거나 underflow 하면 안 된다 (말로 쓴 property)</span><span lang="en">// the FIFO must never overflow or underflow: a property, in words</span></span>
 <span class="k">assert property</span> (@(<span class="k">posedge</span> clk)  start  ##<span class="n">2</span>  transfer);
 <span class="k">assert property</span> (@(<span class="k">posedge</span> clk)  !(grant0 &amp; grant1));</pre>
   <p lang="ko">둘째 줄은 <strong>"start가 뜨면 2클럭 뒤에 transfer가 떠야 한다"</strong>, 셋째 줄은 <strong>"grant0과 grant1이 동시에 뜨면 안 된다"</strong>이다. 두 번째가 arbiter의 전형적인 안전 조건이다.</p>
@@ -2248,9 +2248,9 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 
   <div class="callout">
     <p lang="ko"><strong>다음 강의 (Lecture 3, 8월 31일): Lab 0 (EDA Tools) overview.</strong> 강의 노트가 아니라 <strong>lab 안내</strong>라 별도 노트를 만들지 않는다. Apporto로 EDA 도구에 접속해서 시뮬레이션과 합성을 돌려보는 것이 내용이다. 오늘 04절에서 개념으로 본 synthesis를 <strong>실제로 돌려보는 것</strong>이 Lab 0이다.</p>
-    <p lang="ko"><strong>그다음 (Lecture 4, 9월 2일): System Verilog for Design.</strong> 오늘 01절에서 "어느 추상화 수준에서 쓰는가"를 이야기했다면, 거기서는 <strong>그 수준에서 실제로 어떻게 쓰는가</strong>를 배운다.</p>
+    <p lang="ko"><strong>그다음 (<a href="L04-system-verilog-for-design.html">Lecture 4</a>, 9월 2일): System Verilog for Design.</strong> 오늘 01절에서 "어느 추상화 수준에서 쓰는가"를 이야기했다면, 거기서는 <strong>그 수준에서 실제로 어떻게 쓰는가</strong>를 배운다.</p>
     <p lang="en"><strong>Next up (Lecture 3, August 31): Lab 0, EDA tools overview.</strong> It is a <strong>lab briefing</strong> rather than a lecture, so it gets no note of its own. The content is reaching the EDA tools through Apporto and running simulation and synthesis. Lab 0 is where the synthesis you met conceptually in §04 today <strong>actually gets run.</strong></p>
-    <p lang="en"><strong>Then (Lecture 4, September 2): SystemVerilog for Design.</strong> Today's §01 asked which level of abstraction you write at; that lecture teaches <strong>how to actually write at it.</strong></p>
+    <p lang="en"><strong>Then (<a href="L04-system-verilog-for-design.html">Lecture 4</a>, September 2): SystemVerilog for Design.</strong> Today's §01 asked which level of abstraction you write at; that lecture teaches <strong>how to actually write at it.</strong></p>
   </div>
 </section>
 

@@ -108,6 +108,7 @@ $pres.SaveAs($dst, 32)   # 32 = ppSaveAsPDF
 |---|---|---|---|
 | 01_Course Intro | 25 | 17 | 24쪽 (17쪽 이후 전부 1칸 밀림) |
 | 02_Design and Verification Overview | 59 | 31, 34, 54, 57, 58 | 54쪽 (5번 어긋남) |
+| 03_System Verilog for Design | 37 | 11, 25 | 35쪽 (2번 어긋남) |
 
 숨김 슬라이드를 되살려서 변환하면 **PDF 쪽 번호 = PPTX 슬라이드 번호 = 슬라이드에 인쇄된 번호**가
 전부 일치한다. 어긋날 자리가 없어진다. 이게 포함시키는 첫 번째 이유다.
@@ -118,11 +119,24 @@ $pres.SaveAs($dst, 32)   # 32 = ppSaveAsPDF
 `ExportAsFixedFormat`의 `PrintHiddenSlides` 인자는 PowerShell 후기 바인딩에서
 `msoTrue(-1)`를 못 받는다. **숨김을 먼저 풀고 `SaveAs`를 쓴다.**
 
+### pptx2pdf.ps1 을 고칠 때는 BOM 을 지키라
+
+새 강의가 나오면 `$map` 에 한 줄을 더한다. 그때 **스크립트를 UTF-8 BOM 없이 저장하면 안 된다.**
+Windows PowerShell 5.1 은 BOM 이 없는 파일을 ANSI 로 읽어서, 주석의 한글이 깨지고
+`The string is missing the terminator` 같은 엉뚱한 파서 에러를 낸다. 실제로 이걸로 한 번 헤맸다.
+Python 으로 고친다면 `encoding='utf-8-sig'` 로 저장한다.
+
 ### 숨김이었다는 사실은 노트에 적는다
 
 수업에서 안 넘긴 장이므로 quiz에 나올 가능성이 낮다. 그 정보를 숨기지 않는다.
 해당 섹션에 `.chip.dim` 또는 `.callout`으로 **"강의에서는 넘긴 슬라이드"**라고 표시한다.
 숨김 목록은 이렇게 확인한다.
+
+**다만 숨김이라고 다 넘어간 것은 아니다.** L04 의 25쪽은 24쪽과 글자가 완전히 같은 사본인데
+**강사가 수업 중에 그 위에 그린 판서가 남아 있다.** 즉 실제로 수업에서 쓴 장이다.
+(내용은 "multiple driver 금지"의 예외인 tristate bus 를 그림으로 설명한 것이라 값어치가 크다.)
+**숨김 목록을 뽑았으면 그 쪽을 렌더해서 눈으로 볼 것.** 판서가 있으면 "넘긴 슬라이드"라고
+적으면 안 되고, 무엇이 다른지를 밝혀야 한다.
 
 ```bash
 python scripts/hidden-slides.py "<pptx 경로>"
@@ -135,6 +149,7 @@ index.html                                   허브 (모듈 목록)
 glossary.html                                약어·용어 사전 (아래 참조)
 L01-course-intro.html                        Lecture 1
 L02-design-and-verification-overview.html    Lecture 2
+L04-system-verilog-for-design.html           Lecture 4  (PPTX 는 03_ 로 시작한다)
 L{NN}-{kebab-case-영문주제}.html
 
 LAB{N}-{kebab-case-과제제목}.html            Lab 공략 (아래 참조)
@@ -147,7 +162,9 @@ vendor/pdf.js/                               pdf.js 런타임
 ```
 
 `{NN}`은 **강의 사이트 Schedule 표의 Lecture 번호**를 따른다. PPTX 파일 앞의 번호가 아니다.
-둘은 대체로 같지만 Schedule이 기준이다. Schedule에서 9강과 10강이 날짜순과 어긋나 있는데
+둘은 대체로 같지만 Schedule이 기준이다. **실제로 어긋난다.** `03_System Verilog for Design.pptx`
+는 Schedule 의 **Lecture 4** 다. 3강이 Lab 0 overview 라서 슬라이드 덱이 없기 때문이다.
+Lab overview 강의가 나올 때마다 이 간격이 한 칸씩 더 벌어진다. Schedule에서 9강과 10강이 날짜순과 어긋나 있는데
 (10강 Assertion Based Verification이 11강보다 뒤 날짜다), **번호를 따르고 날짜를 병기한다.**
 
 **슬라이드 사본은 노트와 stem을 맞춰서 이름을 바꾼다.** `02_Design and Verification Overview.pptx`
@@ -166,6 +183,9 @@ vendor/pdf.js/                               pdf.js 런타임
 | `pdftext.mjs` | PDF **쪽별** 텍스트. `data-slide` 앵커를 달기 전 대조용 |
 | `render-slides.mjs` | PDF 쪽을 PNG로 렌더 → `shots/slides/` |
 | `crop.mjs` | 스크린샷 일부만 잘라 보기 |
+| `serve.mjs` | 로컬 서버. `.mjs` MIME 을 제대로 내보낸다 (아래 [슬라이드 리더](#슬라이드-리더-데스크톱-전용) 참조) |
+| `readercheck.mjs` | 섹션으로 스크롤하며 리더가 실제로 그 쪽으로 따라오는지 대조 |
+| `langcheck.mjs` | 영어 모드에 남은 한글 찾기. 번역 누락은 눈으로 못 잡는다 |
 
 ### 슬라이드를 눈으로 봐야 한다
 
@@ -647,9 +667,19 @@ Lab overview 강의(3, 7, 12, 16, 19, 23, 27)는 별도 노트를 만들지 않�
    - `shots/` 폴더에 전체 스크린샷 2장과 **도해별 개별 스크린샷** `-fig01.png…`이 생긴다.
    - **도해 스크린샷을 한 장씩 다 열어본다.** 자동 검사가 통과해도 건너뛰지 않는다.
      테두리가 글자를 관통하는 것, 화살표가 엉킨 것, 의미 고정 색상 위반은 눈으로만 잡힌다.
-8. **슬라이드 리더가 실제로 따라오는지 확인한다.** `node scripts/serve.mjs` 로 띄우고
-   노트를 위에서 아래로 훑으면서 슬라이드가 같이 넘어가는지, `data-slide` 값이 실제
-   PDF 쪽과 맞는지 본다. 브라우저 콘솔에서 섹션으로 뛰어 대조하면 빠르다.
+8. **슬라이드 리더가 실제로 따라오는지 확인한다.**
+
+   ```bash
+   node scripts/readercheck.mjs L{NN}-{topic}.html s1,s3,s9,s18
+   ```
+
+   섹션마다 `data-slide` 와 리더가 실제로 띄운 쪽을 나란히 찍어준다.
+   **한두 쪽 뒤진 값이 나오는 것은 정상이다.** 리더의 판정선이 화면 맨 위가 아니라
+   조금 아래에 있어서, 섹션 머리가 딱 위에 걸린 순간에는 직전 앵커를 유지한다.
+   L01·L02 도 똑같이 나온다. **몇 쪽씩 어긋나면 그때 앵커를 의심한다.**
+
+   손으로 볼 때는 `node scripts/serve.mjs` 로 띄우고 노트를 위에서 아래로 훑는다.
+   브라우저 콘솔에서 섹션으로 뛰어 대조하면 빠르다.
 
    ```js
    document.getElementById('s12').scrollIntoView();
@@ -661,14 +691,16 @@ Lab overview 강의(3, 7, 12, 16, 19, 23, 27)는 별도 노트를 만들지 않�
    **어긋난 앵커는 있으나 마나가 아니라 적극적으로 해롭다.** 근거를 잘못 가리킨다.
    **포트를 바꿔가며 확인한다.** 한 번 잘못된 MIME 으로 받은 `.mjs` 는 브라우저 캐시에
    남아서, 서버를 고쳐도 같은 주소로는 계속 실패한다. 실제로 이걸로 한 번 헤맸다.
-9. 문제가 있으면 고치고 7번 반복.
-10. **`index.html`을 갱신한다:**
+9. **`node scripts/langcheck.mjs L{NN}-{topic}.html` 실행.** 영어 모드에 한글이 남으면 실패한다.
+   **코드 블록 주석에서 제일 많이 걸린다.** 위 [검사](#검사) 절 참조.
+10. 문제가 있으면 고치고 7번 반복.
+11. **`index.html`을 갱신한다:**
     - 해당 강의 카드의 `<div class="mod soon">` → `<a class="mod" href="...">`
     - `<span class="status wait">준비 중</span>` → `<span class="status done">읽기</span>`
     - 닫는 `</div>` → `</a>`
     - 태그 목록을 실제 내용에 맞게 갱신
     - 헤더의 "N / 30강" chip 갱신
-11. 커밋하고 푸시한다. 커밋 메시지는 한 줄, 영어: `Add Lecture 3: SystemVerilog for design`
+12. 커밋하고 푸시한다. 커밋 메시지는 한 줄, 영어: `Add Lecture 3: SystemVerilog for design`
     **슬라이드 PDF가 노트보다 늦게 들어가면 안 된다.** 노트만 먼저 올라가면 리더가 404를 받는다.
 
 ## 검증
@@ -813,7 +845,25 @@ repo 안에 두지 않는다.
 
 번역 누락은 눈으로 못 잡는다. 스크립트로 확인한다.
 
+```bash
+node scripts/langcheck.mjs L{NN}-{topic}.html    # exit 0 이어야 통과
+```
+
 - 영어 모드로 바꾸고 `lang="ko"` 조상이 없는데 한글이 남은 요소를 찾는다.
 - **`<html lang="ko">` 때문에 `closest('[lang="ko"]')`가 모든 요소에서 참이 된다.**
   루트를 제외해야 한다.
 - **SVG 요소에는 `offsetParent`가 없다.** 가시성은 계산된 `display`로 판정한다.
+- **`dataset.lang` 을 직접 바꾸면 안 된다. 토글 버튼을 눌러야 한다.** `langchange` 이벤트가
+  안 돌면 인터랙티브 도구와 glossary 의 항목 수처럼 **JS 가 찍는 문자열이 한국어로 남아**
+  가짜 실패가 무더기로 나온다.
+- 좌하단 토글 버튼 두 개(`.lang-btn`, `.theme-btn`)는 일부러 한국어이므로 검사에서 뺀다.
+
+### 코드 블록의 주석도 번역 대상이다
+
+이게 놓치기 제일 쉽다. `pre.code` 안의 **한국어 주석은 영어 모드에서 그대로 남는다.**
+이 과목은 코드가 많아서 한 강의에 열 개 넘게 생긴다. 두 가지 방법이 있다.
+
+- 주석만 짝을 짓는다: `<span class="c"><span lang="ko">// …</span><span lang="en">// …</span></span>`
+  대부분 이걸로 충분하고 파일도 덜 커진다.
+- **코드 자체가 언어별로 다르면** (설명용 주석이 코드 줄마다 붙는 경우) `<pre class="code" lang="ko">`
+  와 `lang="en">` 두 벌을 둔다. **두 벌을 두고 `lang` 을 안 붙이면 영어 모드에서 둘 다 보인다.**

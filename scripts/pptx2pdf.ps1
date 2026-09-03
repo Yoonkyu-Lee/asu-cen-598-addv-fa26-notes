@@ -1,4 +1,4 @@
-# 강의 슬라이드 PPTX를 slides/*.pdf 로 변환한다.
+﻿# 강의 슬라이드 PPTX를 slides/*.pdf 로 변환한다.
 #
 # 두 가지를 반드시 지킨다.
 #
@@ -22,6 +22,7 @@ $work = Join-Path $env:TEMP 'addv-pptx'
 $map = [ordered]@{
   '01_Course Intro.pptx'                     = 'L01-course-intro.pdf'
   '02_Design and Verification Overview.pptx' = 'L02-design-and-verification-overview.pdf'
+  '03_System Verilog for Design.pptx'        = 'L04-system-verilog-for-design.pdf'
 }
 
 New-Item -ItemType Directory -Force $work | Out-Null
