@@ -14,3 +14,9 @@ Thumbs.db
 
 # PPTX 원본은 올리지 않는다. 발표자 노트가 딸려 들어간다.
 *.pptx
+.gstack/
+
+# Lab 작업 폴더. 과제 문제지, 제출 코드, 벤더 트레이닝 캡처가 들어간다.
+# Synopsys 트레이닝 슬라이드에는 "Synopsys Confidential Information" 표시가 있다.
+# 여기서 뽑은 것을 공개 페이지로 옮길 때는 매번 따로 판단한다.
+lab/

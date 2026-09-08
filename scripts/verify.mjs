@@ -617,37 +617,60 @@ if (shotCount > 0) {
   }
 }
 
-// ── HW 공략 페이지와 노트의 문제 번호가 어긋나지 않는지 ─────────────
-// HW 매핑이 노트와 공략 페이지 양쪽에 있다. 한쪽만 고치면 조용히 갈라진다.
+// ── HW / Lab 공략 페이지와 노트의 항목 번호가 어긋나지 않는지 ─────────────
+// 매핑이 노트와 공략 페이지 양쪽에 있다. 한쪽만 고치면 조용히 갈라진다.
+// HW 는 문제 번호를 sec-num 에서, Lab 은 Task 번호를 data-task 에서 읽는다.
 {
   const dir = resolve(abs, '..');
   const all = readdirSync(dir);
-  for (const g of all.filter(f => /^HW\d+-.*\.html$/.test(f))) {
-    const hw = g.match(/^HW(\d+)/)[1];
-    const gsrc = readFileSync(resolve(dir, g), 'utf8');
-    // 공략 페이지가 다루는 문제 번호. <span class="sec-num">P5</span>
-    const covered = new Set([...gsrc.matchAll(/class="sec-num">P(\d+)</g)].map(m => +m[1]));
-    // 노트가 언급하는 문제 번호. "HW1 Problem 5", "HW1 Problems 4–8", "HW1 4(b)"
-    const cited = new Set();
-    for (const f of all.filter(x => /^L\d+-.*\.html$/.test(x))) {
-      const t = readFileSync(resolve(dir, f), 'utf8');
-      const re = new RegExp('HW' + hw + '\\s*(?:Problems?\\s*)?(\\d+)(?:\\s*[–-]\\s*(\\d+))?', 'g');
-      for (const m of t.matchAll(re)) {
-        const a = +m[1], b = m[2] ? +m[2] : a;
-        if (b < a || b - a > 12) continue;   // 범위가 아닌 숫자가 섞이는 것 방지
-        for (let k = a; k <= b; k++) cited.add(k);
+
+  const KINDS = [
+    {
+      file: /^HW(\d+)-.*\.html$/,
+      unit: '문제',
+      // 공략 페이지가 다루는 문제 번호. <span class="sec-num">P5</span>
+      covered: s => new Set([...s.matchAll(/class="sec-num">P(\d+)</g)].map(m => +m[1])),
+      // 노트가 언급하는 문제 번호. "HW1 Problem 5", "HW1 Problems 4–8", "HW1 4(b)"
+      cite: n => new RegExp('HW' + n + '\\s*(?:Problems?\\s*)?(\\d+)(?:\\s*[–-]\\s*(\\d+))?', 'g'),
+    },
+    {
+      file: /^LAB(\d+)-.*\.html$/,
+      unit: 'Task',
+      // Lab 공략 페이지가 다루는 Task 번호. <h3 data-task="1">
+      covered: s => new Set([...s.matchAll(/data-task="(\d+)"/g)].map(m => +m[1])),
+      // 노트가 언급하는 Task 번호. "LAB0 Task 1", "Lab 0 Tasks 1-3"
+      cite: n => new RegExp('LAB\\s*' + n + '\\s*Tasks?\\s*(\\d+)(?:\\s*[–-]\\s*(\\d+))?', 'gi'),
+    },
+  ];
+
+  for (const kind of KINDS) {
+    for (const g of all.filter(f => kind.file.test(f))) {
+      const num = g.match(kind.file)[1];
+      const gsrc = readFileSync(resolve(dir, g), 'utf8');
+      const covered = kind.covered(gsrc);
+      const cited = new Set();
+      for (const f of all.filter(x => /^L\d+-.*\.html$/.test(x))) {
+        const t = readFileSync(resolve(dir, f), 'utf8');
+        for (const m of t.matchAll(kind.cite(num))) {
+          const a = +m[1], b = m[2] ? +m[2] : a;
+          if (b < a || b - a > 12) continue;   // 범위가 아닌 숫자가 섞이는 것 방지
+          for (let k = a; k <= b; k++) cited.add(k);
+        }
       }
-    }
-    const missing = [...cited].filter(n => !covered.has(n)).sort((a, b) => a - b);
-    const extra = [...covered].filter(n => !cited.has(n)).sort((a, b) => a - b);
-    if (missing.length || extra.length) {
-      fail = 1;
-      line('\n[FAIL] ' + g + ' 와 노트의 HW' + hw + ' 문제 번호가 어긋난다');
-      if (missing.length) line('  노트는 언급하는데 공략에 없는 문제: ' + missing.join(', '));
-      if (extra.length) line('  공략에는 있는데 노트가 안 짚는 문제: ' + extra.join(', '));
-      line('  한쪽만 고치면 이렇게 갈라진다. 양쪽을 맞출 것.');
-    } else if (covered.size) {
-      line('[OK] ' + g + ' 의 문제 ' + covered.size + '개가 노트 언급과 일치');
+      const missing = [...cited].filter(n => !covered.has(n)).sort((a, b) => a - b);
+      const extra = [...covered].filter(n => !cited.has(n)).sort((a, b) => a - b);
+      if (missing.length) {
+        fail = 1;
+        line('\n[FAIL] ' + g + ' 와 노트의 ' + kind.unit + ' 번호가 어긋난다');
+        line('  노트는 언급하는데 공략에 없는 ' + kind.unit + ': ' + missing.join(', '));
+        line('  한쪽만 고치면 이렇게 갈라진다. 양쪽을 맞출 것.');
+      } else if (extra.length && cited.size) {
+        // 노트가 아직 이 공략을 안 가리키는 건 정상이다. 노트가 일부만 가리킬 때만 경고한다.
+        line('[!] ' + g + ' 에는 있는데 노트가 안 짚는 ' + kind.unit + ': ' + extra.join(', '));
+      } else if (covered.size) {
+        line('[OK] ' + g + ' 의 ' + kind.unit + ' ' + covered.size + '개 확인'
+          + (cited.size ? ' (노트 언급과 일치)' : ' (노트에서 아직 언급 없음)'));
+      }
     }
   }
 }

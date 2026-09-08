@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV · Lab 0 · Tools Tutorial</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 · Advanced Digital Design and Verification · Aman Arora</div>
+  <h1 class="title">Lab 0<br>Tools Tutorial</h1>
+  <p class="subtitle" lang="ko">Verilog는 쓸 줄 아는데 EDA 툴체인은 처음인 사람을 위한 강좌. VCS로 돌리고, Verdi로 들여다보고, Design Compiler로 gate로 내린다. 명령 하나하나가 무엇을 만들어서 다음 도구에 넘기는지까지.</p>
+  <p class="subtitle" lang="en">A course for someone who can write Verilog but has never touched an EDA toolchain. Run it with VCS, look inside it with Verdi, take it down to gates with Design Compiler, and see what each command hands to the next tool.</p>
+  <div class="meta" lang="ko">
+    <span class="chip">Lab 0 · Tools Tutorial</span>
+    <span class="chip hot">혼자 한다. 조 편성 없음</span>
+    <span class="chip">데모 없음 · 코드 제출 없음 · 리포트만</span>
+    <span class="chip dim">Part I 20점</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip">Lab 0 · Tools Tutorial</span>
+    <span class="chip hot">individual work, no groups</span>
+    <span class="chip">no demo, no code, report only</span>
+    <span class="chip dim">Part I is 20 points</span>
+  </div>
+  <a class="backlink" href="index.html" lang="ko">← 강의 목록으로</a>
+  <a class="backlink" href="index.html" lang="en">← All lectures</a>
+</header>
+
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="index.html" lang="ko">← 강의 목록</a>
+    <a class="back" href="index.html" lang="en">← All lectures</a>
+    <div class="mod">Lab 0</div>
+    <div class="name">Tools Tutorial</div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#s0"><span class="n">00</span><span lang="ko">이 Lab이 하는 일</span><span lang="en">What this lab does</span></a>
+  <a href="#s1"><span class="n">01</span><span lang="ko">세 도구는 지도의 어디인가</span><span lang="en">Where the three tools sit</span></a>
+  <a href="#s2"><span class="n">02</span><span lang="ko">"컴파일"이 한 단어가 아니다</span><span lang="en">Compile is not one word</span></a>
+  <a href="#s3"><span class="n">03</span><span lang="ko">2-step flow</span><span lang="en">The 2-step flow</span></a>
+  <a href="#s4"><span class="n">04</span><span lang="ko">3-step flow와 logical library</span><span lang="en">The 3-step flow and logical libraries</span></a>
+  <a href="#s5"><span class="n">05</span><span>synopsys_sim.setup</span></a>
+  <a href="#s6"><span class="n">06</span><span lang="ko">simv: 한 번 굽고 여러 번 돌린다</span><span lang="en">simv: compile once, run many</span></a>
+  <a href="#s7"><span class="n">07</span><span lang="ko">Verdi가 푸는 문제</span><span lang="en">The problem Verdi solves</span></a>
+  <a href="#s8"><span class="n">08</span><span>KDB vs. FSDB</span></a>
+  <a href="#s9"><span class="n">09</span><span lang="ko">두 가지 디버그 모드</span><span lang="en">Two debug modes</span></a>
+  <a href="#s10"><span class="n">10</span><span lang="ko">신호를 거슬러 올라가기</span><span lang="en">Tracing a signal backwards</span></a>
+  <a href="#s11"><span class="n">11</span><span lang="ko">Design Compiler와 합성</span><span lang="en">Design Compiler and synthesis</span></a>
+  <a href="#s12"><span class="n">12</span><span lang="ko">옵션은 어디에 붙나</span><span lang="en">Where does the option go</span></a>
+  <a href="#s13"><span class="n">13</span><span lang="ko">Part II: Apporto에서 돌리기</span><span lang="en">Part II: running it on Apporto</span></a>
+  <a href="#s14"><span class="n">14</span><span lang="ko">함정</span><span lang="en">Traps</span></a>
+  <a href="#s15"><span class="n">15</span><span lang="ko">제출 체크리스트 &amp; 정리</span><span lang="en">Submission checklist &amp; recap</span></a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════ 00 -->
+<section id="s0">
+  <div class="sec-head"><span class="sec-num">00</span><h2 lang="ko">이 Lab이 하는 일</h2><h2 lang="en">What this lab does</h2></div>
+  <p class="sec-sub" lang="ko">설계를 새로 하지 않는다. 이미 있는 설계 하나를 세 도구에 차례로 통과시키면서, 각 도구가 무엇을 받아 무엇을 내놓는지 손으로 익히는 게 전부다.</p>
+  <p class="sec-sub" lang="en">You design nothing here. You push one existing design through three tools in order, and learn by hand what each one takes in and what it hands back.</p>
+
+  <p lang="ko">Lab 0은 두 부분이다. <strong>Part I</strong>은 Synopsys 사이트에서 온라인 트레이닝을 듣는 것이고, <strong>Part II</strong>는 Apporto 서버에 접속해서 제공된 설계로 세 도구를 실제로 돌리는 것이다. 이 페이지는 그 사이를 메운다. 트레이닝이 설명 없이 지나가는 용어들을 먼저 풀어두면 Part II에서 명령을 칠 때 무슨 일이 벌어지는지 보인다.</p>
+  <p lang="en">Lab 0 has two parts. <strong>Part I</strong> is a set of online trainings on the Synopsys site. <strong>Part II</strong> is logging into the Apporto server and actually running the three tools on a design that is handed to you. This page fills the gap between them. If the vocabulary the trainings skip past is unpacked first, you can see what is happening when you type the commands in Part II.</p>
+
+  <div class="callout">
+    <p lang="ko">이 Lab이 특이한 점 셋. <strong>혼자 한다.</strong> 이 과목의 다른 Lab은 2인 1조인데 Lab 0만 개인 과제다. <strong>데모가 없다.</strong> <strong>코드를 내지 않는다.</strong> 리포트만 낸다. 셋 다 다른 Lab의 습관을 그대로 가져오면 틀리는 지점이다.</p>
+    <p lang="en">Three things make this lab unusual. <strong>You do it alone.</strong> Every other lab in this course is done in pairs; Lab 0 is individual. <strong>There is no demo.</strong> <strong>You submit no code.</strong> Just a report. All three are places where carrying over habits from the other labs will cost you.</p>
+  </div>
+
+  <h3 lang="ko">오늘 나오는 약어</h3>
+  <h3 lang="en">The acronyms in play today</h3>
+  <p lang="ko">이 Lab의 진짜 장벽은 개념이 아니라 약어다. 아래 표를 먼저 훑고 시작하면 트레이닝 영상이 훨씬 잘 들린다. 굵은 셋이 제일 중요하다.</p>
+  <p lang="en">The real barrier in this lab is not the concepts, it is the acronyms. Skim this table first and the training videos get much easier to follow. The three in bold matter most.</p>
+
+  <table>
+    <tr><th lang="ko">약어</th><th lang="en">Short</th><th lang="ko">풀네임</th><th lang="en">Full name</th><th lang="ko">한 줄</th><th lang="en">One line</th><th lang="ko">어디서</th><th lang="en">Where</th></tr>
+    <tr><td class="hd">VCS</td><td>Verilog Compiler Simulator</td>
+        <td><span lang="ko">설계를 <em>돌려보는</em> 시뮬레이터</span><span lang="en">the simulator that <em>runs</em> your design</span></td>
+        <td><a href="#s3" lang="ko">03절</a><a href="#s3" lang="en">§03</a></td></tr>
+    <tr><td class="hd">KDB</td><td>Knowledge Database</td>
+        <td><span lang="ko">설계의 구조 정보. 정적이다</span><span lang="en">structural facts about the design, static</span></td>
+        <td><a href="#s8" lang="ko">08절</a><a href="#s8" lang="en">§08</a></td></tr>
+    <tr><td class="hd">FSDB</td><td>Fast Signal Database</td>
+        <td><span lang="ko">시뮬레이션 중 값이 언제 바뀌었는지. 동적이다</span><span lang="en">when values changed during simulation, dynamic</span></td>
+        <td><a href="#s8" lang="ko">08절</a><a href="#s8" lang="en">§08</a></td></tr>
+    <tr><td class="hd">DC</td><td>Design Compiler</td>
+        <td><span lang="ko">RTL을 gate로 내리는 합성 도구</span><span lang="en">the synthesis tool that takes RTL down to gates</span></td>
+        <td><a href="#s11" lang="ko">11절</a><a href="#s11" lang="en">§11</a></td></tr>
+    <tr><td class="hd">TFV</td><td>Temporal Flow View</td>
+        <td><span lang="ko">Verdi가 시간을 거슬러 원인을 찾아주는 화면</span><span lang="en">Verdi's view that walks back in time to a root cause</span></td>
+        <td><a href="#s10" lang="ko">10절</a><a href="#s10" lang="en">§10</a></td></tr>
+    <tr><td class="hd">UCLI</td><td>Unified Command Line Interface</td>
+        <td><span lang="ko">시뮬레이션을 세워놓고 치는 Tcl 프롬프트</span><span lang="en">the Tcl prompt you get when simulation is halted</span></td>
+        <td><a href="#s6" lang="ko">06절</a><a href="#s6" lang="en">§06</a></td></tr>
+    <tr><td class="hd">LRM</td><td>Language Reference Manual</td>
+        <td><span lang="ko">언어 표준 문서. IEEE 1800이 SystemVerilog다</span><span lang="en">the language standard, IEEE 1800 for SystemVerilog</span></td>
+        <td><a href="#s14" lang="ko">14절</a><a href="#s14" lang="en">§14</a></td></tr>
+    <tr><td class="hd">EDA</td><td>Electronic Design Automation</td>
+        <td><span lang="ko">이 도구들을 통칭하는 산업 이름</span><span lang="en">the industry name for this whole class of tools</span></td>
+        <td><a href="#s1" lang="ko">01절</a><a href="#s1" lang="en">§01</a></td></tr>
+  </table>
+
+  <div class="trap">
+    <span class="tag" lang="ko">먼저 짚고 간다</span><span class="tag" lang="en">Say it up front</span>
+    <p lang="ko">Part I의 세 트레이닝 중 <strong>Design Compiler 트레이닝은 현재 수강 등록이 막혀 있다.</strong> 열면 플레이어 대신 구매 화면이 뜬다. 알려진 문제이고 강사도 인지하고 있다. 그래서 이 페이지의 11번 절은 다른 절과 근거의 성격이 다르다. 해당 절에서 다시 밝힌다.</p>
+    <p lang="en">Of the three trainings in Part I, <strong>the Design Compiler one is currently not accessible.</strong> Opening it shows a purchase page instead of the player. This is a known issue and the instructor is aware of it. Section 11 of this page therefore rests on different evidence than the rest, and says so again where it appears.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 01 -->
+<section id="s1">
+  <div class="sec-head"><span class="sec-num">01</span><h2 lang="ko">세 도구는 지도의 어디인가</h2><h2 lang="en">Where the three tools sit</h2></div>
+  <p class="sec-sub" lang="ko">도구 이름을 외우기 전에 자리부터 잡는다. 셋은 나란히 놓인 대안이 아니라 서로 다른 일을 한다.</p>
+  <p class="sec-sub" lang="en">Before memorising names, place them. These three are not alternatives sitting side by side; they do different jobs.</p>
+
+  <div class="callout">
+    <p lang="ko"><a href="L01-course-intro.html#s2">Lecture 1의 Design Flow 그림</a>이 이 과목 전체의 지도였다. 이 Lab은 그 지도에서 <strong>RTL Design 다음의 두 갈래</strong>를 처음으로 손에 쥐는 시간이다. 한 갈래는 검증(맞게 동작하나), 다른 갈래는 합성(gate로 내릴 수 있나)이다.</p>
+    <p lang="en">The <a href="L01-course-intro.html#s2">design flow diagram in Lecture 1</a> was the map for this whole course. This lab is where you first get your hands on <strong>the two branches that leave RTL Design</strong>: one is verification (does it behave), the other is synthesis (can it be taken down to gates).</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 900 330" role="img" aria-label="RTL에서 갈라지는 두 갈래. 위쪽은 VCS 시뮬레이션과 Verdi 디버그, 아래쪽은 Design Compiler 합성과 gate-level netlist.">
+      <defs>
+        <marker id="l0ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <rect x="20" y="130" width="140" height="66" rx="9" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="90" y="158" text-anchor="middle" style="font-size:15px;font-weight:600;fill:var(--blue)">RTL</text>
+      <text class="svglab" x="90" y="178" text-anchor="middle" style="font-size:11px;fill:var(--blue)">.v / .sv</text>
+
+      <path d="M165 150 L235 66" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar)"/>
+      <path d="M165 176 L235 258" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar)"/>
+      <text class="svglab" x="238" y="24" text-anchor="end" style="font-size:10px;fill:var(--ink3)" lang="ko">맞게 도나?</text>
+      <text class="svglab" x="238" y="24" text-anchor="end" style="font-size:10px;fill:var(--ink3)" lang="en">does it behave?</text>
+      <text class="svglab" x="238" y="300" text-anchor="end" style="font-size:10px;fill:var(--ink3)" lang="ko">gate로 내려가나?</text>
+      <text class="svglab" x="238" y="300" text-anchor="end" style="font-size:10px;fill:var(--ink3)" lang="en">can it become gates?</text>
+
+      <rect x="245" y="34" width="150" height="64" rx="9" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="320" y="60" text-anchor="middle" style="font-size:14px;font-weight:600;fill:var(--violet)">VCS</text>
+      <text class="svglab" x="320" y="80" text-anchor="middle" style="font-size:10px;fill:var(--violet)">simulate</text>
+
+      <path d="M400 66 L470 66" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar)"/>
+      <text class="svglab" x="435" y="56" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">FSDB</text>
+
+      <rect x="478" y="34" width="150" height="64" rx="9" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="553" y="60" text-anchor="middle" style="font-size:14px;font-weight:600;fill:var(--violet)">Verdi</text>
+      <text class="svglab" x="553" y="80" text-anchor="middle" style="font-size:10px;fill:var(--violet)">debug</text>
+
+      <path d="M633 66 L703 66" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar)"/>
+      <rect x="711" y="34" width="168" height="64" rx="9" fill="rgba(var(--pink-rgb),.13)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="795" y="60" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--pink)" lang="ko">버그를 고친다</text>
+      <text class="svgtxt" x="795" y="60" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--pink)" lang="en">fix the bug</text>
+      <text class="svglab" x="795" y="80" text-anchor="middle" style="font-size:10px;fill:var(--pink)">back to RTL</text>
+
+      <path d="M795 100 L795 322 L90 322 L90 201" stroke="var(--pink)" stroke-width="1.3" fill="none" stroke-dasharray="5 4" marker-end="url(#l0ar)"/>
+      <text class="svglab" x="430" y="302" style="font-size:10px;fill:var(--pink)" lang="ko">고쳐서 다시 돌린다</text>
+      <text class="svglab" x="430" y="302" style="font-size:10px;fill:var(--pink)" lang="en">fix it and run again</text>
+
+      <rect x="245" y="228" width="150" height="64" rx="9" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="320" y="254" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--violet)">Design Compiler</text>
+      <text class="svglab" x="320" y="274" text-anchor="middle" style="font-size:10px;fill:var(--violet)">synthesize</text>
+
+      <path d="M400 260 L470 260" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar)"/>
+      <rect x="478" y="228" width="150" height="64" rx="9" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.5"/>
+      <text class="svgtxt" x="553" y="254" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--brown)">netlist</text>
+      <text class="svglab" x="553" y="274" text-anchor="middle" style="font-size:10px;fill:var(--brown)">gate-level</text>
+
+      <path d="M633 260 L703 260" stroke="var(--ink3)" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#l0ar)"/>
+      <text class="svglab" x="711" y="257" style="font-size:11px;fill:var(--ink3)">P&amp;R, fab</text>
+      <text class="svglab" x="711" y="274" style="font-size:10px;fill:var(--ink3)" lang="ko">(이 과목 밖)</text>
+      <text class="svglab" x="711" y="274" style="font-size:10px;fill:var(--ink3)" lang="en">(outside this course)</text>
+    </svg>
+    <figcaption lang="ko">RTL에서 두 갈래가 나간다. 위쪽이 이 과목 2부 전체가 될 검증 갈래이고, 아래쪽이 물리 구현으로 내려가는 갈래다. Lab 0은 두 갈래를 한 번씩 다 밟아본다.</figcaption>
+    <figcaption lang="en">Two branches leave RTL. The upper one becomes the entire second half of this course; the lower one heads for physical implementation. Lab 0 walks each branch once.</figcaption>
+  </figure>
+
+  <div class="grid3">
+    <div class="mini">
+      <p><strong class="cT">VCS</strong></p>
+      <p lang="ko">설계를 <strong>실행 가능한 프로그램으로 바꿔서 돌린다.</strong> 입력은 <code>.v</code>/<code>.sv</code>, 출력은 <code>simv</code>라는 실행 파일. 그걸 실행하면 시뮬레이션이 돈다.</p>
+      <p lang="en">Turns your design into <strong>an executable program and runs it.</strong> In go <code>.v</code>/<code>.sv</code> files, out comes an executable called <code>simv</code>. Running it runs the simulation.</p>
+      <p class="cap" lang="ko">Task 1</p><p class="cap" lang="en">Task 1</p>
+    </div>
+    <div class="mini">
+      <p><strong class="cT">Verdi</strong></p>
+      <p lang="ko">시뮬레이션이 남긴 기록을 <strong>파형과 소스로 되짚는다.</strong> 파형 뷰어라고만 알면 절반만 아는 것이다. 신호를 거슬러 원인까지 자동으로 따라간다.</p>
+      <p lang="en">Replays what the simulation recorded, <strong>as waveforms tied back to source.</strong> Calling it a waveform viewer is half the story; it traces a signal back to a root cause for you.</p>
+      <p class="cap" lang="ko">Task 2</p><p class="cap" lang="en">Task 2</p>
+    </div>
+    <div class="mini">
+      <p><strong class="cT">Design Compiler</strong></p>
+      <p lang="ko">RTL을 <strong>실제 gate로 번역한다.</strong> 어떤 gate가 있는지는 technology library가 알려준다. 결과는 netlist다.</p>
+      <p lang="en">Translates RTL <strong>into actual gates.</strong> Which gates exist is something a technology library tells it. The result is a netlist.</p>
+      <p class="cap" lang="ko">Task 3</p><p class="cap" lang="en">Task 3</p>
+    </div>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">헷갈리는 짝</span><span class="tag" lang="en">Confusable pair</span>
+    <p lang="ko"><strong>시뮬레이션과 합성은 같은 RTL을 읽지만 목적이 반대다.</strong> 시뮬레이터는 "이 코드가 시간에 따라 어떻게 동작하나"를 묻고, 합성기는 "이 코드를 어떤 하드웨어로 만들 수 있나"를 묻는다. 그래서 <strong>시뮬레이션은 되는데 합성은 안 되는 코드가 존재한다.</strong> <code>#10</code> 같은 지연이나 <code>$display</code>가 그렇다. 이 간극이 Lecture 4에서 배운 합성 가능한 코드 이야기와 정확히 같은 이야기다.</p>
+    <p lang="en"><strong>Simulation and synthesis read the same RTL but ask opposite questions.</strong> The simulator asks how this code behaves over time; the synthesiser asks what hardware this code can be built as. That is why <strong>code exists that simulates fine and will not synthesise at all.</strong> A <code>#10</code> delay or a <code>$display</code> is exactly that. This gap is the same story as the synthesisable-code discussion in Lecture 4.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 02 -->
+<section id="s2">
+  <div class="sec-head"><span class="sec-num">02</span><h2 lang="ko">"컴파일"이 한 단어가 아니다</h2><h2 lang="en">Compile is not one word</h2></div>
+  <p class="sec-sub" lang="ko">여기가 이 Lab에서 처음 막히는 자리다. C를 컴파일하듯 한 방에 되는 게 아니라, 도구가 단계를 나눠 부른다.</p>
+  <p class="sec-sub" lang="en">This is the first place people get stuck. It is not one shot the way compiling C is; the tool splits it into named stages.</p>
+
+  <p lang="ko">C에서는 <code>gcc main.c</code> 하면 실행 파일이 나온다. VCS도 겉보기에는 비슷한데, 안에서는 세 가지 서로 다른 일이 일어나고 <strong>그 셋이 각각 이름을 가지고 있다.</strong> 트레이닝이 이 이름들을 설명 없이 던지기 때문에 먼저 못 박아둔다.</p>
+  <p lang="en">In C, <code>gcc main.c</code> gives you an executable. VCS looks similar from outside, but three different things happen inside and <strong>each of them has a name.</strong> The training throws those names at you without introduction, so pin them down first.</p>
+
+  <div class="def">
+    <span class="tag" lang="ko">세 단계</span><span class="tag" lang="en">Three stages</span>
+    <p lang="ko"><strong>Analysis</strong>는 소스 파일을 하나씩 읽어서 문법을 검사하고, 그 결과를 <strong>library</strong>라는 곳에 넣어둔다. <strong>Elaboration</strong>은 top module을 정해서 계층 전체를 조립하고 parameter를 실제 값으로 확정한다. <strong>Simulation</strong>은 그렇게 조립된 것을 시간축 위에서 실제로 돌린다.</p>
+    <p lang="en"><strong>Analysis</strong> reads the source files one at a time, checks their syntax, and files the result into something called a <strong>library</strong>. <strong>Elaboration</strong> picks a top module, assembles the whole hierarchy, and freezes parameters to real values. <strong>Simulation</strong> takes that assembled thing and actually runs it along a time axis.</p>
+  </div>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · Elaboration</span><span lang="en">Unpacking the jargon · Elaboration</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>Elaboration. 약어가 아니라 그냥 이 단어다.</td></tr>
+        <tr><td>한 줄</td><td>module 정의들을 실제 인스턴스 트리로 펼치고 parameter를 확정하는 것.</td></tr>
+        <tr><td>언제</td><td>analysis 다음, simulation 전. VCS에서는 <code>vcs</code> 명령이 하는 일이다.</td></tr>
+        <tr><td>누가</td><td>도구가 한다. 다만 어느 module이 top인지는 사람이 알려줘야 한다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>합성에서도 elaborate라는 말을 쓴다. 뜻은 같은데 결과물이 다르다. 시뮬레이션의 elaboration은 <strong>실행 준비</strong>를, 합성의 elaboration은 <strong>gate 매핑 준비</strong>를 한다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>Elaboration. Not an acronym, just the word.</td></tr>
+        <tr><td>In one line</td><td>Expanding module definitions into a real instance tree and freezing parameters to values.</td></tr>
+        <tr><td>When</td><td>After analysis, before simulation. In VCS this is what the <code>vcs</code> command does.</td></tr>
+        <tr><td>Who</td><td>The tool does it, but a human has to say which module is the top.</td></tr>
+        <tr><td>Easy to confuse</td><td>Synthesis uses the word elaborate too. Same idea, different product: simulation elaboration prepares <strong>to run</strong>, synthesis elaboration prepares <strong>to map to gates</strong>.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <p lang="ko">여기서 결정적인 사실 하나. <strong>Verilog와 SystemVerilog만 쓰면 analysis 단계를 따로 부를 필요가 없다.</strong> 그래서 명령이 두 개로 끝난다. VHDL이 섞이면 analysis를 따로 불러야 해서 세 개가 된다. 이게 다음 두 절의 전부다.</p>
+  <p lang="en">One fact decides everything that follows. <strong>If you only use Verilog and SystemVerilog, you never have to invoke analysis separately.</strong> So the flow is two commands. Mix in VHDL and analysis has to be called on its own, making it three. That is the whole content of the next two sections.</p>
+
+  <div class="callout">
+    <p lang="ko">왜 VHDL만 다른가. VHDL은 <strong>아래에서 위로 분석해야 하는 언어</strong>다. 어떤 entity를 쓰려면 그 entity가 이미 분석되어 library에 들어가 있어야 한다. 그래서 파일 순서가 중요하고, 분석 결과를 담아둘 장소가 필요하다. Verilog에는 그런 제약이 없어서 <code>.v</code> 파일을 아무 순서로나 던져도 된다.</p>
+    <p lang="en">Why VHDL is the odd one out: it is <strong>a language that has to be analysed bottom up.</strong> To use an entity, that entity must already have been analysed and filed into a library. So file order matters, and you need somewhere to keep the analysed results. Verilog has no such constraint, so you can throw <code>.v</code> files at it in any order.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 03 -->
+<section id="s3">
+  <div class="sec-head"><span class="sec-num">03</span><h2 lang="ko">2-step flow</h2><h2 lang="en">The 2-step flow</h2></div>
+  <p class="sec-sub" lang="ko">순수 Verilog/SystemVerilog일 때. Lab 0에서 실제로 쓰는 게 이쪽이다.</p>
+  <p class="sec-sub" lang="en">For pure Verilog and SystemVerilog. This is the one you actually use in Lab 0.</p>
+
+  <figure>
+    <svg viewBox="0 0 860 190" role="img" aria-label="2단계 흐름. 소스 파일이 vcs 명령을 거쳐 simv 실행 파일이 되고, simv를 실행하면 시뮬레이션 결과가 나온다.">
+      <defs>
+        <marker id="l0ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+      <rect x="14" y="58" width="150" height="70" rx="9" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="89" y="86" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--blue)" lang="ko">소스 파일</text>
+      <text class="svgtxt" x="89" y="86" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--blue)" lang="en">source files</text>
+      <text class="svglab" x="89" y="108" text-anchor="middle" style="font-size:11px;fill:var(--blue)">design.v  tb.sv</text>
+
+      <path d="M170 93 L262 93" stroke="var(--ink3)" stroke-width="1.6" fill="none" marker-end="url(#l0ar2)"/>
+      <text class="svglab" x="216" y="82" text-anchor="middle" style="font-size:11px;fill:var(--violet);font-weight:600">vcs</text>
+      <text class="svglab" x="216" y="110" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">elaborate</text>
+      <text class="svglab" x="216" y="123" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">+ compile</text>
+
+      <rect x="268" y="58" width="150" height="70" rx="9" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="343" y="86" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--violet)">simv</text>
+      <text class="svglab" x="343" y="108" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="ko">실행 파일</text>
+      <text class="svglab" x="343" y="108" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="en">executable</text>
+
+      <path d="M424 93 L516 93" stroke="var(--ink3)" stroke-width="1.6" fill="none" marker-end="url(#l0ar2)"/>
+      <text class="svglab" x="470" y="82" text-anchor="middle" style="font-size:11px;fill:var(--violet);font-weight:600">./simv</text>
+      <text class="svglab" x="470" y="112" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">simulate</text>
+
+      <rect x="522" y="58" width="160" height="70" rx="9" fill="rgba(var(--pink-rgb),.13)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="602" y="86" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--pink)" lang="ko">시뮬레이션 결과</text>
+      <text class="svgtxt" x="602" y="86" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--pink)" lang="en">simulation results</text>
+      <text class="svglab" x="602" y="108" text-anchor="middle" style="font-size:10px;fill:var(--pink)">log, FSDB</text>
+
+      <text class="svglab" x="700" y="86" style="font-size:11px;fill:var(--ink3)" lang="ko">setup 파일 없음</text>
+      <text class="svglab" x="700" y="86" style="font-size:11px;fill:var(--ink3)" lang="en">no setup file</text>
+      <text class="svglab" x="700" y="104" style="font-size:11px;fill:var(--ink3)" lang="ko">library 매핑 없음</text>
+      <text class="svglab" x="700" y="104" style="font-size:11px;fill:var(--ink3)" lang="en">no library mapping</text>
+    </svg>
+    <figcaption lang="ko">두 번의 명령. <code>vcs</code>가 실행 파일을 굽고, 그 실행 파일을 돌리면 끝이다. 설정 파일이 필요 없는 게 이 흐름의 핵심이다.</figcaption>
+    <figcaption lang="en">Two commands. <code>vcs</code> bakes an executable, you run the executable, done. Needing no configuration file at all is the point of this flow.</figcaption>
+  </figure>
+
+  <pre class="code" lang="ko"><span class="c"># 1단계: elaborate + compile. simv 라는 실행 파일이 생긴다</span>
+%&gt; vcs <span class="k">-sverilog</span> 18_19_Slice.v 18_19_Slice_tb.v
+
+<span class="c"># 2단계: 그 실행 파일을 돌린다</span>
+%&gt; ./simv</pre>
+  <pre class="code" lang="en"><span class="c"># step 1: elaborate and compile. this produces an executable named simv</span>
+%&gt; vcs <span class="k">-sverilog</span> 18_19_Slice.v 18_19_Slice_tb.v
+
+<span class="c"># step 2: run that executable</span>
+%&gt; ./simv</pre>
+
+  <p lang="ko"><code>-sverilog</code>는 SystemVerilog 구문을 켜는 스위치다. 안 켜면 <code>logic</code>이나 <code>always_ff</code> 같은 <a href="L04-system-verilog-for-design.html">Lecture 4에서 배운 문법</a>이 문법 오류로 잡힌다. Lab 0의 testbench가 SystemVerilog이므로 이 스위치가 필요하다.</p>
+  <p lang="en"><code>-sverilog</code> is the switch that turns SystemVerilog constructs on. Without it, <a href="L04-system-verilog-for-design.html">the syntax you learned in Lecture 4</a> such as <code>logic</code> or <code>always_ff</code> comes back as a syntax error. The Lab 0 testbench is SystemVerilog, so you need this switch.</p>
+
+  <div class="callout">
+    <p lang="ko">Lab 0에서는 이 명령을 직접 치지 않는다. <code>sim/Makefile</code>에 타겟으로 들어 있다. <strong>그래도 Makefile을 열어서 어느 타겟이 어느 명령을 부르는지 읽어라.</strong> Lab 0 문서가 명시적으로 시키는 일이기도 하고, Lab 1부터는 Makefile을 직접 고쳐야 한다.</p>
+    <p lang="en">You will not type this command yourself in Lab 0; it is sitting in <code>sim/Makefile</code> as a target. <strong>Open the Makefile anyway and read which target invokes which command.</strong> Lab 0 explicitly tells you to, and from Lab 1 on you will be editing those Makefiles yourself.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 04 -->
+<section id="s4">
+  <div class="sec-head"><span class="sec-num">04</span><h2 lang="ko">3-step flow와 logical library</h2><h2 lang="en">The 3-step flow and logical libraries</h2></div>
+  <p class="sec-sub" lang="ko">VHDL이나 SystemC가 섞이면 앞에 한 단계가 붙는다. Lab 0에서는 안 쓰지만, 트레이닝 시간의 절반이 여기에 쓰이고 quiz에 나오기 딱 좋다.</p>
+  <p class="sec-sub" lang="en">Mix in VHDL or SystemC and a stage appears in front. You do not use it in Lab 0, but half the training is about it and it is prime quiz material.</p>
+
+  <figure>
+    <svg viewBox="0 0 860 250" role="img" aria-label="3단계 흐름. 언어별 분석기가 소스를 logical library에 넣고, vcs가 top을 elaborate하고, simv를 실행한다.">
+      <defs>
+        <marker id="l0ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <rect x="14" y="18" width="132" height="40" rx="7" fill="rgba(var(--blue-rgb),.11)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svglab" x="80" y="43" text-anchor="middle" style="font-size:11px;fill:var(--blue)">Verilog / SV</text>
+      <rect x="14" y="66" width="132" height="40" rx="7" fill="rgba(var(--blue-rgb),.11)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svglab" x="80" y="91" text-anchor="middle" style="font-size:11px;fill:var(--blue)">VHDL</text>
+      <rect x="14" y="114" width="132" height="40" rx="7" fill="rgba(var(--blue-rgb),.11)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svglab" x="80" y="139" text-anchor="middle" style="font-size:11px;fill:var(--blue)">SystemC</text>
+
+      <path d="M152 38 L206 38" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#l0ar3)"/>
+      <path d="M152 86 L206 86" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#l0ar3)"/>
+      <path d="M152 134 L206 134" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#l0ar3)"/>
+
+      <text class="svglab" x="212" y="43" style="font-size:12px;fill:var(--violet);font-weight:600">vlogan</text>
+      <text class="svglab" x="212" y="91" style="font-size:12px;fill:var(--violet);font-weight:600">vhdlan</text>
+      <text class="svglab" x="212" y="139" style="font-size:12px;fill:var(--violet);font-weight:600">syscan</text>
+      <text class="svglab" x="212" y="176" style="font-size:10px;fill:var(--ink3)">1. analysis</text>
+
+      <path d="M290 38 L352 76" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#l0ar3)"/>
+      <path d="M290 86 L352 86" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#l0ar3)"/>
+      <path d="M290 134 L352 96" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#l0ar3)"/>
+
+      <rect x="358" y="54" width="150" height="66" rx="9" fill="rgba(var(--green-rgb),.13)" stroke="var(--green)" stroke-width="1.5"/>
+      <text class="svgtxt" x="433" y="80" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--green-deep)">logical library</text>
+      <text class="svglab" x="433" y="100" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="ko">분석 결과가 쌓인다</text>
+      <text class="svglab" x="433" y="100" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="en">analysed results pile up</text>
+
+      <path d="M514 87 L576 87" stroke="var(--ink3)" stroke-width="1.6" fill="none" marker-end="url(#l0ar3)"/>
+      <text class="svglab" x="545" y="76" text-anchor="middle" style="font-size:12px;fill:var(--violet);font-weight:600">vcs</text>
+      <text class="svglab" x="545" y="106" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">2. elaborate</text>
+
+      <rect x="582" y="54" width="120" height="66" rx="9" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="642" y="86" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--violet)">simv</text>
+      <text class="svglab" x="642" y="105" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="ko">실행 파일</text>
+      <text class="svglab" x="642" y="105" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="en">executable</text>
+
+      <path d="M708 87 L768 87" stroke="var(--ink3)" stroke-width="1.6" fill="none" marker-end="url(#l0ar3)"/>
+      <text class="svglab" x="774" y="83" style="font-size:11px;fill:var(--pink);font-weight:600" lang="ko">결과</text>
+      <text class="svglab" x="774" y="83" style="font-size:11px;fill:var(--pink);font-weight:600" lang="en">results</text>
+      <text class="svglab" x="774" y="100" style="font-size:10px;fill:var(--ink3)">3. simulate</text>
+
+      <rect x="358" y="176" width="344" height="52" rx="8" fill="rgba(var(--amber-rgb),.10)" stroke="var(--amber)" stroke-width="1.3" stroke-dasharray="5 4"/>
+      <text class="svgtxt" x="530" y="197" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--amber)">synopsys_sim.setup</text>
+      <text class="svglab" x="530" y="216" text-anchor="middle" style="font-size:10px;fill:var(--amber)" lang="ko">logical 이름 → 실제 디렉토리</text>
+      <text class="svglab" x="530" y="216" text-anchor="middle" style="font-size:10px;fill:var(--amber)" lang="en">logical name to real directory</text>
+      <path d="M470 176 L450 124" stroke="var(--amber)" stroke-width="1.3" fill="none" stroke-dasharray="4 3" marker-end="url(#l0ar3)"/>
+    </svg>
+    <figcaption lang="ko">언어마다 분석기가 다르다. 분석 결과는 logical library라는 이름표가 붙은 곳에 쌓이고, 그 이름표가 실제로 어느 디렉토리인지는 설정 파일이 정한다.</figcaption>
+    <figcaption lang="en">Each language has its own analyser. Analysed results pile up somewhere labelled a logical library, and a configuration file decides which real directory that label points at.</figcaption>
+  </figure>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · logical library</span><span lang="en">Unpacking the jargon · logical library</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>logical library. 줄이지 않고 그대로 부른다.</td></tr>
+        <tr><td>한 줄</td><td>분석 결과를 담아두는 저장소에 붙인 <em>이름</em>. 실제 디렉토리가 아니라 그 디렉토리를 가리키는 별명이다.</td></tr>
+        <tr><td>언제</td><td>analysis 단계에서 채워지고 elaboration 단계에서 읽힌다.</td></tr>
+        <tr><td>누가</td><td>이름을 정하는 건 사람이다. 팀이 커지면 IP마다 library를 나눠 쓴다.</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>technology library와 완전히 다르다.</strong> 저건 합성이 쓰는 표준 셀 목록이고 이건 분석 결과를 담는 통이다. 겹치는 건 library라는 단어뿐이다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>logical library. Never abbreviated.</td></tr>
+        <tr><td>In one line</td><td>A <em>name</em> for the store that analysed results go into. Not a directory, an alias pointing at one.</td></tr>
+        <tr><td>When</td><td>Filled during analysis, read during elaboration.</td></tr>
+        <tr><td>Who</td><td>A human picks the names. On larger teams each IP tends to get its own library.</td></tr>
+        <tr><td>Easy to confuse</td><td><strong>Completely different from a technology library.</strong> That one is the standard cell list synthesis uses; this is a bucket for analysed source. The only thing they share is the word library.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <p lang="ko">순수 Verilog에서 이게 필요 없는 이유가 이제 설명된다. <strong>Verilog에는 logical library라는 개념 자체가 없다.</strong> 그래서 매핑할 것도 없고, 설정 파일도 필요 없다. VHDL이 들어오는 순간 library 개념이 따라 들어오고, 그때 비로소 <code>synopsys_sim.setup</code>이 필요해진다.</p>
+  <p lang="en">Now you can see why pure Verilog does not need any of this. <strong>Verilog has no concept of a logical library at all.</strong> So there is nothing to map and no configuration file to write. The moment VHDL enters, the library concept comes with it, and only then do you need <code>synopsys_sim.setup</code>.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 05 -->
+<section id="s5">
+  <div class="sec-head"><span class="sec-num">05</span><h2>synopsys_sim.setup</h2></div>
+  <p class="sec-sub" lang="ko">3-step flow가 필요로 하는 설정 파일. 두 줄만 읽을 줄 알면 된다.</p>
+  <p class="sec-sub" lang="en">The configuration file the 3-step flow needs. You only have to be able to read two kinds of line.</p>
+
+  <p lang="ko">이 파일이 하는 일은 딱 두 가지다. <strong>logical 이름을 실제 디렉토리에 붙이는 것</strong>과 <strong>도구 환경 변수를 켜는 것.</strong> 문법도 단순하다. <code>--</code>로 시작하면 주석이고, <code>이름 : 값</code>이 한 줄이다.</p>
+  <p lang="en">The file does exactly two things: <strong>it ties logical names to real directories</strong>, and <strong>it sets tool environment variables.</strong> The syntax is just as small. A line starting with <code>--</code> is a comment; everything else is <code>name : value</code>.</p>
+
+  <pre class="code" lang="ko"><span class="c">-- 이 파일에서 주석은 대시 두 개로 시작한다. # 이 아니다</span>
+WORK   : ./work
+TB_LIB : /home/yk/proj/libs/tb_lib
+
+<span class="c">-- 콜론 왼쪽이 logical 이름, 오른쪽이 진짜 Unix 경로다</span>
+<span class="c">-- 같은 문법으로 도구 변수도 켠다</span>
+TIMEBASE : ns</pre>
+  <pre class="code" lang="en"><span class="c">-- comments in this file start with two dashes, not with #</span>
+WORK   : ./work
+TB_LIB : /home/yk/proj/libs/tb_lib
+
+<span class="c">-- left of the colon is the logical name, right of it is the real Unix path</span>
+<span class="c">-- tool variables are set with the same syntax</span>
+TIMEBASE : ns</pre>
+
+  <div class="callout">
+    <p lang="ko">읽는 요령 하나. <strong>콜론 왼쪽은 설계가 부르는 이름, 오른쪽은 파일 시스템의 사실.</strong> 설계 코드는 <code>TB_LIB</code>이라고만 부르고 그게 디스크 어디인지는 모른다. 그 연결을 이 파일이 혼자 알고 있다. 그래서 이 파일 한 줄만 고치면 설계를 안 건드리고도 다른 라이브러리를 물릴 수 있다.</p>
+    <p lang="en">One reading trick: <strong>left of the colon is what the design calls it, right of it is a fact about the filesystem.</strong> The design code only ever says <code>TB_LIB</code> and has no idea where on disk that is. This file is the only thing that knows. That is why editing one line here swaps in a different library without touching the design at all.</p>
+  </div>
+
+  <p lang="ko">환경 설정 쪽도 짚어둔다. VCS를 쓰려면 <code>VCS_HOME</code>이 설치 경로를 가리켜야 하고 <code>PATH</code>에 <code>$VCS_HOME/bin</code>이 들어가야 한다. 라이선스는 <code>SNPSLMD_LICENSE_FILE</code>이나 <code>LM_LICENSE_FILE</code>에 <code>포트@호스트</code> 형태로 준다. 제대로 잡혔는지는 <code>show_setup</code>으로 확인하고, library 매핑만 보려면 <code>show_setup -lib</code>을 쓴다.</p>
+  <p lang="en">A word on environment setup too. To use VCS, <code>VCS_HOME</code> has to point at the install directory and <code>$VCS_HOME/bin</code> has to be on <code>PATH</code>. Licences come from <code>SNPSLMD_LICENSE_FILE</code> or <code>LM_LICENSE_FILE</code> in <code>port@host</code> form. To check that any of it took, run <code>show_setup</code>; to see just the library mappings, <code>show_setup -lib</code>.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">Lab 0에서 진짜 물리는 지점</span><span class="tag" lang="en">Where this actually bites in Lab 0</span>
+    <p lang="ko">Lab 0에서는 이 설정을 직접 쓰지 않는다. <code>env.cshrc</code>가 대신 해준다. 그런데 <strong>그 스크립트는 tcsh용이고 bash에서는 안 돈다.</strong> Lab 0 문서가 명시적으로 경고하는 지점이다. bash에서 <code>source env.cshrc</code>를 하면 문법 오류가 쏟아지거나, 더 나쁘게는 조용히 절반만 먹고 나중에 "명령을 찾을 수 없음"으로 나타난다. <strong>먼저 <code>tcsh</code>로 들어간 다음 source 한다.</strong></p>
+    <p lang="en">You do not write this setup yourself in Lab 0; <code>env.cshrc</code> does it for you. But <strong>that script is for tcsh and will not run under bash.</strong> Lab 0 warns about this explicitly. Sourcing it from bash either throws a pile of syntax errors or, worse, silently takes half and shows up later as command not found. <strong>Get into <code>tcsh</code> first, then source it.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 06 -->
+<section id="s6">
+  <div class="sec-head"><span class="sec-num">06</span><h2 lang="ko">simv: 한 번 굽고 여러 번 돌린다</h2><h2 lang="en">simv: compile once, run many</h2></div>
+  <p class="sec-sub" lang="ko">elaboration이 왜 따로 있는지에 대한 실질적인 답.</p>
+  <p class="sec-sub" lang="en">The practical answer to why elaboration is a separate stage at all.</p>
+
+  <p lang="ko">elaboration의 결과물인 <code>simv</code>는 <strong>보통의 실행 파일이다.</strong> 한 번 만들어두면 옵션만 바꿔서 몇 번이고 다시 돌릴 수 있다. 시드를 바꿔 랜덤 테스트를 100번 돌리는 상황을 생각하면, 매번 다시 컴파일하는 것과 실행 파일을 재사용하는 것의 차이가 시간 단위로 벌어진다. 트레이닝이 이걸 <strong>compile once, run multiple times</strong>라고 부른다.</p>
+  <p lang="en"><code>simv</code>, the product of elaboration, is <strong>an ordinary executable.</strong> Build it once and you can rerun it as often as you like with different options. Picture running a random test a hundred times with different seeds: the gap between recompiling every time and reusing the executable is measured in hours. The training calls this <strong>compile once, run multiple times</strong>.</p>
+
+  <table>
+    <tr><th lang="ko">옵션</th><th lang="en">Option</th><th lang="ko">하는 일</th><th lang="en">What it does</th></tr>
+    <tr><td class="hd">-ucli</td><td><span lang="ko">시뮬레이션을 Tcl 프롬프트로 띄운다. 세워놓고 신호를 들여다볼 수 있다</span><span lang="en">brings the simulation up at a Tcl prompt so you can halt it and poke at signals</span></td></tr>
+    <tr><td class="hd">-i &lt;file&gt;</td><td><span lang="ko">그 Tcl 프롬프트에 미리 쓴 스크립트를 먹인다</span><span lang="en">feeds a prewritten script into that Tcl prompt</span></td></tr>
+    <tr><td class="hd">-l &lt;file&gt;</td><td><span lang="ko">출력과 진단을 로그 파일로 뺀다</span><span lang="en">redirects output and diagnostics into a log file</span></td></tr>
+    <tr><td class="hd">-gui</td><td><span lang="ko">GUI 세션으로 띄운다</span><span lang="en">brings it up as a GUI session</span></td></tr>
+    <tr><td class="hd">-cm &lt;metric&gt;</td><td><span lang="ko">coverage를 수집한다. Lab 5에서 본격적으로 쓴다</span><span lang="en">collects coverage; this is what Lab 5 is built around</span></td></tr>
+  </table>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이게 이 절의 핵심 함정이다</span><span class="tag" lang="en">The real trap in this section</span>
+    <p lang="ko"><strong>runtime 옵션 중 상당수는 compile time에 짝이 켜져 있어야 동작한다.</strong> 예를 들어 coverage를 <code>simv</code>에서 요청해도, <code>vcs</code> 단계에서 coverage 계측을 넣어두지 않았으면 아무것도 안 나온다. <strong>그런데 에러가 안 난다.</strong> 그냥 결과가 비어 있다. 초보가 여기서 몇 시간을 태운다. "옵션을 줬는데 아무 일도 안 일어난다"면 제일 먼저 의심할 것은 오타가 아니라 <strong>compile 단계에 짝이 빠졌는지</strong>다.</p>
+    <p lang="en"><strong>Many runtime options only work if their counterpart was enabled at compile time.</strong> Ask <code>simv</code> for coverage, and if the <code>vcs</code> step never instrumented for coverage, you get nothing. <strong>And it does not error.</strong> The result is simply empty. This is where beginners burn an afternoon. If an option seems to do nothing, the first suspect is not a typo, it is <strong>a missing counterpart at compile time</strong>.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 07 -->
+<section id="s7">
+  <div class="sec-head"><span class="sec-num">07</span><h2 lang="ko">Verdi가 푸는 문제</h2><h2 lang="en">The problem Verdi solves</h2></div>
+  <p class="sec-sub" lang="ko">도구를 배우기 전에 그 도구가 없던 시절의 고통을 먼저 안다. 그래야 옵션 이름이 외워진다.</p>
+  <p class="sec-sub" lang="en">Learn the pain that existed before the tool, and its option names stop being arbitrary.</p>
+
+  <p lang="ko">예전에는 <strong>시뮬레이터와 디버거가 서로 다른 도구였다.</strong> 그래서 같은 설계를 두 번 컴파일해야 했다. 한 번은 시뮬레이션용, 한 번은 디버그 데이터베이스용. 문제가 셋 생긴다. 시간이 두 배로 든다. 시뮬레이션 스크립트의 옵션을 디버거 쪽으로 옮기는 게 쉽지 않다. 그리고 최악은, <strong>두 도구가 소스를 다르게 해석해서 데이터가 어긋나는 경우</strong>가 생긴다는 것이다. 표준을 살짝 벗어난 코드에서 특히 그렇다.</p>
+  <p lang="en">The simulator and the debugger <strong>used to be different tools.</strong> So you compiled the same design twice: once for simulation, once to build a debug database. Three problems follow. It takes twice as long. Porting the options from your simulation script to the debugger side is not easy. And worst of all, <strong>the two tools can read the source differently and the data ends up inconsistent</strong>, especially for code that strays slightly outside the standard.</p>
+
+  <div class="callout">
+    <p lang="ko">그래서 나온 게 <strong>Unified Front-End</strong>다. 한 번만 컴파일하고, 그 결과를 시뮬레이터와 디버거가 같이 쓴다. 사용자 입장에서는 <strong><code>-kdb</code> 옵션 하나를 붙이는 것</strong>으로 끝난다. 이 한 줄이 위 세 문제를 다 없앤다.</p>
+    <p lang="en">The answer is the <strong>Unified Front-End</strong>: compile once, and let the simulator and the debugger share the result. From where you sit it comes down to <strong>adding one option, <code>-kdb</code></strong>. That single flag removes all three problems above.</p>
+  </div>
+
+  <pre class="code" lang="ko"><span class="c"># 2-step flow: vcs 에 붙이면 끝</span>
+%&gt; vcs <span class="k">-sverilog</span> <span class="k">-kdb</span> <span class="k">-debug_access</span>+all design.v tb.sv
+
+<span class="c"># 3-step flow: 분석기마다 다 붙여야 한다. 하나라도 빠지면 그 언어만 디버그가 안 된다</span>
+%&gt; vlogan <span class="k">-kdb</span> ...
+%&gt; vhdlan <span class="k">-kdb</span> ...
+%&gt; vcs <span class="k">-kdb</span> top</pre>
+  <pre class="code" lang="en"><span class="c"># 2-step flow: put it on vcs and you are done</span>
+%&gt; vcs <span class="k">-sverilog</span> <span class="k">-kdb</span> <span class="k">-debug_access</span>+all design.v tb.sv
+
+<span class="c"># 3-step flow: every analyser needs it. miss one and that language alone loses debug</span>
+%&gt; vlogan <span class="k">-kdb</span> ...
+%&gt; vhdlan <span class="k">-kdb</span> ...
+%&gt; vcs <span class="k">-kdb</span> top</pre>
+
+  <div class="trap">
+    <span class="tag" lang="ko">충돌하는 옛날 옵션</span><span class="tag" lang="en">The old options that clash</span>
+    <p lang="ko">스크립트에 <code>-P</code>, <code>-debug</code>, <code>-debug_all</code>, <code>-debug_pp</code>가 남아 있으면 <strong>빼야 한다.</strong> <code>-debug_access</code>와 충돌하고, 게다가 <strong>옛날 옵션이 우선권을 가져간다.</strong> 그래서 새 옵션을 붙여놓고도 옛날 동작을 하는 상태가 된다. 인터넷에서 퍼온 스크립트를 쓸 때 정확히 이 함정에 빠진다. 오래된 블로그일수록 저 옵션들이 들어 있다.</p>
+    <p lang="en">If <code>-P</code>, <code>-debug</code>, <code>-debug_all</code> or <code>-debug_pp</code> are still in your script, <strong>take them out.</strong> They clash with <code>-debug_access</code>, and <strong>the old ones win.</strong> So you end up with the new flag present and the old behaviour running. This is exactly what happens when you paste a script off the internet, and the older the blog post, the more likely those flags are in it.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 08 -->
+<section id="s8">
+  <div class="sec-head"><span class="sec-num">08</span><h2>KDB vs. FSDB</h2></div>
+  <p class="sec-sub" lang="ko">Verdi를 이해하는 데 이 구분 하나면 절반은 끝난다. 이름이 비슷해서 계속 섞인다.</p>
+  <p class="sec-sub" lang="en">Half of understanding Verdi is this one distinction. The names look alike and people keep mixing them.</p>
+
+  <figure>
+    <svg viewBox="0 0 860 260" role="img" aria-label="KDB는 설계의 구조 정보를 담고 FSDB는 시뮬레이션 중 값 변화를 담는다. Verdi는 둘을 같이 읽어야 소스와 파형을 연결할 수 있다.">
+      <defs>
+        <marker id="l0ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <rect x="20" y="24" width="300" height="94" rx="10" fill="rgba(var(--blue-rgb),.11)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="170" y="52" text-anchor="middle" style="font-size:15px;font-weight:600;fill:var(--blue)">KDB</text>
+      <text class="svglab" x="170" y="74" text-anchor="middle" style="font-size:11px;fill:var(--blue)">Knowledge Database</text>
+      <text class="svgtxt" x="170" y="98" text-anchor="middle" style="font-size:12px;fill:var(--blue)" lang="ko">설계가 어떻게 생겼나 · 정적</text>
+      <text class="svgtxt" x="170" y="98" text-anchor="middle" style="font-size:12px;fill:var(--blue)" lang="en">what the design looks like · static</text>
+
+      <rect x="20" y="140" width="300" height="94" rx="10" fill="rgba(var(--pink-rgb),.11)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="170" y="168" text-anchor="middle" style="font-size:15px;font-weight:600;fill:var(--pink)">FSDB</text>
+      <text class="svglab" x="170" y="190" text-anchor="middle" style="font-size:11px;fill:var(--pink)">Fast Signal Database</text>
+      <text class="svgtxt" x="170" y="214" text-anchor="middle" style="font-size:12px;fill:var(--pink)" lang="ko">무슨 일이 일어났나 · 동적</text>
+      <text class="svgtxt" x="170" y="214" text-anchor="middle" style="font-size:12px;fill:var(--pink)" lang="en">what actually happened · dynamic</text>
+
+      <path d="M326 71 L420 108" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar4)"/>
+      <path d="M326 187 L420 150" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar4)"/>
+
+      <rect x="428" y="96" width="180" height="66" rx="10" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="518" y="124" text-anchor="middle" style="font-size:14px;font-weight:600;fill:var(--violet)">Verdi</text>
+      <text class="svglab" x="518" y="145" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="ko">둘을 겹쳐서 읽는다</text>
+      <text class="svglab" x="518" y="145" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="en">reads both together</text>
+
+      <path d="M614 129 L690 129" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar4)"/>
+      <rect x="698" y="96" width="146" height="66" rx="10" fill="rgba(var(--green-rgb),.13)" stroke="var(--green)" stroke-width="1.5"/>
+      <text class="svgtxt" x="771" y="120" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)" lang="ko">파형의 이 지점이</text>
+      <text class="svgtxt" x="771" y="120" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)" lang="en">this point on the waveform</text>
+      <text class="svgtxt" x="771" y="140" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)" lang="ko">소스의 이 줄</text>
+      <text class="svgtxt" x="771" y="140" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)" lang="en">is this line of source</text>
+
+      <text class="svglab" x="330" y="34" style="font-size:10px;fill:var(--ink3)">vcs -kdb</text>
+      <text class="svglab" x="330" y="238" style="font-size:10px;fill:var(--ink3)">simv + dump</text>
+    </svg>
+    <figcaption lang="ko">둘 중 하나만으로는 부족하다. KDB만 있으면 구조는 보이는데 값이 없고, FSDB만 있으면 파형은 보이는데 그게 소스 어느 줄인지 모른다.</figcaption>
+    <figcaption lang="en">Neither is enough on its own. With only KDB you see structure but no values; with only FSDB you see waveforms but cannot tell which source line they came from.</figcaption>
+  </figure>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · KDB와 FSDB</span><span lang="en">Unpacking the jargon · KDB and FSDB</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>KDB는 Knowledge Database, FSDB는 Fast Signal Database.</td></tr>
+        <tr><td>한 줄</td><td>KDB는 <strong>설계 그 자체</strong>에 대한 지식이고, FSDB는 <strong>이번 실행에서 일어난 일</strong>의 기록이다.</td></tr>
+        <tr><td>언제</td><td>KDB는 compile 때 <code>-kdb</code>로 만들어진다. FSDB는 simulation을 <em>돌리는 동안</em> 쌓인다.</td></tr>
+        <tr><td>누가</td><td>둘 다 도구가 만든다. 다만 FSDB는 <strong>설계 안에 dump 명령이 있어야</strong> 생긴다. 옵션만으로는 안 나온다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>KDB는 <strong>시뮬레이션을 안 돌려도</strong> 존재한다. 그래서 시뮬 결과가 아직 없어도 Verdi로 설계를 열어 구조를 보고 static driver를 추적할 수 있다. 이게 왜 유용한지는 <a href="#s10">10절</a>에서 나온다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>KDB is the Knowledge Database, FSDB the Fast Signal Database.</td></tr>
+        <tr><td>In one line</td><td>KDB is knowledge about <strong>the design itself</strong>; FSDB is a record of <strong>what happened on this run</strong>.</td></tr>
+        <tr><td>When</td><td>KDB is built at compile time by <code>-kdb</code>. FSDB accumulates <em>while</em> the simulation runs.</td></tr>
+        <tr><td>Who</td><td>The tool writes both, but FSDB only appears if <strong>the design contains dumping calls</strong>. Flags alone will not produce one.</td></tr>
+        <tr><td>Easy to confuse</td><td>KDB exists <strong>even with no simulation run at all.</strong> So you can open a design in Verdi before you have any results, browse its structure, and trace static drivers. Why that matters comes up in <a href="#s10">section 10</a>.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <div class="trap">
+    <span class="tag" lang="ko">FSDB가 안 생길 때</span><span class="tag" lang="en">When no FSDB appears</span>
+    <p lang="ko">가장 흔한 초보 증상: <strong>옵션을 다 줬는데 <code>.fsdb</code> 파일이 안 생긴다.</strong> 이유는 거의 항상 하나다. <strong>dump를 요청한 코드가 없다.</strong> <code>-debug_access</code>는 "덤프할 수 있게 해줘"이지 "덤프해"가 아니다. 실제 덤프는 testbench 안의 <code>$fsdbDumpvars</code> 같은 호출이 하거나, UCLI 프롬프트에서 덤프 명령을 쳐서 한다. <strong>권한과 실행은 다른 것이다.</strong></p>
+    <p lang="en">The most common beginner symptom: <strong>every flag is in place and no <code>.fsdb</code> file appears.</strong> The reason is almost always the same. <strong>Nothing asked for a dump.</strong> <code>-debug_access</code> means make dumping possible, not do the dumping. The actual dump comes from a call such as <code>$fsdbDumpvars</code> in the testbench, or from typing a dump command at the UCLI prompt. <strong>Permission and action are different things.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 09 -->
+<section id="s9">
+  <div class="sec-head"><span class="sec-num">09</span><h2 lang="ko">두 가지 디버그 모드</h2><h2 lang="en">Two debug modes</h2></div>
+  <p class="sec-sub" lang="ko">시뮬레이션과 같이 살아 있을 것인가, 끝난 뒤 기록을 볼 것인가. 이 선택이 옵션을 가른다.</p>
+  <p class="sec-sub" lang="en">Do you live alongside the simulation, or read the record after it finished? That choice decides your options.</p>
+
+  <div class="grid2">
+    <div class="mini">
+      <p><strong class="cV" lang="ko">Interactive · 살아 있는 채로</strong><strong class="cV" lang="en">Interactive, while it lives</strong></p>
+      <p lang="ko">시뮬레이터와 Verdi가 <strong>같이 떠 있다.</strong> 세워놓고 값을 보고, 다시 진행시키고, 다시 세운다. <code>simv</code>에 <code>-verdi</code>를 붙여서 띄운다.</p>
+      <p lang="en">The simulator and Verdi are <strong>up at the same time.</strong> Halt, inspect, step on, halt again. You get this by adding <code>-verdi</code> to the <code>simv</code> run.</p>
+      <p class="cap" lang="ko">버그를 재현하는 데 오래 걸릴 때 유리하다. 한 번 세워놓고 계속 캐물을 수 있다.</p>
+      <p class="cap" lang="en">Good when the bug takes a long time to reach: get there once, then keep asking questions.</p>
+    </div>
+    <div class="mini">
+      <p><strong class="cV" lang="ko">Post-process · 끝난 뒤에</strong><strong class="cV" lang="en">Post-process, after the fact</strong></p>
+      <p lang="ko">시뮬레이션은 이미 끝났고 <strong>FSDB만 남았다.</strong> 그걸 <code>-ssf</code>로 연다. 이때 <strong>그 FSDB를 만든 KDB가 자동으로 같이 로드된다.</strong></p>
+      <p lang="en">The simulation is over and <strong>only the FSDB remains.</strong> You open it with <code>-ssf</code>, and <strong>the KDB that produced it loads automatically alongside.</strong></p>
+      <p class="cap" lang="ko">회귀 테스트를 밤새 돌리고 아침에 실패한 것만 열어보는 방식. 실무에서 훨씬 흔하다.</p>
+      <p class="cap" lang="en">Run regressions overnight, open only the failures in the morning. Far more common in practice.</p>
+    </div>
+  </div>
+
+  <pre class="code" lang="ko"><span class="c"># interactive: 시뮬레이터를 띄우면서 Verdi 를 같이 연다</span>
+%&gt; ./simv <span class="k">-verdi</span>
+
+<span class="c"># post-process: 남아 있는 FSDB 를 연다. KDB 는 알아서 따라온다</span>
+%&gt; verdi <span class="k">-ssf</span> novas.fsdb</pre>
+  <pre class="code" lang="en"><span class="c"># interactive: bring the simulator up with Verdi attached</span>
+%&gt; ./simv <span class="k">-verdi</span>
+
+<span class="c"># post-process: open the FSDB that was left behind. the KDB follows on its own</span>
+%&gt; verdi <span class="k">-ssf</span> novas.fsdb</pre>
+
+  <div class="callout">
+    <p lang="ko">Lab 0의 Task 2가 post-process 쪽이다. Task 1에서 시뮬레이션을 돌려 파형을 남기고, Task 2에서 그걸 연다. <strong>즉 Task 1이 제대로 안 끝나면 Task 2는 시작도 못 한다.</strong> Makefile에 <code>compile_verdi</code> 같은 타겟이 따로 있는 이유가 이것이다. 디버그용으로 컴파일하는 것과 그냥 돌리는 것이 다른 명령이다.</p>
+    <p lang="en">Task 2 in Lab 0 is the post-process side. Task 1 runs the simulation and leaves a waveform behind; Task 2 opens it. <strong>So if Task 1 does not finish properly, Task 2 cannot start.</strong> That is why the Makefile carries a separate target such as <code>compile_verdi</code>: compiling for debug and simply running are different commands.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 10 -->
+<section id="s10">
+  <div class="sec-head"><span class="sec-num">10</span><h2 lang="ko">신호를 거슬러 올라가기</h2><h2 lang="en">Tracing a signal backwards</h2></div>
+  <p class="sec-sub" lang="ko">Verdi를 파형 뷰어로만 쓰면 여기를 통째로 놓친다. 이 절이 이 도구의 값어치다.</p>
+  <p class="sec-sub" lang="en">Use Verdi as a waveform viewer and you miss all of this. This section is where the tool earns its keep.</p>
+
+  <p lang="ko">디버깅의 실제 모양은 이렇다. 어떤 신호가 <strong>틀린 값</strong>을 가지고 있다. 그 값을 누가 넣었는지 찾아야 한다. 넣은 놈도 입력을 받았을 테니 또 거슬러 올라간다. 이걸 손으로 하면 몇 시간이 간다. Verdi가 제공하는 것은 <strong>이 거슬러 올라가기를 자동화하는 방법 여러 가지</strong>다.</p>
+  <p lang="en">Real debugging looks like this. Some signal holds <strong>a wrong value.</strong> You need to find who put it there. Whoever did also had inputs, so you walk back again. Done by hand this eats hours. What Verdi offers is <strong>several ways to automate that walk backwards.</strong></p>
+
+  <table>
+    <tr><th lang="ko">방법</th><th lang="en">Mechanism</th><th lang="ko">언제 쓰나</th><th lang="en">When you use it</th><th lang="ko">FSDB 필요?</th><th lang="en">Needs FSDB?</th></tr>
+    <tr><td class="hd" lang="ko">static driver 추적</td><td class="hd" lang="en">static driver trace</td>
+        <td><span lang="ko">아직 시뮬레이션 결과가 없을 때. 소스에서 신호를 고르고 driver 추적을 누르면 <strong>이 신호를 구동할 수 있는 모든 곳</strong>을 찾아준다</span><span lang="en">before you have any simulation results. Pick a signal in the source, hit trace driver, and it finds <strong>every place that could drive it</strong></span></td>
+        <td><span lang="ko">아니오</span><span lang="en">no</span></td></tr>
+    <tr><td class="hd" lang="ko">active driver 추적</td><td class="hd" lang="en">active driver trace</td>
+        <td><span lang="ko">파형에서 값이 바뀐 지점을 더블클릭한다. <strong>그 시각에 실제로 구동한 한 곳</strong>으로 바로 간다</span><span lang="en">double-click a transition on the waveform and it jumps to <strong>the one place that actually drove it at that moment</strong></span></td>
+        <td><span lang="ko">예</span><span lang="en">yes</span></td></tr>
+    <tr><td class="hd">TFV</td>
+        <td><span lang="ko">한 단계씩이 아니라 <strong>원인까지 한 번에</strong>. 조합 논리와 레지스터를 시간축을 거슬러 따라간다</span><span lang="en">not one step at a time but <strong>all the way to the cause</strong>, walking back through combinational logic and registers along the time axis</span></td>
+        <td><span lang="ko">예</span><span lang="en">yes</span></td></tr>
+    <tr><td class="hd" lang="ko">Unified Trace Engine</td><td class="hd" lang="en">Unified Trace Engine</td>
+        <td><span lang="ko">위 방법들이 화면마다 흩어져 있어서 헷갈리니까, <strong>한 자리에서 다 부르고 결과도 한 자리에서 본다</strong></span><span lang="en">the methods above are scattered across different views, so this is <strong>one place to invoke them all and see the results together</strong></span></td>
+        <td><span lang="ko">경우에 따라</span><span lang="en">depends</span></td></tr>
+  </table>
+
+  <div class="callout">
+    <p lang="ko">이 표에서 제일 값진 줄은 <strong>첫 줄</strong>이다. static driver 추적은 <strong>시뮬레이션을 한 번도 안 돌리고도</strong> 된다. KDB만 있으면 되기 때문이다. 남의 코드를 처음 받았을 때 "이 신호 어디서 오는 거지"를 소스 grep으로 찾는 대신 도구에게 물어볼 수 있다는 뜻이다. <a href="#s8">08절</a>의 KDB/FSDB 구분이 여기서 실제로 쓸모가 된다.</p>
+    <p lang="en">The most valuable row here is <strong>the first one.</strong> Static driver tracing works <strong>without ever running a simulation</strong>, because it only needs the KDB. Which means that when you inherit somebody else's code, "where does this signal come from" is a question you ask the tool instead of grepping the source. The KDB and FSDB split from <a href="#s8">section 08</a> becomes practical right here.</p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">Demo는 영상 안에 없다</span><span class="tag" lang="en">The demos are not in the video</span>
+    <p lang="ko">Verdi 트레이닝에서 Demo라고 표시된 구간(신호 추적, nCompare, FSDB utilities)은 <strong>영상 안에 실제 데모가 들어 있지 않다.</strong> 화면에 YouTube 링크만 뜨고, 나레이션이 Synopsys의 공개 채널에서 보라고 안내한다. <strong>영상만 끝까지 봐도 데모는 못 본 것이다.</strong> 트레이닝 완료 스크린샷은 찍히지만 내용은 비어 있으므로, 실제로 손에 익히려면 그 채널을 따로 봐야 한다.</p>
+    <p lang="en">The sections marked Demo in the Verdi training (signal tracing, nCompare, FSDB utilities) <strong>do not actually contain a demo.</strong> The screen shows a YouTube link and the narration points you at a public Synopsys channel. <strong>Watching the video to the end still leaves you having seen no demo.</strong> Your completion screenshot will look fine while the content is empty, so if you want the hands-on part you have to go to that channel separately.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 11 -->
+<section id="s11">
+  <div class="sec-head"><span class="sec-num">11</span><h2 lang="ko">Design Compiler와 합성</h2><h2 lang="en">Design Compiler and synthesis</h2></div>
+  <p class="sec-sub" lang="ko">이 절은 근거의 성격이 다르다. 아래 상자를 먼저 읽어라.</p>
+  <p class="sec-sub" lang="en">This section rests on different evidence than the rest. Read the box first.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">근거를 밝힌다</span><span class="tag" lang="en">Stating the evidence</span>
+    <p lang="ko">Part I이 지정한 Design Compiler 트레이닝 세 레슨은 <strong>현재 수강 등록이 막혀 있어 내용을 확인하지 못했다.</strong> 알려진 문제이고 강사도 인지 중이다. 그래서 이 절은 트레이닝 내용이 아니라 <strong>Lab 0 과제 문서가 알려주는 것과 합성 일반</strong>에 근거해서 썼다. 트레이닝이 열리면 그쪽을 기준으로 삼고 이 절을 고쳐라.</p>
+    <p lang="en">The three Design Compiler lessons Part I names <strong>could not be checked, because enrolment is currently blocked.</strong> This is a known issue and the instructor is aware. So this section is written from <strong>what the Lab 0 handout states plus general synthesis knowledge</strong>, not from the training. When access opens, treat the training as authoritative and correct this section against it.</p>
+  </div>
+
+  <p lang="ko">합성은 <strong>RTL을 gate-level netlist로 번역하는 일</strong>이다. 번역이라고 부르는 이유는 의미를 보존하기 때문이고, 컴파일과 다른 이유는 <strong>목표 하드웨어의 부품 목록을 보고 고른다</strong>는 점이다. 그 부품 목록이 technology library다. 같은 RTL이라도 어느 library를 주느냐에 따라 전혀 다른 netlist가 나온다.</p>
+  <p lang="en">Synthesis is <strong>translating RTL into a gate-level netlist.</strong> It is a translation because meaning is preserved; it differs from compilation because <strong>it picks parts from a catalogue of what the target process actually offers.</strong> That catalogue is the technology library. The same RTL against a different library produces a completely different netlist.</p>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · technology library</span><span lang="en">Unpacking the jargon · technology library</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>technology library. standard cell library 라고도 부른다.</td></tr>
+        <tr><td>한 줄</td><td>이 공정에서 쓸 수 있는 gate 하나하나의 목록과, 각각의 면적 / 지연 / 전력 수치.</td></tr>
+        <tr><td>언제</td><td>합성 때 읽힌다. 이후 back-end 단계들도 같은 library를 본다.</td></tr>
+        <tr><td>누가</td><td>설계자가 만들지 않는다. <strong>foundry나 IP 벤더가 준다.</strong> 설계 팀은 고르고 걸어줄 뿐이다.</td></tr>
+        <tr><td>헷갈리는 것</td><td><a href="#s4">04절</a>의 logical library와 아무 관계가 없다. 그쪽은 소스 분석 결과를 담는 통이고, 이쪽은 부품 카탈로그다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>technology library, also called a standard cell library.</td></tr>
+        <tr><td>In one line</td><td>The list of every gate this process offers, each with its area, delay and power numbers.</td></tr>
+        <tr><td>When</td><td>Read during synthesis. The back-end stages downstream read the same library.</td></tr>
+        <tr><td>Who</td><td>Designers do not write it. <strong>The foundry or an IP vendor supplies it.</strong> The design team only chooses one and points the tool at it.</td></tr>
+        <tr><td>Easy to confuse</td><td>Nothing to do with the logical library in <a href="#s4">section 04</a>. That is a bucket for analysed source; this is a parts catalogue.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <p lang="ko">Lab 0에서 합성은 <code>synth/compile_dc.tcl</code>이라는 스크립트가 돌린다. <strong>DC는 Tcl로 몰고 다니는 도구다.</strong> 명령줄 옵션으로 끝나는 VCS와 성격이 다르다. 이건 합성이 한 번에 끝나는 일이 아니라 <strong>library 읽기, 제약 걸기, compile, 리포트 뽑기</strong>가 이어지는 절차이기 때문이다. 스크립트를 열어서 순서를 읽어봐라. Lab 0 문서가 시키는 일이기도 하다.</p>
+  <p lang="en">In Lab 0 the synthesis run is driven by a script, <code>synth/compile_dc.tcl</code>. <strong>DC is a tool you steer with Tcl</strong>, unlike VCS where command-line options are the whole story. That is because synthesis is not one shot but a sequence: <strong>read libraries, apply constraints, compile, produce reports.</strong> Open the script and read the order. Lab 0 tells you to anyway.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 12 -->
+<section id="s12">
+  <div class="sec-head"><span class="sec-num">12</span><h2 lang="ko">옵션은 어디에 붙나</h2><h2 lang="en">Where does the option go</h2></div>
+  <p class="sec-sub" lang="ko">이 Lab에서 제일 많이 나는 사고가 "옵션을 엉뚱한 단계에 붙였다"이다. 읽어서는 안 갈린다. 직접 골라봐야 갈린다.</p>
+  <p class="sec-sub" lang="en">The single most common failure in this lab is putting an option on the wrong stage. Reading will not separate them; picking will.</p>
+
+  <div class="play">
+    <div class="score" id="sc">
+      <span id="scv"></span>
+      <button type="button" id="rst"></button>
+    </div>
+    <div id="qs"></div>
+    <div class="hintline" lang="ko"><strong>막히면:</strong> 한 가지만 물어라. <em>이 일이 벌어지려면 설계를 이미 다 조립해놨어야 하나?</em> 아니라면 앞 단계, 그렇다면 뒷 단계다. 그리고 <strong>기억할 것: 붙이는 곳을 틀려도 대개 에러가 안 난다.</strong> 조용히 아무 일도 안 일어난다.</div>
+    <div class="hintline" lang="en"><strong>Stuck?</strong> Ask one question. <em>Does the design have to be fully assembled already for this to happen?</em> If not, it belongs earlier; if so, later. And <strong>remember: putting it on the wrong stage usually does not error.</strong> Nothing happens, quietly.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 13 -->
+<section id="s13">
+  <div class="sec-head"><span class="sec-num">13</span><h2 lang="ko">Part II: Apporto에서 돌리기</h2><h2 lang="en">Part II: running it on Apporto</h2></div>
+  <p class="sec-sub" lang="ko">여기부터는 읽는 게 아니라 치는 것이다. 설계도 testbench도 이미 주어져 있다.</p>
+  <p class="sec-sub" lang="en">From here you type rather than read. The design and the testbench are both handed to you.</p>
+
+  <p lang="ko">도구는 전부 <strong>Apporto</strong>라는 원격 리눅스 환경에 깔려 있다. Canvas 왼쪽의 <em>Apporto - ECE Cad Lab</em>으로 들어간다. 실습 파일은 <code>/usr/local2/COURSES/ADDV/LAB0</code>에 있고, <strong>거기서 바로 작업하지 말고 자기 작업 디렉토리로 복사한 다음 시작한다.</strong></p>
+  <p lang="en">Every tool lives on a remote Linux environment called <strong>Apporto</strong>. You get there through <em>Apporto - ECE Cad Lab</em> on the left in Canvas. The lab files sit in <code>/usr/local2/COURSES/ADDV/LAB0</code>, and <strong>you copy them into your own working directory rather than working in place.</strong></p>
+
+  <pre class="code"><span class="c">LAB0/</span>
+├── sim/
+│   └── Makefile
+├── synth/
+│   ├── compile_dc.tcl
+│   └── Makefile
+├── env.cshrc
+├── 18_19_Slice.v
+└── 18_19_Slice_tb.v</pre>
+
+  <p lang="ko">파일이 여섯 개뿐이고 그중 셋이 빌드 스크립트다. <strong>Lab 0에서 새로 쓰는 코드는 없다.</strong> 할 일은 각 Makefile을 열어 타겟을 읽고, 그 타겟들을 순서대로 돌리는 것이다.</p>
+  <p lang="en">Six files, three of which are build scripts. <strong>You write no new code in Lab 0.</strong> The work is opening each Makefile, reading its targets, and running them in order.</p>
+
+  <div class="callout">
+    <p lang="ko">시작하기 전에 반드시 <code>env.cshrc</code>를 source 한다. 이게 <code>VCS_HOME</code>과 라이선스 변수를 잡아준다. <strong>이 스크립트는 tcsh용이다.</strong> bash에서 돌리면 안 된다. <a href="#s5">05절</a>에서 짚은 그 함정이 여기서 실제로 터진다.</p>
+    <p lang="en">Source <code>env.cshrc</code> before anything else; it is what sets <code>VCS_HOME</code> and the licence variables. <strong>The script is written for tcsh.</strong> Do not run it under bash. The trap flagged in <a href="#s5">section 05</a> is the one that actually goes off here.</p>
+  </div>
+
+  <h3 data-task="1" lang="ko">Task 1 · VCS로 컴파일하고 시뮬레이션</h3>
+  <h3 data-task="1" lang="en">Task 1 · Compile and simulate with VCS</h3>
+  <p lang="ko"><a href="#s3">03절</a>의 2-step flow 그대로다. <code>sim/Makefile</code>의 타겟이 <code>vcs</code>를 부르고 <code>simv</code>를 만든 다음 실행한다. <strong>확인할 것:</strong> 컴파일 로그에 에러가 없는지, 그리고 시뮬레이션이 실제로 끝까지 갔는지. testbench가 통과/실패를 찍는다면 그 메시지가 리포트에 들어갈 증거다.</p>
+  <p lang="en">This is the 2-step flow from <a href="#s3">section 03</a>, unchanged. A target in <code>sim/Makefile</code> invokes <code>vcs</code>, produces <code>simv</code>, then runs it. <strong>What to check:</strong> that the compile log is clean, and that the simulation actually ran to completion. If the testbench prints a pass or fail line, that line is the evidence that goes in your report.</p>
+
+  <h3 data-task="2" lang="ko">Task 2 · Verdi로 파형 보기</h3>
+  <h3 data-task="2" lang="en">Task 2 · View waveforms in Verdi</h3>
+  <p lang="ko"><a href="#s9">09절</a>의 post-process 모드다. 여기서 순서가 중요하다. <strong>디버그용으로 컴파일하는 타겟이 따로 있다</strong>(Lab 0 문서가 <code>make compile_verdi</code>를 예로 든다). 일반 컴파일로 돌린 결과에는 Verdi가 필요한 정보가 없다. 파형이 안 열리면 <a href="#s8">08절</a>의 FSDB 함정부터 의심해라.</p>
+  <p lang="en">This is the post-process mode from <a href="#s9">section 09</a>, and the order matters. <strong>There is a separate target that compiles for debug</strong> (Lab 0 gives <code>make compile_verdi</code> as its example). A plain compile leaves out what Verdi needs. If no waveform opens, start from the FSDB trap in <a href="#s8">section 08</a>.</p>
+
+  <h3 data-task="3" lang="ko">Task 3 · Design Compiler로 합성</h3>
+  <h3 data-task="3" lang="en">Task 3 · Synthesise with Design Compiler</h3>
+  <p lang="ko"><code>synth/Makefile</code>이 <code>compile_dc.tcl</code>을 물고 DC를 돌린다. 나오는 것은 gate-level netlist와 리포트들이다. <strong>리포트를 열어봐라.</strong> 면적과 타이밍 숫자가 <a href="#s11">11절</a>의 technology library에서 온 것이고, 이 수업 후반의 timing 이야기가 전부 이 숫자에서 출발한다.</p>
+  <p lang="en"><code>synth/Makefile</code> feeds <code>compile_dc.tcl</code> to DC and runs it. Out come a gate-level netlist and a set of reports. <strong>Open the reports.</strong> The area and timing numbers in them come from the technology library in <a href="#s11">section 11</a>, and every timing discussion later in this course starts from numbers like these.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 14 -->
+<section id="s14">
+  <div class="sec-head"><span class="sec-num">14</span><h2 lang="ko">함정</h2><h2 lang="en">Traps</h2></div>
+  <p class="sec-sub" lang="ko">앞 절에 흩어져 있던 것 중 실제로 시간을 잡아먹는 것만 모았다.</p>
+  <p class="sec-sub" lang="en">The ones scattered through the sections above that actually cost you hours, gathered in one place.</p>
+
+  <div class="trap">
+    <span class="tag" lang="ko">1 · 조용한 실패가 기본이다</span><span class="tag" lang="en">1 · Silent failure is the default</span>
+    <p lang="ko">이 도구들은 <strong>옵션을 잘못 붙여도 대개 에러를 안 낸다.</strong> coverage를 요청했는데 리포트가 비어 있고, 디버그를 켰는데 파형이 없고, FSDB를 열었는데 신호가 안 보인다. 소프트웨어 컴파일러에 익숙한 사람이 제일 크게 데는 지점이다. <strong>"에러가 없다"를 "잘 됐다"로 읽지 마라.</strong> 결과물이 실제로 생겼는지를 눈으로 확인하는 습관이 이 판의 기본기다.</p>
+    <p lang="en">These tools <strong>mostly do not error when an option is on the wrong stage.</strong> You asked for coverage and the report is empty; you enabled debug and there is no waveform; you opened the FSDB and no signals appear. This is what burns people who come from software compilers. <strong>Do not read "no errors" as "it worked."</strong> Checking that the artefact actually exists is the basic hygiene of this trade.</p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">2 · 권한과 실행은 다르다</span><span class="tag" lang="en">2 · Permission is not action</span>
+    <p lang="ko"><code>-debug_access</code>는 <strong>덤프할 수 있게 해주는</strong> 옵션이지 덤프하는 옵션이 아니다. 실제 덤프는 설계 안의 호출이나 UCLI 명령이 한다. 같은 모양의 함정이 coverage에도 있다. 계측을 켜는 것과 수집을 요청하는 것이 다른 단계에 있다.</p>
+    <p lang="en"><code>-debug_access</code> is the option that <strong>makes dumping possible</strong>, not the option that dumps. The dump itself comes from a call in the design or a UCLI command. Coverage has a trap of the same shape: instrumenting and requesting collection live on different stages.</p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">3 · library 라는 단어가 세 가지를 가리킨다</span><span class="tag" lang="en">3 · The word library means three things</span>
+    <p lang="ko">이 Lab 안에서만 세 번 다른 뜻으로 나온다. <strong>logical library</strong>는 분석 결과를 담는 통이고(<a href="#s4">04절</a>), <strong>technology library</strong>는 합성이 고르는 gate 카탈로그이며(<a href="#s11">11절</a>), <code>-y</code>로 주는 <strong>Verilog library directory</strong>는 모듈 정의를 찾아볼 디렉토리다. 셋이 아무 관계가 없다. 문서에서 library를 만나면 <strong>어느 단계 이야기인지부터</strong> 확인해라.</p>
+    <p lang="en">It shows up three times with three meanings inside this one lab. A <strong>logical library</strong> is a bucket for analysed source (<a href="#s4">section 04</a>), a <strong>technology library</strong> is the gate catalogue synthesis chooses from (<a href="#s11">section 11</a>), and a <strong>Verilog library directory</strong> passed with <code>-y</code> is a place to go looking for module definitions. None of the three are related. When you meet the word in a document, <strong>first work out which stage it is talking about.</strong></p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">4 · 인터넷 스크립트의 옛날 옵션</span><span class="tag" lang="en">4 · Old flags from copied scripts</span>
+    <p lang="ko"><code>-P</code>, <code>-debug</code>, <code>-debug_all</code>, <code>-debug_pp</code>는 <code>-debug_access</code>와 충돌하고 <strong>우선권까지 가져간다.</strong> 새 옵션이 무시되는 게 아니라, 새 옵션을 쓰고 있다고 믿는 상태로 옛날 동작을 하게 된다. 증상이 헷갈리는 이유다.</p>
+    <p lang="en"><code>-P</code>, <code>-debug</code>, <code>-debug_all</code> and <code>-debug_pp</code> clash with <code>-debug_access</code> and <strong>take priority over it.</strong> The new flag is not merely ignored: you get the old behaviour while believing you are on the new one. That is why the symptoms are confusing.</p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">5 · 이 Lab만 규칙이 다르다</span><span class="tag" lang="en">5 · This lab plays by different rules</span>
+    <p lang="ko">Lab 0은 <strong>개인 과제</strong>다. 다른 Lab의 2인 1조를 그대로 가져오면 학문적 정직성 문제가 된다. 그리고 <strong>데모도 코드 제출도 없다.</strong> 리포트만 낸다. 반대로 다른 Lab의 습관대로 코드를 정성껏 정리하고 리포트를 대충 쓰면 배점을 통째로 놓친다.</p>
+    <p lang="en">Lab 0 is <strong>individual work.</strong> Carrying over the pair setup from the other labs turns into an academic integrity problem. And there is <strong>no demo and no code submission</strong>, only a report. Conversely, polishing the code the way the other labs reward while writing the report carelessly throws away the whole score.</p>
+  </div>
+
+  <h3 lang="ko">왜 이걸 배우는가</h3>
+  <h3 lang="en">Why any of this is worth learning</h3>
+  <p lang="ko">이 Lab에는 설계가 없다. 그래서 시시해 보이는데, <strong>남은 다섯 Lab이 전부 이 위에서 돌아간다.</strong> Lab 1의 FIFO도, Lab 2의 pipelined MIPS도, Lab 6의 APB agent도 결국 <code>vcs</code>로 굽고 <code>simv</code>로 돌리고 Verdi로 들여다본다. 지금 조용한 실패를 알아보는 눈을 만들어두면 앞으로 다섯 번 아낀다. 못 만들어두면 다섯 번 다 같은 자리에서 막힌다.</p>
+  <p lang="en">There is no design work in this lab, which makes it look trivial. But <strong>all five remaining labs run on top of it.</strong> The FIFO in Lab 1, the pipelined MIPS in Lab 2, the APB agent in Lab 6 all end up baked by <code>vcs</code>, run by <code>simv</code> and inspected in Verdi. Build the eye for silent failure now and you save it five times over. Skip it and you get stuck in the same spot five times.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 15 -->
+<section id="s15">
+  <div class="sec-head"><span class="sec-num">15</span><h2 lang="ko">제출 체크리스트 &amp; 정리</h2><h2 lang="en">Submission checklist &amp; recap</h2></div>
+
+  <h3 lang="ko">한 장 요약</h3>
+  <h3 lang="en">One-page recap</h3>
+  <table>
+    <tr><th lang="ko">명령</th><th lang="en">Command</th><th lang="ko">단계</th><th lang="en">Stage</th><th lang="ko">받는 것</th><th lang="en">Takes</th><th lang="ko">내놓는 것</th><th lang="en">Produces</th></tr>
+    <tr><td class="hd">vlogan / vhdlan / syscan</td>
+        <td><span lang="ko">analysis</span><span lang="en">analysis</span></td>
+        <td><span lang="ko">소스 파일</span><span lang="en">source files</span></td>
+        <td><span lang="ko">logical library 안의 분석 결과</span><span lang="en">analysed results inside a logical library</span></td></tr>
+    <tr><td class="hd">vcs</td>
+        <td><span lang="ko">elaboration</span><span lang="en">elaboration</span></td>
+        <td><span lang="ko">top module 이름 (2-step 이면 소스도 같이)</span><span lang="en">a top module name, plus the sources in the 2-step flow</span></td>
+        <td><span lang="ko"><code>simv</code> 실행 파일</span><span lang="en">the <code>simv</code> executable</span></td></tr>
+    <tr><td class="hd">./simv</td>
+        <td><span lang="ko">simulation</span><span lang="en">simulation</span></td>
+        <td><span lang="ko">runtime 옵션</span><span lang="en">runtime options</span></td>
+        <td><span lang="ko">로그, FSDB</span><span lang="en">a log and an FSDB</span></td></tr>
+    <tr><td class="hd">verdi</td>
+        <td><span lang="ko">debug</span><span lang="en">debug</span></td>
+        <td><span lang="ko">KDB + FSDB</span><span lang="en">KDB plus FSDB</span></td>
+        <td><span lang="ko">소스와 연결된 파형, 추적 결과</span><span lang="en">waveforms tied to source, and trace results</span></td></tr>
+    <tr><td class="hd">dc_shell</td>
+        <td><span lang="ko">synthesis</span><span lang="en">synthesis</span></td>
+        <td><span lang="ko">RTL + technology library + 제약</span><span lang="en">RTL, a technology library and constraints</span></td>
+        <td><span lang="ko">gate-level netlist, 리포트</span><span lang="en">a gate-level netlist and reports</span></td></tr>
+  </table>
+
+  <h3 lang="ko">내기 전에 확인할 것</h3>
+  <h3 lang="en">Check before you submit</h3>
+  <div class="def">
+    <span class="tag" lang="ko">제출물</span><span class="tag" lang="en">Deliverables</span>
+    <p lang="ko"><strong>Part I (20점):</strong> 지정된 레슨을 완료했다는 것을 보여주는 <strong>스크린샷을 트레이닝마다</strong> 리포트에 넣는다. 완료 표시가 보이게 찍어야 한다. <strong>Part II:</strong> 세 Task를 돌린 결과. 리포트 하나만 낸다. <strong>코드도 데모도 없다.</strong></p>
+    <p lang="en"><strong>Part I (20 points):</strong> a <strong>screenshot per training</strong> showing that the required lessons are complete, pasted into the report. Make sure the completion marker is visible. <strong>Part II:</strong> the results of the three tasks. One report, that is all. <strong>No code, no demo.</strong></p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">빠뜨리기 제일 쉬운 것</span><span class="tag" lang="en">The easiest thing to forget</span>
+    <p lang="ko"><strong>AI 도구를 썼으면 그 사실을 제출물에 적어야 한다.</strong> 이 과목은 AI 사용을 허용하는 대신 사용 내역 기재를 요구한다. 결과물만 챙기고 이 줄을 빼먹기가 정확히 딱 좋은데, 빼먹으면 감점이다. 그리고 <strong>제출 시점 정책</strong>도 같이 기억해라. 늦으면 24시간마다 15%씩 최대 세 구간까지 깎이고, <strong>일찍 내면 24시간마다 5%씩 최대 10%까지 붙는다.</strong> 하루 일찍 내는 것만으로 5%다. 안 챙기면 그냥 버리는 점수다.</p>
+    <p lang="en"><strong>If you used AI tools, say so in what you hand in.</strong> This course permits AI use but requires you to record it. Gathering the results and dropping that one line is exactly the mistake that is easy to make, and it costs marks. Remember <strong>the timing policy</strong> too: late work loses 15% per 24 hours for up to three blocks, and <strong>early work gains 5% per 24 hours up to 10%.</strong> Submitting one day early is 5% for free. Not claiming it is simply throwing points away.</p>
+  </div>
+
+  <h3 lang="ko">다음으로</h3>
+  <h3 lang="en">What comes next</h3>
+  <p lang="ko">여기서 익힌 <code>vcs</code> → <code>simv</code> → Verdi 사이클이 Lab 1의 FIFO에서 그대로 반복된다. 다른 점은 그때부터 <strong>testbench를 직접 쓴다</strong>는 것이고, 그러면 이 페이지에서 스쳐간 <code>$fsdbDumpvars</code>와 UCLI가 남의 이야기가 아니게 된다. Lecture 6이 FIFO 설계를, Lecture 17이 검증용 SystemVerilog를 다룬다.</p>
+  <p lang="en">The <code>vcs</code> to <code>simv</code> to Verdi cycle you learned here repeats unchanged in the Lab 1 FIFO. The difference is that from then on <strong>you write the testbench</strong>, and at that point <code>$fsdbDumpvars</code> and UCLI, which only brushed past on this page, stop being somebody else's problem. Lecture 6 covers FIFO design and Lecture 17 covers SystemVerilog for verification.</p>
+</section>
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lab 0 개인 학습 노트<br>
+  강의: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 페이지는 수강생이 과제 문서와 공개 자료를 바탕으로 직접 작성한 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  Synopsys 트레이닝의 슬라이드나 나레이션은 싣지 않았습니다. VCS, Verdi, Design Compiler는 Synopsys의 상표입니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lab 0 personal study notes<br>
+  Course: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  This page was written by a student from the assignment handout and public material. It is not official course material.<br>
+  No Synopsys training slides or narration are reproduced here. VCS, Verdi and Design Compiler are trademarks of Synopsys.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 옵션이 어느 단계에 붙는지 고르게 한다.
+// 이 Lab 에서 제일 많이 나는 사고가 "엉뚱한 단계에 붙였다" 이고,
+// 그건 읽어서는 안 갈리기 때문에 눌러보게 만든다.
+(function () {
+  var host = document.getElementById('qs');
+  if (!host) return;
+  var scv = document.getElementById('scv');
+  var rst = document.getElementById('rst');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var OPTS_KO = ['1. analysis (vlogan/vhdlan)', '2. elaborate (vcs)', '3. runtime (simv)'];
+  var OPTS_EN = ['1. analysis (vlogan/vhdlan)', '2. elaborate (vcs)', '3. runtime (simv)'];
+
+  var ITEMS = [
+    { a: 1,
+      ko: '순수 SystemVerilog 설계다. <code>logic</code> 과 <code>always_ff</code> 를 쓰려고 <code>-sverilog</code> 를 켠다. 어디에 붙이나?',
+      en: 'A pure SystemVerilog design. You want <code>logic</code> and <code>always_ff</code>, so you turn on <code>-sverilog</code>. Where does it go?',
+      wko: '2-step flow 에는 analysis 단계가 아예 없다. 남는 것은 <code>vcs</code> 뿐이므로 거기에 붙는다.',
+      wen: 'The 2-step flow has no analysis stage at all. The only place left is <code>vcs</code>, so that is where it goes.' },
+
+    { a: 2,
+      ko: '시뮬레이션을 중간에 세워놓고 신호 값을 직접 물어보고 싶다. <code>-ucli</code> 를 어디에 붙이나?',
+      en: 'You want to halt the simulation partway and ask for signal values by hand. Where does <code>-ucli</code> go?',
+      wko: '세울 대상이 <em>돌고 있는 시뮬레이션</em> 이다. 돌고 있으려면 이미 다 조립된 뒤여야 하므로 runtime 이다.',
+      wen: 'What you are halting is <em>a running simulation</em>. For it to be running it must already be assembled, so this is runtime.' },
+
+    { a: 0,
+      ko: '3-step flow 다. <code>vcs</code> 에만 <code>-kdb</code> 를 붙였더니 Verdi 에서 Verilog 소스가 안 보인다. 어디를 빠뜨렸나?',
+      en: 'A 3-step flow. You put <code>-kdb</code> only on <code>vcs</code>, and now Verilog source does not show up in Verdi. What did you miss?',
+      wko: '소스를 실제로 읽는 것은 분석기다. <code>vlogan</code> 에 <code>-kdb</code> 가 없으면 그 언어의 정보는 애초에 KDB 에 들어가지 않는다. <strong>3-step 에서는 분석기마다 다 붙여야 한다.</strong>',
+      wen: 'The analysers are what actually read the source. With no <code>-kdb</code> on <code>vlogan</code>, that language never enters the KDB in the first place. <strong>In a 3-step flow every analyser needs it.</strong>' },
+
+    { a: 2,
+      ko: '<code>-debug_access</code> 를 붙여 컴파일했고 시뮬레이션도 끝났는데 <code>.fsdb</code> 파일이 없다. 빠진 것은 어느 단계의 일인가?',
+      en: 'You compiled with <code>-debug_access</code>, the simulation finished, and there is no <code>.fsdb</code> file. Which stage is the missing piece on?',
+      wko: '<code>-debug_access</code> 는 <strong>허가</strong>일 뿐이다. 실제로 덤프를 시작시키는 것은 testbench 안의 dump 호출이나 UCLI 명령이고, 둘 다 시뮬레이션이 <em>도는 동안</em> 일어난다.',
+      wen: '<code>-debug_access</code> only grants <strong>permission</strong>. What starts the dump is a dumping call in the testbench or a UCLI command, and both happen <em>while</em> the simulation runs.' },
+
+    { a: 1,
+      ko: 'coverage 를 모으려고 <code>simv</code> 에 <code>-cm</code> 을 줬는데 리포트가 비어 있다. 어느 단계를 빠뜨렸나?',
+      en: 'You passed <code>-cm</code> to <code>simv</code> to collect coverage and the report came out empty. Which stage did you skip?',
+      wko: '계측 코드는 컴파일 때 심어야 한다. 심어놓지 않았으면 runtime 에 아무리 요청해도 셀 것이 없다. <strong>runtime 옵션은 compile time 짝이 있어야 산다.</strong>',
+      wen: 'Instrumentation has to be built in at compile time. If it was never built in, asking at runtime leaves nothing to count. <strong>A runtime option only lives if its compile-time counterpart exists.</strong>' },
+
+    { a: 0,
+      ko: 'VHDL 이 섞인 설계다. entity 를 참조하려면 그 entity 가 먼저 처리돼 있어야 한다. 이 순서 제약이 걸리는 단계는?',
+      en: 'A design with VHDL in it. To reference an entity, that entity has to have been processed first. Which stage does that ordering constraint apply to?',
+      wko: 'VHDL 이 bottom-up 언어라서 생기는 제약이고, 파일을 하나씩 읽어 library 에 넣는 단계가 analysis 다. Verilog 에는 이 제약이 없어서 파일 순서가 상관없다.',
+      wen: 'The constraint exists because VHDL is a bottom-up language, and the stage that reads files one by one into a library is analysis. Verilog has no such constraint, so file order does not matter there.' }
+  ];
+
+  var picked = [];
+
+  function paintScore() {
+    var done = 0, right = 0;
+    for (var i = 0; i < ITEMS.length; i++) {
+      if (picked[i] !== undefined) { done++; if (picked[i] === ITEMS[i].a) right++; }
+    }
+    scv.textContent = L(
+      right + ' / ' + done + ' 맞음  (전체 ' + ITEMS.length + '문항)',
+      right + ' of ' + done + ' correct  (' + ITEMS.length + ' in all)'
+    );
+    rst.textContent = L('다시', 'reset');
+  }
+
+  function build() {
+    host.textContent = '';
+    var OPTS = document.documentElement.dataset.lang === 'en' ? OPTS_EN : OPTS_KO;
+    ITEMS.forEach(function (it, i) {
+      var row = document.createElement('div');
+      row.className = 'qrow';
+
+      var q = document.createElement('div');
+      q.className = 'q';
+      q.innerHTML = (i + 1) + '. ' + L(it.ko, it.en);
+      row.appendChild(q);
+
+      var opts = document.createElement('div');
+      opts.className = 'opts';
+      OPTS.forEach(function (name, oi) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = name;
+        b.addEventListener('click', function () {
+          if (picked[i] !== undefined) return;
+          picked[i] = oi;
+          build();
+        });
+        if (picked[i] !== undefined) {
+          b.disabled = true;
+          if (oi === it.a) b.className = 'right';
+          else if (oi === picked[i]) b.className = 'wrong';
+        }
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);
+
+      var why = document.createElement('div');
+      why.className = 'why';
+      why.innerHTML = L(it.wko, it.wen);
+      row.appendChild(why);
+
+      if (picked[i] !== undefined) {
+        row.classList.add('done');
+        row.classList.add(picked[i] === it.a ? 'ok' : 'no');
+      }
+      host.appendChild(row);
+    });
+    paintScore();
+  }
+
+  rst.addEventListener('click', function () { picked = []; build(); });
+  window.addEventListener('langchange', build);
+  build();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

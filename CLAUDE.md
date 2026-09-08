@@ -64,6 +64,20 @@ Notion은 SPA라 `WebFetch`로는 빈 페이지가 온다. **브라우저 도구
 
 이렇게 얻은 Schedule 표가 [모듈 목록](#모듈-목록-전체-30강)의 근거다.
 
+### 로그인이 필요한 자료는 gstack browse 로 연다
+
+`~/.claude/skills/gstack/browse/dist/browse connect` 가 별도 Chromium 을 headed 로 띄운다.
+프로필이 `~/.gstack/chromium-profile` 에 남으므로 **한 번 로그인하면 재기동 후에도 유지된다.**
+ASU SSO 의 Duo 2FA 쿠키와 Synopsys 트레이닝(`training.synopsys.com`) 세션까지 살아남는 걸 확인했다.
+사용자의 실제 Chrome 은 건드리지 않는다. 별개 브라우저다.
+
+**서버 상태가 `.gstack/browse.json` 한 파일에만 있고 거기에 인증 토큰이 있다.**
+headed 세션이 떠 있는데 `browse` 명령이 그 서버를 못 찾으면 새 headless 서버를 띄우면서
+**그 파일을 덮어쓴다. 그러면 살아 있는 창의 토큰이 영구히 날아가고 복구 경로가 없다.**
+`browse status` 가 `Mode: headed` 가 아니라 `Mode: launched` 로 나오면 이미 그 상태다.
+유령 서버를 `taskkill //PID <pid> //T //F` 로 정리하고 재기동하는 수밖에 없다.
+로그인은 디스크에 있으므로 재기동 자체는 싸다.
+
 ## 내용의 근거
 
 **강의계획서가 명시한다: "There is no textbook for this course."**
@@ -370,8 +384,6 @@ Intel에서는 "Emulation"이다.
 - 파일명은 `LAB{N}-{과제 제목 kebab-case}.html`. 과제 문서 제목을 그대로 쓴다.
 - **요구사항 항목 순서로 정렬한다.** 개념순이 아니다. 진입점이 요구사항이기 때문이다.
 - 항목마다 네 가지: **필요한 개념 → 노트 링크 / 첫 수 / 빠뜨리기 쉬운 것 / 제출물**.
-- **답 코드를 쓰지 않는다.** RTL이나 testbench 코드를 통째로 적으면 공략이 아니라 해답지가 된다.
-  스켈레톤과 인터페이스 수준까지만. **2인 1조 과제라 더 조심한다.**
 - **과제 원문을 그대로 싣지 않는다.** repo가 Public이라 인터넷에 게시하는 것이다.
   요구사항 요약 수준으로 쓴다. 채점 방침처럼 인용이 필요한 대목만 짧게 따온다.
 - **AI 사용 기록 제출 요구를 공략에 적는다.** 코드만 내고 이걸 빠뜨리면 감점이고,
