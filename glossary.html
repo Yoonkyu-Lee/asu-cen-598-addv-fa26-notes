@@ -569,6 +569,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">.ddc · .db · .lib</div>
+  <div class="d" lang="ko">DC 주변 확장자 셋. <strong>계보가 둘로 갈린다.</strong> <code>.lib</code> 은 technology library 의 사람이 읽는 ASCII 원본이고, <strong>Library Compiler</strong> 가 그것을 컴파일하면 DC 가 실제로 읽는 <code>.db</code> 가 된다. 여기까지가 library 계보다. <code>.ddc</code> 는 완전히 다른 것으로, <strong>DC 메모리 안의 설계</strong>를 저장하는 형식이다. 예전에는 설계도 <code>db</code> 로 저장했기 때문에 오래된 스크립트에서는 <code>.db</code> 가 설계 자리에 나온다. <strong>확장자만 보고 판단하지 말고 그 줄이 무엇을 읽고 쓰는지를 볼 것.</strong></div>
+  <div class="d" lang="en">Three extensions that live around DC, in <strong>two separate lineages.</strong> <code>.lib</code> is the human-readable ASCII source of a technology library, and <strong>Library Compiler</strong> turns it into the <code>.db</code> that DC actually reads. That is the library lineage. <code>.ddc</code> is something else entirely: the format for saving <strong>the design</strong> held in DC memory. Designs used to be saved as <code>db</code> too, so in older scripts you will find <code>.db</code> where a design belongs. <strong>Do not judge by the extension; read what the line is loading or writing.</strong></div>
+  <div class="src"><a href="LAB0-tools-tutorial.html#s11">Lab 0 · 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Design Compiler · DC</div>
   <div class="f">Design Compiler</div>
   <div class="d" lang="ko">Synopsys 의 합성 도구. RTL 을 읽어 technology library 의 gate 로 매핑하고 <strong>gate-level netlist</strong> 를 내놓는다. 명령줄 옵션으로 모는 VCS 와 달리 <strong>Tcl 스크립트로 몬다.</strong> 합성이 한 번에 끝나는 일이 아니라 library 읽기, 제약 걸기, compile, 리포트 뽑기가 이어지는 절차이기 때문이다.</div>
@@ -834,6 +841,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Library Compiler</div>
+  <div class="d" lang="ko">Synopsys 도구. technology library 의 ASCII 원본(<code>.lib</code>)을 DC 가 읽을 수 있는 컴파일된 형식(<code>.db</code>)으로 바꾼다. 설계 팀이 직접 돌릴 일은 드물다. <strong>library 는 보통 foundry 나 IP 벤더에게서 이미 <code>.db</code> 로 받는다.</strong></div>
+  <div class="d" lang="en">A Synopsys tool that turns the ASCII source of a technology library (<code>.lib</code>) into the compiled form DC reads (<code>.db</code>). Design teams rarely run it themselves: <strong>libraries usually arrive from the foundry or an IP vendor already as <code>.db</code>.</strong></div>
+  <div class="src"><a href="LAB0-tools-tutorial.html#s11">Lab 0 · 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">link_library</div>
+  <div class="d" lang="ko">DC 변수. <strong>reference 를 해석할 곳</strong>을 가리킨다. reference 란 설계 안에 <em>인스턴스로 박혀 있지만 정의가 여기 없는</em> gate, block, sub-design 이다. 이미 합성된 netlist 를 읽을 때 그 안의 셀 이름을 이걸로 찾는다. <strong>기본값이 존재하지 않는 파일(<code>your_library.db</code>)이라 안 잡아주면 반드시 경고가 뜬다.</strong> 그런데 그 경고는 report 나 compile 을 <strong>중단시키지 않는다.</strong> 명령은 끝까지 돌고 리포트도 나오지만 숫자가 의미가 없다. target_library 와 갈리는 기준: <strong>읽을 때 쓰면 link.</strong></div>
+  <div class="d" lang="en">A DC variable naming <strong>where references get resolved.</strong> A reference is any gate, block or sub-design <em>instantiated</em> in the design whose definition lives elsewhere; this is what makes sense of cell names inside a netlist you read in. <strong>Its default is a file that does not exist (<code>your_library.db</code>)</strong>, so leaving it alone guarantees warnings. Those warnings <strong>do not abort</strong> the report or compile: the command finishes and a report appears, but its numbers mean nothing. The rule that separates it from target_library: <strong>reading uses link.</strong></div>
+  <div class="src"><a href="LAB0-tools-tutorial.html#s11">Lab 0 · 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Logical Library</div>
   <div class="d" lang="ko">분석 결과를 담아두는 저장소에 붙인 <strong>이름</strong>. 실제 디렉토리가 아니라 그것을 가리키는 별명이고, 어느 디렉토리인지는 <code>synopsys_sim.setup</code> 이 <code>이름 : 경로</code> 한 줄로 정한다. <strong>Verilog 에는 이 개념이 아예 없다.</strong> VHDL 이 들어올 때 따라 들어온다. Technology Library 와는 <strong>아무 관계가 없다.</strong></div>
   <div class="d" lang="en">A <strong>name</strong> for the store that analysed results go into. Not a directory but an alias for one, and <code>synopsys_sim.setup</code> decides which directory with a single <code>name : path</code> line. <strong>Verilog has no such concept at all</strong>; it arrives with VHDL. It has <strong>nothing to do with</strong> a technology library.</div>
@@ -1051,6 +1072,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">search_path · .synopsys_dc.setup</div>
+  <div class="d" lang="ko">DC 의 파일 탐색 경로와 시작 스크립트. <code>.synopsys_dc.setup</code> 은 <strong>같은 이름으로 세 군데에 있고 순서대로 실행된다.</strong> <code>$SYNOPSYS/admin/setup</code>(도구 기본) → <code>~user</code>(개인) → <strong>CWD(프로젝트 전용, 마지막이라 앞의 둘을 덮어쓴다)</strong>. 이 구조 덕에 프로젝트마다 다른 library 를 쓰면서 설계 스크립트는 그대로 둘 수 있다. <code>search_path</code> 에는 <strong>상대 경로</strong>를 쓰는 게 권장된다. 절대 경로는 다른 환경에서 깨진다. <strong>시뮬레이터의 <code>synopsys_sim.setup</code> 과 완전히 다른 파일이다.</strong></div>
+  <div class="d" lang="en">DC's file lookup path and startup script. <code>.synopsys_dc.setup</code> exists <strong>under the same name in three places, executed in order</strong>: <code>$SYNOPSYS/admin/setup</code> (tool defaults), then <code>~user</code> (personal), then <strong>CWD (project-specific, and last, so it overrides the other two)</strong>. That is what lets each project point at a different library while the design scripts stay put. Write <strong>relative paths</strong> in <code>search_path</code>; absolute ones break in anyone else's environment. <strong>Not the same file as the simulator's <code>synopsys_sim.setup</code>.</strong></div>
+  <div class="src"><a href="LAB0-tools-tutorial.html#s11">Lab 0 · 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Standard Cell</div>
   <div class="d" lang="ko">Foundry가 미리 만들어 두고 특성까지 재놓은 <strong>부품.</strong> AND 게이트 하나, flip-flop 하나가 각각 하나의 cell이다. <strong>"standard"인 이유는 높이가 전부 같게 설계돼 줄 세워 늘어놓을 수 있기 때문</strong>이고, 그래야 place and route가 자동화된다. 당신의 RTL은 이 목록에 있는 것으로만 만들어진다.</div>
   <div class="d" lang="en">A <strong>part</strong> the foundry has already built and characterised: one AND gate is a cell, one flip-flop is a cell. <strong>They are standard because they share a height and can be laid out in rows</strong>, which is what makes place and route automatable. Your RTL can only be built from what is on that list.</div>
@@ -1092,6 +1120,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">설계 데이터를 <strong>foundry로 넘기는 순간.</strong> 이름은 예전에 자기 테이프에 담아 보냈던 데서 왔다. 여기를 넘으면 되돌리는 비용이 완전히 달라진다. <strong>한 번에 끝나는 사건이 아니다.</strong> base layer를 먼저 넘기고 metal layer를 나중에 넘겨 ECO 여지를 남기는 일이 있다.</div>
   <div class="d" lang="en">The moment design data is <strong>handed to the foundry.</strong> The name comes from when it went out on magnetic tape. Past this point the cost of going back changes entirely. <strong>It is not one single event:</strong> teams sometimes send base layers first and metal layers later, deliberately keeping room for an ECO.</div>
   <div class="src"><a href="L01-course-intro.html#s7">Lecture 1 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">target_library</div>
+  <div class="d" lang="ko">DC 변수. <strong>compile 이 골라 쓸 gate 목록</strong>을 가리킨다. "이 설계를 어떤 부품으로 만들까" 의 답이고, DC 는 여기서 DRC 와 타이밍과 논리를 만족하는 것 중 <strong>가장 작은 gate</strong> 를 고른다. 같은 RTL 이라도 어느 library 를 주느냐에 따라 전혀 다른 netlist 가 나온다. link_library 와 갈리는 기준: <strong>만들 때 쓰면 target.</strong></div>
+  <div class="d" lang="en">A DC variable naming <strong>the gates compile is allowed to choose from.</strong> It answers "what parts should this be built out of", and DC picks <strong>the smallest gate</strong> that still meets DRC, timing and function. The same RTL against a different library gives a completely different netlist. The rule that separates it from link_library: <strong>building uses target.</strong></div>
+  <div class="src"><a href="LAB0-tools-tutorial.html#s11">Lab 0 · 11</a></div>
 </div>
 
 <div class="gterm">

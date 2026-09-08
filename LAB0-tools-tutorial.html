@@ -426,9 +426,9 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   </table>
 
   <div class="trap">
-    <span class="tag" lang="ko">먼저 짚고 간다</span><span class="tag" lang="en">Say it up front</span>
-    <p lang="ko">Part I의 세 트레이닝 중 <strong>Design Compiler 트레이닝은 현재 수강 등록이 막혀 있다.</strong> 열면 플레이어 대신 구매 화면이 뜬다. 알려진 문제이고 강사도 인지하고 있다. 그래서 이 페이지의 11번 절은 다른 절과 근거의 성격이 다르다. 해당 절에서 다시 밝힌다.</p>
-    <p lang="en">Of the three trainings in Part I, <strong>the Design Compiler one is currently not accessible.</strong> Opening it shows a purchase page instead of the player. This is a known issue and the instructor is aware of it. Section 11 of this page therefore rests on different evidence than the rest, and says so again where it appears.</p>
+    <span class="tag" lang="ko">library 라는 단어를 조심해라</span><span class="tag" lang="en">Watch the word library</span>
+    <p lang="ko">이 Lab 하나를 지나는 동안 <strong>library 라는 단어가 다섯 번 나오는데 전부 다른 것을 가리킨다.</strong> logical library, technology library, Verilog library directory, 그리고 DC 쪽의 <code>target_library</code>와 <code>link_library</code>. 문서에서 이 단어를 만나면 뜻을 짐작하지 말고 <strong>어느 도구의 어느 단계 이야기인지</strong>부터 확인해라. <a href="#s14">14절</a>에 다섯 개를 한 표로 모아뒀다.</p>
+    <p lang="en">In the course of this one lab <strong>the word library turns up five times meaning five different things</strong>: a logical library, a technology library, a Verilog library directory, and DC's <code>target_library</code> and <code>link_library</code>. When you meet the word in a document, do not guess: work out <strong>which tool and which stage</strong> it belongs to first. <a href="#s14">Section 14</a> puts all five in one table.</p>
   </div>
 </section>
 
@@ -981,14 +981,8 @@ TIMEBASE : ns</pre>
 <!-- ══════════════════════════════════════════════════════ 11 -->
 <section id="s11">
   <div class="sec-head"><span class="sec-num">11</span><h2 lang="ko">Design Compiler와 합성</h2><h2 lang="en">Design Compiler and synthesis</h2></div>
-  <p class="sec-sub" lang="ko">이 절은 근거의 성격이 다르다. 아래 상자를 먼저 읽어라.</p>
-  <p class="sec-sub" lang="en">This section rests on different evidence than the rest. Read the box first.</p>
-
-  <div class="trap">
-    <span class="tag" lang="ko">근거를 밝힌다</span><span class="tag" lang="en">Stating the evidence</span>
-    <p lang="ko">Part I이 지정한 Design Compiler 트레이닝 세 레슨은 <strong>현재 수강 등록이 막혀 있어 내용을 확인하지 못했다.</strong> 알려진 문제이고 강사도 인지 중이다. 그래서 이 절은 트레이닝 내용이 아니라 <strong>Lab 0 과제 문서가 알려주는 것과 합성 일반</strong>에 근거해서 썼다. 트레이닝이 열리면 그쪽을 기준으로 삼고 이 절을 고쳐라.</p>
-    <p lang="en">The three Design Compiler lessons Part I names <strong>could not be checked, because enrolment is currently blocked.</strong> This is a known issue and the instructor is aware. So this section is written from <strong>what the Lab 0 handout states plus general synthesis knowledge</strong>, not from the training. When access opens, treat the training as authoritative and correct this section against it.</p>
-  </div>
+  <p class="sec-sub" lang="ko">RTL을 gate로 내리는 도구. VCS와 성격이 완전히 달라서, 옵션이 아니라 <strong>변수와 스크립트</strong>로 몬다.</p>
+  <p class="sec-sub" lang="en">The tool that takes RTL down to gates. It behaves nothing like VCS: you steer it with <strong>variables and scripts</strong>, not options.</p>
 
   <p lang="ko">합성은 <strong>RTL을 gate-level netlist로 번역하는 일</strong>이다. 번역이라고 부르는 이유는 의미를 보존하기 때문이고, 컴파일과 다른 이유는 <strong>목표 하드웨어의 부품 목록을 보고 고른다</strong>는 점이다. 그 부품 목록이 technology library다. 같은 RTL이라도 어느 library를 주느냐에 따라 전혀 다른 netlist가 나온다.</p>
   <p lang="en">Synthesis is <strong>translating RTL into a gate-level netlist.</strong> It is a translation because meaning is preserved; it differs from compilation because <strong>it picks parts from a catalogue of what the target process actually offers.</strong> That catalogue is the technology library. The same RTL against a different library produces a completely different netlist.</p>
@@ -1015,6 +1009,172 @@ TIMEBASE : ns</pre>
 
   <p lang="ko">Lab 0에서 합성은 <code>synth/compile_dc.tcl</code>이라는 스크립트가 돌린다. <strong>DC는 Tcl로 몰고 다니는 도구다.</strong> 명령줄 옵션으로 끝나는 VCS와 성격이 다르다. 이건 합성이 한 번에 끝나는 일이 아니라 <strong>library 읽기, 제약 걸기, compile, 리포트 뽑기</strong>가 이어지는 절차이기 때문이다. 스크립트를 열어서 순서를 읽어봐라. Lab 0 문서가 시키는 일이기도 하다.</p>
   <p lang="en">In Lab 0 the synthesis run is driven by a script, <code>synth/compile_dc.tcl</code>. <strong>DC is a tool you steer with Tcl</strong>, unlike VCS where command-line options are the whole story. That is because synthesis is not one shot but a sequence: <strong>read libraries, apply constraints, compile, produce reports.</strong> Open the script and read the order. Lab 0 tells you to anyway.</p>
+
+  <h3 lang="ko">파일 확장자부터 정리한다</h3>
+  <h3 lang="en">Start with the file extensions</h3>
+  <p lang="ko">DC 주위에는 확장자가 많고, <strong>library 쪽과 design 쪽이 서로 다른 계보</strong>라 처음에 섞인다.</p>
+  <p lang="en">A lot of extensions float around DC, and they get mixed up because <strong>the library ones and the design ones are two separate lineages.</strong></p>
+
+  <table>
+    <tr><th lang="ko">확장자</th><th lang="en">Extension</th><th lang="ko">계보</th><th lang="en">Lineage</th><th lang="ko">무엇인가</th><th lang="en">What it is</th></tr>
+    <tr><td class="hd">.lib</td><td><span lang="ko">library</span><span lang="en">library</span></td>
+        <td><span lang="ko">technology library의 <strong>사람이 읽는 원본</strong>. ASCII 텍스트다</span><span lang="en">the <strong>human-readable source</strong> of a technology library, plain ASCII</span></td></tr>
+    <tr><td class="hd">.db</td><td><span lang="ko">library</span><span lang="en">library</span></td>
+        <td><span lang="ko"><code>.lib</code>을 <strong>Library Compiler</strong>가 컴파일한 것. DC가 실제로 읽는 쪽</span><span lang="en">what <strong>Library Compiler</strong> makes from a <code>.lib</code>; this is the one DC actually reads</span></td></tr>
+    <tr><td class="hd">.ddc</td><td><span lang="ko">design</span><span lang="en">design</span></td>
+        <td><span lang="ko">DC 메모리 안의 <strong>설계</strong>를 저장한 형식. 예전 design용 <code>db</code>를 대체했다</span><span lang="en">the format for saving the <strong>design</strong> in DC memory; it replaced the older design <code>db</code></span></td></tr>
+  </table>
+
+  <div class="trap">
+    <span class="tag" lang="ko">여기서 한 번 걸린다</span><span class="tag" lang="en">This one catches people</span>
+    <p lang="ko">옛날에는 <strong>설계도 <code>.db</code>로 저장했다.</strong> 지금 설계는 <code>.ddc</code>이고 <code>.db</code>는 library 전용으로 남았다. 그래서 오래된 스크립트나 블로그를 보면 <code>.db</code>가 설계를 가리키는 자리에 나온다. <strong>확장자만 보고 "라이브러리구나" 하면 안 되고, 그 줄이 무엇을 읽고 쓰는지를 봐야 한다.</strong></p>
+    <p lang="en">Designs <strong>used to be saved as <code>.db</code> too.</strong> Today a design is <code>.ddc</code> and <code>.db</code> survives for libraries only. So in older scripts and blog posts you will find <code>.db</code> sitting where a design belongs. <strong>Do not read the extension and conclude "library"; read what that line is actually loading or writing.</strong></p>
+  </div>
+
+  <h3 lang="ko">target_library와 link_library</h3>
+  <h3 lang="en">target_library and link_library</h3>
+  <p lang="ko">이 둘이 이 강좌에서 제일 많이 헷갈리는 짝이다. 둘 다 <code>.db</code>를 가리키는데 <strong>쓰이는 시점과 목적이 다르다.</strong></p>
+  <p lang="en">These two are the most confusable pair in this course. Both point at <code>.db</code> files, but <strong>they are used at different moments for different reasons.</strong></p>
+
+  <div class="grid2">
+    <div class="mini">
+      <p><strong class="cT"><code>target_library</code></strong></p>
+      <p lang="ko"><strong>compile이 골라 쓸 gate 목록.</strong> "이 설계를 어떤 부품으로 만들까"의 답이다. DC는 여기서 DRC와 타이밍과 논리를 만족하는 것 중 <strong>가장 작은 gate</strong>를 고른다.</p>
+      <p lang="en"><strong>The gates compile is allowed to choose from.</strong> It answers "what parts should this design be built out of". DC picks <strong>the smallest gate</strong> that still meets DRC, timing and function.</p>
+      <p class="cap" lang="ko">만들 때 쓴다</p><p class="cap" lang="en">used when building</p>
+    </div>
+    <div class="mini">
+      <p><strong class="cT"><code>link_library</code></strong></p>
+      <p lang="ko"><strong>reference를 찾아낼 곳.</strong> reference란 설계 안에 <em>인스턴스로 박혀 있는</em> gate, block, sub-design을 말한다. 이미 만들어진 netlist를 읽을 때 그 안의 셀 이름을 해석하는 데 쓴다.</p>
+      <p lang="en"><strong>Where references get resolved.</strong> A reference is any gate, block or sub-design <em>instantiated</em> in your design. This is what makes sense of the cell names inside a netlist you read in.</p>
+      <p class="cap" lang="ko">읽을 때 쓴다</p><p class="cap" lang="en">used when reading</p>
+    </div>
+  </div>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 · reference와 link</span><span lang="en">Unpacking the jargon · reference and link</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>reference. 그리고 그것을 이어붙이는 <code>link</code> 명령.</td></tr>
+        <tr><td>한 줄</td><td>reference 는 설계 안에 <strong>인스턴스로 등장하지만 정의가 여기 없는 것</strong>이다. <code>link</code> 는 그 정의를 찾아 현재 설계에 연결한다.</td></tr>
+        <tr><td>언제</td><td>설계를 읽은 뒤, report 나 compile 전에. <strong>대부분의 <code>check_</code> · <code>report_</code> · <code>compile</code> 이 알아서 암묵적으로 link 한다.</strong></td></tr>
+        <tr><td>누가</td><td>도구가 한다. 다만 어디를 뒤질지(<code>link_library</code>)는 사람이 정해줘야 한다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>암묵적으로 되니까 <code>link</code> 를 안 써도 된다고 생각하기 쉬운데, <strong>명시적으로 부르는 편이 낫다.</strong> 실패하면 0 을 돌려주므로 <strong>문제를 report 나 compile 전에 잡을 수 있다.</strong> 안 부르면 엉뚱한 리포트를 한참 들여다본 뒤에야 알게 된다.</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>reference, and the <code>link</code> command that resolves one.</td></tr>
+        <tr><td>In one line</td><td>A reference is something <strong>instantiated in your design whose definition is not here.</strong> <code>link</code> goes and finds that definition and connects it to the current design.</td></tr>
+        <tr><td>When</td><td>After reading a design, before reporting or compiling. <strong>Most <code>check_</code>, <code>report_</code> and <code>compile</code> commands perform an implicit link anyway.</strong></td></tr>
+        <tr><td>Who</td><td>The tool does it, but a human has to say where to look, via <code>link_library</code>.</td></tr>
+        <tr><td>Easy to confuse</td><td>Because it happens implicitly it is tempting to skip, but <strong>calling it explicitly is better.</strong> It returns 0 when it cannot fully link, so <strong>you catch the problem before a report or a compile</strong> rather than after staring at nonsense output.</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <pre class="code" lang="ko"><span class="c"># 이미 합성된 netlist 를 읽어서 타이밍만 확인하는 흐름</span>
+dc_shell-topo&gt; <span class="k">read_verilog</span> mapped/MYREG_mapped.v
+dc_shell-topo&gt; <span class="k">set_app_var</span> target_library libs/20nm_wc.db
+dc_shell-topo&gt; <span class="k">source</span> cons/myreg.con
+dc_shell-topo&gt; <span class="k">report_constraint</span> -all_violators
+
+<span class="c"># link_library 를 안 잡아주면 이렇게 된다</span>
+<span class="c"># Warning: Can't read link_library file 'your_library.db'.</span>
+<span class="c"># Warning: Unable to resolve reference 'OR2_4x' in 'MYREG'.</span></pre>
+  <pre class="code" lang="en"><span class="c"># reading an already-synthesised netlist just to check its timing</span>
+dc_shell-topo&gt; <span class="k">read_verilog</span> mapped/MYREG_mapped.v
+dc_shell-topo&gt; <span class="k">set_app_var</span> target_library libs/20nm_wc.db
+dc_shell-topo&gt; <span class="k">source</span> cons/myreg.con
+dc_shell-topo&gt; <span class="k">report_constraint</span> -all_violators
+
+<span class="c"># this is what you get when link_library was never set</span>
+<span class="c"># Warning: Can't read link_library file 'your_library.db'.</span>
+<span class="c"># Warning: Unable to resolve reference 'OR2_4x' in 'MYREG'.</span></pre>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이 경고를 무시하면 시간을 버린다</span><span class="tag" lang="en">Ignoring this warning wastes your afternoon</span>
+    <p lang="ko"><code>link_library</code>는 기본값이 <strong>존재하지 않는 파일</strong>(<code>your_library.db</code>)로 잡혀 있다. 그래서 안 건드리면 위 경고가 반드시 뜬다. 문제는 <strong>이 경고들이 report나 compile을 중단시키지 않는다</strong>는 것이다. 명령은 끝까지 돌고 리포트도 나온다. <strong>다만 그 숫자가 의미가 없다.</strong> 셀 정의를 못 찾았으니 지연을 알 수 없기 때문이다. 트레이닝은 이걸 <em>wasted effort</em>라고 부른다. <a href="#s14">14절</a>의 "조용한 실패"가 DC에서 나타나는 모습이 정확히 이것이다.</p>
+    <p lang="en"><code>link_library</code> defaults to <strong>a file that does not exist</strong> (<code>your_library.db</code>), so leaving it alone guarantees the warnings above. The catch is that <strong>these warnings do not abort the report or the compile.</strong> The command runs to the end and a report appears. <strong>The numbers in it just do not mean anything</strong>, because with no cell definitions there are no delays to work from. The training calls this <em>wasted effort</em>. It is exactly how the silent failure of <a href="#s14">section 14</a> shows up in DC.</p>
+  </div>
+
+  <h3 lang="ko">시작 파일이 세 곳에서 실행된다</h3>
+  <h3 lang="en">The startup file runs from three places</h3>
+  <p lang="ko">DC는 켜질 때 <code>.synopsys_dc.setup</code>이라는 <strong>같은 이름의 파일을 세 군데에서</strong> 차례로 실행한다.</p>
+  <p lang="en">On startup DC runs <strong>a file of the same name from three locations</strong>, in order.</p>
+
+  <table>
+    <tr><th lang="ko">순서</th><th lang="en">Order</th><th lang="ko">위치</th><th lang="en">Location</th><th lang="ko">성격</th><th lang="en">Role</th></tr>
+    <tr><td class="hd">1</td><td><code>$SYNOPSYS/admin/setup</code></td>
+        <td><span lang="ko">도구 기본 설정. 사이트 관리자 영역이다</span><span lang="en">the tool's own defaults, owned by whoever administers the site</span></td></tr>
+    <tr><td class="hd">2</td><td><code>~user</code></td>
+        <td><span lang="ko">사용자 개인 설정. 내 계정 전체에 적용된다</span><span lang="en">your personal settings, applying across all your work</span></td></tr>
+    <tr><td class="hd">3</td><td><span lang="ko">CWD (DC를 띄운 디렉토리)</span><span lang="en">CWD, the directory you launched DC from</span></td>
+        <td><span lang="ko"><strong>프로젝트 전용. 마지막에 실행되므로 앞의 둘을 덮어쓴다</strong></span><span lang="en"><strong>project-specific; it runs last, so it overrides the other two</strong></span></td></tr>
+  </table>
+
+  <div class="callout">
+    <p lang="ko">순서가 곧 우선순위다. <strong>CWD의 설정이 이긴다.</strong> 이 구조 덕분에 프로젝트마다 다른 technology library를 쓰면서도 설계 스크립트는 그대로 둘 수 있다. 그리고 경로를 적을 때는 <code>./mapped</code>처럼 <strong>상대 경로를 쓰라</strong>고 트레이닝이 권한다. 절대 경로로 박아두면 다른 사람 환경에서 그대로 깨진다.</p>
+    <p lang="en">The order is the precedence: <strong>the CWD copy wins.</strong> That is what lets each project use a different technology library while the design scripts stay untouched. And when you write paths, the training recommends <strong>relative ones</strong> like <code>./mapped</code>: absolute paths hard-coded into a script break the moment somebody else runs it.</p>
+  </div>
+
+  <div class="trap">
+    <span class="tag" lang="ko">이름이 거의 같은 다른 파일</span><span class="tag" lang="en">A nearly identical name, a different file</span>
+    <p lang="ko"><code>.synopsys_dc.setup</code>과 <a href="#s5">05절</a>의 <code>synopsys_sim.setup</code>은 <strong>완전히 다른 파일이다.</strong> 앞의 것은 합성 도구의 Tcl 시작 스크립트이고, 뒤의 것은 시뮬레이터의 library 매핑 설정이다. 이름이 비슷하고 둘 다 "setup"이라 검색하다 서로 바꿔 읽기 딱 좋다. <strong>앞에 점이 붙고 <code>_dc_</code>가 들어가면 합성 쪽이다.</strong></p>
+    <p lang="en"><code>.synopsys_dc.setup</code> and the <code>synopsys_sim.setup</code> of <a href="#s5">section 05</a> are <strong>completely different files.</strong> The first is the synthesis tool's Tcl startup script; the second is the simulator's library mapping. The names rhyme and both say "setup", so it is easy to read one while searching for the other. <strong>Leading dot and <code>_dc_</code> means synthesis.</strong></p>
+  </div>
+
+  <h3 lang="ko">Timing report 읽는 법</h3>
+  <h3 lang="en">Reading a timing report</h3>
+  <p lang="ko">합성이 끝나면 리포트가 나온다. <code>report_timing</code>의 기본 출력은 <strong>네 구역</strong>으로 되어 있고, 이 구조만 알면 어디를 봐야 할지가 정해진다.</p>
+  <p lang="en">Synthesis produces reports. The default <code>report_timing</code> output has <strong>four sections</strong>, and knowing the structure tells you where to look.</p>
+
+  <figure>
+    <svg viewBox="0 0 860 250" role="img" aria-label="timing report 의 네 구역. Path Information, Path Delay, Path Required, Summary 순서이고 마지막에서 slack 이 계산된다.">
+      <defs>
+        <marker id="lab0tr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <rect x="20" y="20" width="200" height="58" rx="8" fill="none" stroke="var(--ink3)" stroke-width="1.3"/>
+      <text class="svgtxt" x="120" y="44" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--ink2)">1. Path Information</text>
+      <text class="svglab" x="120" y="64" text-anchor="middle" style="font-size:10px;fill:var(--ink3)" lang="ko">어느 경로, 어느 library</text>
+      <text class="svglab" x="120" y="64" text-anchor="middle" style="font-size:10px;fill:var(--ink3)" lang="en">which path, which library</text>
+
+      <rect x="20" y="92" width="200" height="58" rx="8" fill="rgba(var(--blue-rgb),.11)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgtxt" x="120" y="116" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--blue)">2. Path Delay</text>
+      <text class="svglab" x="120" y="136" text-anchor="middle" style="font-size:10px;fill:var(--blue)">data arrival time</text>
+
+      <rect x="20" y="164" width="200" height="58" rx="8" fill="rgba(var(--violet-rgb),.11)" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgtxt" x="120" y="188" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--violet)">3. Path Required</text>
+      <text class="svglab" x="120" y="208" text-anchor="middle" style="font-size:10px;fill:var(--violet)">data required time</text>
+
+      <path d="M226 121 L300 121" stroke="var(--blue)" stroke-width="1.5" fill="none" marker-end="url(#lab0tr)"/>
+      <path d="M226 193 L300 152" stroke="var(--violet)" stroke-width="1.5" fill="none" marker-end="url(#lab0tr)"/>
+
+      <rect x="306" y="92" width="250" height="88" rx="9" fill="rgba(var(--green-rgb),.11)" stroke="var(--green)" stroke-width="1.5"/>
+      <text class="svgtxt" x="431" y="118" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--green-deep)">4. Summary</text>
+      <text class="svglab" x="431" y="140" text-anchor="middle" style="font-size:11px;fill:var(--green-deep)">required - arrival</text>
+      <text class="svgtxt" x="431" y="164" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--green-deep)">= slack</text>
+
+      <path d="M562 136 L636 136" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#lab0tr)"/>
+
+      <rect x="644" y="92" width="196" height="40" rx="7" fill="rgba(var(--green-rgb),.13)" stroke="var(--green)" stroke-width="1.3"/>
+      <text class="svgtxt" x="742" y="117" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)">+ (MET)</text>
+
+      <rect x="644" y="140" width="196" height="40" rx="7" fill="rgba(var(--amber-rgb),.13)" stroke="var(--amber)" stroke-width="1.3"/>
+      <text class="svgtxt" x="742" y="165" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--amber)">- (VIOLATED)</text>
+    </svg>
+    <figcaption lang="ko">앞의 세 구역은 재료이고 마지막 한 줄이 결론이다. slack이 양수면 통과, 음수면 위반. 리포트를 처음 열면 <strong>맨 아래부터 본다.</strong></figcaption>
+    <figcaption lang="en">The first three sections are the ingredients and the last line is the verdict. Positive slack passes, negative violates. When you open a report, <strong>read the bottom first.</strong></figcaption>
+  </figure>
+
+  <p lang="ko"><strong>slack</strong>이라는 단어가 여기서 처음 나온다. <strong>여유 시간</strong>이다. 신호가 도착해야 하는 시각(required)에서 실제로 도착한 시각(arrival)을 뺀 값이고, 양수면 <code>(MET)</code>, 음수면 <code>(VIOLATED)</code>가 붙는다. 이 수업 후반의 타이밍 이야기가 전부 이 한 줄에서 출발한다.</p>
+  <p lang="en">This is where the word <strong>slack</strong> first appears. It is spare time: the time the signal was required by minus the time it actually arrived, marked <code>(MET)</code> when positive and <code>(VIOLATED)</code> when negative. Every timing discussion later in this course starts from that single line.</p>
+
+  <div class="callout">
+    <p lang="ko"><code>report_timing</code>의 기본 동작을 알아둘 것. <strong>path group마다 가장 나쁜 경로 하나만</strong> 보여주고, <strong>setup(최대 지연)만</strong> 본다. hold도 area도 DRC도 안 나온다. 더 보려면 <code>-max_paths</code>로 경로 수를 늘리거나 <code>-nworst</code>로 endpoint당 개수를 늘린다. 지연이 cell 출력 핀 기준으로만 찍히는 게 답답하면 <code>-input_pins</code>를 붙인다. 그러면 <strong>net delay가 보인다.</strong></p>
+    <p lang="en">Know what <code>report_timing</code> does by default: it shows <strong>only the single worst path per path group</strong> and looks at <strong>setup, the maximum delay, only</strong>. No hold, no area, no DRC. To see more, raise the path count with <code>-max_paths</code> or the per-endpoint count with <code>-nworst</code>. If it frustrates you that delays are reported only to cell output pins, add <code>-input_pins</code> and <strong>the net delays appear.</strong></p>
+  </div>
 </section>
 
 <!-- ══════════════════════════════════════════════════════ 12 -->
@@ -1073,8 +1233,10 @@ TIMEBASE : ns</pre>
 
   <h3 data-task="3" lang="ko">Task 3 · Design Compiler로 합성</h3>
   <h3 data-task="3" lang="en">Task 3 · Synthesise with Design Compiler</h3>
-  <p lang="ko"><code>synth/Makefile</code>이 <code>compile_dc.tcl</code>을 물고 DC를 돌린다. 나오는 것은 gate-level netlist와 리포트들이다. <strong>리포트를 열어봐라.</strong> 면적과 타이밍 숫자가 <a href="#s11">11절</a>의 technology library에서 온 것이고, 이 수업 후반의 timing 이야기가 전부 이 숫자에서 출발한다.</p>
-  <p lang="en"><code>synth/Makefile</code> feeds <code>compile_dc.tcl</code> to DC and runs it. Out come a gate-level netlist and a set of reports. <strong>Open the reports.</strong> The area and timing numbers in them come from the technology library in <a href="#s11">section 11</a>, and every timing discussion later in this course starts from numbers like these.</p>
+  <p lang="ko"><code>synth/Makefile</code>이 <code>compile_dc.tcl</code>을 물고 DC를 돌린다. 나오는 것은 gate-level netlist와 리포트들이다. <strong>스크립트를 열어서 <code>target_library</code>와 <code>link_library</code>가 어디서 잡히는지 찾아봐라.</strong> 그 두 줄이 <a href="#s11">11절</a>의 전부다.</p>
+  <p lang="en"><code>synth/Makefile</code> feeds <code>compile_dc.tcl</code> to DC and runs it. Out come a gate-level netlist and a set of reports. <strong>Open the script and find where <code>target_library</code> and <code>link_library</code> get set.</strong> Those two lines are what <a href="#s11">section 11</a> is all about.</p>
+  <p lang="ko">그리고 <strong>timing 리포트를 열어 맨 아래 <code>slack</code> 줄부터 봐라.</strong> <code>(MET)</code>인지 <code>(VIOLATED)</code>인지가 이 설계가 지금 클럭에서 도는지 아닌지다. 위쪽 세 구역은 그 한 줄이 왜 그 값인지를 설명하는 재료다.</p>
+  <p lang="en">Then <strong>open the timing report and start at the <code>slack</code> line at the bottom.</strong> Whether it says <code>(MET)</code> or <code>(VIOLATED)</code> is whether this design runs at the clock you asked for. The three sections above it are the workings behind that one number.</p>
 </section>
 
 <!-- ══════════════════════════════════════════════════════ 14 -->
@@ -1096,9 +1258,29 @@ TIMEBASE : ns</pre>
   </div>
 
   <div class="trap">
-    <span class="tag" lang="ko">3 · library 라는 단어가 세 가지를 가리킨다</span><span class="tag" lang="en">3 · The word library means three things</span>
-    <p lang="ko">이 Lab 안에서만 세 번 다른 뜻으로 나온다. <strong>logical library</strong>는 분석 결과를 담는 통이고(<a href="#s4">04절</a>), <strong>technology library</strong>는 합성이 고르는 gate 카탈로그이며(<a href="#s11">11절</a>), <code>-y</code>로 주는 <strong>Verilog library directory</strong>는 모듈 정의를 찾아볼 디렉토리다. 셋이 아무 관계가 없다. 문서에서 library를 만나면 <strong>어느 단계 이야기인지부터</strong> 확인해라.</p>
-    <p lang="en">It shows up three times with three meanings inside this one lab. A <strong>logical library</strong> is a bucket for analysed source (<a href="#s4">section 04</a>), a <strong>technology library</strong> is the gate catalogue synthesis chooses from (<a href="#s11">section 11</a>), and a <strong>Verilog library directory</strong> passed with <code>-y</code> is a place to go looking for module definitions. None of the three are related. When you meet the word in a document, <strong>first work out which stage it is talking about.</strong></p>
+    <span class="tag" lang="ko">3 · library 라는 단어가 다섯 가지를 가리킨다</span><span class="tag" lang="en">3 · The word library means five things</span>
+    <p lang="ko">이 Lab 하나를 지나는 동안 같은 단어가 다섯 번, 서로 아무 관계 없는 뜻으로 나온다. <strong>문서에서 library를 만나면 뜻을 짐작하지 말고 어느 도구의 어느 단계인지부터 확인해라.</strong></p>
+    <p lang="en">Inside this one lab the same word turns up five times meaning five unrelated things. <strong>When you meet it in a document, do not guess: work out which tool and which stage first.</strong></p>
+    <table>
+      <tr><th lang="ko">무엇</th><th lang="en">Which</th><th lang="ko">도구·단계</th><th lang="en">Tool and stage</th><th lang="ko">담는 것</th><th lang="en">Holds</th></tr>
+      <tr><td class="hd">logical library</td>
+          <td><span lang="ko">VCS, analysis (<a href="#s4">04절</a>)</span><span lang="en">VCS, analysis (<a href="#s4">§04</a>)</span></td>
+          <td><span lang="ko">분석된 소스</span><span lang="en">analysed source</span></td></tr>
+      <tr><td class="hd">technology library</td>
+          <td><span lang="ko">DC, 합성 (<a href="#s11">11절</a>)</span><span lang="en">DC, synthesis (<a href="#s11">§11</a>)</span></td>
+          <td><span lang="ko">공정이 제공하는 gate 카탈로그</span><span lang="en">the gate catalogue the process offers</span></td></tr>
+      <tr><td class="hd"><code>-y</code> library directory</td>
+          <td><span lang="ko">VCS, 파일 탐색</span><span lang="en">VCS, file lookup</span></td>
+          <td><span lang="ko">module 정의를 찾아볼 디렉토리</span><span lang="en">a directory to hunt module definitions in</span></td></tr>
+      <tr><td class="hd"><code>target_library</code></td>
+          <td><span lang="ko">DC, compile 할 때</span><span lang="en">DC, while compiling</span></td>
+          <td><span lang="ko">골라 쓸 gate 목록</span><span lang="en">the gates it may choose from</span></td></tr>
+      <tr><td class="hd"><code>link_library</code></td>
+          <td><span lang="ko">DC, 읽어들일 때</span><span lang="en">DC, while reading</span></td>
+          <td><span lang="ko">reference 를 해석할 곳</span><span lang="en">where references get resolved</span></td></tr>
+    </table>
+    <p lang="ko">뒤의 둘이 제일 위험하다. <strong>둘 다 DC이고 둘 다 <code>.db</code>를 가리킨다.</strong> 갈리는 기준 하나만 잡아라. <strong>만들 때 쓰면 target, 읽을 때 쓰면 link.</strong></p>
+    <p lang="en">The last two are the dangerous pair: <strong>same tool, and both point at <code>.db</code> files.</strong> Hold on to one rule. <strong>Building uses target, reading uses link.</strong></p>
   </div>
 
   <div class="trap">
