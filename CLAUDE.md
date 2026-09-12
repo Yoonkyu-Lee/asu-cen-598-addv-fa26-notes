@@ -15,13 +15,14 @@ GitHub Pages로 배포된다: https://yoonkyu-lee.github.io/asu-cen-598-addv-fa2
 
 ## 이 문서를 다 읽지 않고 착수하려면
 
-이 파일은 전체 계약이라 길다. **자주 하는 두 작업은 `.claude/skills/` 에 실행 절차로 뽑아놨다.**
+이 파일은 전체 계약이라 길다. **자주 하는 작업은 `.claude/skills/` 에 실행 절차로 뽑아놨다.**
 컨텍스트 없이 들어온 에이전트도 거기서 바로 시작할 수 있다.
 
 | 스킬 | 언제 |
 |---|---|
 | `write-note` | 강의 노트나 Lab 공략을 새로 쓰거나 고칠 때 |
 | `synopsys-training` | Synopsys 트레이닝을 열어 읽거나 자료를 뽑을 때 |
+| `synopsys-training-chrome` | 같은 일을 `claude --chrome` 의 Chrome 도구로 할 때 |
 
 **스킬과 이 문서가 어긋나면 이 문서가 이긴다.** 규약을 고쳤으면 스킬도 같이 고친다.
 스킬은 요약이지 사본이 아니다. 같은 내용을 양쪽에 길게 적어두면 갈라진다.
@@ -77,7 +78,25 @@ Notion은 SPA라 `WebFetch`로는 빈 페이지가 온다. **브라우저 도구
 
 이렇게 얻은 Schedule 표가 [모듈 목록](#모듈-목록-전체-30강)의 근거다.
 
-### 로그인이 필요한 자료는 gstack browse 로 연다
+### 로그인이 필요한 자료: 브라우저 두 갈래
+
+**gstack browse 와 `claude --chrome` 은 상호보완이다.** 둘 다 쓸 수 있으면 아래로 고른다.
+
+| 상황 | 쓸 것 |
+|---|---|
+| 덱 전체처럼 **양이 많은** 수집 | `browse`. 한 번의 eval 로 통째로 가져온다 |
+| **iframe 안**에 든 콘텐츠 (SCORM 등) | `browse`. Chrome 도구는 프레임 안에 못 들어간다 |
+| **오래 도는** 작업 (영상 재생, 완료 판정) | `browse`. 사용자의 실제 브라우저를 묶지 않는다 |
+| **이미 로그인된** 세션을 그대로 쓰고 싶을 때 | Chrome. 재로그인이 없다 |
+| **화면이 어떻게 보이는지**가 판단 대상일 때 | Chrome. 스크린샷을 직접 본다 |
+| 몇 장만 **눈으로 확인**하면 될 때 | Chrome. 띄우는 비용이 없다 |
+
+가르는 선은 **cross-origin iframe** 이다. Chrome 도구는 `tabId` 단위라
+`javascript_tool` / `get_page_text` / `read_page` / `find` 가 전부 프레임 벽에서 멈춘다.
+뚫리는 건 스크린샷과 좌표 클릭뿐이다. **로그인해도 안 열린다. 인증 문제가 아니라
+same-origin policy 다.** 자세한 실측과 절차는 `synopsys-training-chrome` 스킬에 있다.
+
+#### gstack browse
 
 `~/.claude/skills/gstack/browse/dist/browse connect` 가 별도 Chromium 을 headed 로 띄운다.
 프로필이 `~/.gstack/chromium-profile` 에 남으므로 **한 번 로그인하면 재기동 후에도 유지된다.**
@@ -90,6 +109,21 @@ headed 세션이 떠 있는데 `browse` 명령이 그 서버를 못 찾으면 �
 `browse status` 가 `Mode: headed` 가 아니라 `Mode: launched` 로 나오면 이미 그 상태다.
 유령 서버를 `taskkill //PID <pid> //T //F` 로 정리하고 재기동하는 수밖에 없다.
 로그인은 디스크에 있으므로 재기동 자체는 싸다.
+
+**이 함정은 업스트림에서 이미 고쳐졌다** (gstack `v1.56.0.0`, #1781, "silently downgrades a
+headed session to headless"). 이 머신의 설치본이 `v1.40.0.0` 이라 아직 남아 있는 것이다.
+`/gstack-upgrade` 로 올렸으면 **위 복구 절차가 필요한지 다시 확인하고 이 문단을 줄인다.**
+
+#### claude --chrome
+
+사용자의 실제 Chrome 을 확장으로 몬다. 이미 로그인된 세션을 그대로 쓴다.
+
+**Chrome 이 여러 개 붙어 있으면 `tabs_context_mcp` 가 거부한다.** 임의로 고르지 말고
+`AskUserQuestion` 으로 묻는다. `switch_browser` 는 모든 창에 확인 버튼을 띄우고 2 분 기다리는데,
+사용자가 못 보고 넘기면 timeout 으로 죽는다. 그때는 다시 보내면서 눌러 달라고 말한다.
+
+되돌릴 수 없는 버튼(제출, 삭제, 결제)은 사용자의 진짜 계정에서 실제로 눌린다.
+**누르기 전에 확인을 받는다.**
 
 ## 내용의 근거
 

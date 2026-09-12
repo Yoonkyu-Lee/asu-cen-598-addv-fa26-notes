@@ -30,6 +30,10 @@ Verdi 강좌의 Demo 구간은 영상 안에 데모가 없고 **공개 YouTube �
 
 ## 2. 브라우저 띄우기
 
+**`claude --chrome` 으로 들어왔고 `browse` 를 못 살리겠으면 `synopsys-training-chrome` 으로 간다.**
+다만 Chrome 도구는 cross-origin iframe 안에 못 들어가서 4~6 절이 통째로 안 먹고,
+장당 스크린샷이라 비용이 크다. **덱 전체를 훑을 일이면 여기서 `browse` 를 되살리는 게 거의 항상 싸다.**
+
 ```bash
 B="$HOME/.claude/skills/gstack/browse/dist/browse"
 "$B" status          # Mode: headed 여야 정상
