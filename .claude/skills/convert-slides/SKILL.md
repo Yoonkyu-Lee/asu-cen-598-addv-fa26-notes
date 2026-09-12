@@ -49,6 +49,7 @@ Notion은 SPA라 `WebFetch`로는 빈 페이지가 온다. **브라우저 도구
 EEE 554는 슬라이드가 PDF로 배포됐다. **여기는 PPTX다.** 리더가 PDF만 다루므로 변환이 필요하다.
 
 LibreOffice는 이 머신에 없다. **PowerPoint COM 자동화를 쓴다.**
+변환에 쓴 **스크래치패드의 PPTX 사본도 repo 안에 두지 않는다.** 발표자 노트가 딸려 들어간다.
 
 ```powershell
 # 원본을 스크래치패드로 복사한 뒤 거기서만 작업한다. Drive 미러는 건드리지 않는다.

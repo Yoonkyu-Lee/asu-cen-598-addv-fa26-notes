@@ -124,7 +124,7 @@ Design Flow 그림, testbench 구성도, "무엇이 언제 일어나는가" 타�
 | `.callout` | 강의 간 연결, 강조 | 상하 실선 |
 | `pre.code` | SystemVerilog 코드 블록 | 회색 배경, 가로 스크롤 |
 | `figure` + `figcaption` | SVG 도해 | 흰 카드 |
-| `.mini` | 작은 SVG 카드 (grid2/3/4 안에) | 흰 카드 |
+| `.mini` | 작은 SVG 카드 (`.grid2` / `.grid3` 안에) | 흰 카드 |
 | `.play` | 인터랙티브 도구 | 흰 카드 |
 
 기존 `L01`, `L02` 파일의 `<style>` 블록을 그대로 복사해서 시작하고, 필요한 것만 추가한다.

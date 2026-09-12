@@ -94,7 +94,11 @@ gstack 스킬 문서에 Aside 이야기가 나와도 여기서는 fallback 경�
 
 repo는 **Public**이고 GitHub Pages로 서빙된다. 여기 올리는 건 인터넷에 게시하는 것이다.
 
-강의계획서의 Student Copyright Responsibilities가 슬라이드 배포를 금지한다.
+**강의계획서의 Student Copyright Responsibilities가 이렇게 적고 있다:**
+
+> Students may not share outside the class, including uploading, selling or distributing
+> course content or notes taken during the conduct of the course.
+
 **사용자에게 이 조항을 알렸고, 슬라이드를 커밋하기로 결정했다.** 이 결정을 조용히 뒤집지 않는다.
 나중에 내려달라고 하면 `slides/` 커밋을 지우고 `.gitignore`에 `slides/*.pdf`를 추가하면 된다.
 리더는 슬라이드가 없어도 노트 본문을 막지 않는다.

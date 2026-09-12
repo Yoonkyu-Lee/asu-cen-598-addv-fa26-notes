@@ -43,9 +43,10 @@ B="$HOME/.claude/skills/gstack/browse/dist/browse.exe"   # Windows. 확장자 �
 로그인은 `~/.gstack/chromium-profile` 에 남아서 **재기동해도 유지된다.** ASU SSO 의 Duo 2FA 쿠키까지 산다.
 사용자의 실제 Chrome 은 건드리지 않는다.
 
-**`Mode: launched` 로 나오면 headed 세션의 인증 토큰이 이미 날아간 상태다.**
+**`Mode: launched` 로 나오면 headed 세션의 인증 토큰이 날아간 상태다.**
 상태가 `.gstack/browse.json` 한 파일에만 있어서, 다른 명령이 새 headless 서버를 띄우며 덮어쓴다.
-복구 경로가 없으니 유령 서버를 정리하고 다시 띄운다.
+**이 버그는 gstack `v1.55.0.0` (#1781) 에서 고쳐졌고 설치본은 `v1.84.1.0` 이라 해당 없다.**
+그래도 증상이 보이면 유령 서버를 정리하고 다시 띄운다.
 
 ```bash
 netstat -ano | grep ":34567 " | grep LISTENING      # 잡고 있는 PID

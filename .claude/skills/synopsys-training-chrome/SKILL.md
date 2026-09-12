@@ -10,7 +10,7 @@ description: gstack browse 없이 claude --chrome 의 Chrome 도구만으로 Syn
 
 ## 0. 먼저: 이걸 쓸 상황인가
 
-**기본은 gstack 이다.** `CLAUDE.md` 의 "로그인이 필요한 자료는 gstack browse 로 연다" 가 계약이고,
+**기본은 gstack 이다.** `CLAUDE.md` 의 "브라우저 고르기" 절이 계약이고,
 수집량이 조금이라도 많으면 그쪽이 압도적으로 싸다 (3절의 비용 표 참조).
 
 이 스킬은 **gstack 을 못 쓸 때의 경로**다.

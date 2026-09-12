@@ -6,7 +6,9 @@ Lab #0: Tools Tutorial - Fall 2026 의 Part I (Synopsys Online Trainings) 에서
 **전부 Synopsys 의 confidential 자료다.** VCS 덱의 `II. Confidential information` 슬라이드가
 "You are not permitted to disseminate or use any of the information provided to you in this
 presentation outside of Synopsys without prior written authorization" 라고 명시한다.
-`lab/` 은 `.gitignore` 에 들어 있으므로 이 폴더는 GitHub 에 올라가지 않는다.
+`.gitignore` 가 막는 것은 **`lab/**/materials/` 와 `lab/**/*.png|jpg|slides.jsonl` 이다.**
+`lab/` 전체가 아니다. 이 README 와 `report.md` 는 추적되어 공개 저장소에 올라간다.
+**수집물은 반드시 `materials/` 안에 둔다.** 밖에 두면 그대로 게시된다.
 공개 노트(`LAB0-*.html`)에는 여기 있는 슬라이드 이미지나 transcript 를 옮기지 않는다.
 공개 쪽은 배운 개념을 직접 다시 쓰고, 근거는 공개된 VCS/Verdi User Guide 와 표준 문서로 단다.
 

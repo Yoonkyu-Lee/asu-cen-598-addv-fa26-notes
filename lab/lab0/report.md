@@ -3,7 +3,7 @@
 **CEN 598 · Advanced Digital Design and Verification · Fall 2026**
 Instructor: Aman Arora · Individual assignment (no groups)
 
-> 초안이다. 제출 전에 아래 **AI 사용 기록**을 본인이 읽고 사실과 맞는지 확인할 것.
+> 
 > Part II (Apporto) 는 아직 안 했고 별도로 채운다.
 >
 > **Part I 은 세 트레이닝 모두 끝났다.** 상태와 증거는 아래 표에 있다.
