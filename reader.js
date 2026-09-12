@@ -67,11 +67,13 @@ function teardown() {
 }
 
 // 노트 파일명에서 슬라이드 경로를 만든다. L02-probability-space.html → slides/L02-probability-space.pdf
+// 노트는 notes/ 안에 있고 slides/ 는 저장소 루트에 있다. 상대 경로로 쓰면
+// notes/slides/... 를 찾아 404 가 나므로, reader.js 자기 위치(루트)를 기준으로 잡는다.
 function pdfUrl() {
   const name = location.pathname.split('/').pop() || '';
   const stem = name.replace(/\.html?$/i, '');
   if (!/^L\d+-/.test(stem)) return null;
-  return `slides/${stem}.pdf`;
+  return new URL(`./slides/${stem}.pdf`, import.meta.url).href;
 }
 
 function css(href) {

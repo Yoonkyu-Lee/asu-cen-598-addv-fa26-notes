@@ -159,21 +159,37 @@ python scripts/hidden-slides.py "<pptx 경로>"
 ## 파일 명명
 
 ```
-index.html                                   허브 (모듈 목록)
-glossary.html                                약어·용어 사전 (아래 참조)
-L01-course-intro.html                        Lecture 1
-L02-design-and-verification-overview.html    Lecture 2
-L04-system-verilog-for-design.html           Lecture 4  (PPTX 는 03_ 로 시작한다)
-L{NN}-{kebab-case-영문주제}.html
+index.html                                        허브 (모듈 목록). 루트에 남는다
 
-LAB{N}-{kebab-case-과제제목}.html            Lab 공략 (아래 참조)
+notes/                                            노트는 전부 여기 모은다
+  glossary.html                                   약어·용어 사전 (아래 참조)
+  L01-course-intro.html                           Lecture 1
+  L02-design-and-verification-overview.html       Lecture 2
+  L04-system-verilog-for-design.html              Lecture 4  (PPTX 는 03_ 로 시작한다)
+  L{NN}-{kebab-case-영문주제}.html
+  LAB{N}-{kebab-case-과제제목}.html               Lab 공략 (아래 참조)
 
-slides/L01-course-intro.pdf                  Lecture 1 슬라이드 (노트와 같은 stem)
+slides/L01-course-intro.pdf                       Lecture 1 슬라이드 (노트와 같은 stem)
 slides/L02-design-and-verification-overview.pdf
 
-reader.js  reader.css                        슬라이드 리더 (모든 노트가 공유)
-vendor/pdf.js/                               pdf.js 런타임
+lab/lab0/README.md                                Lab 작업 기록
+lab/lab0/report.md                                제출 리포트
+lab/lab0/materials/                               공개 금지. gitignore 된다 (아래 참조)
+
+reader.js  reader.css                             슬라이드 리더 (모든 노트가 공유)
+vendor/pdf.js/                                    pdf.js 런타임
 ```
+
+**노트는 `notes/` 안이고 `index.html`만 루트다.** GitHub Pages 진입점이라 옮길 수 없다.
+30강이 다 차면 루트에 HTML 이 35 개 쌓이므로 미리 갈라놨다.
+
+- `index.html` 에서 노트로 갈 때는 `href="notes/L01-....html"`.
+- 노트에서 허브로 돌아갈 때는 `href="../index.html"`, 리더는 `src="../reader.js"`.
+- **노트끼리의 링크와 glossary 링크는 같은 폴더라 그대로다.** `href="L02-....html#s7"`.
+- `slides/` 와 `reader.js` 는 루트에 남는다. `reader.js` 가 슬라이드 경로를
+  `new URL('./slides/...', import.meta.url)` 로 잡으므로 노트가 어디 있든 루트를 가리킨다.
+  **이 한 줄이 EEE 554 에서 가져온 `reader.js` 를 이 저장소에서 고친 유일한 곳이다.**
+  상대 경로로 되돌리면 `notes/slides/...` 를 찾아 404 가 난다.
 
 `{NN}`은 **강의 사이트 Schedule 표의 Lecture 번호**를 따른다. PPTX 파일 앞의 번호가 아니다.
 둘은 대체로 같지만 Schedule이 기준이다. **실제로 어긋난다.** `03_System Verilog for Design.pptx`
@@ -371,7 +387,7 @@ Intel에서는 "Emulation"이다.
 
 - Lab은 **6개**. 앞 3개가 설계(FIFO, Pipelined MIPS, Systolic Matmul),
   뒤 3개가 검증(FIFO Checker+DPI, MIPS Random Stimulus+Coverage, APB agent+Assertions).
-- **2인 1조**이고 **AI 도구 사용이 허용**되며 AI 사용 내역을 제출물에 적어야 한다.
+- **2인 1조**이고 **AI 도구 사용이 허용**된다.
 - 제출 정책이 특이하다: **늦으면 24시간당 15% 감점(최대 3구간), 일찍 내면 24시간당 5% 가산점(최대 10%).**
   이건 노트 헤더 chip과 Lab 공략 페이지에 명시한다. 놓치면 그냥 점수를 버리는 것이다.
 - Quiz는 **6개**, Canvas + Lockdown Browser, **AI 사용 금지**, MCQ와 코딩 문제.
