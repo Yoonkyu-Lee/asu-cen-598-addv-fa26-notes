@@ -35,7 +35,7 @@ Verdi 강좌의 Demo 구간은 영상 안에 데모가 없고 **공개 YouTube �
 장당 스크린샷이라 비용이 크다. **덱 전체를 훑을 일이면 여기서 `browse` 를 되살리는 게 거의 항상 싸다.**
 
 ```bash
-B="$HOME/.claude/skills/gstack/browse/dist/browse"
+B="$HOME/.claude/skills/gstack/browse/dist/browse.exe"   # Windows. 확장자 없는 이름은 v1.84 에 없다
 "$B" status          # Mode: headed 여야 정상
 "$B" connect         # 아니면 이걸로 띄운다
 ```

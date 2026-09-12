@@ -98,21 +98,23 @@ same-origin policy 다.** 자세한 실측과 절차는 `synopsys-training-chrom
 
 #### gstack browse
 
-`~/.claude/skills/gstack/browse/dist/browse connect` 가 별도 Chromium 을 headed 로 띄운다.
+**바이너리는 `~/.claude/skills/gstack/browse/dist/browse.exe` 다.** Windows 에서는 확장자가 붙는다.
+`v1.40` 까지 있던 확장자 없는 `browse` 는 `v1.84` 에 없다. 옛 경로를 적어둔 문서를 보면 고친다.
+
+`browse.exe connect` 가 별도 Chromium 을 headed 로 띄운다.
 프로필이 `~/.gstack/chromium-profile` 에 남으므로 **한 번 로그인하면 재기동 후에도 유지된다.**
 ASU SSO 의 Duo 2FA 쿠키와 Synopsys 트레이닝(`training.synopsys.com`) 세션까지 살아남는 걸 확인했다.
 사용자의 실제 Chrome 은 건드리지 않는다. 별개 브라우저다.
 
-**서버 상태가 `.gstack/browse.json` 한 파일에만 있고 거기에 인증 토큰이 있다.**
-headed 세션이 떠 있는데 `browse` 명령이 그 서버를 못 찾으면 새 headless 서버를 띄우면서
-**그 파일을 덮어쓴다. 그러면 살아 있는 창의 토큰이 영구히 날아가고 복구 경로가 없다.**
-`browse status` 가 `Mode: headed` 가 아니라 `Mode: launched` 로 나오면 이미 그 상태다.
-유령 서버를 `taskkill //PID <pid> //T //F` 로 정리하고 재기동하는 수밖에 없다.
-로그인은 디스크에 있으므로 재기동 자체는 싸다.
+서버 상태는 저장소 안 `.gstack/browse.json` 에 있고 인증 토큰이 거기 들어 있다.
+**`v1.40` 시절에는 다른 명령이 이 파일을 덮어써서 살아 있는 headed 창의 토큰을 영구히 날리는
+버그가 있었다. `v1.55.0.0` (#1781) 에서 고쳐졌고 지금 설치본은 `v1.84.1.0` 이라 해당 없다.**
+그래도 `browse status` 가 `Mode: headed` 가 아니라 `Mode: launched` 로 나오면 그 증상이니,
+유령 서버를 `taskkill //PID <pid> //T //F` 로 정리하고 재기동한다. 로그인은 디스크에 있어서 재기동은 싸다.
 
-**이 함정은 업스트림에서 이미 고쳐졌다** (gstack `v1.56.0.0`, #1781, "silently downgrades a
-headed session to headless"). 이 머신의 설치본이 `v1.40.0.0` 이라 아직 남아 있는 것이다.
-`/gstack-upgrade` 로 올렸으면 **위 복구 절차가 필요한지 다시 확인하고 이 문단을 줄인다.**
+**gstack `v1.81` 부터 브라우징 스킬이 Aside 를 1 순위 드라이버로 쓴다. Aside 는 macOS 전용이라
+Windows 인 이 머신에서는 번들 브라우저가 그대로 쓰인다.** `./setup` 도 그렇게 보고한다.
+gstack 스킬 문서에 Aside 이야기가 나와도 여기서는 fallback 경로가 정상이다.
 
 #### claude --chrome
 
