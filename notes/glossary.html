@@ -509,6 +509,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">CDC</div>
+  <div class="f">Clock Domain Crossing</div>
+  <div class="d" lang="ko">한 클럭 도메인의 신호가 <strong>비동기인 다른 도메인의 flip-flop에서 샘플링되는</strong> 지점. 설계할 때 이미 생기고 실리콘에서만 실패로 드러나며, <strong>STA는 이 경계를 아예 보지 않는다.</strong></div>
+  <div class="d" lang="en">The point where a signal from one clock domain <strong>is sampled by a flop in a different, asynchronous domain.</strong> It is created at design time but only fails in silicon, and <strong>STA never looks here at all.</strong></div>
+  <div class="src"><a href="L04-clock-and-reset.html#s6">Lecture 4 · 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Checker</div>
   <div class="d" lang="ko">DUT가 제대로 동작하는지 확인하고 <strong>불법적인 일이 벌어지면 오류를 띄우는</strong> testbench 부품. 두 층이 있다. 신호 수준(assertion)과 동작 수준(scoreboard). 검증의 세 기둥 중 하나.</div>
   <div class="d" lang="en">The testbench component that confirms the DUT behaves correctly and <strong>raises an error when something illegal happens.</strong> It has two layers: signal level, meaning assertions, and behavioural, meaning scoreboards. One of the three pillars of verification.</div>
@@ -520,6 +528,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">회로에서 <strong>지금 쓰지 않는 부분에 클럭을 끊어</strong> 전력을 아끼는 기법. 클럭이 안 도는 flip-flop은 동적 전력을 거의 안 쓴다. 전원을 통째로 끄는 power gating과 다르다.</div>
   <div class="d" lang="en">Saving power by <strong>stopping the clock to parts of the circuit that are idle.</strong> A flip-flop with no clock burns almost no dynamic power. Distinct from power gating, which shuts the supply off entirely.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Clock Skew</div>
+  <div class="d" lang="ko">같은 클럭이 서로 다른 flip-flop에 <strong>도착하는 시각의 차이</strong>(<code>Tskew</code>). RTL이 아니라 <strong>clock tree synthesis 단계에서 생기고 physical design이 관리한다.</strong> setup 쪽에서는 여유를 늘려주고 hold 쪽에서는 깎아먹는다.</div>
+  <div class="d" lang="en">The difference in <strong>arrival time</strong> of the same clock at two flops (<code>Tskew</code>). Created during <strong>clock tree synthesis, not RTL</strong>, and managed by physical design. It helps setup margin but eats into hold margin.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s1">Lecture 4 · 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Clock-to-Q Delay</div>
+  <div class="d" lang="ko">클럭 엣지가 들어온 뒤 flip-flop 출력 Q가 <strong>실제로 바뀌기까지</strong> 걸리는 시간(<code>Tcq</code>). setup·hold와 달리 <strong>지켜야 할 최소치가 아니라 경로 지연에 그냥 더해지는 값</strong>이라, "clock-to-Q 위반"이라는 것은 없다.</div>
+  <div class="d" lang="en">How long after a clock edge a flop's Q output <strong>actually changes</strong> (<code>Tcq</code>). Unlike setup and hold, <strong>it is not a minimum to meet, just a number added to the path delay</strong>, so there is no such thing as a clock-to-Q violation.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s1">Lecture 4 · 01</a></div>
 </div>
 
 <div class="gterm">
@@ -592,6 +614,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">DLL</div>
+  <div class="f">Delay-Locked Loop</div>
+  <div class="d" lang="ko">지연 소자로 입력 클럭의 <strong>위상만 맞추는</strong> 회로. <strong>주파수는 바꾸지 않는다.</strong> DDR 메모리 인터페이스처럼 위상 정렬만 필요할 때 쓴다.</div>
+  <div class="d" lang="en">A loop of delay elements that aligns only <strong>the phase</strong> of an input clock. <strong>It never changes the frequency.</strong> Used where only phase alignment is needed, such as DDR memory interfaces.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s2">Lecture 4 · 02</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">DPI</div>
   <div class="f">Direct Programming Interface</div>
   <div class="d" lang="ko">SystemVerilog에서 <strong>C/C++ 함수를 직접 부르고 반대로 불리게 하는</strong> 인터페이스. 검증에서 <strong>C로 짠 참조 모델(golden model)을 testbench에 붙일 때</strong> 쓴다. 강의계획서가 "model based verification (C model integration using PLI/DPI)"으로 적어둔 것이 이것이고, Lab 4의 주제 중 하나다.</div>
@@ -604,6 +634,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">시나리오를 사람이 정해서 정확히 그것만 만들어내는 테스트. <strong>좋은 점:</strong> 아주 잘 제어된다. <strong>나쁜 점:</strong> 몇 개나 쓸 수 있겠나. 가능한 시나리오를 사람이 다 생각해낼 수 없다. 그래서 randomization과 같이 쓴다.</div>
   <div class="d" lang="en">A test where a person fixes the scenario and produces exactly that. <strong>Good:</strong> extremely controllable. <strong>Bad:</strong> how many can you write? Nobody can think of every possible scenario. Hence it is paired with randomisation.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Double-FF Synchronizer</div>
+  <div class="d" lang="ko">받는 쪽 도메인에 flip-flop 두 개를 연달아 붙여, <strong>첫 flop이 metastable해도 두 번째가 잡을 때쯤엔 대개 정착해 있게</strong> 만드는 구조. 한 비트(또는 gray coded 버스)를 CDC로 넘길 때 <strong>가장 먼저 쓰는 기본 수단</strong>이다.</div>
+  <div class="d" lang="en">Two flops back to back in the receiving domain, so that <strong>even if the first goes metastable, the value has usually settled by the time the second samples it.</strong> The default first choice for crossing one bit, or a gray-coded bus, over a CDC.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s7">Lecture 4 · 07</a></div>
 </div>
 
 <div class="gterm">
@@ -746,6 +783,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L03-system-verilog-for-design.html#s15">Lecture 3 · 15</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">Gray Code</div>
+  <div class="d" lang="ko">인접한 두 값 사이에 <strong>딱 한 비트만</strong> 바뀌는 이진 코드. 멀티비트 카운터(FIFO의 read/write pointer)를 CDC로 넘길 때, <strong>double-FF synchronizer가 버스에서도 통하게 해주는 전제 조건</strong>이다.</div>
+  <div class="d" lang="en">A binary encoding where adjacent values differ by <strong>exactly one bit.</strong> It is the precondition that lets a <strong>double-FF synchroniser work on a multi-bit bus</strong>, such as FIFO read and write pointers, crossing a CDC.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s7">Lecture 4 · 07</a></div>
+</div>
+
 <h2 class="gletter" id="gH">H</h2>
 
 <div class="gterm">
@@ -757,6 +801,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Hold Time</div>
+  <div class="d" lang="ko">클럭 엣지가 지나간 <strong>뒤에도</strong> 데이터가 안정돼 있어야 하는 최소 시간(<code>thold</code>). setup과 같은 라이브러리 특성치지만, <strong>위반은 주파수와 무관해서 클럭을 늦춰도 안 고쳐진다.</strong></div>
+  <div class="d" lang="en">The minimum time data must stay stable <strong>after</strong> a clock edge (<code>thold</code>). A library characteristic like setup, but a <strong>hold violation is frequency-independent</strong>; slowing the clock never fixes it.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s1">Lecture 4 · 01</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">HVT · LVT · SVT</div>
   <div class="f">High / Low / Standard Threshold Voltage</div>
   <div class="d" lang="ko">Standard cell library의 변형들. VT는 트랜지스터가 켜지는 문턱 전압이다. <strong>HVT는 느리지만 누설이 적고, LVT는 빠르지만 누설이 많다.</strong> HP(High Performance)와 LP(Low Power)도 같은 축의 다른 이름이다. 도구가 <strong>급한 경로에만 LVT를 쓰고 나머지는 HVT로 채우는</strong> 식으로 트레이드오프를 실행한다.</div>
@@ -765,6 +816,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gI">I</h2>
+
+<div class="gterm">
+  <div class="t">ICG</div>
+  <div class="f">Integrated Gated Clock Cell</div>
+  <div class="d" lang="ko"><strong>negative level-sensitive latch + AND gate</strong> 조합의 표준 셀. enable이 클럭 도중 흔들려도 그 흔들림이 gated clock으로 새지 않게 막는다. 단순 <code>clk &amp; enable</code>과 회로도는 비슷해 보여도 <strong>latch 하나가 결정적 차이</strong>다.</div>
+  <div class="d" lang="en">A standard cell combining a <strong>negative level-sensitive latch and an AND gate.</strong> It stops a twitch on the enable signal from leaking onto the gated clock. Looks almost identical to a bare <code>clk &amp; enable</code>, but <strong>that one latch is the difference.</strong></div>
+  <div class="src"><a href="L04-clock-and-reset.html#s4">Lecture 4 · 04</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">Inference</div>
@@ -886,6 +945,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Metastability</div>
+  <div class="d" lang="ko">flip-flop의 D 입력이 <strong>setup/hold 윈도우 안에서 바뀌어</strong> Q가 0도 1도 아닌 불확정 상태로 한동안 머무는 현상. <strong>같은 클럭 도메인 안에서는 안 생기고</strong>, 동기화 없이 넘어온 비동기 신호에서만 생긴다. glitch와는 다른 현상이다.</div>
+  <div class="d" lang="en">A flop's D input <strong>changes inside the setup/hold window</strong>, and Q sits undecided, neither 0 nor 1, for a while. <strong>It cannot happen inside one clock domain</strong>, only where an unsynchronised asynchronous signal walks straight in. Not the same thing as a glitch.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s6">Lecture 4 · 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Microarchitecture</div>
   <div class="d" lang="ko">Architecture가 정의한 동작을 <strong>register, memory, gate, control path, data path로 구현한 구체적 형태.</strong> Architecture가 "무엇을"이라면 microarchitecture는 "어떻게"다. <strong>같은 architecture를 여러 microarchitecture로 만들 수 있다.</strong> x86 하나에 Intel과 AMD의 서로 다른 microarchitecture가 붙는 것이 그 예다.</div>
   <div class="d" lang="en">The behaviour defined by an architecture, <strong>made concrete with registers, memories, gates, control paths and data paths.</strong> Architecture says what; microarchitecture says how. <strong>One architecture can carry many microarchitectures</strong>, as x86 carries quite different ones at Intel and AMD.</div>
@@ -978,7 +1044,30 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">PLL</div>
+  <div class="f">Phase-Locked Loop</div>
+  <div class="d" lang="ko">내부 오실레이터를 외부 reference 클럭에 <strong>피드백으로 고정</strong>시켜 <strong>주파수를 곱하거나 나누는</strong> 회로. 아날로그 설계자가 만들고 디지털 쪽은 IP로 받아 쓴다. DLL과 달리 오실레이터가 있어 주파수를 바꿀 수 있다.</div>
+  <div class="d" lang="en">A feedback loop that <strong>locks an internal oscillator</strong> to a reference clock and <strong>can multiply or divide the frequency.</strong> Built by analogue designers and dropped into digital designs as IP. Unlike a DLL it has an oscillator, so it can change frequency.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s2">Lecture 4 · 02</a></div>
+</div>
+
 <h2 class="gletter" id="gR">R</h2>
+
+<div class="gterm">
+  <div class="t">RDC</div>
+  <div class="f">Reset Domain Crossing</div>
+  <div class="d" lang="ko">한 reset 도메인에서 <strong>비동기로 assert된 reset</strong>의 영향이 <strong>다른 reset 도메인의 register에서 샘플되는</strong> 경계. CDC와 이름이 대칭이고, <strong>클럭이 같아도 reset만 다르면 생긴다.</strong></div>
+  <div class="d" lang="en">A boundary where the effect of a reset <strong>asserted asynchronously in one reset domain</strong> ends up <strong>sampled by a register in a different reset domain.</strong> Deliberately symmetric with CDC in name; <strong>it can exist even on a single clock</strong> if the resets differ.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s11">Lecture 4 · 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Recovery Time</div>
+  <div class="d" lang="ko">비동기 set/reset이 <strong>풀리는 순간</strong>과 다음 클럭 엣지 사이에 필요한 최소 시간. 위반의 성격은 <strong>setup/hold와 똑같지만</strong>, 대상이 데이터 경로가 아니라 <strong>reset release 타이밍</strong>이고 STA가 같은 방식으로 검사한다.</div>
+  <div class="d" lang="en">The minimum time between <strong>an asynchronous set or reset being released</strong> and the next clock edge. A violation behaves <strong>exactly like a setup/hold violation</strong>, except the subject is <strong>reset release timing</strong>, not a data path, and STA checks it the same way.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s10">Lecture 4 · 10</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">ref</div>
@@ -986,6 +1075,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">task나 function의 인자를 <strong>복사하지 않고 원본을 가리켜서 넘기는 것.</strong> 보통 <code>output</code> 인자는 <strong>task가 끝날 때 한 번</strong> 복사해 돌려주지만, <code>ref</code>는 <strong>바뀌는 즉시</strong> 바깥에 보인다. 슬라이드의 말풍선이 <em>"All output updates seen"</em>, <em>"Input changes detected"</em>라고 적은 것이 이 뜻이다. <strong>합성되지 않는다.</strong> testbench 문법이다.</div>
   <div class="d" lang="en">Passing a task or function argument <strong>as a handle to the original rather than a copy.</strong> A plain <code>output</code> argument copies back <strong>once, when the task ends</strong>; a <code>ref</code> is visible outside <strong>the moment it changes.</strong> That is what the slide callouts mean by <em>"All output updates seen"</em> and <em>"Input changes detected"</em>. <strong>It does not synthesise</strong>: this is testbench syntax.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Reset Synchronizer</div>
+  <div class="d" lang="ko">비동기 reset의 <strong>assert는 그대로 두고 de-assert만</strong> 목적지 클럭에 맞춰 내보내는 회로. <strong>Double-FF synchronizer와 회로 모양이 똑같지만</strong>, 통과시키는 게 데이터가 아니라 reset이라는 게 다르다.</div>
+  <div class="d" lang="en">A circuit that <strong>leaves the assertion alone and aligns only the de-assertion</strong> of an asynchronous reset to the destination clock. <strong>Drawn identically to a double-FF synchroniser</strong>, but what passes through it is a reset, not data.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s11">Lecture 4 · 11</a></div>
 </div>
 
 <div class="gterm">
@@ -1032,6 +1128,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">동작 수준 checker. <strong>DUT에 들어간 transaction과 나온 transaction을 맞춰본다.</strong> "데이터 X를 담은 transaction을 넣었으니 응답은 데이터 Y여야 한다" 같은 검사다. 신호 수준의 assertion과 층이 다르다.</div>
   <div class="d" lang="en">A behavioural checker that <strong>matches transactions going into the DUT against those coming out</strong>, as in "a transaction carrying X went in, so the response should carry Y". It sits at a different layer from signal level assertions.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Setup Time</div>
+  <div class="d" lang="ko">클럭 엣지가 오기 <strong>전에</strong> 데이터가 미리 안정돼 있어야 하는 최소 시간(<code>tSetUp</code>). flip-flop 셀의 물리적 특성치이고 라이브러리(<code>.lib</code>)에 들어 있으며, <strong>STA가 이 값을 읽어서 검사한다.</strong> hold time과 방향이 반대다.</div>
+  <div class="d" lang="en">The minimum time data must already be stable <strong>before</strong> a clock edge (<code>tSetUp</code>). A physical property of the flip-flop cell, stored in the library and <strong>read by STA to check it.</strong> Points the opposite way from hold time.</div>
+  <div class="src"><a href="L04-clock-and-reset.html#s1">Lecture 4 · 01</a></div>
 </div>
 
 <div class="gterm">
