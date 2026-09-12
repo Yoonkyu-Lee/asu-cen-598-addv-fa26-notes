@@ -313,7 +313,8 @@ notes/                                            노트는 전부 여기 모은
   glossary.html                                   약어·용어 사전 (아래 참조)
   L01-course-intro.html                           Lecture 1
   L02-design-and-verification-overview.html       Lecture 2
-  L04-system-verilog-for-design.html              Lecture 4  (PPTX 는 03_ 로 시작한다)
+  L03-system-verilog-for-design.html              Lecture 3
+  L04-clock-and-reset.html                        Lecture 4
   L{NN}-{kebab-case-영문주제}.html
   LAB{N}-{kebab-case-과제제목}.html               Lab 공략 (아래 참조)
 
@@ -339,11 +340,15 @@ vendor/pdf.js/                                    pdf.js 런타임
   **이 한 줄이 EEE 554 에서 가져온 `reader.js` 를 이 저장소에서 고친 유일한 곳이다.**
   상대 경로로 되돌리면 `notes/slides/...` 를 찾아 404 가 난다.
 
-`{NN}`은 **강의 사이트 Schedule 표의 Lecture 번호**를 따른다. PPTX 파일 앞의 번호가 아니다.
-둘은 대체로 같지만 Schedule이 기준이다. **실제로 어긋난다.** `03_System Verilog for Design.pptx`
-는 Schedule 의 **Lecture 4** 다. 3강이 Lab 0 overview 라서 슬라이드 덱이 없기 때문이다.
-Lab overview 강의가 나올 때마다 이 간격이 한 칸씩 더 벌어진다. Schedule에서 9강과 10강이 날짜순과 어긋나 있는데
-(10강 Assertion Based Verification이 11강보다 뒤 날짜다), **번호를 따르고 날짜를 병기한다.**
+`{NN}`은 **`docs/schedule.md` 의 강의 번호**를 따른다. **Lab overview 는 강의로 세지 않는다.**
+그래서 강의가 23 개이고, 이 번호는 **강사가 PPTX 앞에 붙인 번호와 일치한다.**
+`03_System Verilog for Design.pptx` 가 3 강이고 `04_Clock_Reset_Chetan.pptx` 가 4 강이다.
+
+강의 사이트 Schedule 은 Lab 을 함께 세므로 번호가 다르다. `docs/schedule.md` 의 `site` 열이
+그 번호이고 **사이트와 대조할 때만 쓴다.** 사이트 번호는 10 과 11 이 날짜순과 어긋나 있는데
+여기서는 날짜순으로 정리되어 그 문제가 사라졌다.
+
+**Lab 은 `LAB{N}` 으로 따로 센다.** Lab 0~6 이고 강의 번호를 달지 않는다.
 
 **슬라이드 사본은 노트와 stem을 맞춰서 이름을 바꾼다.** `02_Design and Verification Overview.pptx`
 → `slides/L02-design-and-verification-overview.pdf`. 그러면 `reader.js`가 노트 파일명에서

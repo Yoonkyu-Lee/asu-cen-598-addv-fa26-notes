@@ -382,7 +382,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">2-state · 4-state</div>
   <div class="d" lang="ko">자료형이 가질 수 있는 값의 가짓수. <strong>4-state는 <code>0 1 x z</code></strong>, <strong>2-state는 <code>0 1</code></strong>뿐이다. <code>logic</code>·<code>wire</code>·<code>reg</code>가 4-state, <code>bit</code>·<code>int</code>가 2-state다. 설계에 2-state를 쓰면 리셋 안 된 flop이 <code>x</code> 대신 <code>0</code>으로 보여서 <strong>버그가 시뮬레이션을 통과한다.</strong></div>
   <div class="d" lang="en">How many values a type can take. <strong>Four-state is <code>0 1 x z</code></strong>; <strong>two-state is just <code>0 1</code></strong>. <code>logic</code>, <code>wire</code> and <code>reg</code> are four-state; <code>bit</code> and <code>int</code> are two-state. Use two-state in a design and an unreset flop reads <code>0</code> instead of <code>x</code>, so <strong>the bug passes simulation.</strong></div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s2">Lecture 4 · 02</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s2">Lecture 3 · 02</a></div>
 </div>
 
 <h2 class="gletter" id="gA">A</h2>
@@ -398,7 +398,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">always_comb · always_ff</div>
   <div class="d" lang="ko">SystemVerilog가 추가한 <strong>의도를 밝히는 always 블록.</strong> <code>always_comb</code>은 조합 논리를, <code>always_ff</code>는 flip-flop을 만들 셈이라고 도구에게 선언한다. 어긋나면 경고가 나온다. <strong>선언한다고 저절로 그렇게 되지는 않는다.</strong> <code>always_ff</code>에도 <code>@(posedge)</code>와 non-blocking 대입은 직접 써야 한다.</div>
   <div class="d" lang="en">SystemVerilog blocks that <strong>declare your intent.</strong> <code>always_comb</code> says you meant combinational logic and <code>always_ff</code> says you meant flip-flops, and the tool warns when the code disagrees. <strong>Declaring does not make it so:</strong> you still write the <code>@(posedge)</code> and the non-blocking assignments yourself.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s3">Lecture 4 · 03</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s3">Lecture 3 · 03</a></div>
 </div>
 
 <div class="gterm">
@@ -428,21 +428,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Assertion</div>
   <div class="d" lang="ko">설계가 <strong>반드시 보여야 하거나 절대 보이면 안 되는 동작</strong>을 코드로 명시한 것. 결정적인 성질은 <strong>"항상 켜져 있다"</strong>는 것이다. 어떤 테스트를 돌리든 계속 감시한다. 예: <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
   <div class="d" lang="en">Code that states behaviour the design <strong>must, or must never, exhibit.</strong> The decisive property is that it is <strong>always on</strong>: it keeps watching no matter which test is running. For example <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 10 전체</span><span lang="en">all of Lecture 10</span></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 13 전체</span><span lang="en">all of Lecture 13</span></div>
 </div>
 
 <div class="gterm">
   <div class="t">Autoconnect · .*</div>
   <div class="d" lang="ko">자식 module의 포트를 <strong>이름이 같은 신호에 자동으로 연결</strong>하는 축약. <code>mod x (.*);</code> 한 줄이 <code>.a(a), .b(b), .c(c)</code>를 대신한다. <strong>이름과 폭이 둘 다 맞아야만 동작하고</strong>, 안 맞으면 컴파일 에러다. 연결이 코드에 안 보여서 팀마다 사용 정책이 갈린다.</div>
   <div class="d" lang="en">A shorthand that <strong>wires a child module's ports to same-named signals automatically.</strong> One <code>mod x (.*);</code> replaces <code>.a(a), .b(b), .c(c)</code>. <strong>Names and widths must both match</strong>, and a mismatch is a compile error. Because the connections are invisible in the code, teams differ on whether to allow it.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s4">Lecture 4 · 04</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s4">Lecture 3 · 04</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">automatic</div>
   <div class="d" lang="ko">task와 function을 <strong>호출할 때마다 지역 변수를 새로 만들게</strong> 하는 키워드. module 안에서는 기본이 <code>static</code>이라 <strong>모든 호출이 변수 한 벌을 공유한다.</strong> 같은 task가 <code>fork</code>로 동시에 두 번 돌면 서로를 덮어쓴다. 그래서 <strong>testbench의 task·function에는 거의 항상 붙인다.</strong></div>
   <div class="d" lang="en">A keyword that makes a task or function <strong>allocate fresh locals on every call.</strong> Inside a module the default is <code>static</code>, so <strong>every call shares one set of variables.</strong> Run the same task twice at once under a <code>fork</code> and they overwrite each other. <strong>Put it on nearly every testbench task and function.</strong></div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s14">Lecture 4 · 14</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
 </div>
 
 <h2 class="gletter" id="gB">B</h2>
@@ -482,7 +482,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">bit</div>
   <div class="d" lang="ko">2-state 자료형. <code>0</code>과 <code>1</code>만 갖고 <strong>시뮬레이션 시작 시 <code>0</code></strong>이다. 시뮬레이션이 빠르고 메모리를 덜 먹는다. 슬라이드가 <strong>"Use only in verification"</strong>이라고 못 박았다. 설계에 쓰면 <code>x</code>가 안 보여서 리셋 누락 같은 버그를 놓친다. 반대말은 <code>logic</code>.</div>
   <div class="d" lang="en">The two-state type: only <code>0</code> and <code>1</code>, and <strong>it starts simulation at <code>0</code>.</strong> Faster and lighter than four-state. The slide is blunt about it: <strong>"Use only in verification."</strong> In a design it hides <code>x</code> and lets missing-reset bugs through. Its opposite is <code>logic</code>.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s2">Lecture 4 · 02</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s2">Lecture 3 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -496,7 +496,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Bus Semantics</div>
   <div class="d" lang="ko">여러 드라이버가 <strong>한 선을 공유하되 한 번에 하나만 몰기로 약속한 것.</strong> 나머지는 <code>z</code>로 물러난다. 슬라이드 24의 "multiple driver 금지" 규칙에서 <strong>유일하게 허용되는 예외</strong>이고, 조건은 "explicitly", 즉 실수가 아니라 의도적으로 그렇게 설계했을 때다. 이때 신호는 <code>logic</code>이 아니라 <code>wire</code>여야 한다.</div>
   <div class="d" lang="en">Several drivers <strong>sharing one line on the agreement that only one drives at a time</strong>, the rest sitting back at <code>z</code>. It is <strong>the one exception</strong> to the "no multiple drivers" rule on slide 24, and the condition is "explicitly": designed that way on purpose, not by accident. The signal then has to be a <code>wire</code>, not a <code>logic</code>.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s17">Lecture 4 · 17</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s17">Lecture 3 · 17</a></div>
 </div>
 
 <h2 class="gletter" id="gC">C</h2>
@@ -596,7 +596,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Direct Programming Interface</div>
   <div class="d" lang="ko">SystemVerilog에서 <strong>C/C++ 함수를 직접 부르고 반대로 불리게 하는</strong> 인터페이스. 검증에서 <strong>C로 짠 참조 모델(golden model)을 testbench에 붙일 때</strong> 쓴다. 강의계획서가 "model based verification (C model integration using PLI/DPI)"으로 적어둔 것이 이것이고, Lab 4의 주제 중 하나다.</div>
   <div class="d" lang="en">The SystemVerilog interface for <strong>calling C and C++ functions directly, and being called back.</strong> In verification it is how <strong>a reference model written in C gets attached to a testbench.</strong> The syllabus lists it as "model based verification, C model integration using PLI/DPI", and it is one of the topics in Lab 4.</div>
-  <div class="src"><span lang="ko">Lecture 17 · Lab 4에서 다룬다</span><span lang="en">covered in Lecture 17 and Lab 4</span></div>
+  <div class="src"><span lang="ko">Lecture 12 · Lab 4에서 다룬다</span><span lang="en">covered in Lecture 12 and Lab 4</span></div>
 </div>
 
 <div class="gterm">
@@ -666,7 +666,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Emulation</div>
   <div class="d" lang="ko">진짜 실리콘이 나오기 전에 <strong>전용 하드웨어로 설계를 실현</strong>해 돌려보는 것. FPGA 기반(Siemens Veloce)과 프로세서 기반(Cadence Palladium)이 있다. 시뮬레이션 가속이 목적이고 validation을 미리 준비한다. <strong>한계:</strong> 아날로그 블록 불가, 진짜 clocking/reset이 아님, 진짜 timing verification이 아님, <strong>디버깅이 아주 어려움.</strong> 시뮬레이션은 느리지만 전부 볼 수 있다는 것과의 맞교환이다.</div>
   <div class="d" lang="en">Realising the design <strong>on dedicated hardware</strong> and running it before real silicon exists. FPGA based, such as Siemens Veloce, or processor based, such as Cadence Palladium. The purpose is simulation acceleration and getting validation ready early. <strong>Limits:</strong> no analog blocks, the clocking and reset are not real, it is not real timing verification, and <strong>debugging is hard.</strong> The trade against simulation, which is slow but shows you everything.</div>
-  <div class="src"><a href="L01-course-intro.html#s11">Lecture 1 · 11</a> · <span lang="ko">Lecture 29 전체</span><span lang="en">all of Lecture 29</span></div>
+  <div class="src"><a href="L01-course-intro.html#s11">Lecture 1 · 11</a> · <span lang="ko">Lecture 22 전체</span><span lang="en">all of Lecture 22</span></div>
 </div>
 
 <div class="gterm">
@@ -674,7 +674,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">enumerated type</div>
   <div class="d" lang="ko"><strong>정해진 이름들만 값으로 가질 수 있는 자료형.</strong> FSM 상태나 명령 종류에 쓴다. 폭에 안 맞는 값을 나열하면 <strong>컴파일이 실패한다</strong>(<code>parameter</code>였으면 조용히 잘렸다). <code>next()</code> <code>num()</code> <code>name()</code> 같은 메서드가 딸려 오고, <strong>파형에 숫자 대신 이름이 뜬다.</strong> 인코딩까지 정해주지는 않는다.</div>
   <div class="d" lang="en"><strong>A type whose values can only be a fixed list of names</strong>, used for FSM states and operation kinds. List values that do not fit the width and <strong>compilation fails</strong>, where a <code>parameter</code> would have truncated silently. It brings methods such as <code>next()</code>, <code>num()</code> and <code>name()</code>, and <strong>waveforms show names instead of numbers.</strong> It does not choose an encoding for you.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s6">Lecture 4 · 06</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s6">Lecture 3 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -705,7 +705,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Formal Verification</div>
   <div class="d" lang="ko">검증 문제를 <strong>수학으로</strong> 푸는 것. 설계를 수식으로 표현하고 제약 아래 성립함을 증명한다. Static verification이라고도 한다. <strong>Exhaustive하지만 state explosion problem 때문에 확장이 안 된다.</strong> 슬라이드가 "이 과목의 초점이 아니다"라고 명시했다. 기법은 equivalence checking, model checking, theorem proving 셋.</div>
   <div class="d" lang="en">Solving the verification problem <strong>with mathematics</strong>: express the design as a formula and prove it holds under constraints. Also called static verification. <strong>Exhaustive, but it does not scale, because of the state explosion problem.</strong> The slides state outright that it is not a focus of this course. The three techniques are equivalence checking, model checking and theorem proving.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <span lang="ko">Lecture 28 전체</span><span lang="en">all of Lecture 28</span></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <span lang="ko">Lecture 21 전체</span><span lang="en">all of Lecture 21</span></div>
 </div>
 
 <div class="gterm">
@@ -743,7 +743,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">generate · genvar</div>
   <div class="d" lang="ko"><strong>하드웨어를 복사해서 여러 벌 만드는 반복문</strong>과 그 반복 변수. 실행되는 루프가 아니라 <strong>elaboration 때 한 번 펼쳐진다.</strong> 슬라이드 주석이 정확하다. <em>"creates 16 assign statements"</em>, 즉 16번 도는 게 아니라 16개를 만든다. <code>genvar</code>는 회로를 펼칠 때만 쓰이고 실물에는 남지 않는다. SV부터 <code>generate</code> 키워드는 선택사항이다.</div>
   <div class="d" lang="en"><strong>A loop that copies hardware</strong>, and its loop variable. It does not run; it <strong>unrolls once at elaboration.</strong> The slide comment says it exactly: <em>"creates 16 assign statements"</em>. Sixteen things built, not sixteen iterations. A <code>genvar</code> exists only while the circuit is unrolled and leaves nothing behind. Since SV the <code>generate</code> keyword is optional.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s15">Lecture 4 · 15</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s15">Lecture 3 · 15</a></div>
 </div>
 
 <h2 class="gletter" id="gH">H</h2>
@@ -770,21 +770,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Inference</div>
   <div class="d" lang="ko">합성 도구가 <strong>RTL을 읽고 "이건 flip-flop이겠군" 하고 판단해서 그 하드웨어를 만들어내는 것.</strong> 코드 어디에도 "flip-flop을 만들어라"라고 적혀 있지 않다. <code>@(posedge clk)</code>와 <code>&lt;=</code>라는 <strong>모양</strong>을 보고 짐작한다. <strong>시뮬레이터는 추론하지 않고 그냥 실행한다.</strong> 그래서 simulation/synthesis mismatch가 생긴다.</div>
   <div class="d" lang="en">The synthesis tool <strong>reading your RTL, deciding "that must be a flip-flop", and building it.</strong> Nowhere does the code say "build a flip-flop"; the tool guesses from <strong>the shape</strong> of <code>@(posedge clk)</code> and <code>&lt;=</code>. <strong>A simulator infers nothing, it just runs the code</strong>, which is how simulation/synthesis mismatches happen.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s3">Lecture 4 · 03</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s3">Lecture 3 · 03</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Instantiate</div>
   <div class="d" lang="ko">module의 <strong>사본을 하나 실제로 만들어서 회로에 놓는 것.</strong> 함수 호출이 아니라 부품을 하나 사서 기판에 납땜하는 쪽에 가깝다. <strong>같은 module을 열 번 instantiate 하면 게이트가 열 벌 생긴다.</strong> 슬라이드 24가 따로 적어둘 만큼 흔한 혼동이다. <em>"You're not calling. You're instantiating."</em></div>
   <div class="d" lang="en">Making <strong>an actual copy of a module and placing it in the circuit</strong>, closer to soldering one component onto a board than to calling a function. <strong>Instantiate the same module ten times and you get ten copies of the gates.</strong> Slide 24 spells it out because the slip is so common: <em>"You're not calling. You're instantiating."</em></div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s1">Lecture 4 · 01</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s1">Lecture 3 · 01</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">interface</div>
   <div class="d" lang="ko">여러 신호를 <strong>한 덩어리로 묶어 module 포트에 통째로 꽂을 수 있게 하는</strong> SystemVerilog 구조물. <code>module</code>과 나란한 급의 키워드다. 신호를 하나 추가할 때 고칠 곳이 여러 module에서 한 군데로 줄어든다. <strong>설계와 검증이 같은 것을 공유한다.</strong> UVM에서는 <strong>virtual interface</strong>로 다시 나온다. 소프트웨어의 "interface"와는 전혀 다른 것이다.</div>
   <div class="d" lang="en">A SystemVerilog construct that <strong>bundles signals so the bundle plugs into a module port as one thing.</strong> It is a keyword of the same rank as <code>module</code>. Adding a signal goes from editing many modules to editing one, and <strong>design and verification share the same one.</strong> In UVM it returns as a <strong>virtual interface.</strong> Nothing to do with a software "interface".</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s9">Lecture 4 · 09</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s9">Lecture 3 · 09</a></div>
 </div>
 
 <div class="gterm">
@@ -809,7 +809,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Latch Inference</div>
   <div class="d" lang="ko">조합 논리를 쓸 셈이었는데 <strong>합성 도구가 latch를 만들어버리는 것.</strong> <code>if</code>에 <code>else</code>가 없거나 <code>case</code>에 <code>default</code>가 없으면 "그 경우엔 이전 값을 유지"가 되고, <strong>유지하려면 저장 소자가 필요하다.</strong> latch는 scan chain에 안 들어가서 <strong>테스트가 안 되므로</strong> 대부분의 설계 규칙이 금지한다. 시뮬레이션은 대개 통과하고 <strong>합성 리포트나 lint에서 뒤늦게 드러난다.</strong></div>
   <div class="d" lang="en">You meant combinational logic and <strong>the tool built a latch.</strong> An <code>if</code> with no <code>else</code>, or a <code>case</code> with no <code>default</code>, means "otherwise keep the old value", and <strong>keeping a value needs storage.</strong> A latch does not join the scan chain, so <strong>it cannot be tested</strong>, and most design rules ban it. Simulation usually passes; <strong>it surfaces late, in the synthesis report or from lint.</strong></div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s3">Lecture 4 · 03</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s3">Lecture 3 · 03</a></div>
 </div>
 
 <div class="gterm">
@@ -830,7 +830,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">logic</div>
   <div class="d" lang="ko">SystemVerilog가 <code>wire</code>와 <code>reg</code>의 혼란을 끝내려고 내놓은 4-state 자료형. <code>assign</code>의 좌변으로도, <code>always</code> 블록 안에서도 쓴다. <strong><code>reg</code>의 새 이름이 아니다.</strong> 진짜 변화는 "variable도 continuous assignment를 <strong>하나까지</strong> 받을 수 있게" 규칙이 풀린 것이다. <strong>드라이버가 둘이면 컴파일 에러</strong>이고, 그래서 다중 드라이버가 필요한 tristate 버스에는 여전히 <code>wire</code>를 쓴다.</div>
   <div class="d" lang="en">The four-state type SystemVerilog introduced to end the <code>wire</code> versus <code>reg</code> question. It works on the left of an <code>assign</code> and inside an <code>always</code> block alike. <strong>It is not <code>reg</code> renamed.</strong> The real change is that the rules relaxed so a variable may take <strong>one</strong> continuous assignment. <strong>Two drivers is a compile error</strong>, which is why a tristate bus still needs a <code>wire</code>.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s2">Lecture 4 · 02</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s2">Lecture 3 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -875,7 +875,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Manager · Subordinate</div>
   <div class="d" lang="ko">AMBA 스펙이 <strong><code>master</code>와 <code>slave</code>를 대체하려고 쓰는 용어.</strong> 뜻은 완전히 같다. 트랜잭션을 <strong>시작하는 쪽</strong>이 Manager(=master), <strong>응답하는 쪽</strong>이 Subordinate(=slave)다. <strong>기존 코드와 툴 옵션에는 여전히 master/slave가 남아 있으므로 둘 다 알아야 한다.</strong> 강의 슬라이드는 벤더 트레이닝 자료라 옛 이름을 쓴다.</div>
   <div class="d" lang="en">The terms recent AMBA specifications use <strong>in place of <code>master</code> and <code>slave</code>.</strong> The meaning is identical: the side that <strong>starts a transaction</strong> is the Manager, the side that <strong>responds</strong> is the Subordinate. <strong>Existing code and tool options still say master and slave, so you need both.</strong> The lecture slides come from vendor training and use the older names.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s10">Lecture 4 · 10</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s10">Lecture 3 · 10</a></div>
 </div>
 
 <div class="gterm">
@@ -904,7 +904,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">module port</div>
   <div class="d" lang="ko">하나의 <code>interface</code>를 <strong>어느 쪽에서 보느냐에 따라 신호 방향을 정해준 관점.</strong> 같은 <code>req</code> 신호가 한쪽에는 <code>output</code>, 다른 쪽에는 <code>input</code>이 된다. <strong>막으려는 것은 multi-driver다.</strong> 방향이 없으면 두 module이 같은 신호를 몰아 <code>x</code>가 뜨는데, <code>modport</code>가 있으면 <strong>컴파일 시점에</strong> 에러가 난다. 연결하는 쪽이 아니라 <strong>받는 쪽 포트 선언에서</strong> 고른다.</div>
   <div class="d" lang="en">A view of one <code>interface</code> that <strong>fixes signal directions for the side you stand on.</strong> The same <code>req</code> is an <code>output</code> on one side and an <code>input</code> on the other. <strong>It exists to stop multiple drivers.</strong> Without directions two modules can drive one signal and produce <code>x</code>; with a modport that becomes an error <strong>at compile time.</strong> You pick it <strong>in the receiving port declaration</strong>, not at the connection.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s10">Lecture 4 · 10</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s10">Lecture 3 · 10</a></div>
 </div>
 
 <div class="gterm">
@@ -935,7 +935,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">net · variable</div>
   <div class="d" lang="ko">IEEE 1800이 자료형을 나누는 두 갈래. <strong>net</strong>(<code>wire</code>, <code>tri</code>)은 <strong>여러 드라이버를 받고</strong> 충돌하면 언어 규칙으로 값을 결정한다. <strong>variable</strong>(<code>logic</code>, <code>reg</code>, <code>int</code>)은 <strong>드라이버가 하나여야 하고</strong> 마지막에 대입된 값을 들고 있는다. <strong><code>logic</code>은 net이 아니라 variable이다.</strong> 이걸 알아야 왜 아직 <code>wire</code>가 필요한지가 읽힌다.</div>
   <div class="d" lang="en">The two families IEEE 1800 splits types into. A <strong>net</strong> (<code>wire</code>, <code>tri</code>) <strong>accepts several drivers</strong> and resolves conflicts by language rules. A <strong>variable</strong> (<code>logic</code>, <code>reg</code>, <code>int</code>) <strong>takes one driver</strong> and holds the last value assigned. <strong><code>logic</code> is a variable, not a net</strong>, and knowing that is what makes the surviving uses of <code>wire</code> make sense.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s2">Lecture 4 · 02</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s2">Lecture 3 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -961,14 +961,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">package</div>
   <div class="d" lang="ko">typedef, function, struct, class 같은 것을 <strong>이름 있는 상자에 담아두는 것.</strong> 바깥에서는 <code>my_pkg::state_t</code>로 지목하거나 <code>import my_pkg::*;</code>로 통째로 가져온다. Verilog의 <strong>전역 이름공간과 <code>`include</code> + <code>`ifdef</code> 조합을 대체한다.</strong> 매크로가 아니라 언어 기능이라 <strong>컴파일 순서에 안 휘둘린다.</strong></div>
   <div class="d" lang="en"><strong>A named box</strong> holding typedefs, functions, structs and classes. From outside you point at one with <code>my_pkg::state_t</code> or pull everything in with <code>import my_pkg::*;</code>. It replaces <strong>Verilog's global namespace and the <code>`include</code> plus <code>`ifdef</code> dance.</strong> Being a language feature rather than a macro, <strong>it does not depend on compile order.</strong></div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s11">Lecture 4 · 11</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s11">Lecture 3 · 11</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">packed · unpacked</div>
   <div class="d" lang="ko">배열 차원의 두 종류. <strong>packed는 변수 이름 왼쪽</strong>에 오고 비트들을 <strong>하나의 워드</strong>로 다룬다. <strong>unpacked는 이름 오른쪽</strong>에 오고 원소를 <strong>독립된 변수</strong>로 다룬다. <code>logic [3:0] t[6];</code>은 4비트짜리 원소 6개다. <strong>접근은 순서가 뒤집혀서</strong> <code>t[원소][비트]</code>로 쓴다. 설계에서는 각각 하나씩만 쓰는 것이 관행이다.</div>
   <div class="d" lang="en">The two kinds of array dimension. <strong>Packed goes to the left of the name</strong> and treats the bits as <strong>one word</strong>; <strong>unpacked goes to the right</strong> and treats elements as <strong>independent variables.</strong> <code>logic [3:0] t[6];</code> is six four-bit elements. <strong>Access reverses the order:</strong> <code>t[element][bit]</code>. Designs conventionally use one of each and no more.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s8">Lecture 4 · 08</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s8">Lecture 3 · 08</a></div>
 </div>
 
 <div class="gterm">
@@ -985,7 +985,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">pass by reference</div>
   <div class="d" lang="ko">task나 function의 인자를 <strong>복사하지 않고 원본을 가리켜서 넘기는 것.</strong> 보통 <code>output</code> 인자는 <strong>task가 끝날 때 한 번</strong> 복사해 돌려주지만, <code>ref</code>는 <strong>바뀌는 즉시</strong> 바깥에 보인다. 슬라이드의 말풍선이 <em>"All output updates seen"</em>, <em>"Input changes detected"</em>라고 적은 것이 이 뜻이다. <strong>합성되지 않는다.</strong> testbench 문법이다.</div>
   <div class="d" lang="en">Passing a task or function argument <strong>as a handle to the original rather than a copy.</strong> A plain <code>output</code> argument copies back <strong>once, when the task ends</strong>; a <code>ref</code> is visible outside <strong>the moment it changes.</strong> That is what the slide callouts mean by <em>"All output updates seen"</em> and <em>"Input changes detected"</em>. <strong>It does not synthesise</strong>: this is testbench syntax.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s14">Lecture 4 · 14</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
 </div>
 
 <div class="gterm">
@@ -1096,7 +1096,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">struct</div>
   <div class="d" lang="ko"><strong>관련된 신호를 한 덩어리로 묶는 자료형.</strong> module 안에서도 쓰고 포트에도 쓴다. 포트 하나가 여러 필드를 통째로 나르므로 필드를 하나 추가할 때 포트 목록을 전부 고칠 필요가 없다. <code>packed</code>를 붙이면 <strong>빈틈없는 비트 벡터</strong>가 되어 통째로 시프트하거나 FIFO에 실어 보낼 수 있다. 대신 모든 필드가 integral type이어야 한다.</div>
   <div class="d" lang="en"><strong>A type that groups related signals.</strong> Usable inside a module and on its ports, so one port carries many fields and adding a field does not mean editing every port list. Mark it <code>packed</code> and it becomes <strong>a contiguous bit vector</strong> you can shift whole or push through a FIFO, at the cost of every field having to be an integral type.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s7">Lecture 4 · 07</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s7">Lecture 3 · 07</a></div>
 </div>
 
 <div class="gterm">
@@ -1133,7 +1133,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">task · function</div>
   <div class="d" lang="ko"><strong>구별 기준은 하나다: 시간을 쓰는가.</strong> <code>function</code>은 <code>#</code>, <code>wait</code>, <code>@</code>를 못 쓰고 호출한 시점에 <strong>즉시</strong> 끝나며 그래서 조합 논리로 <strong>합성된다.</strong> <code>task</code>는 여러 클럭에 걸쳐 돌 수 있고 그래서 대개 <strong>합성되지 않는다.</strong> SystemVerilog가 <code>function</code>에 <code>return</code>과 <code>output</code> 인자를 추가했다.</div>
   <div class="d" lang="en"><strong>One criterion separates them: does it consume time.</strong> A <code>function</code> cannot use <code>#</code>, <code>wait</code> or <code>@</code>, finishes <strong>instantly</strong> at the point of call, and therefore <strong>synthesises</strong> into combinational logic. A <code>task</code> can run across many clocks and therefore usually <strong>does not synthesise.</strong> SystemVerilog gave functions a <code>return</code> and <code>output</code> arguments.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s14">Lecture 4 · 14</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
 </div>
 
 <div class="gterm">
@@ -1154,7 +1154,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Testing</div>
   <div class="d" lang="ko">이 과목에서는 거의 고유명사다. <strong>제조된 칩 하나하나에 하는 manufacturing test</strong>를 가리킨다. 잡는 것은 설계 버그가 아니라 <strong>제조 결함</strong>이고, 바깥 핀으로만 접근할 수 있다. Verification이 testbench와 test를 쓴다고 해서 Testing인 것은 아니다. 구별 기준은 하나: <strong>칩을 만들기 전이냐 후냐.</strong></div>
   <div class="d" lang="en">In this course it is close to a proper noun: <strong>the manufacturing test done on every fabricated part.</strong> It catches <strong>process defects</strong> rather than design bugs, and it can only reach the outside pins. Verification uses testbenches and runs tests, but that does not make it Testing. One test settles it: <strong>before the chip is made, or after.</strong></div>
-  <div class="src"><a href="L01-course-intro.html#s9">Lecture 1 · 09</a> · <span lang="ko">Lecture 30 전체</span><span lang="en">all of Lecture 30</span></div>
+  <div class="src"><a href="L01-course-intro.html#s9">Lecture 1 · 09</a> · <span lang="ko">Lecture 23 전체</span><span lang="en">all of Lecture 23</span></div>
 </div>
 
 <div class="gterm">
@@ -1176,7 +1176,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">timeunit · timeprecision</div>
   <div class="d" lang="ko">단위 없는 지연(<code>#10</code>)의 <strong>단위</strong>와, 시뮬레이터가 시간을 쪼개는 <strong>해상도.</strong> <code>`timescale</code>과 하는 일은 같지만 <strong>directive가 아니라 declaration이다.</strong> module 안에 적고 그 module과 중첩된 것에만 적용되므로 <strong>파일을 컴파일한 순서에 휘둘리지 않는다.</strong> <code>`timescale</code>은 파일 목록 순서를 바꾸면 적용 범위가 바뀌었다.</div>
   <div class="d" lang="en">The <strong>unit</strong> for a bare delay such as <code>#10</code>, and the <strong>resolution</strong> at which the simulator slices time. Same job as <code>`timescale</code>, but <strong>a declaration rather than a directive.</strong> Written inside a module, applying only to it and what nests in it, so <strong>compile order cannot reach it.</strong> Reordering a file list really did change what a <code>`timescale</code> covered.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s13">Lecture 4 · 13</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s13">Lecture 3 · 13</a></div>
 </div>
 
 <div class="gterm">
@@ -1206,14 +1206,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Tristate</div>
   <div class="d" lang="ko">출력이 <strong>세 가지 상태</strong>를 갖는 것. <code>0</code>, <code>1</code>, 그리고 <strong><code>z</code></strong>(아무것도 안 몲, high impedance). <code>z</code>로 물러날 수 있어야 <strong>다른 드라이버가 그 선을 가져갈 수 있다.</strong> 약속이 깨져 두 드라이버가 동시에 몰면 시뮬레이션에서는 <code>x</code>지만 실물에서는 전류와 열이다. 그래서 칩 내부는 대부분 <strong>mux로 대체됐고</strong> tristate는 양방향 IO 패드에 주로 남아 있다.</div>
   <div class="d" lang="en">An output with <strong>three states</strong>: <code>0</code>, <code>1</code>, and <strong><code>z</code></strong>, driving nothing, high impedance. Being able to fall back to <code>z</code> is what <strong>lets another driver take the line.</strong> When the agreement breaks and two drive at once, simulation shows <code>x</code> and silicon burns current. On-chip tristate has therefore largely been <strong>replaced by muxes</strong>, surviving mostly at bidirectional IO pads.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s17">Lecture 4 · 17</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s17">Lecture 3 · 17</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">typedef</div>
   <div class="d" lang="ko">자주 쓰는 자료형에 <strong>이름을 붙여두는 것.</strong> C의 <code>typedef</code>와 같은 발상이다. <code>enum</code>과 <code>struct</code>는 사실상 항상 이것과 함께 쓴다. 폭을 한 군데서 고칠 수 있다는 것보다 <strong>의미가 이름에 붙는다는 것이 크다.</strong> <code>logic [7:0]</code>은 아무 말도 안 하지만 <code>opcode_t</code>는 무엇인지를 말한다. 이름 끝의 <code>_t</code>는 문법이 아니라 관례다.</div>
   <div class="d" lang="en"><strong>Giving a name to a type you use a lot</strong>, the same idea as C's <code>typedef</code>. <code>enum</code> and <code>struct</code> are effectively always written with one. Changing a width in one place is the small win; <strong>the big one is that meaning attaches to the name.</strong> <code>logic [7:0]</code> says nothing, <code>opcode_t</code> says what it is. The <code>_t</code> suffix is convention, not syntax.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s5">Lecture 4 · 05</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s5">Lecture 3 · 05</a></div>
 </div>
 
 <h2 class="gletter" id="gU">U</h2>
@@ -1230,13 +1230,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Unsized Literal</div>
   <div class="d" lang="ko">폭을 안 적은 리터럴. SystemVerilog의 <code>'0</code> <code>'1</code> <code>'x</code> <code>'z</code>는 <strong>대상 신호의 폭을 알고 그 값 하나로 전체를 채운다.</strong> <code>6'b1</code>은 <strong>숫자 1</strong>이지만 <code>'1</code>은 <strong>전부 1</strong>이다. 그리고 폭이 모자란 리터럴은 위쪽이 <code>0</code>으로 채워지므로 <strong><code>4'bx</code>를 6비트에 넣으면 <code>00xxxx</code>가 된다.</strong> 리셋 값 쓸 때 매번 쓰게 된다.</div>
   <div class="d" lang="en">A literal written without a width. SystemVerilog's <code>'0</code>, <code>'1</code>, <code>'x</code> and <code>'z</code> are <strong>aware of the target's width and fill it with that one value.</strong> <code>6'b1</code> is <strong>the number one</strong>; <code>'1</code> is <strong>all ones</strong>. And a too-short literal pads on top with <code>0</code>, so <strong><code>4'bx</code> into six bits gives <code>00xxxx</code>.</strong> You reach for these every time you write a reset value.</div>
-  <div class="src"><a href="L04-system-verilog-for-design.html#s12">Lecture 4 · 12</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s12">Lecture 3 · 12</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">UVM</div>
   <div class="f">Universal Verification Methodology</div>
-  <div class="d" lang="ko">검증 방법론의 사실상 표준. <strong>언어가 아니라 SystemVerilog로 쓰인 class 라이브러리 + 관행의 묶음이다.</strong> testbench 부품의 이름과 모양과 붙이는 방법을 정해두어 <strong>남이 만든 것(VIP)을 가져다 쓸 수 있게</strong> 한다. VMM과 OVM을 합친 것이다. 이 과목에서는 Lecture 20~22와 Lab 6에서 다룬다.</div>
+  <div class="d" lang="ko">검증 방법론의 사실상 표준. <strong>언어가 아니라 SystemVerilog로 쓰인 class 라이브러리 + 관행의 묶음이다.</strong> testbench 부품의 이름과 모양과 붙이는 방법을 정해두어 <strong>남이 만든 것(VIP)을 가져다 쓸 수 있게</strong> 한다. VMM과 OVM을 합친 것이다. 이 과목에서는 Lecture 15~22와 Lab 6에서 다룬다.</div>
   <div class="d" lang="en">The de facto standard verification methodology. <strong>Not a language but a class library written in SystemVerilog, plus a set of conventions.</strong> By fixing the names, shapes and connection rules of testbench components it makes it possible <strong>to use what somebody else built</strong>, that is, VIP. It merged VMM and OVM. This course covers it in lectures 20 to 22 and Lab 6.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
 </div>

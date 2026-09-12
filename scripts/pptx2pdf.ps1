@@ -18,11 +18,13 @@ $out  = Join-Path $PSScriptRoot '..\slides' | Resolve-Path
 $work = Join-Path $env:TEMP 'addv-pptx'
 
 # PPTX 파일명 -> 노트와 stem 을 맞춘 PDF 파일명.
-# 새 강의가 나오면 여기에 한 줄 추가한다. Schedule 표의 Lecture 번호를 따른다.
+# 새 강의가 나오면 여기에 한 줄 추가한다.
+# 번호는 Lab overview 를 세지 않은 강의 번호다. 강사가 PPTX 앞에 붙인 번호와 일치한다.
 $map = [ordered]@{
   '01_Course Intro.pptx'                     = 'L01-course-intro.pdf'
   '02_Design and Verification Overview.pptx' = 'L02-design-and-verification-overview.pdf'
-  '03_System Verilog for Design.pptx'        = 'L04-system-verilog-for-design.pdf'
+  '03_System Verilog for Design.pptx'        = 'L03-system-verilog-for-design.pdf'
+  '04_Clock_Reset_Chetan.pptx'               = 'L04-clock-and-reset.pdf'
 }
 
 New-Item -ItemType Directory -Force $work | Out-Null

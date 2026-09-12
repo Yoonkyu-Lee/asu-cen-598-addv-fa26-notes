@@ -926,8 +926,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   </table>
 
   <div class="callout">
-    <p lang="ko"><strong>이 여섯 개는 학기 후반의 지도이기도 하다.</strong> 인터페이스 표준화는 Lecture 14(SoC architecture and on-chip interfaces)와 Lab 6의 APB agent로, IP 기반 설계는 Lecture 15(interconnect case study)로 이어진다. <strong>재사용은 검증 쪽에서 더 중요해진다.</strong> <a href="#s22">22절</a>의 UVM과 VIP가 정확히 "검증 자산을 재사용하자"는 답이다.</p>
-    <p lang="en"><strong>These six double as a map of the rest of the semester.</strong> Standardised interfaces lead to Lecture 14 on SoC architecture and on-chip interfaces, and to the APB agent in Lab 6; IP based design leads to the interconnect case study in Lecture 15. <strong>Reuse matters even more on the verification side:</strong> UVM and VIP in <a href="#s22">§22</a> are exactly the answer to "let us reuse verification assets".</p>
+    <p lang="ko"><strong>이 여섯 개는 학기 후반의 지도이기도 하다.</strong> 인터페이스 표준화는 Lecture 10(SoC architecture and on-chip interfaces)와 Lab 6의 APB agent로, IP 기반 설계는 Lecture 11(interconnect case study)로 이어진다. <strong>재사용은 검증 쪽에서 더 중요해진다.</strong> <a href="#s22">22절</a>의 UVM과 VIP가 정확히 "검증 자산을 재사용하자"는 답이다.</p>
+    <p lang="en"><strong>These six double as a map of the rest of the semester.</strong> Standardised interfaces lead to Lecture 10 on SoC architecture and on-chip interfaces, and to the APB agent in Lab 6; IP based design leads to the interconnect case study in Lecture 11. <strong>Reuse matters even more on the verification side:</strong> UVM and VIP in <a href="#s22">§22</a> are exactly the answer to "let us reuse verification assets".</p>
   </div>
 </section>
 
@@ -1148,8 +1148,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   </div>
 
   <div class="callout">
-    <p lang="ko"><strong>이 두 목록이 학기 일정표와 거의 그대로 겹친다.</strong> FIFO는 Lecture 6과 Lab 1, pipelined CPU는 Lecture 8과 Lab 2, matrix multiplication accelerator는 Lecture 13과 Lab 3, interconnect는 Lecture 15, memory와 I/O controller는 Lecture 25. <strong>오늘의 목록은 앞으로 만들 것의 목차다.</strong></p>
-    <p lang="en"><strong>These two lists overlap almost exactly with the semester schedule.</strong> FIFOs are Lecture 6 and Lab 1, the pipelined CPU is Lecture 8 and Lab 2, the matrix multiplication accelerator is Lecture 13 and Lab 3, interconnects are Lecture 15, memory and I/O controllers are Lecture 25. <strong>Today's list is a table of contents for what you will build.</strong></p>
+    <p lang="ko"><strong>이 두 목록이 학기 일정표와 거의 그대로 겹친다.</strong> FIFO는 Lecture 5과 Lab 1, pipelined CPU는 Lecture 6과 Lab 2, matrix multiplication accelerator는 Lecture 9과 Lab 3, interconnect는 Lecture 11, memory와 I/O controller는 Lecture 19. <strong>오늘의 목록은 앞으로 만들 것의 목차다.</strong></p>
+    <p lang="en"><strong>These two lists overlap almost exactly with the semester schedule.</strong> FIFOs are Lecture 5 and Lab 1, the pipelined CPU is Lecture 6 and Lab 2, the matrix multiplication accelerator is Lecture 9 and Lab 3, interconnects are Lecture 11, memory and I/O controllers are Lecture 19. <strong>Today's list is a table of contents for what you will build.</strong></p>
   </div>
 
   <h3 lang="ko">설계 언어</h3>
@@ -1415,14 +1415,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
         <tr><td>AG</td><td>A는 <strong>모든 경로에서</strong>(on All paths), G는 <strong>항상</strong>(Globally). 합쳐서 "어떤 일이 벌어지든 언제나".</td></tr>
         <tr><td>F</td><td><strong>결국은</strong>(Finally). 지금은 아니어도 언젠가 참이 된다.</td></tr>
         <tr><td>그래서 <code>AG(req &rarr; F ack)</code>는</td><td>"어떤 실행 경로에서든, 언제 req가 뜨더라도, 그 뒤 언젠가는 ack가 뜬다." 이걸 한국어로 읽으면 그냥 <strong>"요청은 반드시 응답받는다"</strong>다.</td></tr>
-        <tr><td>왜 알아둘 가치가 있나</td><td>Lecture 10의 assertion이 이 발상의 실용판이다. SystemVerilog assertion은 temporal logic을 하드웨어 엔지니어가 쓸 수 있게 만든 것이다.</td></tr>
+        <tr><td>왜 알아둘 가치가 있나</td><td>Lecture 13의 assertion이 이 발상의 실용판이다. SystemVerilog assertion은 temporal logic을 하드웨어 엔지니어가 쓸 수 있게 만든 것이다.</td></tr>
       </table>
       <table class="parts" lang="en">
         <tr><td>canonical</td><td>As the speaker notes put it, <strong>there is exactly one representation.</strong> No redundancy, no repetition, no ambiguity. So if two ROBDDs have the same shape, <strong>the two functions are immediately proven equal.</strong> Equivalence checking comes from this.</td></tr>
         <tr><td>AG</td><td>A means <strong>on all paths</strong>, G means <strong>globally</strong>. Together: no matter what happens, always.</td></tr>
         <tr><td>F</td><td><strong>Finally</strong>, meaning eventually. Not necessarily now, but at some point.</td></tr>
         <tr><td>So <code>AG(req &rarr; F ack)</code> reads</td><td>"On every execution path, whenever req rises, ack rises at some later point." In plain words, <strong>every request gets answered.</strong></td></tr>
-        <tr><td>Why it is worth knowing</td><td>Assertions in Lecture 10 are the practical version of this idea. SystemVerilog assertions are temporal logic packaged so hardware engineers can use it.</td></tr>
+        <tr><td>Why it is worth knowing</td><td>Assertions in Lecture 13 are the practical version of this idea. SystemVerilog assertions are temporal logic packaged so hardware engineers can use it.</td></tr>
       </table>
     </div>
   </details>
@@ -1455,9 +1455,9 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 
   <div class="callout">
     <p lang="ko"><strong>이 표에서 실무적으로 중요한 줄은 첫 줄이다.</strong> Equivalence checking은 "매우 널리 쓰인다"고 적혀 있고, 용도가 <strong>합성 결과 검증</strong>이다. <a href="L01-course-intro.html#s7">Lecture 1의 ECO</a>가 왜 승인이 필요한지도 여기와 이어진다. netlist를 손으로 고치면 <strong>RTL과 netlist가 같다는 보장이 깨지므로</strong>, equivalence checking을 다시 돌려서 의도한 변경만 들어갔는지 확인해야 한다.</p>
-    <p lang="ko"><strong>Lecture 28이 이 주제 하나에 배정돼 있다</strong> (11월 25일, Amin Rezai). 지금은 세 이름만 갈라두면 된다.</p>
+    <p lang="ko"><strong>Lecture 21이 이 주제 하나에 배정돼 있다</strong> (11월 25일, Amin Rezai). 지금은 세 이름만 갈라두면 된다.</p>
     <p lang="en"><strong>The row that matters in practice is the first one.</strong> Equivalence checking is described as very popular, and its use is <strong>verifying the result of synthesis.</strong> It also explains why the <a href="L01-course-intro.html#s7">ECO in Lecture 1</a> needs approval: editing the netlist by hand <strong>breaks the guarantee that RTL and netlist agree</strong>, so equivalence checking gets re-run to confirm that only the intended change went in.</p>
-    <p lang="en"><strong>Lecture 28 is devoted to this topic</strong> (November 25, Amin Rezai). For now, just keep the three names apart.</p>
+    <p lang="en"><strong>Lecture 21 is devoted to this topic</strong> (November 25, Amin Rezai). For now, just keep the three names apart.</p>
   </div>
 </section>
 
@@ -1578,8 +1578,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <p lang="en">The scoreboard example: <strong>a transaction carrying data X went into the DUT, so the response transaction should carry data Y.</strong></p>
 
   <div class="callout">
-    <p lang="ko"><strong>Lecture 10이 Assertion Based Verification 하나에 배정돼 있고</strong> (10월 19일), Lab 4가 FIFO checker, Lab 6이 assertion을 다룬다. 지금은 <strong>"항상 켜져 있다"</strong>는 성질만 붙잡아두면 된다. 그게 assertion과 일반 테스트 코드의 결정적 차이다. 테스트는 그 시나리오에서만 확인하지만 assertion은 <strong>어떤 테스트를 돌리든 계속 감시한다.</strong></p>
-    <p lang="en"><strong>Lecture 10 is devoted to assertion based verification</strong> (October 19), Lab 4 covers a FIFO checker and Lab 6 covers assertions. For now, hold onto the <strong>always on</strong> property. That is the decisive difference between an assertion and ordinary test code: a test checks within its own scenario, while an assertion <strong>keeps watching no matter which test is running.</strong></p>
+    <p lang="ko"><strong>Lecture 13이 Assertion Based Verification 하나에 배정돼 있고</strong> (10월 19일), Lab 4가 FIFO checker, Lab 6이 assertion을 다룬다. 지금은 <strong>"항상 켜져 있다"</strong>는 성질만 붙잡아두면 된다. 그게 assertion과 일반 테스트 코드의 결정적 차이다. 테스트는 그 시나리오에서만 확인하지만 assertion은 <strong>어떤 테스트를 돌리든 계속 감시한다.</strong></p>
+    <p lang="en"><strong>Lecture 13 is devoted to assertion based verification</strong> (October 19), Lab 4 covers a FIFO checker and Lab 6 covers assertions. For now, hold onto the <strong>always on</strong> property. That is the decisive difference between an assertion and ordinary test code: a test checks within its own scenario, while an assertion <strong>keeps watching no matter which test is running.</strong></p>
   </div>
 
   <h3 data-slide="45"><span>Coverage</span></h3>
@@ -2055,14 +2055,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
         <tr><td>무엇을 정하나</td><td>testbench 부품의 <strong>이름과 모양과 붙이는 방법</strong>을 정한다. agent는 이렇게 생겼고, driver는 이 함수를 가져야 하고, 하는 식이다.</td></tr>
         <tr><td>왜 필요한가</td><td>정해진 모양이 있어야 <strong>남이 만든 것을 가져다 쓸 수 있다.</strong> VIP를 사서 끼워 넣는다는 게 이 뜻이다.</td></tr>
         <tr><td>순서</td><td>VMM과 OVM이 먼저 있었고 <strong>UVM이 그 둘을 합쳐 표준이 됐다.</strong> 지금 새로 배우는 건 UVM이고, 나머지 둘은 예전 코드에서 마주칠 이름이다.</td></tr>
-        <tr><td>헷갈리는 것</td><td>UVM은 <strong>언어가 아니다.</strong> SystemVerilog를 모른 채로 UVM만 배울 수 없고, 그래서 이 과목이 Lecture 17에서 SystemVerilog for Verification을 먼저 한다.</td></tr>
+        <tr><td>헷갈리는 것</td><td>UVM은 <strong>언어가 아니다.</strong> SystemVerilog를 모른 채로 UVM만 배울 수 없고, 그래서 이 과목이 Lecture 12에서 SystemVerilog for Verification을 먼저 한다.</td></tr>
       </table>
       <table class="parts" lang="en">
         <tr><td>In one line</td><td>Not a language but <strong>a library plus a set of conventions.</strong> UVM is a class library written in SystemVerilog.</td></tr>
         <tr><td>What it fixes</td><td>The <strong>names, shapes and connection rules</strong> of testbench components: this is what an agent looks like, this is the method a driver must have.</td></tr>
         <tr><td>Why it is needed</td><td>Agreed shapes are what make it possible to <strong>use something somebody else built.</strong> That is what plugging in a purchased VIP means.</td></tr>
         <tr><td>The order</td><td>VMM and OVM came first and <strong>UVM merged them into the standard.</strong> UVM is what you learn now; the other two are names you meet in older code.</td></tr>
-        <tr><td>Easy to misread</td><td>UVM is <strong>not a language.</strong> You cannot learn UVM without SystemVerilog, which is why this course does SystemVerilog for Verification first, in Lecture 17.</td></tr>
+        <tr><td>Easy to misread</td><td>UVM is <strong>not a language.</strong> You cannot learn UVM without SystemVerilog, which is why this course does SystemVerilog for Verification first, in Lecture 12.</td></tr>
       </table>
     </div>
   </details>
@@ -2247,10 +2247,10 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   </ul>
 
   <div class="callout">
-    <p lang="ko"><strong>다음 강의 (Lecture 3, 8월 31일): Lab 0 (EDA Tools) overview.</strong> 강의 노트가 아니라 <strong>lab 안내</strong>라 별도 노트를 만들지 않는다. Apporto로 EDA 도구에 접속해서 시뮬레이션과 합성을 돌려보는 것이 내용이다. 오늘 04절에서 개념으로 본 synthesis를 <strong>실제로 돌려보는 것</strong>이 Lab 0이다.</p>
-    <p lang="ko"><strong>그다음 (<a href="L04-system-verilog-for-design.html">Lecture 4</a>, 9월 2일): System Verilog for Design.</strong> 오늘 01절에서 "어느 추상화 수준에서 쓰는가"를 이야기했다면, 거기서는 <strong>그 수준에서 실제로 어떻게 쓰는가</strong>를 배운다.</p>
-    <p lang="en"><strong>Next up (Lecture 3, August 31): Lab 0, EDA tools overview.</strong> It is a <strong>lab briefing</strong> rather than a lecture, so it gets no note of its own. The content is reaching the EDA tools through Apporto and running simulation and synthesis. Lab 0 is where the synthesis you met conceptually in §04 today <strong>actually gets run.</strong></p>
-    <p lang="en"><strong>Then (<a href="L04-system-verilog-for-design.html">Lecture 4</a>, September 2): SystemVerilog for Design.</strong> Today's §01 asked which level of abstraction you write at; that lecture teaches <strong>how to actually write at it.</strong></p>
+    <p lang="ko"><strong>다음 시간 (8월 31일): Lab 0 (EDA Tools) overview.</strong> 강의 노트가 아니라 <strong>lab 안내</strong>라 별도 노트를 만들지 않는다. Apporto로 EDA 도구에 접속해서 시뮬레이션과 합성을 돌려보는 것이 내용이다. 오늘 04절에서 개념으로 본 synthesis를 <strong>실제로 돌려보는 것</strong>이 Lab 0이다.</p>
+    <p lang="ko"><strong>그다음 (<a href="L03-system-verilog-for-design.html">Lecture 3</a>, 9월 2일): System Verilog for Design.</strong> 오늘 01절에서 "어느 추상화 수준에서 쓰는가"를 이야기했다면, 거기서는 <strong>그 수준에서 실제로 어떻게 쓰는가</strong>를 배운다.</p>
+    <p lang="en"><strong>Next up (August 31): Lab 0, EDA tools overview.</strong> It is a <strong>lab briefing</strong> rather than a lecture, so it gets no note of its own. The content is reaching the EDA tools through Apporto and running simulation and synthesis. Lab 0 is where the synthesis you met conceptually in §04 today <strong>actually gets run.</strong></p>
+    <p lang="en"><strong>Then (<a href="L03-system-verilog-for-design.html">Lecture 3</a>, September 2): SystemVerilog for Design.</strong> Today's §01 asked which level of abstraction you write at; that lecture teaches <strong>how to actually write at it.</strong></p>
   </div>
 </section>
 

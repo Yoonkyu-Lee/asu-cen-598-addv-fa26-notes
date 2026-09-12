@@ -524,8 +524,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 
   <div class="trap">
     <span class="tag" lang="ko">헷갈리는 짝</span><span class="tag" lang="en">Confusable pair</span>
-    <p lang="ko"><strong>시뮬레이션과 합성은 같은 RTL을 읽지만 목적이 반대다.</strong> 시뮬레이터는 "이 코드가 시간에 따라 어떻게 동작하나"를 묻고, 합성기는 "이 코드를 어떤 하드웨어로 만들 수 있나"를 묻는다. 그래서 <strong>시뮬레이션은 되는데 합성은 안 되는 코드가 존재한다.</strong> <code>#10</code> 같은 지연이나 <code>$display</code>가 그렇다. 이 간극이 Lecture 4에서 배운 합성 가능한 코드 이야기와 정확히 같은 이야기다.</p>
-    <p lang="en"><strong>Simulation and synthesis read the same RTL but ask opposite questions.</strong> The simulator asks how this code behaves over time; the synthesiser asks what hardware this code can be built as. That is why <strong>code exists that simulates fine and will not synthesise at all.</strong> A <code>#10</code> delay or a <code>$display</code> is exactly that. This gap is the same story as the synthesisable-code discussion in Lecture 4.</p>
+    <p lang="ko"><strong>시뮬레이션과 합성은 같은 RTL을 읽지만 목적이 반대다.</strong> 시뮬레이터는 "이 코드가 시간에 따라 어떻게 동작하나"를 묻고, 합성기는 "이 코드를 어떤 하드웨어로 만들 수 있나"를 묻는다. 그래서 <strong>시뮬레이션은 되는데 합성은 안 되는 코드가 존재한다.</strong> <code>#10</code> 같은 지연이나 <code>$display</code>가 그렇다. 이 간극이 Lecture 3에서 배운 합성 가능한 코드 이야기와 정확히 같은 이야기다.</p>
+    <p lang="en"><strong>Simulation and synthesis read the same RTL but ask opposite questions.</strong> The simulator asks how this code behaves over time; the synthesiser asks what hardware this code can be built as. That is why <strong>code exists that simulates fine and will not synthesise at all.</strong> A <code>#10</code> delay or a <code>$display</code> is exactly that. This gap is the same story as the synthesisable-code discussion in Lecture 3.</p>
   </div>
 </section>
 
@@ -630,8 +630,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <span class="c"># step 2: run that executable</span>
 %&gt; ./simv</pre>
 
-  <p lang="ko"><code>-sverilog</code>는 SystemVerilog 구문을 켜는 스위치다. 안 켜면 <code>logic</code>이나 <code>always_ff</code> 같은 <a href="L04-system-verilog-for-design.html">Lecture 4에서 배운 문법</a>이 문법 오류로 잡힌다. Lab 0의 testbench가 SystemVerilog이므로 이 스위치가 필요하다.</p>
-  <p lang="en"><code>-sverilog</code> is the switch that turns SystemVerilog constructs on. Without it, <a href="L04-system-verilog-for-design.html">the syntax you learned in Lecture 4</a> such as <code>logic</code> or <code>always_ff</code> comes back as a syntax error. The Lab 0 testbench is SystemVerilog, so you need this switch.</p>
+  <p lang="ko"><code>-sverilog</code>는 SystemVerilog 구문을 켜는 스위치다. 안 켜면 <code>logic</code>이나 <code>always_ff</code> 같은 <a href="L03-system-verilog-for-design.html">Lecture 3에서 배운 문법</a>이 문법 오류로 잡힌다. Lab 0의 testbench가 SystemVerilog이므로 이 스위치가 필요하다.</p>
+  <p lang="en"><code>-sverilog</code> is the switch that turns SystemVerilog constructs on. Without it, <a href="L03-system-verilog-for-design.html">the syntax you learned in Lecture 3</a> such as <code>logic</code> or <code>always_ff</code> comes back as a syntax error. The Lab 0 testbench is SystemVerilog, so you need this switch.</p>
 
   <div class="callout">
     <p lang="ko">Lab 0에서는 이 명령을 직접 치지 않는다. <code>sim/Makefile</code>에 타겟으로 들어 있다. <strong>그래도 Makefile을 열어서 어느 타겟이 어느 명령을 부르는지 읽어라.</strong> Lab 0 문서가 명시적으로 시키는 일이기도 하고, Lab 1부터는 Makefile을 직접 고쳐야 한다.</p>
@@ -1347,8 +1347,8 @@ dc_shell-topo&gt; <span class="k">report_constraint</span> -all_violators
 
   <h3 lang="ko">다음으로</h3>
   <h3 lang="en">What comes next</h3>
-  <p lang="ko">여기서 익힌 <code>vcs</code> → <code>simv</code> → Verdi 사이클이 Lab 1의 FIFO에서 그대로 반복된다. 다른 점은 그때부터 <strong>testbench를 직접 쓴다</strong>는 것이고, 그러면 이 페이지에서 스쳐간 <code>$fsdbDumpvars</code>와 UCLI가 남의 이야기가 아니게 된다. Lecture 6이 FIFO 설계를, Lecture 17이 검증용 SystemVerilog를 다룬다.</p>
-  <p lang="en">The <code>vcs</code> to <code>simv</code> to Verdi cycle you learned here repeats unchanged in the Lab 1 FIFO. The difference is that from then on <strong>you write the testbench</strong>, and at that point <code>$fsdbDumpvars</code> and UCLI, which only brushed past on this page, stop being somebody else's problem. Lecture 6 covers FIFO design and Lecture 17 covers SystemVerilog for verification.</p>
+  <p lang="ko">여기서 익힌 <code>vcs</code> → <code>simv</code> → Verdi 사이클이 Lab 1의 FIFO에서 그대로 반복된다. 다른 점은 그때부터 <strong>testbench를 직접 쓴다</strong>는 것이고, 그러면 이 페이지에서 스쳐간 <code>$fsdbDumpvars</code>와 UCLI가 남의 이야기가 아니게 된다. Lecture 5이 FIFO 설계를, Lecture 12이 검증용 SystemVerilog를 다룬다.</p>
+  <p lang="en">The <code>vcs</code> to <code>simv</code> to Verdi cycle you learned here repeats unchanged in the Lab 1 FIFO. The difference is that from then on <strong>you write the testbench</strong>, and at that point <code>$fsdbDumpvars</code> and UCLI, which only brushed past on this page, stop being somebody else's problem. Lecture 5 covers FIFO design and Lecture 12 covers SystemVerilog for verification.</p>
 </section>
 
 <footer>
