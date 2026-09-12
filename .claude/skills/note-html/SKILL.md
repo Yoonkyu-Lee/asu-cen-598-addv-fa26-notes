@@ -92,6 +92,8 @@ python -c "import io; s=io.open('L01-course-intro.html',encoding='utf-8').read()
 | 물리·back-end (P&R, mask, fab, silicon) | `--brown` |
 | 이 강의 범위 밖 / 나중에 배울 것 | `--ink3` |
 
+이 표가 `CLAUDE.md` 의 불변식과 어긋나면 `CLAUDE.md` 가 이긴다.
+
 **이 규칙이 지켜지면 독자가 색만 보고 "이건 설계쪽 일" / "이건 검증쪽 일"을 읽게 된다.**
 Design Flow 그림, testbench 구성도, "무엇이 언제 일어나는가" 타임라인이 전부 같은 색 체계를
 쓰므로 세 그림이 한 이야기로 붙는다. 이게 이 노트의 시그니처다.
@@ -364,3 +366,16 @@ Lab overview 강의가 나올 때마다 이 간격이 한 칸씩 더 벌어진�
 | **`.jargon .parts` 첫 칸이 `nowrap`** | `@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}` |
 
 세 번째와 네 번째가 이 과목에서 새로 생긴 것이다. EEE 554 스타일 블록에는 없다.
+
+## 검증 루프
+
+도해나 레이아웃을 고쳤으면 끝나기 전에 돌린다. 명령과 판정 기준은 `write-note` 스킬의
+"검증 루프" 절이 단일 출처고, 여기는 그중 도해·레이아웃 수정에 필요한 것만 추린다.
+
+```bash
+node scripts/verify.mjs <노트 파일>
+node scripts/langcheck.mjs <노트 파일>
+```
+
+`shots/` 에 생긴 도해별 스크린샷을 한 장씩 전부 눈으로 연다. 자동 검사가 통과해도 건너뛰지 않는다.
+앵커(`data-slide`)를 건드렸으면 `node scripts/readercheck.mjs <노트 파일> s1,s3,...` 도 돌린다.

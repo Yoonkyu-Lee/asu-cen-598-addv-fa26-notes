@@ -24,10 +24,13 @@ GitHub Pages로 배포된다: https://yoonkyu-lee.github.io/asu-cen-598-addv-fa2
 | Lab 공략 페이지를 쓴다 | `write-note` → `note-html` |
 | 슬라이드만 저장소에 넣는다 | `convert-slides` |
 | Synopsys 트레이닝을 수집한다 | `synopsys-training` (또는 `-chrome`) |
+| `index.html` 허브를 고친다 (카드·chip·공지 배너) | `note-html`, 노트를 새로 올리는 경우는 `write-note` 도 |
+| `glossary.html` 에 용어를 추가한다 | `write-note` |
 
 강의 번호·날짜·강사는 `docs/schedule.md` 가 단일 출처다.
 
 **불변식은 이 문서가 이긴다. 각 절차의 단일 출처는 해당 스킬이다.**
+규약을 고쳤으면 스킬도 같이 고친다. 스킬은 요약이지 사본이 아니다.
 
 ## 경로
 
@@ -96,15 +99,7 @@ repo는 **Public**이고 GitHub Pages로 서빙된다. 여기 올리는 건 인�
 나중에 내려달라고 하면 `slides/` 커밋을 지우고 `.gitignore`에 `slides/*.pdf`를 추가하면 된다.
 리더는 슬라이드가 없어도 노트 본문을 막지 않는다.
 
-`.gitignore`는 `*.pdf`로 전부 막고 `!slides/*.pdf`로 슬라이드만 되살린다.
-
-```
-node_modules/
-shots/
-package-lock.json
-*.pdf
-!slides/*.pdf
-```
+무엇이 무시되는지는 `.gitignore` 파일이 단일 출처다. 커밋 전에 `git status` 로 확인한다.
 
 | 파일 | 커밋 |
 |---|---|
