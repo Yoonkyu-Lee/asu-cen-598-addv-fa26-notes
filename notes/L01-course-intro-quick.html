@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV · Lecture 1 — Course Intro and Design Flow</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <p class="kicker">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</p>
+  <p class="lec" lang="ko">Lecture 1 &middot; 빠른 읽기</p>
+  <p class="lec" lang="en">Lecture 1 &middot; Quick read</p>
+  <h1 class="title">Course Intro and Design Flow</h1>
+  <p class="sub" lang="ko">칩이 만들어지는 길 일곱 칸, 우리가 서 있는 칸, 그리고 그 위에 붙는 헷갈리는 이름 넷.</p>
+  <p class="sub" lang="en">The seven steps a chip travels, the one we stand on, and the four confusing names stuck on top of it.</p>
+  <p class="meta" lang="ko"><a href="L01-course-intro.html">자세한 판 보기</a> &middot; 이 판은 훑고 다시 읽기 위한 것이다</p>
+  <p class="meta" lang="en"><a href="L01-course-intro.html">Full version</a> &middot; this one is for skimming and re-reading</p>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 1</div>
+    <div class="name">Course Intro and Design Flow</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">칩이 만들어지는 길</span><span lang="en">How a chip gets made</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">우리는 어디에 있나</span><span lang="en">Where we stand</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">헷갈리는 이름 넷</span><span lang="en">The four confusing names</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">추상화 3단</span><span lang="en">Three levels of abstraction</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">회사마다 말이 다르다</span><span lang="en">Every company renames things</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+
+  <p lang="ko">1강은 새 기술이 하나도 안 나온다. 대신 <strong>앞으로 23강 내내 쓸 단어들이 한꺼번에 쏟아진다.</strong> 그래서 지금 이걸 정리해두면 나중에 편하고, 안 해두면 계속 헷갈린다.</p>
+  <p lang="en">Lecture 1 teaches no new technology. What it does is <strong>dump every word you will use for the next 23 lectures all at once.</strong> Sort it now and the rest is easy; skip it and you stay confused.</p>
+
+  <div class="def">
+    <p lang="ko">칩은 <strong>문서 &rarr; 블록도 &rarr; RTL &rarr; netlist &rarr; mask &rarr; 실물</strong> 순서로 만들어진다. 그리고 <strong>그 각 지점마다 이름이 다른 검증이 붙어 있다.</strong> 1강은 이 두 줄을 나란히 놓는 게 전부다.</p>
+    <p lang="en">A chip goes <strong>document &rarr; block diagram &rarr; RTL &rarr; netlist &rarr; mask &rarr; physical part</strong>. And <strong>at every one of those points sits a differently named kind of checking.</strong> Lecture 1 is those two lines laid side by side. That is it.</p>
+  </div>
+
+  <p lang="ko">그리고 이 수업의 성격을 한 문장으로 하면 이거다. <strong>우리는 ASIC 을 다룬다. ASIC 은 틀리면 되돌릴 수 없다.</strong> 이 한 줄이 왜 이 과목이 검증에 그렇게 집착하는지를 전부 설명한다. FPGA 였으면 다시 구우면 그만이다. ASIC 은 mask 를 이미 만들었으면 끝이다.</p>
+  <p lang="en">And the whole course in one sentence: <strong>we work on ASICs, and an ASIC cannot be taken back once it is wrong.</strong> That single line explains why this subject is so obsessed with verification. On an FPGA you just reflash it. On an ASIC, once the masks exist, that is that.</p>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; ASIC</span><span lang="en">Jargon &middot; ASIC</span></summary>
+      <table class="parts">
+        <tr><td lang="ko">풀네임</td><td lang="en">Full name</td><td>Application Specific Integrated Circuit</td></tr>
+        <tr><td lang="ko">한 줄</td><td lang="en">In one line</td><td><span lang="ko">한 가지 용도로 고정해서 만든 칩. 만들고 나면 회로가 안 바뀐다.</span><span lang="en">A chip frozen to one purpose. Once made, the circuit does not change.</span></td></tr>
+        <tr><td lang="ko">반대편</td><td lang="en">Its opposite</td><td><span lang="ko">FPGA. 만들어 놓고 나중에 회로를 바꿀 수 있다.</span><span lang="en">An FPGA, which you can rewire after manufacturing.</span></td></tr>
+        <tr><td lang="ko">헷갈리는 것</td><td lang="en">Easy to misread</td><td><span lang="ko">"ASIC 기반" 은 우리가 칩을 굽는다는 뜻이 아니다. 굽는 걸 <strong>전제로</strong> 설계하고 검증한다는 뜻이다.</span><span lang="en">"ASIC based" does not mean you bake a chip. It means you design and verify <strong>as though</strong> one will be baked.</span></td></tr>
+      </table>
+    </details>
+  </div>
+
+  <p lang="ko">실무 수업이라는 것도 미리 알아두면 좋다. 강사 Aman Arora 는 Freescale 에서 DFT 3 년, <strong>NVIDIA 에서 Design &middot; Verification &middot; Architecture 를 8 년</strong> 하고 왔다. 그래서 수업에서 나오는 말이 교과서 정의가 아니라 <strong>현장에서 실제로 쓰이는 말</strong>이다. 정의를 외우는 것보다 <strong>누가 언제 그 말을 쓰는지</strong>를 아는 게 중요한 이유다.</p>
+  <p lang="en">Worth knowing this is an industry course. The instructor, Aman Arora, did three years of DFT at Freescale and <strong>eight years of design, verification and architecture at NVIDIA</strong>. So the vocabulary here is not textbook definitions, it is <strong>what people actually say on the job</strong>. Which is why knowing <strong>who says a word and when</strong> beats memorising a definition.</p>
+
+  <div class="trap">
+    <p lang="ko"><strong>과제 제출 정책이 양방향이다.</strong> 늦으면 24 시간마다 15% 씩 깎이고(최대 3 구간, 그 뒤는 0 점), <strong>일찍 내면 24 시간마다 5% 씩 붙는다</strong>(최대 10%). 48 시간 일찍 내면 그냥 10 점을 얻는 거다. 마감에 맞춰 내는 습관이 여기서는 손해다.</p>
+    <p lang="en"><strong>The submission policy cuts both ways.</strong> Late costs 15% per 24 hours, up to three periods, then a zero. <strong>Early pays 5% per 24 hours</strong>, up to 10%. Finishing two days ahead is worth ten free points. Aiming at the deadline is a losing habit here.</p>
+  </div>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">칩이 만들어지는 길</h2><h2 lang="en">How a chip gets made</h2></div>
+
+  <p lang="ko">이 그림 하나가 과목 전체의 지도다. 앞으로 새 강의를 시작할 때마다 <strong>"지금 여기 어디쯤인가"</strong>를 이 그림에서 짚게 된다. 한 번 제대로 보고 넘어가자.</p>
+  <p lang="en">This one diagram is the map for the whole course. Every new lecture from here starts with <strong>"so where are we on this?"</strong> Worth looking at properly once.</p>
+
+<figure>
+    <svg viewBox="0 0 700 400" role="img" aria-label="Specification부터 Board/Product까지 일곱 단계와 각 단계가 넘기는 산출물">
+      <defs>
+        <marker id="f1-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+        <marker id="f1-arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--pink)"/>
+        </marker>
+      </defs>
+
+      <!-- 단계 박스 -->
+      <g>
+        <rect x="250" y="14" width="190" height="36" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.4"/>
+        <text class="svgtxt" x="345" y="37" text-anchor="middle" style="font-size:14px">Specification</text>
+      </g>
+      <g>
+        <rect x="250" y="68" width="190" height="36" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.4"/>
+        <text class="svgtxt" x="345" y="91" text-anchor="middle" style="font-size:14px">Architecture</text>
+      </g>
+      <g>
+        <rect x="250" y="122" width="190" height="36" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="2.4"/>
+        <text class="svgtxt" x="345" y="145" text-anchor="middle" style="font-size:14px;font-weight:700">Design</text>
+      </g>
+      <g>
+        <rect x="250" y="176" width="190" height="36" rx="6" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.4"/>
+        <text class="svgtxt" x="345" y="199" text-anchor="middle" style="font-size:14px">Synthesis</text>
+      </g>
+      <g>
+        <rect x="250" y="230" width="190" height="36" rx="6" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.4"/>
+        <text class="svgtxt" x="345" y="253" text-anchor="middle" style="font-size:14px">Place and Route</text>
+      </g>
+      <g>
+        <rect x="250" y="284" width="190" height="36" rx="6" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.4"/>
+        <text class="svgtxt" x="345" y="307" text-anchor="middle" style="font-size:14px">Fabrication</text>
+      </g>
+      <g>
+        <rect x="250" y="338" width="190" height="36" rx="6" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.4"/>
+        <text class="svgtxt" x="345" y="361" text-anchor="middle" style="font-size:14px">Board / Product</text>
+      </g>
+
+      <!-- 단계 사이 화살표 -->
+      <line x1="345" y1="51" x2="345" y2="65" stroke="var(--ink3)" stroke-width="1.6" marker-end="url(#f1-ar)"/>
+      <line x1="345" y1="105" x2="345" y2="119" stroke="var(--ink3)" stroke-width="1.6" marker-end="url(#f1-ar)"/>
+      <line x1="345" y1="159" x2="345" y2="173" stroke="var(--ink3)" stroke-width="1.6" marker-end="url(#f1-ar)"/>
+      <line x1="345" y1="213" x2="345" y2="227" stroke="var(--ink3)" stroke-width="1.6" marker-end="url(#f1-ar)"/>
+      <line x1="345" y1="267" x2="345" y2="281" stroke="var(--ink3)" stroke-width="1.6" marker-end="url(#f1-ar)"/>
+      <line x1="345" y1="321" x2="345" y2="335" stroke="var(--ink3)" stroke-width="1.6" marker-end="url(#f1-ar)"/>
+
+      <!-- 산출물 -->
+      <line x1="352" y1="58" x2="446" y2="58" stroke="var(--rule)" stroke-width="1"/>
+      <text class="svglab" x="452" y="62" style="fill:var(--ink)">Documents</text>
+      <line x1="352" y1="112" x2="446" y2="112" stroke="var(--rule)" stroke-width="1"/>
+      <text class="svglab" x="452" y="116" style="fill:var(--ink)">Block Diagrams</text>
+      <line x1="352" y1="166" x2="446" y2="166" stroke="var(--rule)" stroke-width="1"/>
+      <text class="svglab" x="452" y="170" style="fill:var(--ink);font-weight:700">RTL</text>
+      <line x1="352" y1="220" x2="446" y2="220" stroke="var(--rule)" stroke-width="1"/>
+      <text class="svglab" x="452" y="224" style="fill:var(--ink)">Gates (Netlist)</text>
+      <line x1="352" y1="274" x2="446" y2="274" stroke="var(--rule)" stroke-width="1"/>
+      <text class="svglab" x="452" y="278" style="fill:var(--ink)">Masks</text>
+      <line x1="352" y1="328" x2="446" y2="328" stroke="var(--rule)" stroke-width="1"/>
+      <text class="svglab" x="452" y="332" style="fill:var(--ink)">Chip</text>
+
+      <!-- 이 수업 1부가 집중하는 곳 -->
+      <text class="svglab" x="10" y="130" style="fill:var(--pink);font-weight:700" lang="ko">이 수업 1부가</text>
+      <text class="svglab" x="10" y="146" style="fill:var(--pink);font-weight:700" lang="ko">집중하는 단계</text>
+      <text class="svglab" x="10" y="130" style="fill:var(--pink);font-weight:700" lang="en">Where part 1 of</text>
+      <text class="svglab" x="10" y="146" style="fill:var(--pink);font-weight:700" lang="en">the course aims</text>
+      <line x1="150" y1="140" x2="243" y2="140" stroke="var(--pink)" stroke-width="1.6" marker-end="url(#f1-arb)"/>
+    </svg>
+    <figcaption lang="ko">슬라이드 13쪽. 오른쪽에 적힌 것이 <strong>그 단계가 다음 단계에 넘기는 산출물</strong>이다. 화살표 하나가 곧 한 번의 인수인계다. 슬라이드의 빨간 화살표는 <strong>Design 박스</strong>를 가리키고 있다. 이 수업 1부가 RTL을 쓰는 그 한 칸에 집중한다는 뜻이다.</figcaption>
+    <figcaption lang="en">Slide 13. The labels on the right are <strong>what each stage hands to the next one</strong>, so every arrow is one handover. The red arrow on the slide points at the <strong>Design box</strong>: part one of the course lives in that one cell, where the RTL gets written.</figcaption>
+  </figure>
+
+  <p lang="ko">화살표 하나가 <strong>한 번의 인수인계</strong>다. 오른쪽에 적힌 게 그 단계가 다음 단계로 넘기는 산출물이고. 여기서 기억할 건 두 가지뿐이다.</p>
+  <p lang="en">Each arrow is <strong>one handover</strong>, and the label on the right is what that step passes along. Two things to take away.</p>
+
+  <ul>
+    <li lang="ko"><strong>RTL 이 사람이 쓰는 마지막 지점이다.</strong> 그 뒤로는 도구가 받아서 기계적으로 변환한다</li>
+    <li lang="en"><strong>RTL is the last thing a human writes.</strong> After that the tools take over and transform it mechanically</li>
+    <li lang="ko"><strong>뒤로 갈수록 고치는 비용이 폭발한다.</strong> RTL 에서 고치면 재컴파일이고, mask 를 만든 뒤에 고치면 수억이 날아간다</li>
+    <li lang="en"><strong>The cost of a fix explodes as you move right.</strong> Fix it in RTL and you recompile; fix it after masks and you burn a fortune</li>
+  </ul>
+
+  <p lang="ko">그리고 이 길 위에 <strong>Front-End 와 Back-End 라는 경계</strong>가 하나 그어져 있다. 회사 조직이 실제로 이 선을 따라 갈린다.</p>
+  <p lang="en">There is also a <strong>front-end / back-end line</strong> drawn across this path. Real companies split their org charts along it.</p>
+
+<figure>
+    <svg viewBox="0 0 700 230" role="img" aria-label="Front-End와 Back-End의 경계, Synthesis가 그 가운데 걸쳐 있다">
+      <!-- Front-End -->
+      <rect x="20" y="60" width="250" height="112" rx="10" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-width="1.4" stroke-dasharray="5 4"/>
+      <text class="svglab" x="145" y="50" text-anchor="middle" style="fill:var(--blue);font-weight:700;font-size:12px">Front-End</text>
+      <rect x="32" y="72" width="226" height="26" rx="5" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.1"/>
+      <text class="svgtxt" x="145" y="90" text-anchor="middle" style="font-size:12.5px">Specification</text>
+      <rect x="32" y="104" width="226" height="26" rx="5" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.1"/>
+      <text class="svgtxt" x="145" y="122" text-anchor="middle" style="font-size:12.5px">Architecture</text>
+      <rect x="32" y="136" width="226" height="26" rx="5" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.1"/>
+      <text class="svgtxt" x="145" y="154" text-anchor="middle" style="font-size:12.5px">Design (RTL)</text>
+
+      <!-- Synthesis, 경계에 걸침 -->
+      <rect x="280" y="88" width="140" height="56" rx="8" fill="rgba(var(--violet-rgb),.16)" stroke="var(--violet)" stroke-width="2"/>
+      <text class="svgtxt" x="350" y="112" text-anchor="middle" style="font-size:13.5px;font-weight:700">Synthesis</text>
+      <text class="svglab" x="350" y="131" text-anchor="middle" style="fill:var(--violet);font-size:10px" lang="ko">경계에 걸쳐 있다</text>
+      <text class="svglab" x="350" y="131" text-anchor="middle" style="fill:var(--violet);font-size:10px" lang="en">sits on the line</text>
+      <line x1="270" y1="116" x2="278" y2="116" stroke="var(--rule)" stroke-width="1.4"/>
+      <line x1="422" y1="116" x2="430" y2="116" stroke="var(--rule)" stroke-width="1.4"/>
+
+      <!-- Back-End -->
+      <rect x="432" y="60" width="248" height="112" rx="10" fill="rgba(var(--brown-rgb),.07)" stroke="var(--brown)" stroke-width="1.4" stroke-dasharray="5 4"/>
+      <text class="svglab" x="556" y="50" text-anchor="middle" style="fill:var(--brown);font-weight:700;font-size:12px">Back-End</text>
+      <rect x="444" y="72" width="224" height="26" rx="5" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.1"/>
+      <text class="svgtxt" x="556" y="90" text-anchor="middle" style="font-size:12.5px">Place and Route</text>
+      <rect x="444" y="104" width="224" height="26" rx="5" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.1"/>
+      <text class="svgtxt" x="556" y="122" text-anchor="middle" style="font-size:12.5px">Fabrication</text>
+      <rect x="444" y="136" width="224" height="26" rx="5" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.1"/>
+      <text class="svgtxt" x="556" y="154" text-anchor="middle" style="font-size:12.5px">Board / Product</text>
+
+      <!-- 아래 라벨 -->
+      <text class="svglab" x="145" y="200" text-anchor="middle" lang="ko">코드와 문서를 다룬다</text>
+      <text class="svglab" x="145" y="200" text-anchor="middle" lang="en">it deals in code and documents</text>
+      <text class="svglab" x="556" y="200" text-anchor="middle" lang="ko">모양과 물성을 다룬다</text>
+      <text class="svglab" x="556" y="200" text-anchor="middle" lang="en">it deals in shapes and physics</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 14쪽. <strong>슬라이드의 두 괄호는 Synthesis 상자 한가운데에서 만난다.</strong> 즉 슬라이드가 Synthesis를 어느 쪽으로 셀지 정하지 않았다. 실제로도 이건 회사와 팀마다 갈리는 지점이고, 그래서 이 노트도 억지로 한쪽에 붙이지 않는다. Synthesis 자체는 <a href="L02-design-and-verification-overview.html#s4">Lecture 2의 04절</a>에서 제대로 다룬다.</figcaption>
+    <figcaption lang="en">Slide 14. <strong>The two brackets on the slide meet in the middle of the Synthesis box</strong>, which means the slide does not decide which side it belongs to. It genuinely varies by company and by team, so these notes do not force it either. Synthesis itself gets proper treatment in <a href="L02-design-and-verification-overview.html#s4">Lecture 2, §04</a>.</figcaption>
+  </figure>
+
+  <p lang="ko">재밌는 건 <strong>Synthesis 가 그 경계에 걸쳐 있다</strong>는 거다. RTL(사람의 언어)을 netlist(게이트)로 바꾸는 단계라 양쪽 다 걸친다. Lab 0 에서 Design Compiler 를 돌려보는 게 정확히 이 지점이다.</p>
+  <p lang="en">The fun part is that <strong>synthesis straddles that line</strong>. It turns RTL (human language) into a netlist (gates), so it belongs to both sides. Running Design Compiler in Lab 0 is exactly this step.</p>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">우리는 어디에 있나</h2><h2 lang="en">Where we stand</h2></div>
+
+  <p lang="ko">지도를 폈으니 우리 위치를 찍자. <strong>이 수업은 Front-End 안에서도 Design 과 Verification 두 칸에 산다.</strong> 슬라이드의 빨간 화살표가 Design 박스를 가리키는 게 그 뜻이다.</p>
+  <p lang="en">Map is open, so mark your position. <strong>This course lives in two cells of the front end: design and verification.</strong> That is what the red arrow pointing at the design box on the slide means.</p>
+
+  <p lang="ko">근데 여기서 오해하기 쉬운 게 있다. <strong>Verification 은 한 칸이 아니다.</strong> 흐름 전체에 걸쳐 구간마다 다른 형태로 붙어 있다.</p>
+  <p lang="en">Easy thing to get wrong, though: <strong>verification is not one cell.</strong> It clings to the whole flow, taking a different shape at each stretch.</p>
+
+<figure>
+    <svg viewBox="0 0 700 330" role="img" aria-label="설계 흐름의 각 구간에 붙는 세 종류의 verification">
+      <!-- 오른쪽 흐름 열 -->
+      <rect x="404" y="14" width="176" height="26" rx="5" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.1"/>
+      <text class="svgtxt" x="492" y="32" text-anchor="middle" style="font-size:12px">Specification</text>
+      <rect x="404" y="58" width="176" height="26" rx="5" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.1"/>
+      <text class="svgtxt" x="492" y="76" text-anchor="middle" style="font-size:12px">Architecture</text>
+      <rect x="404" y="102" width="176" height="26" rx="5" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.1"/>
+      <text class="svgtxt" x="492" y="120" text-anchor="middle" style="font-size:12px">Design</text>
+      <rect x="404" y="146" width="176" height="26" rx="5" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.1"/>
+      <text class="svgtxt" x="492" y="164" text-anchor="middle" style="font-size:12px">Synthesis</text>
+      <rect x="404" y="190" width="176" height="26" rx="5" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.1"/>
+      <text class="svgtxt" x="492" y="208" text-anchor="middle" style="font-size:12px">Place and Route</text>
+      <rect x="404" y="234" width="176" height="26" rx="5" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.1"/>
+      <text class="svgtxt" x="492" y="252" text-anchor="middle" style="font-size:12px">Fabrication</text>
+      <rect x="404" y="278" width="176" height="26" rx="5" fill="rgba(var(--brown-rgb),.13)" stroke="var(--brown)" stroke-width="1.1"/>
+      <text class="svgtxt" x="492" y="296" text-anchor="middle" style="font-size:12px">Board / Product</text>
+
+      <!-- 밴드 1 -->
+      <rect x="24" y="14" width="336" height="114" rx="9" fill="rgba(var(--pink-rgb),.13)" stroke="var(--pink)" stroke-width="1.8"/>
+      <rect x="36" y="24" width="128" height="19" rx="9" fill="rgba(var(--pink-rgb),.22)" stroke="var(--pink)" stroke-width="1"/>
+      <text class="svglab" x="100" y="37" text-anchor="middle" style="fill:var(--pink);font-size:10px;font-weight:700" lang="ko">이 수업 2부</text>
+      <text class="svglab" x="100" y="37" text-anchor="middle" style="fill:var(--pink);font-size:10px;font-weight:700" lang="en">part 2 of the course</text>
+      <text class="svgtxt" x="192" y="72" text-anchor="middle" style="font-size:14px;font-weight:700">Functional and</text>
+      <text class="svgtxt" x="192" y="91" text-anchor="middle" style="font-size:14px;font-weight:700">Performance Verification</text>
+      <text class="svglab" x="192" y="112" text-anchor="middle" lang="ko">기능이 맞는가, 충분히 빠른가</text>
+      <text class="svglab" x="192" y="112" text-anchor="middle" lang="en">does it do the right thing, and fast enough</text>
+
+      <!-- 밴드 2 -->
+      <rect x="24" y="146" width="336" height="70" rx="9" fill="rgba(var(--pink-rgb),.05)" stroke="rgba(var(--pink-rgb),.5)" stroke-width="1.3"/>
+      <text class="svgtxt" x="192" y="176" text-anchor="middle" style="font-size:13.5px">Timing, Power, Layout Verification</text>
+      <text class="svglab" x="192" y="198" text-anchor="middle" lang="ko">클럭 안에 들어오는가, 전력과 배치가 맞는가</text>
+      <text class="svglab" x="192" y="198" text-anchor="middle" lang="en">does it close timing, does the power and layout hold</text>
+
+      <!-- 밴드 3 -->
+      <rect x="24" y="234" width="336" height="70" rx="9" fill="rgba(var(--pink-rgb),.05)" stroke="rgba(var(--pink-rgb),.5)" stroke-width="1.3"/>
+      <text class="svgtxt" x="192" y="264" text-anchor="middle" style="font-size:13.5px">Faults and electrical verification</text>
+      <text class="svglab" x="192" y="286" text-anchor="middle" lang="ko">만들다 생긴 결함과 전기적 특성</text>
+      <text class="svglab" x="192" y="286" text-anchor="middle" lang="en">defects from manufacturing, and electrical behaviour</text>
+
+      <!-- 연결선 -->
+      <line x1="362" y1="71" x2="402" y2="71" stroke="var(--rule)" stroke-width="1.4" stroke-dasharray="3 3"/>
+      <line x1="362" y1="181" x2="402" y2="181" stroke="var(--rule)" stroke-width="1.4" stroke-dasharray="3 3"/>
+      <line x1="362" y1="269" x2="402" y2="269" stroke="var(--rule)" stroke-width="1.4" stroke-dasharray="3 3"/>
+    </svg>
+    <figcaption lang="ko">슬라이드 16쪽. 같은 "verification"인데 <strong>잡으려는 대상이 다르다.</strong> 맨 위는 논리가 틀렸는지, 가운데는 물리적 제약을 못 지켰는지, 맨 아래는 공정에서 결함이 생겼는지를 본다. 이 수업 2부는 <strong>맨 위 하나</strong>다.</figcaption>
+    <figcaption lang="en">Slide 16. All three are called verification, but <strong>each hunts a different thing</strong>: the top one asks whether the logic is wrong, the middle one whether a physical constraint was missed, the bottom one whether the process introduced a defect. Part two of this course is <strong>only the top one</strong>.</figcaption>
+  </figure>
+
+  <p lang="ko">그러니까 "검증 엔지니어" 라고 해도 <strong>어느 구간에 있느냐에 따라 하는 일이 완전히 다르다.</strong> 이게 다음 절에서 이름이 넷으로 갈리는 이유다.</p>
+  <p lang="en">So "verification engineer" means <strong>completely different work depending on which stretch you are on.</strong> That is precisely why the next section has four different names for it.</p>
+
+  <p lang="ko">한 가지 더. 흐름에는 <strong>얼어붙는 지점</strong>이 있다. Spec Freeze, Logic Freeze, Tapeout. 얼었다고 다시 못 고치는 건 아닌데, 그 뒤의 수정은 <strong>ECO</strong> 라는 별도 절차를 탄다.</p>
+  <p lang="en">One more thing. The flow has <strong>freeze points</strong>: spec freeze, logic freeze, tapeout. Frozen does not mean unfixable, but any change after one goes through a separate process called an <strong>ECO</strong>.</p>
+
+<figure>
+    <svg viewBox="0 0 700 200" role="img" aria-label="Spec Freeze, Logic Freeze, Tapeout 순서와 그 사이의 ECO 구간">
+      <!-- 진행 화살표 -->
+      <path d="M20 88 H600 V72 L660 100 L600 128 V112 H20 Z" fill="rgba(var(--ink-rgb),.06)" stroke="var(--rule)" stroke-width="1"/>
+
+      <!-- 마일스톤 -->
+      <circle cx="150" cy="100" r="9" fill="var(--blue)" stroke="var(--card)" stroke-width="2.5"/>
+      <circle cx="340" cy="100" r="9" fill="var(--blue)" stroke="var(--card)" stroke-width="2.5"/>
+      <circle cx="530" cy="100" r="9" fill="var(--brown)" stroke="var(--card)" stroke-width="2.5"/>
+
+      <text class="svgtxt" x="150" y="64" text-anchor="middle" style="font-size:13px;font-weight:650">Spec Freeze</text>
+      <text class="svglab" x="150" y="80" text-anchor="middle" style="font-size:10px" lang="ko">사양을 더 안 바꾼다</text>
+      <text class="svglab" x="150" y="80" text-anchor="middle" style="font-size:10px" lang="en">no more spec changes</text>
+
+      <text class="svgtxt" x="340" y="64" text-anchor="middle" style="font-size:13px;font-weight:650">Logic Freeze</text>
+      <text class="svglab" x="340" y="80" text-anchor="middle" style="font-size:10px" lang="ko">RTL을 더 안 바꾼다</text>
+      <text class="svglab" x="340" y="80" text-anchor="middle" style="font-size:10px" lang="en">no more RTL changes</text>
+
+      <text class="svgtxt" x="530" y="46" text-anchor="middle" style="font-size:13px;font-weight:650">Tapeout</text>
+      <text class="svglab" x="530" y="62" text-anchor="middle" style="font-size:10px">Base Layer</text>
+      <text class="svglab" x="530" y="76" text-anchor="middle" style="font-size:10px">Metal Layer</text>
+
+      <!-- ECO 구간 -->
+      <line x1="340" y1="112" x2="340" y2="134" stroke="var(--amber)" stroke-width="1" stroke-dasharray="3 3"/>
+      <line x1="530" y1="112" x2="530" y2="134" stroke="var(--amber)" stroke-width="1" stroke-dasharray="3 3"/>
+      <rect x="340" y="134" width="190" height="22" rx="11" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svglab" x="435" y="149" text-anchor="middle" style="fill:var(--amber);font-weight:700">ECO</text>
+      <text class="svglab" x="435" y="176" text-anchor="middle" lang="ko">여기서 버그가 나오면 RTL이 아니라 netlist를 고친다</text>
+      <text class="svglab" x="435" y="176" text-anchor="middle" lang="en">a bug found here gets fixed in the netlist, not the RTL</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 18쪽. <strong>Logic Freeze 이후에 RTL 버그가 발견되면</strong> RTL을 고쳐서 합성을 다시 돌리지 않는다. netlist를 직접 "수술하듯" 고친다. 합성을 다시 돌리면 다른 곳의 타이밍이 전부 흔들려서 이미 끝난 back-end 작업이 무효가 되기 때문이다. 그래서 승인 절차가 붙는다.</figcaption>
+    <figcaption lang="en">Slide 18. <strong>If an RTL bug turns up after logic freeze</strong>, nobody edits the RTL and re-runs synthesis. The netlist gets patched surgically instead. Re-running synthesis would shake timing everywhere else and throw away back end work that is already finished, which is also why approvals are attached.</figcaption>
+  </figure>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; ECO</span><span lang="en">Jargon &middot; ECO</span></summary>
+      <table class="parts">
+        <tr><td lang="ko">풀네임</td><td lang="en">Full name</td><td>Engineering Change Order</td></tr>
+        <tr><td lang="ko">한 줄</td><td lang="en">In one line</td><td><span lang="ko">이미 얼린 설계에 넣는 <strong>최소한의</strong> 수정. 전체를 다시 돌리지 않는다.</span><span lang="en">A <strong>minimal</strong> patch to an already-frozen design, without rerunning everything.</span></td></tr>
+        <tr><td lang="ko">언제</td><td lang="en">When</td><td><span lang="ko">Logic Freeze 이후, 심하면 tapeout 직전에도.</span><span lang="en">After logic freeze, sometimes right up against tapeout.</span></td></tr>
+        <tr><td lang="ko">헷갈리는 것</td><td lang="en">Easy to misread</td><td><span lang="ko">ECO 는 "급하게 고친다" 가 아니라 <strong>"영향 범위를 최소로 막으면서 고친다"</strong> 는 뜻이다.</span><span lang="en">ECO does not mean "fix it in a hurry". It means <strong>"fix it while containing the blast radius"</strong>.</span></td></tr>
+      </table>
+    </details>
+  </div>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">헷갈리는 이름 넷</h2><h2 lang="en">The four confusing names</h2></div>
+
+  <p lang="ko"><strong>여기가 1강의 진짜 알맹이다.</strong> 그리고 <strong>quiz 단골</strong>이다. Verification, Testing, Validation, Emulation. 넷 다 "확인한다" 는 뜻인데 <strong>확인하는 대상과 시점이 전부 다르다.</strong></p>
+  <p lang="en"><strong>This is the actual meat of lecture 1</strong>, and <strong>a quiz favourite</strong>. Verification, testing, validation, emulation. All four mean "checking", but <strong>what gets checked and when differs every time.</strong></p>
+
+  <p lang="ko">표 하나로 끝내자. 다시 읽을 때는 이것만 봐도 된다.</p>
+  <p lang="en">One table settles it. On a re-read, this is the only thing you need.</p>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">이름</th><th lang="en">Name</th>
+      <th lang="ko">무엇을 확인하나</th><th lang="en">Checks what</th>
+      <th lang="ko">언제</th><th lang="en">When</th>
+      <th lang="ko">한 줄로</th><th lang="en">In a line</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Verification</strong></td>
+        <td><span lang="ko">설계가 <strong>명세대로</strong> 동작하나</span><span lang="en">Does the design match <strong>the spec</strong></span></td>
+        <td><span lang="ko">제조 <strong>전</strong></span><span lang="en"><strong>Before</strong> manufacturing</span></td>
+        <td><span lang="ko">"우리가 만든 게 <strong>맞게</strong> 만들어졌나"</span><span lang="en">"Did we build it <strong>right</strong>"</span></td>
+      </tr>
+      <tr>
+        <td><strong>Testing</strong></td>
+        <td><span lang="ko">실제로 나온 <strong>칩에 제조 결함</strong>이 있나</span><span lang="en">Does the <strong>physical chip</strong> have manufacturing defects</span></td>
+        <td><span lang="ko">제조 <strong>후</strong></span><span lang="en"><strong>After</strong> manufacturing</span></td>
+        <td><span lang="ko">"이번에 구운 게 <strong>제대로 구워졌나</strong>"</span><span lang="en">"Did this particular one <strong>come out intact</strong>"</span></td>
+      </tr>
+      <tr>
+        <td><strong>Validation</strong></td>
+        <td><span lang="ko">칩이 <strong>실제 환경</strong>에서 쓸 만한가</span><span lang="en">Is the chip usable <strong>in a real system</strong></span></td>
+        <td><span lang="ko">실물 칩 + 보드</span><span lang="en">Real silicon on a board</span></td>
+        <td><span lang="ko">"<strong>맞는 걸</strong> 만들었나"</span><span lang="en">"Did we build <strong>the right thing</strong>"</span></td>
+      </tr>
+      <tr>
+        <td><strong>Emulation</strong></td>
+        <td><span lang="ko">설계를 <strong>빠르게</strong> 돌려보기 (전용 하드웨어에 얹어서)</span><span lang="en">Running the design <strong>fast</strong>, mapped onto dedicated hardware</span></td>
+        <td><span lang="ko">제조 전, 시뮬레이션이 너무 느릴 때</span><span lang="en">Pre-silicon, when simulation is too slow</span></td>
+        <td><span lang="ko">"시뮬레이션이 <strong>느려서</strong> 못 하는 걸 한다"</span><span lang="en">"Does what simulation is <strong>too slow</strong> to do"</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">제일 많이 헷갈리는 <strong>Verification 과 Testing</strong> 만 그림으로 한 번 더 보자. 경계가 <strong>제조</strong>다.</p>
+  <p lang="en">The pair people mix up most is <strong>verification and testing</strong>, so here it is drawn. The dividing line is <strong>manufacturing</strong>.</p>
+
+<figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="제조를 경계로 갈라지는 verification과 testing의 관찰 범위 비교">
+      <line x1="350" y1="34" x2="350" y2="278" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="6 5"/>
+      <text class="svglab" x="350" y="22" text-anchor="middle" style="font-weight:700;fill:var(--ink)" lang="ko">여기서 칩이 만들어진다</text>
+      <text class="svglab" x="350" y="22" text-anchor="middle" style="font-weight:700;fill:var(--ink)" lang="en">the chip gets manufactured here</text>
+
+      <!-- 왼쪽: Verification -->
+      <rect x="20" y="36" width="310" height="242" rx="10" fill="rgba(var(--pink-rgb),.06)" stroke="var(--pink)" stroke-width="1.4"/>
+      <text class="svgtxt" x="175" y="62" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--pink)">Verification</text>
+      <text class="svglab" x="175" y="82" text-anchor="middle" lang="ko">설계가 사양대로인가</text>
+      <text class="svglab" x="175" y="82" text-anchor="middle" lang="en">does the design match the spec</text>
+
+      <rect x="66" y="100" width="218" height="108" rx="7" fill="rgba(var(--pink-rgb),.10)" stroke="var(--pink)" stroke-width="1.3"/>
+      <circle cx="110" cy="132" r="6" fill="var(--pink)"/>
+      <circle cx="175" cy="132" r="6" fill="var(--pink)"/>
+      <circle cx="240" cy="132" r="6" fill="var(--pink)"/>
+      <circle cx="110" cy="176" r="6" fill="var(--pink)"/>
+      <circle cx="175" cy="176" r="6" fill="var(--pink)"/>
+      <circle cx="240" cy="176" r="6" fill="var(--pink)"/>
+      <line x1="110" y1="132" x2="175" y2="132" stroke="var(--pink)" stroke-width="1.2"/>
+      <line x1="175" y1="132" x2="240" y2="132" stroke="var(--pink)" stroke-width="1.2"/>
+      <line x1="110" y1="176" x2="175" y2="176" stroke="var(--pink)" stroke-width="1.2"/>
+      <line x1="175" y1="176" x2="240" y2="176" stroke="var(--pink)" stroke-width="1.2"/>
+      <line x1="175" y1="132" x2="175" y2="176" stroke="var(--pink)" stroke-width="1.2"/>
+
+      <text class="svglab" x="175" y="234" text-anchor="middle" style="font-weight:700;fill:var(--ink)" lang="ko">모든 내부 노드를 보고 조작할 수 있다</text>
+      <text class="svglab" x="175" y="234" text-anchor="middle" style="font-weight:700;fill:var(--ink)" lang="en">every internal node is visible and drivable</text>
+      <text class="svglab" x="175" y="254" text-anchor="middle" lang="ko">설계 버그를 잡는다 · 제조 전에 한 번</text>
+      <text class="svglab" x="175" y="254" text-anchor="middle" lang="en">it hunts design bugs, once, before manufacturing</text>
+      <text class="svglab" x="175" y="270" text-anchor="middle" lang="ko">설계의 품질을 책임진다</text>
+      <text class="svglab" x="175" y="270" text-anchor="middle" lang="en">it owns the quality of the design</text>
+
+      <!-- 오른쪽: Testing -->
+      <rect x="370" y="36" width="310" height="242" rx="10" fill="rgba(var(--brown-rgb),.06)" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svgtxt" x="525" y="62" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--brown)">Testing</text>
+      <text class="svglab" x="525" y="82" text-anchor="middle" lang="ko">만들어진 칩이 설계대로인가</text>
+      <text class="svglab" x="525" y="82" text-anchor="middle" lang="en">does the made part match the design</text>
+
+      <rect x="416" y="100" width="218" height="108" rx="7" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.3"/>
+      <circle cx="460" cy="132" r="6" fill="none" stroke="rgba(var(--ink-rgb),.28)" stroke-width="1.2"/>
+      <circle cx="525" cy="132" r="6" fill="none" stroke="rgba(var(--ink-rgb),.28)" stroke-width="1.2"/>
+      <circle cx="590" cy="132" r="6" fill="none" stroke="rgba(var(--ink-rgb),.28)" stroke-width="1.2"/>
+      <circle cx="460" cy="176" r="6" fill="none" stroke="rgba(var(--ink-rgb),.28)" stroke-width="1.2"/>
+      <circle cx="525" cy="176" r="6" fill="none" stroke="rgba(var(--ink-rgb),.28)" stroke-width="1.2"/>
+      <circle cx="590" cy="176" r="6" fill="none" stroke="rgba(var(--ink-rgb),.28)" stroke-width="1.2"/>
+      <line x1="460" y1="132" x2="525" y2="132" stroke="rgba(var(--ink-rgb),.22)" stroke-width="1.2"/>
+      <line x1="525" y1="132" x2="590" y2="132" stroke="rgba(var(--ink-rgb),.22)" stroke-width="1.2"/>
+      <line x1="460" y1="176" x2="525" y2="176" stroke="rgba(var(--ink-rgb),.22)" stroke-width="1.2"/>
+      <line x1="525" y1="176" x2="590" y2="176" stroke="rgba(var(--ink-rgb),.22)" stroke-width="1.2"/>
+      <line x1="525" y1="132" x2="525" y2="176" stroke="rgba(var(--ink-rgb),.22)" stroke-width="1.2"/>
+      <!-- 핀만 접근 가능 -->
+      <rect x="406" y="122" width="12" height="18" rx="2" fill="var(--brown)"/>
+      <rect x="406" y="168" width="12" height="18" rx="2" fill="var(--brown)"/>
+      <rect x="632" y="122" width="12" height="18" rx="2" fill="var(--brown)"/>
+      <rect x="632" y="168" width="12" height="18" rx="2" fill="var(--brown)"/>
+
+      <text class="svglab" x="525" y="234" text-anchor="middle" style="font-weight:700;fill:var(--ink)" lang="ko">바깥 핀만 보고 조작할 수 있다</text>
+      <text class="svglab" x="525" y="234" text-anchor="middle" style="font-weight:700;fill:var(--ink)" lang="en">only the outside pins are reachable</text>
+      <text class="svglab" x="525" y="254" text-anchor="middle" lang="ko">제조 결함을 잡는다 · 칩 하나하나마다</text>
+      <text class="svglab" x="525" y="254" text-anchor="middle" lang="en">it hunts manufacturing defects, on every single part</text>
+      <text class="svglab" x="525" y="270" text-anchor="middle" lang="ko">출하되는 제품의 품질을 책임진다</text>
+      <text class="svglab" x="525" y="270" text-anchor="middle" lang="en">it owns the quality of what ships</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 21쪽. 차이가 여섯 줄이지만 <strong>전부 "제조 전이냐 후냐" 하나에서 따라 나온다.</strong> 제조 전이면 설계 파일을 들고 있으니 안을 다 볼 수 있고, 한 번만 하면 되고, 잡는 건 설계 버그다. 제조 후면 물건을 들고 있으니 핀밖에 못 만지고, 물건마다 해야 하고, 잡는 건 공정 결함이다.</figcaption>
+    <figcaption lang="en">Slide 21. There are six differences, but <strong>all six fall out of one question: before manufacturing or after.</strong> Before, you hold the design files, so you can see inside, you do it once, and the bugs are design bugs. After, you hold a physical part, so you only reach the pins, you do it for every part, and the faults are process defects.</figcaption>
+  </figure>
+
+  <div class="trap">
+    <p lang="ko"><strong>"Test" 라는 단어가 두 가지로 쓰인다.</strong> 일상에서 "테스트해봐" 는 시뮬레이션 돌려보라는 뜻으로 쓰지만, 이 판에서 <strong>Testing 은 제조 후 결함 검사</strong>를 가리키는 정식 용어다. DFT(Design For Testability)의 T 가 이 Testing 이다. <strong>시뮬레이션은 Testing 이 아니라 Verification 이다.</strong></p>
+    <p lang="en"><strong>The word "test" does double duty.</strong> Casually, "go test it" means run a simulation. In this field, <strong>testing</strong> is the formal term for post-manufacturing defect screening. The T in DFT (Design For Testability) is that testing. <strong>Simulation is verification, not testing.</strong></p>
+  </div>
+
+  <p lang="ko">Validation 은 시점이 하나 더 뒤다. 칩이 실제로 나온 다음, <strong>EVB(Evaluation Board)</strong> 같은 데 얹어서 진짜 시스템처럼 굴려본다. Verification 이 "명세대로 됐나" 를 본다면 Validation 은 <strong>"명세 자체가 맞았나"</strong> 를 본다.</p>
+  <p lang="en">Validation sits one step later still. Once real silicon exists you drop it on something like an <strong>EVB (evaluation board)</strong> and run it as a real system. Where verification asks "does it match the spec", validation asks <strong>"was the spec right in the first place"</strong>.</p>
+
+<figure>
+    <svg viewBox="0 0 700 200" role="img" aria-label="Design부터 Customer까지의 순서와 실리콘 이전 이후의 경계">
+      <path d="M14 54 H616 V32 L690 76 L616 120 V98 H14 Z" fill="rgba(var(--ink-rgb),.05)" stroke="none"/>
+
+      <!-- pre / post silicon 밴드 -->
+      <rect x="24" y="20" width="182" height="18" rx="9" fill="rgba(var(--pink-rgb),.14)" stroke="var(--pink)" stroke-width="1"/>
+      <text class="svglab" x="115" y="33" text-anchor="middle" style="fill:var(--pink);font-size:10px;font-weight:700">pre-silicon</text>
+      <rect x="306" y="20" width="182" height="18" rx="9" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)" stroke-width="1"/>
+      <text class="svglab" x="397" y="33" text-anchor="middle" style="fill:var(--brown);font-size:10px;font-weight:700">post-silicon</text>
+
+      <!-- 단계 -->
+      <rect x="24" y="46" width="88" height="66" rx="7" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgtxt" x="68" y="84" text-anchor="middle" style="font-size:11.5px">Design</text>
+
+      <rect x="118" y="46" width="88" height="66" rx="7" fill="rgba(var(--pink-rgb),.16)" stroke="var(--pink)" stroke-width="2"/>
+      <text class="svgtxt" x="162" y="72" text-anchor="middle" style="font-size:11px;font-weight:700">Verification</text>
+      <text class="svgtxt" x="162" y="88" text-anchor="middle" style="font-size:11px">+</text>
+      <text class="svgtxt" x="162" y="103" text-anchor="middle" style="font-size:11px;font-weight:700">Emulation</text>
+
+      <rect x="212" y="46" width="88" height="66" rx="7" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svgtxt" x="256" y="78" text-anchor="middle" style="font-size:11px">Fabri-</text>
+      <text class="svgtxt" x="256" y="93" text-anchor="middle" style="font-size:11px">cation</text>
+
+      <rect x="306" y="46" width="88" height="66" rx="7" fill="rgba(var(--brown-rgb),.2)" stroke="var(--brown)" stroke-width="2"/>
+      <text class="svgtxt" x="350" y="84" text-anchor="middle" style="font-size:11.5px;font-weight:700">Testing</text>
+
+      <rect x="400" y="46" width="88" height="66" rx="7" fill="rgba(var(--brown-rgb),.2)" stroke="var(--brown)" stroke-width="2"/>
+      <text class="svgtxt" x="444" y="84" text-anchor="middle" style="font-size:11px;font-weight:700">Validation</text>
+
+      <rect x="494" y="46" width="88" height="66" rx="7" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.2"/>
+      <text class="svgtxt" x="538" y="84" text-anchor="middle" style="font-size:11.5px;fill:var(--ink2)">Software</text>
+
+      <rect x="588" y="46" width="88" height="66" rx="7" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.2"/>
+      <text class="svgtxt" x="632" y="84" text-anchor="middle" style="font-size:11.5px;fill:var(--ink2)">Customer</text>
+
+      <!-- 이 수업 범위 -->
+      <path d="M24 128 V138 H206 V128" fill="none" stroke="var(--pink)" stroke-width="1.3"/>
+      <text class="svglab" x="115" y="156" text-anchor="middle" style="fill:var(--pink);font-weight:700" lang="ko">이 수업이 다루는 구간</text>
+      <text class="svglab" x="115" y="156" text-anchor="middle" style="fill:var(--pink);font-weight:700" lang="en">the span this course covers</text>
+      <text class="svglab" x="350" y="156" text-anchor="middle" style="font-size:10px" lang="ko">Lecture 23에서 한 번 다룬다</text>
+      <text class="svglab" x="350" y="156" text-anchor="middle" style="font-size:10px" lang="en">covered once, in lecture 30</text>
+      <text class="svglab" x="350" y="178" text-anchor="middle" style="font-size:10px" lang="ko">Fabrication이 pre와 post를 가르는 경계다</text>
+      <text class="svglab" x="350" y="178" text-anchor="middle" style="font-size:10px" lang="en">fabrication is the line between pre and post</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 24쪽. 슬라이드는 Verification+Emulation, Testing, Validation 세 칸을 노란 글씨로 강조해뒀다. <strong>이 셋이 이 강의가 구별시키려는 대상</strong>이라는 뜻이다. pre/post 밴드는 이 노트가 덧붙인 것으로, 슬라이드에는 없다.</figcaption>
+    <figcaption lang="en">Slide 24. The slide picks out Verification+Emulation, Testing and Validation in yellow, which marks <strong>the three the lecture wants you to separate.</strong> The pre and post silicon bands are added by these notes and are not on the slide.</figcaption>
+  </figure>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">추상화 3단</h2><h2 lang="en">Three levels of abstraction</h2></div>
+
+  <p lang="ko">이름 헷갈리는 게 하나 더 있다. <strong>Architecture, Microarchitecture, Design.</strong> 이건 셋이 나란한 게 아니라 <strong>위에서 아래로 내려가는 계단</strong>이다.</p>
+  <p lang="en">One more naming trap: <strong>architecture, microarchitecture, design.</strong> These are not three siblings, they are <strong>a staircase going down</strong>.</p>
+
+<figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="Architecture에서 Microarchitecture를 거쳐 Design으로 내려가는 추상화 단계">
+      <defs>
+        <marker id="f4-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <rect x="30" y="18" width="252" height="58" rx="8" fill="rgba(var(--blue-rgb),.09)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="156" y="42" text-anchor="middle" style="font-size:14.5px;font-weight:700">Architecture</text>
+      <text class="svglab" x="156" y="62" text-anchor="middle" lang="ko">무엇을 하는가 (what)</text>
+      <text class="svglab" x="156" y="62" text-anchor="middle" lang="en">what it does</text>
+
+      <rect x="140" y="94" width="290" height="58" rx="8" fill="rgba(var(--blue-rgb),.15)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="285" y="118" text-anchor="middle" style="font-size:14.5px;font-weight:700">Microarchitecture</text>
+      <text class="svglab" x="285" y="138" text-anchor="middle" lang="ko">어떻게 하는가 (how)</text>
+      <text class="svglab" x="285" y="138" text-anchor="middle" lang="en">how it does it</text>
+
+      <rect x="272" y="170" width="330" height="58" rx="8" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="2"/>
+      <text class="svgtxt" x="437" y="194" text-anchor="middle" style="font-size:14.5px;font-weight:700">Design</text>
+      <text class="svglab" x="437" y="214" text-anchor="middle" lang="ko">실제로 만든다 (build)</text>
+      <text class="svglab" x="437" y="214" text-anchor="middle" lang="en">actually building it</text>
+
+      <line x1="210" y1="78" x2="210" y2="91" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#f4-ar)"/>
+      <line x1="350" y1="154" x2="350" y2="167" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#f4-ar)"/>
+      <text class="svglab" x="220" y="89" style="font-size:10px" lang="ko">구체화</text>
+      <text class="svglab" x="220" y="89" style="font-size:10px" lang="en">made concrete</text>
+      <text class="svglab" x="360" y="165" style="font-size:10px" lang="ko">구체화</text>
+      <text class="svglab" x="360" y="165" style="font-size:10px" lang="en">made concrete</text>
+
+      <line x1="660" y1="26" x2="660" y2="222" stroke="var(--rule)" stroke-width="1.4" marker-end="url(#f4-ar)"/>
+      <text class="svglab" x="660" y="16" text-anchor="middle" style="font-size:10px" lang="ko">추상적</text>
+      <text class="svglab" x="660" y="16" text-anchor="middle" style="font-size:10px" lang="en">abstract</text>
+      <text class="svglab" x="660" y="242" text-anchor="middle" style="font-size:10px" lang="ko">구체적</text>
+      <text class="svglab" x="660" y="242" text-anchor="middle" style="font-size:10px" lang="en">concrete</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 20쪽. 오른쪽 화살표가 추상화 수준이다. 아래로 갈수록 상자가 넓어지는 건 <strong>같은 것을 더 많은 말로 적어야 한다</strong>는 뜻이다.</figcaption>
+    <figcaption lang="en">Slide 20. The arrow on the right is the level of abstraction. The boxes widen as you go down because <strong>the same thing takes more words to write out.</strong></figcaption>
+  </figure>
+
+  <table>
+    <thead><tr>
+      <th lang="ko">단계</th><th lang="en">Level</th>
+      <th lang="ko">답하는 질문</th><th lang="en">Answers</th>
+      <th lang="ko">산출물</th><th lang="en">Output</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><strong>Architecture</strong></td>
+        <td><span lang="ko"><strong>무엇을</strong> 할 것인가</span><span lang="en"><strong>What</strong> it will do</span></td>
+        <td><span lang="ko">명세 문서</span><span lang="en">A spec document</span></td></tr>
+      <tr><td><strong>Microarchitecture</strong></td>
+        <td><span lang="ko"><strong>어떻게</strong> 할 것인가</span><span lang="en"><strong>How</strong> it will do it</span></td>
+        <td><span lang="ko">블록도, 파이프라인 구조</span><span lang="en">Block diagrams, pipeline structure</span></td></tr>
+      <tr><td><strong>Design</strong></td>
+        <td><span lang="ko">그걸 <strong>실제 코드로</strong></span><span lang="en">Turn that into <strong>actual code</strong></span></td>
+        <td><span lang="ko">RTL</span><span lang="en">RTL</span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">쉽게 기억하려면 <strong>"무엇 &rarr; 어떻게 &rarr; 코드"</strong>. 예를 들어 "캐시를 넣는다" 가 architecture, "2-way set associative 에 32KB" 가 microarchitecture, 그걸 SystemVerilog 로 쓰는 게 design 이다.</p>
+  <p lang="en">Easiest hook: <strong>what &rarr; how &rarr; code</strong>. "We will have a cache" is architecture, "32KB, two-way set associative" is microarchitecture, writing it in SystemVerilog is design.</p>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">회사마다 말이 다르다</h2><h2 lang="en">Every company renames things</h2></div>
+
+  <p lang="ko">이건 시험에는 안 나오는데 <strong>취업하면 바로 겪는 것</strong>이라 적어둔다. 같은 일을 회사마다 다른 이름으로 부른다.</p>
+  <p lang="en">This will not be on a quiz but <strong>you hit it the week you start a job</strong>, so it is worth writing down. The same role gets a different name at every company.</p>
+
+  <ul>
+    <li lang="ko"><strong>DV</strong> (Design Verification) 가 제일 흔한 이름이다. NVIDIA 계열에서 많이 쓴다</li>
+    <li lang="en"><strong>DV</strong> (design verification) is the most common label, widely used around NVIDIA</li>
+    <li lang="ko">Intel 에서는 같은 일을 다른 이름으로 부른다. <strong>"Emulation" 이라는 말도 회사마다 가리키는 범위가 다르다</strong></li>
+    <li lang="en">Intel calls the same work something else, and <strong>even "emulation" covers different ground depending on who says it</strong></li>
+    <li lang="ko">그래서 <strong>채용 공고를 읽을 때 직함이 아니라 업무 설명을 봐야 한다</strong></li>
+    <li lang="en">Which is why <strong>you read the job description, not the job title</strong></li>
+  </ul>
+
+  <div class="callout">
+    <p lang="ko">이 노트가 용어마다 <strong>"누가 언제 쓰는 말인가"</strong>를 굳이 적는 이유가 이거다. 정의는 검색하면 나오지만, <strong>그 말을 어느 자리에서 쓰는지</strong>는 안 나온다.</p>
+    <p lang="en">This is why these notes keep noting <strong>who uses a word and when</strong>. Definitions are a search away; <strong>knowing which room a word belongs in</strong> is not.</p>
+  </div>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+
+  <p lang="ko">1 강에서 quiz 로 나올 만한 건 사실상 <strong>용어 구분</strong> 하나다.</p>
+  <p lang="en">Realistically there is one quiz-shaped thing in lecture 1: <strong>telling the terms apart</strong>.</p>
+
+  <ul>
+    <li lang="ko"><strong>Verification vs. Testing.</strong> 경계는 <strong>제조</strong>다. 제조 전이면 verification, 제조 후 결함 검사면 testing</li>
+    <li lang="en"><strong>Verification vs. testing.</strong> The line is <strong>manufacturing</strong>. Before it, verification; defect screening after it, testing</li>
+    <li lang="ko"><strong>Verification vs. Validation.</strong> "맞게 만들었나" 와 <strong>"맞는 걸 만들었나"</strong></li>
+    <li lang="en"><strong>Verification vs. validation.</strong> "Built it right" versus <strong>"built the right thing"</strong></li>
+    <li lang="ko"><strong>Architecture &rarr; Microarchitecture &rarr; Design.</strong> 무엇 &rarr; 어떻게 &rarr; 코드</li>
+    <li lang="en"><strong>Architecture &rarr; microarchitecture &rarr; design.</strong> What &rarr; how &rarr; code</li>
+    <li lang="ko"><strong>Front-End vs. Back-End</strong> 경계, 그리고 Synthesis 가 그 위에 걸쳐 있다는 것</li>
+    <li lang="en"><strong>Front end vs. back end</strong>, and that synthesis straddles the boundary</li>
+  </ul>
+
+  <div class="callout">
+    <p lang="ko"><strong>다음 강의(2 강)</strong>는 여기서 지도만 봤던 Design 과 Verification 을 안으로 들어가서 본다. testbench 가 어떻게 생겼는지, 무엇이 무엇을 확인하는지가 거기서 나온다.</p>
+    <p lang="en"><strong>Lecture 2</strong> climbs inside the design and verification cells we only mapped here: what a testbench looks like, and what checks what.</p>
+  </div>
+
+  <p class="meta" lang="ko">더 자세한 설명, 각 용어의 전체 분해, 직접 분류해보는 연습은 <a href="L01-course-intro.html">자세한 판</a>에 있다.</p>
+  <p class="meta" lang="en">Fuller explanations, every term broken down, and a sorting exercise live in the <a href="L01-course-intro.html">full version</a>.</p>
+</section>
+
+</main>
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 1 개인 학습 노트<br>
+  강의: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 1 personal study notes<br>
+  Course: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 분류 연습. 상황을 주고 네 용어 중 하나를 고르게 한다.
+// 결과를 보여주는 게 아니라 사용자가 눌러서 발견하게 하는 것이 목적이다.
+(function () {
+  var host = document.getElementById('qs');
+  if (!host) return;
+  var scv = document.getElementById('scv');
+  var rst = document.getElementById('rst');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var OPTS = ['Verification', 'Emulation', 'Testing', 'Validation'];
+
+  var ITEMS = [
+    { a: 0,
+      ko: 'RTL을 시뮬레이터에 넣고 testbench로 랜덤 자극을 넣어 FIFO가 overflow 하는지 본다.',
+      en: 'You load the RTL into a simulator and throw random stimulus at it from a testbench to see whether the FIFO overflows.',
+      wko: '아직 칩이 없고, 손에 든 건 파일이다. 시뮬레이터 안에서 설계 버그를 찾고 있으므로 Verification.',
+      wen: 'There is no chip yet and what you hold is a file. Hunting design bugs inside a simulator makes it verification.' },
+    { a: 2,
+      ko: '공장에서 갓 나온 웨이퍼의 die 하나하나에 패턴을 넣어보고 불량을 골라낸다.',
+      en: 'Patterns get applied to each die on a wafer fresh out of the fab, and the bad ones are sorted out.',
+      wko: '칩이 이미 만들어졌고, 칩 하나하나마다 한다. 잡는 건 설계 버그가 아니라 제조 결함이다. Testing.',
+      wen: 'The chip already exists and this happens on every single part. What it catches is a process defect, not a design bug. Testing.' },
+    { a: 3,
+      ko: '보드에 칩을 꽂고 Linux를 부팅한 다음 벤치마크를 돌려 실제 전력을 측정한다.',
+      en: 'The chip goes onto a board, Linux boots, a benchmark runs, and real power draw gets measured.',
+      wko: '살아 있는 실리콘이고, OS를 부팅하고 있고, 전력을 실측하고 있다. 슬라이드 22쪽의 Validation 정의 그대로다.',
+      wen: 'Alive silicon, an OS booting, real power measurements. That is the definition of validation on slide 22, word for word.' },
+    { a: 1,
+      ko: '실리콘이 아직 안 왔는데, 설계를 Palladium에 올려서 드라이버를 미리 돌려본다.',
+      en: 'Silicon has not arrived, so the design is mapped onto a Palladium box and the drivers are exercised early.',
+      wko: '제조 전인데 시뮬레이터가 아니라 전용 하드웨어를 쓴다. Palladium은 슬라이드가 예로 든 프로세서 기반 emulator다.',
+      wen: 'Pre-manufacturing, but on dedicated hardware rather than a simulator. Palladium is the processor based emulator the slide names.' },
+    { a: 0,
+      ko: 'Logic Freeze 전에 assertion을 걸어 두 grant 신호가 동시에 뜨지 않는지 확인한다.',
+      en: 'Before logic freeze, an assertion checks that two grant signals never rise together.',
+      wko: '제조는커녕 RTL도 아직 얼지 않았다. 설계가 사양대로인지 보는 일이므로 Verification.',
+      wen: 'Nothing has been manufactured and the RTL is not even frozen. Checking the design against the spec is verification.' },
+    { a: 2,
+      ko: '설계에 scan chain을 넣어두고, 나중에 그 chain으로 내부 flip-flop 값을 밖으로 뽑는다.',
+      en: 'Scan chains go into the design so that later the internal flip-flop values can be shifted out through them.',
+      wko: 'scan chain은 DFT의 대표 장치다. 목적은 <strong>제조된 칩</strong>에서 핀만으로 안을 들여다보는 것. 넣는 시점은 설계 때지만 쓰는 곳은 Testing이다.',
+      wen: 'Scan chains are the signature DFT structure. Their purpose is to see inside <strong>a manufactured part</strong> using only its pins. They are inserted at design time but used in testing.' },
+    { a: 3,
+      ko: '새로 도착한 칩에 전원을 넣었더니 클럭이 안 돈다. 왜인지 파고 있다.',
+      en: 'Power goes into a newly arrived chip and the clock does not run. Someone is digging into why.',
+      wko: '살아 있는 물건에서 처음 동작을 만들어가는 단계, 즉 bring-up이다. NVIDIA에는 이걸 부르는 고유 이름이 없다고 슬라이드 25쪽이 적어놨다.',
+      wen: 'This is bring-up: coaxing first signs of life out of a physical part. Slide 25 notes that NVIDIA has no specific name for it.' },
+    { a: 1,
+      ko: '시뮬레이션으로는 부팅 한 번에 몇 주가 걸려서, FPGA 박스에 설계를 올려 몇 시간으로 줄였다.',
+      en: 'A single boot takes weeks in simulation, so the design is mapped onto an FPGA box and the same boot takes hours.',
+      wko: '"simulation acceleration"이 emulation의 존재 이유다. 슬라이드 23쪽의 첫 번째 항목.',
+      wen: 'Simulation acceleration is the whole reason emulation exists. It is the first bullet on slide 23.' },
+    { a: 0,
+      ko: '합성된 netlist가 원래 RTL과 논리적으로 같은지 도구로 증명한다.',
+      en: 'A tool proves that the synthesised netlist is logically the same as the original RTL.',
+      wko: '함정 문항이다. 물건이 아직 없으므로 Testing이 아니다. 이건 equivalence checking이고 formal verification의 한 종류다. <a href="L02-design-and-verification-overview.html#s12">Lecture 2의 12절</a>에서 다룬다.',
+      wen: 'A trap. Nothing physical exists, so it is not testing. This is equivalence checking, a form of formal verification, covered in <a href="L02-design-and-verification-overview.html#s12">Lecture 2, §12</a>.' },
+    { a: 2,
+      ko: '출하 전 마지막 관문에서, 팔 물건 100%에 대해 같은 패턴을 돌린다.',
+      en: 'At the last gate before shipping, the same pattern set runs on 100% of the parts to be sold.',
+      wko: '"칩마다 한다"가 결정적이다. Verification은 제조 전에 <strong>한 번</strong> 하고, Testing은 <strong>모든 칩에</strong> 한다.',
+      wen: '"Every part" settles it. Verification happens <strong>once</strong> before manufacturing; testing happens <strong>on every chip</strong>.' }
+  ];
+
+  var picked = [];
+
+  function paintScore() {
+    var done = 0, right = 0;
+    for (var i = 0; i < ITEMS.length; i++) {
+      if (picked[i] !== undefined) { done++; if (picked[i] === ITEMS[i].a) right++; }
+    }
+    scv.textContent = L(
+      right + ' / ' + done + ' 맞음  (전체 ' + ITEMS.length + '문항)',
+      right + ' of ' + done + ' correct  (' + ITEMS.length + ' in all)'
+    );
+    rst.textContent = L('다시', 'reset');
+  }
+
+  function build() {
+    host.textContent = '';
+    ITEMS.forEach(function (it, i) {
+      var row = document.createElement('div');
+      row.className = 'qrow';
+
+      var q = document.createElement('div');
+      q.className = 'q';
+      q.textContent = (i + 1) + '. ' + L(it.ko, it.en);
+      row.appendChild(q);
+
+      var opts = document.createElement('div');
+      opts.className = 'opts';
+      OPTS.forEach(function (name, oi) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = name;
+        b.addEventListener('click', function () {
+          if (picked[i] !== undefined) return;
+          picked[i] = oi;
+          build();
+        });
+        if (picked[i] !== undefined) {
+          b.disabled = true;
+          if (oi === it.a) b.className = 'right';
+          else if (oi === picked[i]) b.className = 'wrong';
+        }
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);
+
+      var why = document.createElement('div');
+      why.className = 'why';
+      why.innerHTML = L(it.wko, it.wen);
+      row.appendChild(why);
+
+      if (picked[i] !== undefined) {
+        row.classList.add('done');
+        row.classList.add(picked[i] === it.a ? 'ok' : 'no');
+      }
+      host.appendChild(row);
+    });
+    paintScore();
+  }
+
+  rst.addEventListener('click', function () { picked = []; build(); });
+  window.addEventListener('langchange', build);
+  build();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
