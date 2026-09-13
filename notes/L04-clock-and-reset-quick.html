@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 4 빠른 읽기 · Clock and Reset · CEN 598 ADDV</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 4<br>Clock and Reset</h1>
+  <p class="subtitle" lang="ko">클럭이 하나라는 가정이 깨지는 지점, 그리고 STA 가 손을 놓은 자리에 남는 CDC 와 RDC.</p>
+  <p class="subtitle" lang="en">Where the single-clock assumption breaks, and the CDC and RDC that live in the space STA leaves empty.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L04-clock-and-reset.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L04-clock-and-reset.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 4</div>
+    <div class="name">Clock and Reset</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">STA 가 재는 다섯 개의 시간</span><span lang="en">The five times STA measures</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">클럭 하나 뿌리는 데도 대가가 있다</span><span lang="en">Even one clock costs something</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">클럭이 둘이 되는 순간</span><span lang="en">The moment there are two</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">CDC: 두 가지 사고</span><span lang="en">CDC: two kinds of failure</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">reset 은 걸 때와 풀 때가 다르다</span><span lang="en">Reset: applying is not releasing</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+
+  <p lang="ko">3 강까지는 <code>clk</code> 이라고 쓰면 그게 <strong>온 칩에 하나뿐인, 어디서나 동시에 도착하는 완벽한 신호</strong>라고 가정하고 왔다. 이 강의는 그 가정을 깬다. 깨는 순서가 정확히 이렇다.</p>
+  <p lang="en">Up to Lecture 3, writing <code>clk</code> assumed <strong>one perfect signal that arrives everywhere at once.</strong> This lecture breaks that assumption, and breaks it in a specific order.</p>
+
+  <div class="def">
+    <p lang="ko"><strong>클럭이 하나여도</strong> 트리로 뿌리는 과정에서 도착 시각이 어긋난다. 그게 <strong>skew</strong> 다. 여기까지는 <strong>STA 가 재준다.</strong></p>
+    <p lang="ko"><strong>클럭이 둘이 되면</strong> STA 는 <strong>검사를 만들지조차 못한다.</strong> 두 클럭의 엣지 관계가 고정돼 있지 않아서 "이 경로가 몇 ns 안에 도착해야 한다" 는 문장 자체가 안 써진다.</p>
+    <p lang="ko">그 <strong>STA 가 비워둔 자리</strong>에 들어앉은 위험 두 가지가 <strong>CDC</strong> 와 <strong>RDC</strong> 다. 이 강의의 나머지는 전부 이 둘을 막는 이야기다.</p>
+    <p lang="en"><strong>Even with one clock</strong>, fanning it out through a tree makes arrival times differ. That is <strong>skew</strong>, and <strong>STA still measures it.</strong></p>
+    <p lang="en"><strong>With two clocks</strong>, STA <strong>cannot even form the check.</strong> The edge relationship is not fixed, so the sentence "this path must arrive within N ns" cannot be written at all.</p>
+    <p lang="en">The two hazards that move into <strong>the space STA leaves empty</strong> are <strong>CDC</strong> and <strong>RDC</strong>. Everything else in this lecture is about keeping them out.</p>
+  </div>
+
+  <p lang="ko">그래서 이 강의를 한 문장으로 줄이면 <strong>"도구가 안 봐주는 영역이 어디부터인지, 그리고 거기서 사람이 무엇을 해야 하는지"</strong> 다.</p>
+  <p lang="en">One sentence: <strong>where the tools stop looking, and what a human has to do once they do.</strong></p>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">STA 가 재는 다섯 개의 시간</h2><h2 lang="en">The five times STA measures</h2></div>
+
+  <p lang="ko">2 강에서 slack 을 <strong>개념</strong>으로 배웠다. 여기서 그 안의 숫자들에 <strong>이름이 붙는다.</strong> 다섯 개다.</p>
+  <p lang="en">Lecture 2 gave you slack as <strong>a concept</strong>. Here the numbers inside it <strong>get names</strong>. There are five.</p>
+
+<figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="launch 클럭, capture flop의 데이터 입력, capture 클럭 세 파형. 데이터 전이가 setup 창과 hold 창 밖에 있어 slack이 양수인 상태">
+      <defs>
+        <marker id="f02-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <line x1="140" y1="30" x2="140" y2="252" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
+      <line x1="170" y1="192" x2="170" y2="252" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
+      <line x1="540" y1="30" x2="540" y2="100" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
+      <line x1="570" y1="100" x2="570" y2="230" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
+
+      <rect x="170" y="104" width="40" height="44" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1" stroke-dasharray="3 2"/>
+      <rect x="510" y="104" width="60" height="44" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1" stroke-dasharray="3 2"/>
+      <text class="svglab" x="190" y="98" text-anchor="middle" style="font-size:9.5px;fill:var(--green-deep)">Thold</text>
+      <text class="svglab" x="540" y="98" text-anchor="middle" style="font-size:9.5px;fill:var(--green-deep)">Tsetup</text>
+
+      <line x1="140" y1="22" x2="540" y2="22" stroke="var(--ink3)" stroke-width="1.2" marker-start="url(#f02-a)" marker-end="url(#f02-a)"/>
+      <text class="svglab" x="340" y="16" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">T</text>
+
+      <text class="svglab" x="104" y="52" text-anchor="end" style="font-size:10px;fill:var(--brown)">CLK launch</text>
+      <path d="M110 62 H140 V34 H340 V62 H540 V34 H690" fill="none" stroke="var(--brown)" stroke-width="2"/>
+
+      <text class="svglab" x="104" y="130" text-anchor="end" style="font-size:10px;fill:var(--blue)">D @ capture</text>
+      <path d="M110 140 H435 L445 112 H690" fill="none" stroke="var(--blue)" stroke-width="2"/>
+
+      <text class="svglab" x="104" y="214" text-anchor="end" style="font-size:10px;fill:var(--brown)">CLK capture</text>
+      <path d="M110 224 H170 V196 H370 V224 H570 V196 H690" fill="none" stroke="var(--brown)" stroke-width="2"/>
+
+      <line x1="140" y1="162" x2="180" y2="162" stroke="var(--ink3)" stroke-width="1.2" marker-start="url(#f02-a)" marker-end="url(#f02-a)"/>
+      <text class="svglab" x="160" y="178" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">Tclk-Q</text>
+      <line x1="180" y1="162" x2="440" y2="162" stroke="var(--ink3)" stroke-width="1.2" marker-start="url(#f02-a)" marker-end="url(#f02-a)"/>
+      <text class="svglab" x="310" y="178" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">Tcomb</text>
+      <line x1="440" y1="162" x2="510" y2="162" stroke="var(--green)" stroke-width="1.4" marker-start="url(#f02-a)" marker-end="url(#f02-a)"/>
+      <text class="svglab" x="475" y="178" text-anchor="middle" style="font-size:9.5px;fill:var(--green-deep);font-weight:700">slack</text>
+
+      <line x1="140" y1="244" x2="170" y2="244" stroke="var(--brown)" stroke-width="1.4" marker-start="url(#f02-a)" marker-end="url(#f02-a)"/>
+      <text class="svglab" x="155" y="262" text-anchor="middle" style="font-size:9.5px;fill:var(--brown)">Tskew</text>
+
+      <text class="svgtxt" x="430" y="248" text-anchor="middle" style="font-size:11px;fill:var(--green-deep);font-weight:700" lang="ko">데이터 전이가 두 창 바깥이다 · slack &gt; 0 이므로 통과</text>
+      <text class="svgtxt" x="430" y="248" text-anchor="middle" style="font-size:11px;fill:var(--green-deep);font-weight:700" lang="en">the data edge misses both windows · slack &gt; 0, so it passes</text>
+      <text class="svgtxt" x="430" y="266" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">초록 칸은 데이터가 흔들리면 안 되는 구간</text>
+      <text class="svgtxt" x="430" y="266" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">the green boxes are where the data must not move</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 6·7쪽과 backup 슬라이드 43쪽의 파형을 하나로 합친 것이다. <strong>capture 클럭이 launch 클럭보다 <code>Tskew</code>만큼 늦게 온다</strong>는 게 그림의 핵심이고, 그래서 setup 쪽에서는 skew가 여유를 늘려주고 hold 쪽에서는 여유를 깎아먹는다. 이 노트에서는 <strong>클럭 계통을 갈색, 데이터를 파란색</strong>으로 칠한다. 이유는 <a href="#s3">03절</a>에서 나온다.</figcaption>
+    <figcaption lang="en">This merges the waveforms from slides 6 and 7 with the backup slide 43. The point of the picture is that <strong>the capture clock arrives <code>Tskew</code> later than the launch clock</strong>, which is why skew buys you room on the setup side and eats into it on the hold side. Throughout this note <strong>the clock network is brown and data is blue</strong>; the reason shows up in <a href="#s3">§03</a>.</figcaption>
+  </figure>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">이름</span><span lang="en">Name</span></th>
+      <th><span lang="ko">무엇의 시간인가</span><span lang="en">Time of what</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>T<sub>clk-Q</sub></code></td><td><span lang="ko">보내는 flop 이 클럭 엣지를 받고 출력을 내놓기까지</span><span lang="en">From the launching flop's clock edge to its output changing</span></td></tr>
+      <tr><td><code>T<sub>comb</sub></code></td><td><span lang="ko">그 사이의 조합 논리를 통과하는 시간</span><span lang="en">Propagating through the combinational logic between them</span></td></tr>
+      <tr><td><code>T<sub>setup</sub></code></td><td><span lang="ko">받는 flop 이 엣지 <strong>전에</strong> 값이 안정돼 있기를 요구하는 시간</span><span lang="en">How long the capturing flop needs the value stable <strong>before</strong> its edge</span></td></tr>
+      <tr><td><code>T<sub>hold</sub></code></td><td><span lang="ko">엣지 <strong>후에</strong> 값이 유지되기를 요구하는 시간</span><span lang="en">How long it needs the value held <strong>after</strong> the edge</span></td></tr>
+      <tr><td><code>T<sub>skew</sub></code></td><td><span lang="ko"><strong>같은 클럭</strong>이 두 flop 에 도착하는 시각의 차이</span><span lang="en">The difference in arrival time of <strong>the same clock</strong> at two flops</span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">앞 넷은 <strong>RTL 을 보고 대충 감이 오는 것</strong>이고, 마지막 하나는 아니다. <code>T<sub>skew</sub></code> 는 <strong>배치와 배선이 끝나야 정해진다.</strong> RTL 만 보고는 알 수 없다.</p>
+  <p lang="en">The first four you can roughly feel from the RTL. The last one you cannot: <code>T<sub>skew</sub></code> <strong>is not decided until place and route is done.</strong></p>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">클럭 하나 뿌리는 데도 대가가 있다</h2><h2 lang="en">Even one clock costs something</h2></div>
+
+  <p lang="ko">클럭은 <strong>crystal</strong> 에서 시작한다. 거기서 나온 주파수를 <strong>PLL</strong> 이 원하는 값으로 만든다. (<strong>DLL</strong> 도 나오는데 이쪽은 주파수를 안 만들고 <strong>위상만 맞춘다.</strong> 둘의 차이가 시험에 나올 만한 지점이다.)</p>
+  <p lang="en">A clock starts at a <strong>crystal</strong>, and a <strong>PLL</strong> turns that frequency into the one you want. (A <strong>DLL</strong> also appears; it makes no frequency and <strong>only aligns phase</strong>. That difference is quiz-shaped.)</p>
+
+  <p lang="ko">그 다음이 진짜 문제다. 그 한 신호를 <strong>flop 수십만 개에 다 꽂아야 한다.</strong> 하나가 감당 못 하니 버퍼를 넣어 트리로 퍼뜨린다. <strong>그 버퍼들이 skew 를 만든다.</strong> 앞 절의 <code>T<sub>skew</sub></code> 가 여기서 태어난다.</p>
+  <p lang="en">Then the real problem: that one signal has to reach <strong>hundreds of thousands of flops.</strong> One driver cannot, so buffers fan it out into a tree, and <strong>those buffers are where skew comes from.</strong> That is the birth of the previous section's <code>T<sub>skew</sub></code>.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>이 노트의 도해에서 클럭 계통은 갈색이다.</strong> RTL 설계자가 쓰는 것이 아니라 <strong>물리 설계 단계가 만들어주는 것</strong>이기 때문이다. 색만 보고도 "여기는 내가 코드로 어쩌지 못하는 영역" 이라고 읽으면 된다.</p>
+    <p lang="en"><strong>Clock infrastructure is drawn brown in these notes</strong>, because it is not written by the RTL designer but <strong>produced by physical design.</strong> Read the colour as "this part is not something my code controls."</p>
+  </div>
+
+  <p lang="ko">그리고 클럭은 <strong>토글하는 것만으로 전력을 쓴다.</strong> 안 쓰는 블록의 클럭은 끊는 게 이득이다. 이게 <strong>clock gating</strong> 이고, 2 강 최적화 목록에 한 줄로 있던 것이 여기서 회로로 펴진다.</p>
+  <p lang="en">A clock also <strong>burns power just by toggling</strong>, so gating it off for idle blocks pays. That is <strong>clock gating</strong>: one line in Lecture 2's optimisation list, unfolded here into a circuit.</p>
+
+  <div class="trap">
+    <p lang="ko"><strong>AND 게이트 하나로 끊으면 안 된다.</strong> enable 이 클럭 high 구간에 흔들리면 그 흔들림이 그대로 통과해서 <strong>gated clock 에 가짜 엣지</strong>가 하나 생긴다. flop 이 아무도 시키지 않은 순간에 값을 잡는다.</p>
+    <p lang="ko">해법은 <strong>ICG</strong>(Integrated Clock Gating cell) 다. AND 앞에 <strong>latch 를 하나 붙여서</strong> enable 을 클럭 low 구간에만 갱신되게 붙잡아둔다. 그러면 high 구간에는 enable 이 절대 안 움직인다.</p>
+    <p lang="en"><strong>Do not gate with a bare AND.</strong> If enable wobbles while the clock is high, the wobble passes straight through as <strong>a glitch edge on the gated clock</strong>, and a flop captures at a moment nobody asked for.</p>
+    <p lang="en">The fix is an <strong>ICG</strong> (integrated clock gating cell): <strong>a latch in front of the AND</strong> holds enable so it can only update while the clock is low, and therefore never moves while it is high.</p>
+  </div>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">클럭이 둘이 되는 순간</h2><h2 lang="en">The moment there are two</h2></div>
+
+  <p lang="ko">왜 클럭이 여러 개인가. <strong>블록마다 필요한 속도가 다르기 때문</strong>이다. CPU 는 빠르게, 주변 장치는 느리게. 전력과 성능을 블록별로 따로 고르려면 클럭이 갈릴 수밖에 없다.</p>
+  <p lang="en">Why more than one clock? <strong>Because blocks need different speeds.</strong> A CPU fast, a peripheral slow. Choosing power and performance per block means the clocks split.</p>
+
+<figure>
+    <svg viewBox="0 0 700 330" role="img" aria-label="하나의 SoC 안에 CPU, GPU, Peripheral Interface, DDR, I/O 블록이 서로 다른 주파수로 돌고 블록 사이마다 CDC 경계가 생기는 그림">
+      <defs>
+        <marker id="f04-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--amber)"/>
+        </marker>
+      </defs>
+
+      <text class="svgtxt" x="360" y="16" text-anchor="middle" style="font-size:11px;fill:var(--ink3)" lang="ko">하나의 SoC 안</text>
+      <text class="svgtxt" x="360" y="16" text-anchor="middle" style="font-size:11px;fill:var(--ink3)" lang="en">inside one SoC</text>
+      <rect x="110" y="28" width="500" height="284" rx="10" fill="none" stroke="var(--ink3)" stroke-width="1.4" stroke-dasharray="5 4"/>
+
+      <rect x="150" y="44" width="180" height="60" rx="7" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="240" y="70" text-anchor="middle" style="font-size:13px;fill:var(--blue);font-weight:750">CPU</text>
+      <text class="svglab" x="240" y="90" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">수 GHz</text>
+      <text class="svglab" x="240" y="90" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">several GHz</text>
+
+      <rect x="380" y="44" width="180" height="60" rx="7" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="470" y="70" text-anchor="middle" style="font-size:13px;fill:var(--blue);font-weight:750">GPU</text>
+      <text class="svglab" x="470" y="90" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">수 GHz</text>
+      <text class="svglab" x="470" y="90" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">several GHz</text>
+
+      <rect x="150" y="140" width="180" height="60" rx="7" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="240" y="166" text-anchor="middle" style="font-size:12px;fill:var(--blue);font-weight:750" lang="ko">Peripheral I/F</text>
+      <text class="svgtxt" x="240" y="166" text-anchor="middle" style="font-size:12px;fill:var(--blue);font-weight:750" lang="en">Peripheral I/F</text>
+      <text class="svglab" x="240" y="186" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">수십 MHz</text>
+      <text class="svglab" x="240" y="186" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">tens of MHz</text>
+
+      <rect x="380" y="140" width="180" height="60" rx="7" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="470" y="166" text-anchor="middle" style="font-size:13px;fill:var(--blue);font-weight:750">DDR</text>
+      <text class="svglab" x="470" y="186" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">수백 MHz</text>
+      <text class="svglab" x="470" y="186" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">hundreds of MHz</text>
+
+      <rect x="150" y="236" width="180" height="60" rx="7" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="240" y="262" text-anchor="middle" style="font-size:13px;fill:var(--blue);font-weight:750">I/O</text>
+      <text class="svglab" x="240" y="282" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">수십 MHz</text>
+      <text class="svglab" x="240" y="282" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">tens of MHz</text>
+
+      <line x1="334" y1="74" x2="376" y2="74" stroke="var(--amber)" stroke-width="1.8" marker-start="url(#f04-ar)" marker-end="url(#f04-ar)"/>
+      <text class="svglab" x="355" y="62" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">CDC</text>
+      <line x1="240" y1="108" x2="240" y2="136" stroke="var(--amber)" stroke-width="1.8" marker-start="url(#f04-ar)" marker-end="url(#f04-ar)"/>
+      <text class="svglab" x="266" y="126" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">CDC</text>
+      <line x1="470" y1="108" x2="470" y2="136" stroke="var(--amber)" stroke-width="1.8" marker-start="url(#f04-ar)" marker-end="url(#f04-ar)"/>
+      <text class="svglab" x="496" y="126" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">CDC</text>
+      <line x1="334" y1="170" x2="376" y2="170" stroke="var(--amber)" stroke-width="1.8" marker-start="url(#f04-ar)" marker-end="url(#f04-ar)"/>
+      <text class="svglab" x="355" y="158" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">CDC</text>
+      <line x1="240" y1="204" x2="240" y2="232" stroke="var(--amber)" stroke-width="1.8" marker-start="url(#f04-ar)" marker-end="url(#f04-ar)"/>
+      <text class="svglab" x="266" y="222" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">CDC</text>
+    </svg>
+    <figcaption lang="ko">블록은 전부 설계자가 쓰는 것이라 파란색이고, <strong>블록 사이의 화살표만 amber</strong>다. 그게 이 그림의 요지다. <strong>위험은 블록 안에 있지 않고 블록 사이에 있다.</strong> 블록 다섯 개짜리 장난감 그림에도 경계가 다섯 개 생긴다. 실제 SoC에서 이 숫자가 수천, 수만이 되는 것이 08절의 "실행에 하루가 걸린다"로 이어진다.</figcaption>
+    <figcaption lang="en">Every block is blue because a designer writes all of them; <strong>only the arrows between them are amber.</strong> That is the whole point. <strong>The danger is not inside the blocks, it is between them.</strong> Even this toy picture with five blocks already has five boundaries. In a real SoC that number runs into the thousands, which is what §08's "the run takes a day" is about.</figcaption>
+  </figure>
+
+  <p lang="ko">여기서 이 강의 전체의 <strong>분기점</strong>이 나온다.</p>
+  <p lang="en">And here is the <strong>pivot</strong> of the whole lecture.</p>
+
+  <div class="def">
+    <p lang="ko">두 클럭이 <strong>비동기</strong>이면 엣지 사이 간격이 매 사이클 달라진다. 그러면 STA 는 <strong>"이 경로에 몇 ns 가 있는가" 를 계산할 수 없다.</strong> 틀린 답을 내는 게 아니라 <strong>질문을 만들지 못한다.</strong></p>
+    <p lang="en">If two clocks are <strong>asynchronous</strong>, the gap between their edges differs every cycle, so STA <strong>cannot compute how many ns this path has.</strong> It does not answer wrong; <strong>it cannot form the question.</strong></p>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>"클럭 개수 = 도메인 개수" 가 아니다.</strong> clock domain 은 <strong>서로 synchronous 한 클럭들의 묶음</strong>이다. 100 MHz 와 그것을 2 분주한 50 MHz 는 <strong>같은 도메인</strong>이고, 그 사이를 오가는 것은 CDC 가 <strong>아니다.</strong> 주파수가 다르다고 자동으로 CDC 가 되지 않는다.</p>
+    <p lang="en"><strong>Number of clocks is not number of domains.</strong> A clock domain is <strong>a group of mutually synchronous clocks.</strong> 100 MHz and its divide-by-two 50 MHz are <strong>the same domain</strong>, and a path between them is <strong>not</strong> a CDC. Different frequency does not automatically mean crossing.</p>
+  </div>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">CDC: 두 가지 사고</h2><h2 lang="en">CDC: two kinds of failure</h2></div>
+
+  <p lang="ko">비동기 경계를 <strong>아무 조치 없이</strong> 넘기면 사고가 난다. 그런데 <strong>한 비트일 때와 버스일 때 사고의 종류가 다르다.</strong> 이 구분이 다음 절의 대책 네 가지를 전부 설명한다.</p>
+  <p lang="en">Cross an asynchronous boundary <strong>bare</strong> and things break, but <strong>they break differently for one bit than for a bus.</strong> That distinction explains all four remedies below.</p>
+
+  <p lang="ko"><strong>한 비트일 때: metastability.</strong> 받는 flop 의 D 가 하필 setup/hold 윈도우 안에서 바뀌면, Q 가 <strong>0 도 1 도 아닌 중간 전압에 한동안 머문다.</strong> 그리고 두 클럭이 비동기면 위상이 계속 미끄러지므로 <strong>충분히 오래 돌리면 이 순간이 반드시 온다.</strong> 사고가 아니라 시간문제다.</p>
+  <p lang="en"><strong>One bit: metastability.</strong> If the receiving flop's D happens to move inside the setup/hold window, Q <strong>sits at an intermediate voltage for a while, neither 0 nor 1.</strong> And because asynchronous clocks keep sliding in phase, <strong>run it long enough and that moment is guaranteed to arrive.</strong> Not an accident, a matter of time.</p>
+
+<figure>
+    <svg viewBox="0 0 700 240" role="img" aria-label="A1 flop의 출력이 Clk_B의 엣지와 겹치는 순간에 바뀌어 B1의 출력이 불확정 구간을 거친 뒤에야 값이 정해지는 파형">
+      <line x1="262" y1="14" x2="262" y2="226" stroke="var(--rule)" stroke-width="1"/>
+
+      <text class="svglab" x="58" y="92" text-anchor="end" style="font-size:9.5px;fill:var(--blue)">A_in</text>
+      <path d="M62 88 H92" fill="none" stroke="var(--blue)" stroke-width="1.8"/>
+      <rect x="92" y="64" width="52" height="56" rx="5" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="118" y="97" text-anchor="middle" style="font-size:12px;fill:var(--blue);font-weight:750">A1</text>
+      <path d="M144 88 H182" fill="none" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svglab" x="163" y="80" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">B_in</text>
+      <rect x="182" y="64" width="52" height="56" rx="5" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="208" y="97" text-anchor="middle" style="font-size:12px;fill:var(--blue);font-weight:750">B1</text>
+      <path d="M234 88 H256" fill="none" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svglab" x="243" y="56" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">B_out</text>
+      <text class="svglab" x="58" y="150" text-anchor="end" style="font-size:9.5px;fill:var(--brown)">Clk_A</text>
+      <path d="M62 146 H118 V120" fill="none" stroke="var(--brown)" stroke-width="1.8"/>
+      <text class="svglab" x="58" y="178" text-anchor="end" style="font-size:9.5px;fill:var(--brown)">Clk_B</text>
+      <path d="M62 174 H208 V120" fill="none" stroke="var(--brown)" stroke-width="1.8"/>
+      <text class="svgtxt" x="140" y="212" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">두 클럭은 서로 비동기다</text>
+      <text class="svgtxt" x="140" y="212" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">the two clocks are asynchronous</text>
+
+      <rect x="458" y="178" width="78" height="32" fill="rgba(var(--amber-rgb),.22)"/>
+      <line x1="462" y1="26" x2="462" y2="212" stroke="var(--amber)" stroke-width="1" stroke-dasharray="3 3"/>
+
+      <text class="svglab" x="296" y="40" text-anchor="end" style="font-size:9px;fill:var(--brown)">Clk_A</text>
+      <path d="M302 44 H320 V26 H355 V44 H390 V26 H425 V44 H460 V26 H495 V44 H530 V26 H565 V44 H600 V26 H635 V44 H670 V26 H688" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svglab" x="296" y="80" text-anchor="end" style="font-size:9px;fill:var(--blue)">A1.D</text>
+      <path d="M302 84 H436 L444 66 H688" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="296" y="120" text-anchor="end" style="font-size:9px;fill:var(--blue)">A1.Q</text>
+      <path d="M302 124 H462 L470 106 H688" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="296" y="160" text-anchor="end" style="font-size:9px;fill:var(--brown)">Clk_B</text>
+      <path d="M302 164 H322 V146 H357 V164 H392 V146 H427 V164 H462 V146 H497 V164 H532 V146 H567 V164 H602 V146 H637 V164 H672 V146 H688" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svglab" x="296" y="200" text-anchor="end" style="font-size:9px;fill:var(--blue)">B1.Q</text>
+      <path d="M302 204 H462 L470 196 L478 200 L486 192 L494 198 L502 190 L510 196 L518 188 L526 192 L532 186 H688" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="497" y="228" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">metastability</text>
+    </svg>
+    <figcaption lang="ko">하필 <code>A1.Q</code>가 바뀌는 순간에 <code>Clk_B</code>의 엣지가 온다. <strong>이건 사고가 아니라 시간문제다.</strong> 두 클럭이 비동기면 위상이 계속 미끄러지므로, 충분히 오래 돌리면 반드시 이 순간이 온다. 그 뒤 <code>B1.Q</code>는 한동안 0도 1도 아닌 값에 머물다가 결국 어느 쪽으로든 정착하는데, <strong>어느 쪽으로 갈지는 정해져 있지 않다.</strong></figcaption>
+    <figcaption lang="en">The <code>Clk_B</code> edge lands exactly when <code>A1.Q</code> is changing. <strong>This is not an accident, it is a matter of time.</strong> Two asynchronous clocks keep sliding past each other, so run long enough and this moment arrives. After it, <code>B1.Q</code> lingers at neither 0 nor 1 before settling one way or the other, and <strong>which way it settles is not determined.</strong></figcaption>
+  </figure>
+
+  <p lang="ko"><strong>버스일 때: data coherency.</strong> 이쪽이 더 고약하다. 비트마다 정착하는 시각이 조금씩 달라서, <strong>원본에 존재한 적이 없는 값</strong>이 받는 쪽에 잠깐 나타난다. <code>011</code> 에서 <code>100</code> 으로 가는 도중에 <code>101</code> 이 지나가는 식이다.</p>
+  <p lang="en"><strong>A bus: data coherency.</strong> Worse, this one. Bits settle at slightly different times, so <strong>a value that never existed at the source</strong> appears briefly at the destination: going from <code>011</code> to <code>100</code>, a <code>101</code> flickers past.</p>
+
+<figure>
+    <svg viewBox="0 0 700 190" role="img" aria-label="3비트 값이 3에서 4로 갈 때 binary는 세 비트가 동시에 바뀌어 받는 쪽에 여덟 개 값 중 아무거나 나타날 수 있고, gray code는 한 비트만 바뀌어 옛값 아니면 새값만 나타나는 비교">
+      <defs>
+        <marker id="f05-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+      <line x1="350" y1="8" x2="350" y2="182" stroke="var(--rule)" stroke-width="1"/>
+
+      <text class="svgtxt" x="175" y="20" text-anchor="middle" style="font-size:11.5px;fill:var(--amber);font-weight:750" lang="ko">binary 카운터 3 → 4</text>
+      <text class="svgtxt" x="175" y="20" text-anchor="middle" style="font-size:11.5px;fill:var(--amber);font-weight:750" lang="en">binary counter 3 → 4</text>
+      <text class="svgnum" x="108" y="64" text-anchor="middle" style="font-size:20px;fill:var(--ink)">011</text>
+      <line x1="142" y1="57" x2="180" y2="57" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#f05-ar)"/>
+      <text class="svglab" x="161" y="44" text-anchor="middle" style="font-size:9px;fill:var(--ink3)">1 clk</text>
+      <text class="svgnum" x="214" y="64" text-anchor="middle" style="font-size:20px;fill:var(--ink)">100</text>
+      <text class="svgtxt" x="175" y="88" text-anchor="middle" style="font-size:10.5px;fill:var(--amber);font-weight:700" lang="ko">세 비트가 한꺼번에 바뀐다</text>
+      <text class="svgtxt" x="175" y="88" text-anchor="middle" style="font-size:10.5px;fill:var(--amber);font-weight:700" lang="en">all three bits change at once</text>
+      <text class="svgtxt" x="175" y="110" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">받는 쪽에 나타날 수 있는 값</text>
+      <text class="svgtxt" x="175" y="110" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">what the receiver can see</text>
+      <rect x="22" y="120" width="36" height="24" rx="4" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svglab" x="40" y="136" text-anchor="middle" style="font-size:9px;fill:var(--amber)">000</text>
+      <rect x="60" y="120" width="36" height="24" rx="4" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svglab" x="78" y="136" text-anchor="middle" style="font-size:9px;fill:var(--amber)">001</text>
+      <rect x="98" y="120" width="36" height="24" rx="4" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svglab" x="116" y="136" text-anchor="middle" style="font-size:9px;fill:var(--amber)">010</text>
+      <rect x="136" y="120" width="36" height="24" rx="4" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.2"/>
+      <text class="svglab" x="154" y="136" text-anchor="middle" style="font-size:9px;fill:var(--green-deep)">011</text>
+      <rect x="174" y="120" width="36" height="24" rx="4" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.2"/>
+      <text class="svglab" x="192" y="136" text-anchor="middle" style="font-size:9px;fill:var(--green-deep)">100</text>
+      <rect x="212" y="120" width="36" height="24" rx="4" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svglab" x="230" y="136" text-anchor="middle" style="font-size:9px;fill:var(--amber)">101</text>
+      <rect x="250" y="120" width="36" height="24" rx="4" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svglab" x="268" y="136" text-anchor="middle" style="font-size:9px;fill:var(--amber)">110</text>
+      <rect x="288" y="120" width="36" height="24" rx="4" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svglab" x="306" y="136" text-anchor="middle" style="font-size:9px;fill:var(--amber)">111</text>
+      <text class="svgtxt" x="175" y="166" text-anchor="middle" style="font-size:10px;fill:var(--amber)" lang="ko">여덟 개 중 어느 것이든 나올 수 있다</text>
+      <text class="svgtxt" x="175" y="166" text-anchor="middle" style="font-size:10px;fill:var(--amber)" lang="en">any one of the eight can show up</text>
+
+      <text class="svgtxt" x="525" y="20" text-anchor="middle" style="font-size:11.5px;fill:var(--green-deep);font-weight:750" lang="ko">gray code로 같은 3 → 4</text>
+      <text class="svgtxt" x="525" y="20" text-anchor="middle" style="font-size:11.5px;fill:var(--green-deep);font-weight:750" lang="en">the same 3 → 4 in gray code</text>
+      <text class="svgnum" x="458" y="64" text-anchor="middle" style="font-size:20px;fill:var(--ink)">010</text>
+      <line x1="492" y1="57" x2="530" y2="57" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#f05-ar)"/>
+      <text class="svglab" x="511" y="44" text-anchor="middle" style="font-size:9px;fill:var(--ink3)">1 clk</text>
+      <text class="svgnum" x="564" y="64" text-anchor="middle" style="font-size:20px;fill:var(--ink)">110</text>
+      <text class="svgtxt" x="525" y="88" text-anchor="middle" style="font-size:10.5px;fill:var(--green-deep);font-weight:700" lang="ko">한 비트만 바뀐다</text>
+      <text class="svgtxt" x="525" y="88" text-anchor="middle" style="font-size:10.5px;fill:var(--green-deep);font-weight:700" lang="en">exactly one bit changes</text>
+      <text class="svgtxt" x="525" y="110" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">받는 쪽에 나타날 수 있는 값</text>
+      <text class="svgtxt" x="525" y="110" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">what the receiver can see</text>
+      <rect x="487" y="120" width="36" height="24" rx="4" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.2"/>
+      <text class="svglab" x="505" y="136" text-anchor="middle" style="font-size:9px;fill:var(--green-deep)">010</text>
+      <rect x="527" y="120" width="36" height="24" rx="4" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.2"/>
+      <text class="svglab" x="545" y="136" text-anchor="middle" style="font-size:9px;fill:var(--green-deep)">110</text>
+      <text class="svgtxt" x="525" y="166" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="ko">옛값 아니면 새값. 둘 다 유효하다</text>
+      <text class="svgtxt" x="525" y="166" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="en">the old value or the new one, both valid</text>
+    </svg>
+    <figcaption lang="ko">초록 칸이 <strong>정상적인 값</strong>이고 amber 칸이 <strong>원본에 존재한 적이 없는 값</strong>이다. 왼쪽에서 위험한 것은 <code>101</code> 같은 값이 <strong>틀린 값인 티가 안 난다</strong>는 점이다. FIFO의 write pointer가 이렇게 튀면 받는 쪽은 "데이터가 다섯 개 들어왔구나"라고 멀쩡하게 믿는다.</figcaption>
+    <figcaption lang="en">Green boxes are <strong>values that really existed</strong>; amber boxes are <strong>values the source never held.</strong> The nasty part on the left is that a value like <code>101</code> <strong>does not look wrong.</strong> If a FIFO write pointer lands there, the reader happily concludes that five entries arrived.</figcaption>
+  </figure>
+
+  <div class="trap">
+    <p lang="ko"><strong>버스에 double-FF 를 그냥 쓰면 안 된다.</strong> double-FF 는 metastability 는 막아주지만 <strong>data coherency 는 못 막는다.</strong> 버스를 double-FF 로 넘기고 싶으면 <strong>gray code 로 먼저 바꿔야 한다.</strong> gray code 는 한 번에 <strong>한 비트만</strong> 바뀌므로, 어긋나봤자 <strong>이전 값 아니면 다음 값</strong>이지 없던 값은 안 나온다.</p>
+    <p lang="en"><strong>Do not put a bus through a double-FF as is.</strong> A double-FF stops metastability but <strong>does nothing for data coherency.</strong> To send a bus that way you must <strong>gray-code it first</strong>: gray code changes <strong>one bit at a time</strong>, so the worst case is the old value or the new one, never an invented one.</p>
+  </div>
+
+  <p lang="ko">그래서 대책이 네 가지로 갈린다. <strong>고르는 기준은 두 개뿐이다. 한 비트인가 버스인가, 흐름 제어가 필요한가.</strong></p>
+  <p lang="en">Hence four remedies, chosen by <strong>two questions only: one bit or a bus, and do you need flow control.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">기법</span><span lang="en">Scheme</span></th>
+      <th><span lang="ko">무엇을 넘기나</span><span lang="en">What it passes</span></th>
+      <th><span lang="ko">한 줄</span><span lang="en">In a line</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><strong>Double-FF</strong></td>
+        <td><span lang="ko">한 비트 (또는 gray coded 버스)</span><span lang="en">One bit, or a gray-coded bus</span></td>
+        <td><span lang="ko">받는 도메인에 flop 두 개를 연달아. <strong>제일 먼저 꺼내드는 기본 수단</strong></span><span lang="en">Two flops back to back in the receiving domain. <strong>The default thing you reach for</strong></span></td></tr>
+      <tr><td><strong>MUX</strong></td>
+        <td><span lang="ko">버스</span><span lang="en">A bus</span></td>
+        <td><span lang="ko">데이터는 그대로 보내고 <strong>select 만 동기화한다</strong></span><span lang="en">Data goes straight across; <strong>only the select is synchronised</strong></span></td></tr>
+      <tr><td><strong>Handshake</strong></td>
+        <td><span lang="ko">버스 + 흐름 제어</span><span lang="en">A bus, plus flow control</span></td>
+        <td><span lang="ko">보내는 쪽과 받는 쪽이 <code>req</code>/<code>ack</code> 로 <strong>번갈아 대화</strong>한다</span><span lang="en">Sender and receiver <strong>take turns</strong> with <code>req</code> and <code>ack</code></span></td></tr>
+      <tr><td><strong>FIFO</strong></td>
+        <td><span lang="ko">연속 스트림</span><span lang="en">A continuous stream</span></td>
+        <td><span lang="ko">read/write pointer 를 도메인 사이로 동기화. <strong>Lab 1 에서 직접 만든다</strong></span><span lang="en">Read and write pointers synchronised across domains. <strong>You build this in Lab 1</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>다 넣었는지는 누가 확인하나.</strong> 사람이 아니라 <strong>CDC 분석 도구</strong>다. 다만 공짜가 아니다. constraint 를 제대로 안 주면 <strong>실행에 하루가 걸리고 false violation 이 쏟아진다.</strong> 도구를 돌리는 것과 도구를 쓸 줄 아는 것은 다른 일이다.</p>
+    <p lang="en"><strong>Who checks that you got them all?</strong> Not a person: a <strong>CDC analysis tool.</strong> Not free, though. Without proper constraints it <strong>runs for a day and buries you in false violations.</strong> Running the tool and knowing how to use it are different skills.</p>
+  </div>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">reset 은 걸 때와 풀 때가 다르다</h2><h2 lang="en">Reset: applying is not releasing</h2></div>
+
+  <p lang="ko">3 강에서 sync reset 과 async reset 이 <strong>다른 회로</strong>라는 것과 구별법(<strong>reset 이 sensitivity list 에 있는가</strong>)을 이미 배웠다. 이 강의가 더하는 건 <strong>"그래서 어느 쪽을 쓰나"</strong> 다.</p>
+  <p lang="en">Lecture 3 already gave you that sync and async reset are <strong>different circuits</strong>, and the test that separates them: <strong>is the reset in the sensitivity list?</strong> What this lecture adds is <strong>which one you actually use.</strong></p>
+
+  <p lang="ko">표만 보면 async 가 전부 이긴다. 로직도 덜 들고 면적도 덜 들고 빠르다. <strong>진짜 이유는 따로 있다.</strong></p>
+  <p lang="en">On the table, async wins everything: less logic, less area, faster. <strong>But the real reason is elsewhere.</strong></p>
+
+  <div class="def">
+    <p lang="ko"><strong>전원이 막 들어온 칩에는 클럭이 없다.</strong> PLL 이 lock 될 때까지 클럭 트리는 죽어 있다. 그 상태에서 <strong>sync reset 은 아무것도 못 한다.</strong> 클럭 엣지가 와야 동작하는데 엣지가 없으니까. 초기화되지 않은 flop 들이 임의의 값으로 임의의 조합 논리를 구동하는데 <strong>멈출 방법이 없다.</strong></p>
+    <p lang="en"><strong>A chip that just powered up has no clock.</strong> The clock tree is dead until the PLL locks, and in that state <strong>a sync reset can do nothing</strong>: it needs an edge and there is none. Uninitialised flops drive arbitrary logic with arbitrary values and <strong>there is no way to stop them.</strong></p>
+  </div>
+
+  <p lang="ko">그래서 업계의 답은 "둘 중 하나" 가 아니라 <strong>절충</strong>이다.</p>
+  <p lang="en">So the industry answer is not "pick one", it is <strong>a split</strong>.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>assert 는 async 로, de-assert 는 sync 로.</strong> 이 한 줄이 9 절부터 11 절까지의 결론이다.</p>
+    <p lang="en"><strong>Assert asynchronously, de-assert synchronously.</strong> That one line is the conclusion of three sections of slides.</p>
+  </div>
+
+  <p lang="ko">왜 푸는 쪽만 동기화하느냐. <strong>걸 때는 아무 때나 걸어도 된다.</strong> 어차피 모두를 같은 상태로 몰아넣는 거니까. 그런데 <strong>풀리는 순간이 클럭 엣지와 가까우면</strong> flop 이 흔들린다. 그 위반에 이름이 있다.</p>
+  <p lang="en">Why synchronise only the release? <strong>Asserting can happen any time</strong>, since it is driving everything to the same state anyway. But <strong>if the release lands near a clock edge</strong>, the flop wobbles. That violation has a name.</p>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; Recovery time</span><span lang="en">Jargon &middot; Recovery time</span></summary>
+      <table class="parts">
+        <tr><td><span lang="ko">한 줄</span><span lang="en">In one line</span></td><td><span lang="ko">비동기 reset 이 <strong>풀리는 순간</strong>과 그 다음 클럭 엣지 사이에 필요한 최소 시간.</span><span lang="en">The minimum time between an asynchronous reset <strong>being released</strong> and the next clock edge.</span></td></tr>
+        <tr><td><span lang="ko">좋은 소식</span><span lang="en">The good news</span></td><td><span lang="ko"><strong>STA 가 검사한다.</strong> setup/hold 와 똑같은 방식이다. 슬라이드가 직접 이렇게 쓴다. <strong>"Violating recovery time is no different than violating setup/hold"</strong></span><span lang="en"><strong>STA checks it</strong>, exactly the way it checks setup and hold. The slide says so: <strong>"Violating recovery time is no different than violating setup/hold"</strong></span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to misread</span></td><td><span lang="ko">이름만 새롭다. 대상이 데이터 경로가 아니라 <strong>reset release 타이밍</strong>일 뿐이다.</span><span lang="en">Only the name is new. The subject is <strong>reset release timing</strong> instead of a data path.</span></td></tr>
+      </table>
+    </details>
+  </div>
+
+<figure>
+    <svg viewBox="0 0 700 420" role="img" aria-label="왼쪽은 비동기 reset을 flop에 바로 연결해 Q1이 흔들리는 회로, 오른쪽은 R1과 R2 두 flop으로 reset을 목적지 클럭에 동기화한 뒤 F2에 주는 회로. 아래는 두 경우의 파형 비교">
+      <defs>
+        <marker id="f09-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--brown)"/>
+        </marker>
+      </defs>
+      <line x1="350" y1="8" x2="350" y2="206" stroke="var(--rule)" stroke-width="1"/>
+      <line x1="16" y1="222" x2="684" y2="222" stroke="var(--rule)" stroke-width="1"/>
+
+      <text class="svgtxt" x="175" y="20" text-anchor="middle" style="font-size:11.5px;fill:var(--amber);font-weight:750" lang="ko">동기화 없이 바로 연결</text>
+      <text class="svgtxt" x="175" y="20" text-anchor="middle" style="font-size:11.5px;fill:var(--amber);font-weight:750" lang="en">wired straight in, no synchroniser</text>
+      <text class="svglab" x="132" y="58" text-anchor="end" style="font-size:9.5px;fill:var(--brown)">Async RST</text>
+      <path d="M136 54 H166 V88" fill="none" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#f09-ar)"/>
+      <rect x="140" y="88" width="52" height="48" rx="5" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="166" y="117" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:750">F1</text>
+      <text class="svglab" x="120" y="116" text-anchor="end" style="font-size:9.5px;fill:var(--blue)">D1</text>
+      <path d="M124 112 H140" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="120" y="162" text-anchor="end" style="font-size:9.5px;fill:var(--brown)">CLK0</text>
+      <path d="M124 158 H166 V136" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <path d="M192 112 H244" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="218" y="104" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)">Q1</text>
+      <text class="svgtxt" x="175" y="192" text-anchor="middle" style="font-size:10.5px;fill:var(--amber);font-weight:700" lang="ko">release가 엣지와 겹치면 Q1이 흔들린다</text>
+      <text class="svgtxt" x="175" y="192" text-anchor="middle" style="font-size:10.5px;fill:var(--amber);font-weight:700" lang="en">release near an edge and Q1 wobbles</text>
+
+      <text class="svgtxt" x="525" y="20" text-anchor="middle" style="font-size:11.5px;fill:var(--green-deep);font-weight:750" lang="ko">reset synchronizer를 거친다</text>
+      <text class="svgtxt" x="525" y="20" text-anchor="middle" style="font-size:11.5px;fill:var(--green-deep);font-weight:750" lang="en">through a reset synchroniser</text>
+      <text class="svglab" x="444" y="58" text-anchor="end" style="font-size:9.5px;fill:var(--brown)">Async RST</text>
+      <path d="M448 54 H539 M475 54 V88 M539 54 V88" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <rect x="452" y="88" width="46" height="48" rx="5" fill="rgba(var(--brown-rgb),.16)" stroke="var(--brown)" stroke-width="1.8"/>
+      <text class="svgtxt" x="475" y="117" text-anchor="middle" style="font-size:11px;fill:var(--brown);font-weight:750">R1</text>
+      <rect x="516" y="88" width="46" height="48" rx="5" fill="rgba(var(--brown-rgb),.16)" stroke="var(--brown)" stroke-width="1.8"/>
+      <text class="svgtxt" x="539" y="117" text-anchor="middle" style="font-size:11px;fill:var(--brown);font-weight:750">R2</text>
+      <path d="M436 112 H452 M498 112 H516" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svglab" x="432" y="116" text-anchor="end" style="font-size:9.5px;fill:var(--ink2)">1</text>
+      <path d="M562 112 H578 V64 H639 V88" fill="none" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#f09-ar)"/>
+      <text class="svglab" x="606" y="58" text-anchor="middle" style="font-size:9.5px;fill:var(--brown)">Sync RST</text>
+      <rect x="616" y="88" width="46" height="48" rx="5" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
+      <text class="svgtxt" x="639" y="117" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:750">F2</text>
+      <path d="M598 112 H616" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="594" y="116" text-anchor="end" style="font-size:9.5px;fill:var(--blue)">D2</text>
+      <path d="M662 112 H684" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="673" y="104" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)">Q2</text>
+      <text class="svglab" x="444" y="162" text-anchor="end" style="font-size:9.5px;fill:var(--brown)">CLK0</text>
+      <path d="M448 158 H639 M475 158 V136 M539 158 V136 M639 158 V136" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svgtxt" x="525" y="192" text-anchor="middle" style="font-size:10.5px;fill:var(--green-deep);font-weight:700" lang="ko">release만 CLK0에 맞춰 떨어진다</text>
+      <text class="svgtxt" x="525" y="192" text-anchor="middle" style="font-size:10.5px;fill:var(--green-deep);font-weight:700" lang="en">only the release lands on a CLK0 edge</text>
+
+      <rect x="336" y="300" width="30" height="30" fill="rgba(var(--amber-rgb),.22)"/>
+      <line x1="340" y1="246" x2="340" y2="400" stroke="var(--amber)" stroke-width="1" stroke-dasharray="3 3"/>
+      <line x1="520" y1="246" x2="520" y2="400" stroke="var(--green)" stroke-width="1" stroke-dasharray="3 3"/>
+      <text class="svglab" x="340" y="240" text-anchor="middle" style="font-size:9px;fill:var(--amber)">async release</text>
+      <text class="svglab" x="520" y="240" text-anchor="middle" style="font-size:9px;fill:var(--green-deep)">sync release</text>
+
+      <text class="svglab" x="114" y="252" text-anchor="end" style="font-size:9px;fill:var(--brown)">CLK0</text>
+      <path d="M120 258 H160 V240 H205 V258 H250 V240 H295 V258 H340 V240 H385 V258 H430 V240 H475 V258 H520 V240 H565 V258 H610 V240 H655 V258 H680" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svglab" x="114" y="286" text-anchor="end" style="font-size:9px;fill:var(--brown)">AsyncRST</text>
+      <path d="M120 292 H335 V274 H680" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svglab" x="114" y="320" text-anchor="end" style="font-size:9px;fill:var(--blue)">Q1</text>
+      <path d="M120 308 H340 L344 324 L348 310 L352 324 L356 310 L360 326 H680" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="114" y="354" text-anchor="end" style="font-size:9px;fill:var(--brown)">SyncRST</text>
+      <path d="M120 360 H520 V342 H680" fill="none" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svglab" x="114" y="388" text-anchor="end" style="font-size:9px;fill:var(--blue)">Q2</text>
+      <path d="M120 376 H520 L524 394 H680" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+    </svg>
+    <figcaption lang="ko">왼쪽 회로에서 <code>Async RST</code>는 F1의 reset 핀에 바로 붙는다. 걸 때는 이게 좋은데, <strong>풀 때가 문제다.</strong> 풀리는 순간이 클럭 엣지와 가까우면 recovery time을 위반하고 <code>Q1</code>이 파형처럼 흔들린다. 오른쪽은 같은 <code>Async RST</code>를 <strong>R1과 R2 두 flop에 통과시켜</strong> 목적지 클럭 <code>CLK0</code>에 맞춘 <code>Sync RST</code>를 만들고, 그것을 F2에 준다. <strong>걸리는 것은 여전히 즉시이고(두 flop의 reset 핀에 직접 들어간다), 풀리는 것만 클럭에 맞춰진다.</strong> 그게 09절 절충의 회로 구현이다.</figcaption>
+    <figcaption lang="en">On the left, <code>Async RST</code> goes straight to F1's reset pin. That is good for asserting, but <strong>releasing is the problem.</strong> Release too close to a clock edge and recovery time is violated, so <code>Q1</code> wobbles the way the waveform shows. On the right the same <code>Async RST</code> <strong>passes through two flops, R1 and R2</strong>, producing a <code>Sync RST</code> aligned to the destination clock <code>CLK0</code>, and that is what drives F2. <strong>Assertion is still immediate, because the async reset feeds both flops' reset pins directly; only the release is aligned to the clock.</strong> That circuit is the split from §09 made real.</figcaption>
+  </figure>
+
+  <p lang="ko">그 절충을 구현한 회로가 <strong>reset synchronizer</strong> 다. 재미있는 건 <strong>회로 모양이 double-FF synchronizer 와 똑같다는 것</strong>이다. 목적이 다를 뿐이다.</p>
+  <p lang="en">The circuit that implements the split is a <strong>reset synchroniser</strong>, and the amusing part is that <strong>it looks identical to a double-FF synchroniser.</strong> Only the purpose differs.</p>
+
+  <p lang="ko">마지막으로 <strong>RDC</strong>. CDC 를 이해했으면 한 문장이다. <strong>넘어가는 게 데이터가 아니라 reset 이다.</strong></p>
+  <p lang="en">Finally <strong>RDC</strong>. Once CDC makes sense, this is one sentence: <strong>what crosses is not data, it is the reset.</strong></p>
+
+  <div class="trap">
+    <p lang="ko"><strong>RDC 는 클럭이 하나여도 생긴다.</strong> 이게 제일 놓치기 쉽다. flop 두 개가 <strong>같은 클럭</strong>을 쓰는데 <strong>reset 만 다르면</strong> 그 사이가 RDC 다. 한쪽이 비동기로 리셋되면서 출력을 바꾸는데 받는 쪽은 리셋 중이 아니라서 그 변화를 그대로 받는다.</p>
+    <p lang="en"><strong>An RDC exists even with a single clock.</strong> Easiest thing to miss. Two flops on <strong>the same clock</strong> but with <strong>different resets</strong> form one: the sender is reset asynchronously and its output moves, while the receiver, not in reset, samples that move.</p>
+  </div>
+
+<figure>
+    <svg viewBox="0 0 700 210" role="img" aria-label="reset ordering 세 경우. rst2가 걸릴 때는 안전하고, rst1만 걸리고 dff2가 켜져 있으면 metastable이 되며, 그래서 rst1이 걸릴 때 rst2도 걸려 있어야 한다">
+      <defs>
+        <marker id="f10-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+        <marker id="f10-rs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--brown)"/>
+        </marker>
+      </defs>
+
+      <text class="svgtxt" x="110" y="18" text-anchor="middle" style="font-size:10.5px;fill:var(--green-deep);font-weight:750" lang="ko">(a) rst2가 걸린다</text>
+      <text class="svgtxt" x="110" y="18" text-anchor="middle" style="font-size:10.5px;fill:var(--green-deep);font-weight:750" lang="en">(a) rst2 asserts</text>
+      <text class="svglab" x="70" y="46" text-anchor="middle" style="font-size:9px;fill:var(--brown)">rst1</text>
+      <path d="M70 52 V70" fill="none" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#f10-rs)"/>
+      <text class="svglab" x="160" y="46" text-anchor="middle" style="font-size:9px;fill:var(--brown)">rst2</text>
+      <path d="M160 52 V70" fill="none" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#f10-rs)"/>
+      <rect x="40" y="70" width="60" height="54" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="70" y="92" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">dff1</text>
+      <rect x="130" y="70" width="60" height="54" rx="6" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.8"/>
+      <text class="svgtxt" x="160" y="92" text-anchor="middle" style="font-size:11px;fill:var(--green-deep);font-weight:700">dff2</text>
+      <text class="svglab" x="160" y="112" text-anchor="middle" style="font-size:8.5px;fill:var(--green-deep);font-weight:700">ON → OFF</text>
+      <path d="M100 97 H128" fill="none" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#f10-ar)"/>
+      <text class="svglab" x="114" y="88" text-anchor="middle" style="font-size:8px;fill:var(--ink3)">data</text>
+      <path d="M24 142 H160 M70 142 V124 M160 142 V124" fill="none" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svglab" x="20" y="146" text-anchor="end" style="font-size:9px;fill:var(--brown)">clk</text>
+      <text class="svgtxt" x="110" y="176" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="ko">dff2가 reset 상태로 가므로</text>
+      <text class="svgtxt" x="110" y="176" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="en">dff2 goes into reset, so</text>
+      <text class="svgtxt" x="110" y="192" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="ko">rst1이 어떻든 상관없다</text>
+      <text class="svgtxt" x="110" y="192" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="en">rst1 does not matter</text>
+
+      <text class="svgtxt" x="344" y="18" text-anchor="middle" style="font-size:10.5px;fill:var(--amber);font-weight:750" lang="ko">(b) rst1만 걸린다</text>
+      <text class="svgtxt" x="344" y="18" text-anchor="middle" style="font-size:10.5px;fill:var(--amber);font-weight:750" lang="en">(b) only rst1 asserts</text>
+      <text class="svglab" x="304" y="46" text-anchor="middle" style="font-size:9px;fill:var(--brown)">rst1</text>
+      <path d="M304 52 V70" fill="none" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#f10-rs)"/>
+      <text class="svglab" x="394" y="46" text-anchor="middle" style="font-size:9px;fill:var(--brown)">rst2</text>
+      <path d="M394 52 V70" fill="none" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#f10-rs)"/>
+      <rect x="274" y="70" width="60" height="54" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="304" y="92" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">dff1</text>
+      <text class="svglab" x="304" y="112" text-anchor="middle" style="font-size:8.5px;fill:var(--blue);font-weight:700">ON → OFF</text>
+      <rect x="364" y="70" width="60" height="54" rx="6" fill="rgba(var(--amber-rgb),.18)" stroke="var(--amber)" stroke-width="1.8"/>
+      <text class="svgtxt" x="394" y="92" text-anchor="middle" style="font-size:11px;fill:var(--amber);font-weight:700">dff2</text>
+      <text class="svglab" x="394" y="112" text-anchor="middle" style="font-size:8.5px;fill:var(--amber);font-weight:700">If ON</text>
+      <path d="M334 97 H362" fill="none" stroke="var(--amber)" stroke-width="1.6" marker-end="url(#f10-ar)"/>
+      <text class="svglab" x="348" y="88" text-anchor="middle" style="font-size:8px;fill:var(--amber)">data</text>
+      <path d="M258 142 H394 M304 142 V124 M394 142 V124" fill="none" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svglab" x="254" y="146" text-anchor="end" style="font-size:9px;fill:var(--brown)">clk</text>
+      <text class="svgtxt" x="344" y="176" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700" lang="ko">dff1 출력이 비동기로 바뀌는데</text>
+      <text class="svgtxt" x="344" y="176" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700" lang="en">dff1's output changes asynchronously</text>
+      <text class="svgtxt" x="344" y="192" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700" lang="ko">dff2가 그걸 잡는다 → metastable</text>
+      <text class="svgtxt" x="344" y="192" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700" lang="en">and dff2 samples it → metastable</text>
+
+      <text class="svgtxt" x="578" y="18" text-anchor="middle" style="font-size:10.5px;fill:var(--green-deep);font-weight:750" lang="ko">(c) 그래서 지켜야 할 규칙</text>
+      <text class="svgtxt" x="578" y="18" text-anchor="middle" style="font-size:10.5px;fill:var(--green-deep);font-weight:750" lang="en">(c) hence the rule</text>
+      <text class="svglab" x="538" y="46" text-anchor="middle" style="font-size:9px;fill:var(--brown)">rst1</text>
+      <path d="M538 52 V70" fill="none" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#f10-rs)"/>
+      <text class="svglab" x="628" y="46" text-anchor="middle" style="font-size:9px;fill:var(--brown)">rst2</text>
+      <path d="M628 52 V70" fill="none" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#f10-rs)"/>
+      <rect x="508" y="70" width="60" height="54" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="538" y="92" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">dff1</text>
+      <text class="svglab" x="538" y="112" text-anchor="middle" style="font-size:8.5px;fill:var(--blue);font-weight:700">ON → OFF</text>
+      <rect x="598" y="70" width="60" height="54" rx="6" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.8"/>
+      <text class="svgtxt" x="628" y="92" text-anchor="middle" style="font-size:11px;fill:var(--green-deep);font-weight:700">dff2</text>
+      <text class="svglab" x="628" y="112" text-anchor="middle" style="font-size:7.5px;fill:var(--green-deep);font-weight:700">Must be OFF</text>
+      <path d="M568 97 H596" fill="none" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#f10-ar)"/>
+      <text class="svglab" x="582" y="88" text-anchor="middle" style="font-size:8px;fill:var(--ink3)">data</text>
+      <path d="M492 142 H628 M538 142 V124 M628 142 V124" fill="none" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svglab" x="488" y="146" text-anchor="end" style="font-size:9px;fill:var(--brown)">clk</text>
+      <text class="svgtxt" x="578" y="176" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="ko">rst1이 걸릴 때는 rst2도</text>
+      <text class="svgtxt" x="578" y="176" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="en">when rst1 asserts, rst2</text>
+      <text class="svgtxt" x="578" y="192" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="ko">반드시 걸려 있어야 한다</text>
+      <text class="svgtxt" x="578" y="192" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="en">must be asserted too</text>
+    </svg>
+    <figcaption lang="ko">슬라이드가 <strong>ON과 OFF</strong>로 쓰는 것은 flip-flop이 <strong>정상 동작 중(ON)</strong>인지 <strong>reset 상태(OFF)</strong>인지다. 세 칸을 한 줄로 줄이면 이렇게 된다. <strong>받는 쪽이 reset 중이면 보내는 쪽이 무슨 짓을 해도 안전하고, 받는 쪽이 깨어 있는데 보내는 쪽이 비동기로 리셋되면 위험하다.</strong></figcaption>
+    <figcaption lang="en">What the slide writes as <strong>ON and OFF</strong> is whether the flop is <strong>running normally (ON)</strong> or <strong>held in reset (OFF)</strong>. Compressed to one line: <strong>if the receiver is in reset, nothing the sender does can hurt; if the receiver is awake while the sender is asynchronously reset, you are exposed.</strong></figcaption>
+  </figure>
+
+  <p lang="ko">푸는 방법은 둘이다. 목적지에 <strong>synchronizer 를 넣거나</strong>, reset 들 사이에 <strong>순서를 정하거나</strong>. 순서 규칙이 <strong>비대칭</strong>인 게 요점이다.</p>
+  <p lang="en">Two ways out: put a <strong>synchroniser</strong> at the destination, or impose an <strong>order</strong> between the resets. The point is that the ordering rule is <strong>asymmetric</strong>.</p>
+
+  <div class="def">
+    <p lang="ko"><strong><code>rst1</code> 이 걸릴 때는 <code>rst2</code> 도 반드시 걸려 있어야 한다. 반대는 상관없다.</strong></p>
+    <p lang="ko">"동시에 건다" 가 아니라 <strong>"한쪽이 다른 쪽을 포함한다"</strong> 에 가깝다. 받는 쪽이 reset 중이면 보내는 쪽이 무슨 짓을 해도 안전하고, <strong>받는 쪽이 깨어 있는데 보내는 쪽이 비동기로 리셋되면 위험하다.</strong></p>
+    <p lang="en"><strong>When <code>rst1</code> asserts, <code>rst2</code> must be asserted too. The other direction does not matter.</strong></p>
+    <p lang="en">Not "assert them together" so much as <strong>"one contains the other".</strong> If the receiver is in reset, nothing the sender does can hurt; <strong>if the receiver is awake while the sender is asynchronously reset, you are exposed.</strong></p>
+  </div>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+
+  <ul>
+    <li lang="ko"><strong>다섯 개의 시간 이름과 <code>T<sub>slack</sub></code> 과의 관계.</strong> 그리고 <code>T<sub>skew</sub></code> 만 RTL 로 알 수 없다는 것</li>
+    <li lang="en"><strong>The five time names and how they make <code>T<sub>slack</sub></code></strong>, and that only <code>T<sub>skew</sub></code> is invisible from the RTL</li>
+    <li lang="ko"><strong>PLL 과 DLL 의 차이.</strong> 주파수를 만드는가, 위상만 맞추는가</li>
+    <li lang="en"><strong>PLL versus DLL</strong>: makes a frequency, or only aligns phase</li>
+    <li lang="ko"><strong>왜 AND 가 아니라 ICG 인가.</strong> latch 가 enable 을 클럭 low 구간에 묶어둔다</li>
+    <li lang="en"><strong>Why an ICG and not an AND</strong>: the latch pins enable to the clock-low window</li>
+    <li lang="ko"><strong>clock domain 의 정의.</strong> "클럭 하나" 가 아니라 <strong>"synchronous 한 클럭 묶음"</strong></li>
+    <li lang="en"><strong>The definition of a clock domain</strong>: not one clock but <strong>a group of mutually synchronous clocks</strong></li>
+    <li lang="ko"><strong>metastability 와 data coherency 의 차이.</strong> 그리고 <strong>왜 버스에는 gray code 가 먼저인가</strong></li>
+    <li lang="en"><strong>Metastability versus data coherency</strong>, and <strong>why a bus needs gray code first</strong></li>
+    <li lang="ko"><strong>CDC 기법 네 개와 각각의 선택 기준</strong></li>
+    <li lang="en"><strong>The four CDC schemes and what picks between them</strong></li>
+    <li lang="ko"><strong>reset 은 async assert, sync de-assert. 그리고 그 이유가 "전원 직후에는 클럭이 없다"</strong></li>
+    <li lang="en"><strong>Reset asserts async and de-asserts sync</strong>, because <strong>right after power-up there is no clock</strong></li>
+    <li lang="ko"><strong>recovery time 이 무엇을 검사하나.</strong> 그리고 <strong>STA 가 이건 봐준다</strong>는 것</li>
+    <li lang="en"><strong>What recovery time checks</strong>, and that <strong>STA does cover this one</strong></li>
+    <li lang="ko"><strong>RDC 는 클럭이 하나여도 생긴다.</strong> 그리고 <strong>ordering 규칙이 비대칭</strong>이라는 것</li>
+    <li lang="en"><strong>An RDC happens even with one clock</strong>, and <strong>the ordering rule is asymmetric</strong></li>
+  </ul>
+
+  <div class="callout">
+    <p lang="ko"><strong>이 강의가 Lab 1 로 곧장 이어진다.</strong> CDC 기법 네 개 중 마지막인 FIFO 를 직접 만든다. 여기서 배운 <strong>gray code, pointer 동기화, double-FF</strong> 가 전부 그 하나의 과제에 들어간다.</p>
+    <p lang="en"><strong>This lecture feeds straight into Lab 1</strong>, where you build the last of the four schemes, the FIFO. <strong>Gray code, pointer synchronisation and the double-FF</strong> all land in that one assignment.</p>
+  </div>
+</section>
+
+</main>
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 4 개인 학습 노트<br>
+  강의: Aman Arora, Arizona State University · Fall 2026 · 이 강의의 발표자: Chetan Sudarshan (Marvell Technology) · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 4 personal study notes<br>
+  Course: Aman Arora, Arizona State University · Fall 2026 · guest speaker for this lecture: Chetan Sudarshan (Marvell Technology) · <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// CDC / RDC 분류기. 상황을 주고 셋 중 하나를 고르게 하고 즉시 채점한다.
+// 정답을 나열하는 게 아니라, 고르고 나서 "왜"를 읽게 하는 것이 목적이다.
+// 상태는 JS 변수로만 들고 있고 브라우저 저장소는 쓰지 않는다.
+(function () {
+  var list = document.getElementById('cq-list');
+  if (!list) return;
+  var scoreBox = document.getElementById('cq-score');
+  var hintBox = document.getElementById('cq-hint');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var OPTS = [
+    { v: 'cdc', ko: 'CDC', en: 'CDC' },
+    { v: 'rdc', ko: 'RDC', en: 'RDC' },
+    { v: 'ok',  ko: '문제 없음', en: 'no issue' }
+  ];
+
+  var QS = [
+    { ans: 'cdc',
+      ko: '100 MHz 도메인의 flop 출력이 80 MHz 도메인의 flop에 <strong>바로</strong> 들어간다. 두 클럭은 서로 다른 PLL에서 나왔다.',
+      en: 'A flop output in the 100 MHz domain feeds a flop in the 80 MHz domain <strong>directly</strong>. The two clocks come from different PLLs.',
+      wko: '서로 다른 소스라 타이밍 관계를 정할 수 없다. 100과 80은 4:5라 위상이 계속 미끄러지고, 언젠가 엣지가 겹친다. <strong>동기화 없이 넘기고 있으므로 CDC 위반이다.</strong>',
+      wen: 'Different sources, so no timing relationship can be established. 100 to 80 is 4:5, the phase keeps sliding, and eventually the edges coincide. <strong>Crossing with no synchroniser makes this a CDC violation.</strong>' },
+    { ans: 'ok',
+      ko: '100 MHz 클럭과, 그것을 2분주해서 만든 50 MHz 클럭 사이에서 데이터를 넘긴다.',
+      en: 'Data is passed between a 100 MHz clock and the 50 MHz clock made by dividing it by two.',
+      wko: '주파수는 다르지만 <strong>같은 소스에서 나왔고 매 두 번째 엣지가 정렬</strong>된다. 타이밍 관계를 적어줄 수 있으므로 둘은 <strong>같은 clock domain</strong>이고, STA가 정상적으로 검사한다. CDC가 아니다.',
+      wen: 'The frequencies differ but they <strong>share a source and every second edge lines up.</strong> The relationship can be written down, so they are <strong>the same clock domain</strong> and STA checks them normally. Not a CDC.' },
+    { ans: 'rdc',
+      ko: 'FF1과 FF2가 <strong>둘 다 clk1</strong>으로 돈다. FF1은 RST_1로, FF2는 RST_2로 비동기 리셋된다. FF1의 출력이 FF2로 들어간다.',
+      en: 'FF1 and FF2 are <strong>both clocked by clk1</strong>. FF1 is asynchronously reset by RST_1, FF2 by RST_2. FF1 drives FF2.',
+      wko: '클럭이 하나이므로 CDC는 없다. 그런데 <strong>RST_1이 걸리면 FF1의 출력이 클럭과 무관하게 바뀌고</strong>, 그 순간 FF2는 리셋 중이 아니므로 그 변화를 엣지 근처에서 잡는다. <strong>슬라이드 32쪽 metastability 패널 그대로다.</strong>',
+      wen: 'One clock, so no CDC. But <strong>when RST_1 asserts, FF1’s output changes with no regard for the clock</strong>, and FF2, not being in reset, samples that change near an edge. <strong>This is the metastability panel on slide 32, exactly.</strong>' },
+    { ans: 'cdc',
+      ko: '8비트 <strong>binary</strong> 카운터 값을 double-FF synchronizer 하나로 비동기 도메인에 넘긴다.',
+      en: 'An 8-bit <strong>binary</strong> counter value is passed into an asynchronous domain through a single double-FF synchroniser.',
+      wko: 'double-FF가 metastability는 막아준다. 그런데 카운터가 예를 들어 <code>01111111</code>에서 <code>10000000</code>으로 갈 때 <strong>여덟 비트가 한꺼번에 바뀌고 각 비트가 독립적으로 정착</strong>한다. 원본에 없던 값이 나타난다. <strong>gray code로 바꿔서 넘겨야 한다.</strong>',
+      wen: 'The double-FF does stop metastability. But when the counter goes from <code>01111111</code> to <code>10000000</code>, <strong>all eight bits change at once and each settles independently.</strong> Values the source never held appear. <strong>It has to be gray-coded before crossing.</strong>' },
+    { ans: 'rdc',
+      ko: '비동기 reset 신호가 <strong>다른 클럭 도메인 flop의 reset 핀에 바로</strong> 붙어 있다. 중간에 아무것도 없다.',
+      en: 'An asynchronous reset is wired <strong>straight onto the reset pin of a flop in another clock domain</strong>, with nothing in between.',
+      wko: '슬라이드 34쪽이 ✗ 표시를 붙여둔 바로 그 모양, <strong>Missing Reset Synchronizer</strong>다. 걸릴 때는 괜찮지만 <strong>풀릴 때 목적지 클럭 엣지와 겹치면 recovery time을 위반</strong>하고, 그 도메인 전체가 어긋난 시점에 깨어난다.',
+      wen: 'This is the shape slide 34 marks with an ✗: <strong>Missing Reset Synchronizer.</strong> Asserting is fine, but <strong>releasing on top of a destination clock edge violates recovery time</strong>, and the whole domain wakes up at inconsistent times.' },
+    { ans: 'ok',
+      ko: '같은 도메인 안에서 flop → 조합 논리 → flop으로 데이터가 간다. STA가 setup과 hold를 전부 통과시켰다.',
+      en: 'Inside one domain, data goes flop, combinational logic, flop. STA passed both setup and hold.',
+      wko: '같은 도메인이므로 CDC가 아니고, reset도 하나이므로 RDC가 아니다. <strong>그리고 STA가 통과시켰다는 것은 데이터가 setup/hold 윈도우 밖에서만 바뀐다는 뜻</strong>이라 metastability도 안 생긴다. <strong>이게 "클럭이 하나인 세계"의 안심이고, 이 강의는 그 안심이 언제 깨지는지를 다뤘다.</strong>',
+      wen: 'Same domain, so not a CDC; one reset, so not an RDC. <strong>And STA passing means the data only ever changes outside the setup and hold window</strong>, so metastability cannot occur either. <strong>This is the comfort of the single-clock world, and this lecture was about when that comfort ends.</strong>' }
+  ];
+
+  var picked = QS.map(function () { return null; });
+
+  function render() {
+    list.innerHTML = '';
+    QS.forEach(function (q, i) {
+      var row = document.createElement('div');
+      row.className = 'qrow';
+      if (picked[i]) {
+        row.classList.add('done');
+        row.classList.add(picked[i] === q.ans ? 'ok' : 'no');
+      }
+
+      var qd = document.createElement('div');
+      qd.className = 'q';
+      qd.innerHTML = '<strong>' + (i + 1) + '.</strong> ' + L(q.ko, q.en);
+      row.appendChild(qd);
+
+      var opts = document.createElement('div');
+      opts.className = 'opts';
+      OPTS.forEach(function (o) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = L(o.ko, o.en);
+        if (picked[i]) {
+          b.disabled = true;
+          if (o.v === q.ans) b.classList.add('right');
+          else if (o.v === picked[i]) b.classList.add('wrong');
+        } else {
+          b.addEventListener('click', function () { picked[i] = o.v; render(); });
+        }
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);
+
+      var why = document.createElement('div');
+      why.className = 'why';
+      why.innerHTML = L(q.wko, q.wen);
+      row.appendChild(why);
+
+      list.appendChild(row);
+    });
+    paintScore();
+  }
+
+  function paintScore() {
+    var done = picked.filter(function (p) { return p !== null; }).length;
+    var right = picked.filter(function (p, i) { return p === QS[i].ans; }).length;
+    scoreBox.innerHTML = '';
+    var s = document.createElement('span');
+    s.textContent = L('푼 문제 ' + done + ' / ' + QS.length + '  ·  맞힌 것 ' + right,
+                      'answered ' + done + ' of ' + QS.length + '  ·  correct ' + right);
+    scoreBox.appendChild(s);
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = L('다시 풀기', 'start over');
+    b.addEventListener('click', function () {
+      picked = QS.map(function () { return null; });
+      render();
+    });
+    scoreBox.appendChild(b);
+
+    if (done < QS.length) {
+      hintBox.innerHTML = L('판정 순서를 이렇게 잡으면 헷갈리지 않는다. <strong>1. 클럭이 둘인가</strong> → 아니면 CDC는 빼도 된다. <strong>2. reset이 둘인가</strong> → 아니면 RDC도 빼도 된다. <strong>3. 남았다면, 중간에 동기화 장치가 있는가.</strong>',
+                           'Work through it in this order and it stays clear. <strong>1. Are there two clocks?</strong> If not, CDC is off the table. <strong>2. Are there two resets?</strong> If not, RDC is off the table too. <strong>3. If something is left, is there a synchroniser in between?</strong>');
+    } else {
+      hintBox.innerHTML = L('여섯 문제가 각각 이 강의의 한 절에 대응한다. 틀린 것이 있으면 그 절로 돌아가면 된다. 1번은 <a href="#s6">06절</a>, 2번은 <a href="#s5">05절</a>, 3번과 5번은 <a href="#s11">11절</a>, 4번은 <a href="#s7">07절</a>, 6번은 <a href="#s1">01절</a>이다.',
+                           'Each of the six maps to one section. If you missed one, go back to it: 1 is <a href="#s6">§06</a>, 2 is <a href="#s5">§05</a>, 3 and 5 are <a href="#s11">§11</a>, 4 is <a href="#s7">§07</a>, and 6 is <a href="#s1">§01</a>.');
+    }
+  }
+
+  window.addEventListener('langchange', render);
+  render();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

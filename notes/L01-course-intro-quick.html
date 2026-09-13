@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CEN 598 ADDV · Lecture 1 — Course Intro and Design Flow</title>
+<title>Lecture 1 빠른 읽기 · Course Intro and Design Flow · CEN 598 ADDV</title>
 <style>
 :root{
   color-scheme:light dark;
@@ -328,14 +328,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <div class="wrap">
 
 <header class="top">
-  <p class="kicker">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</p>
-  <p class="lec" lang="ko">Lecture 1 &middot; 빠른 읽기</p>
-  <p class="lec" lang="en">Lecture 1 &middot; Quick read</p>
-  <h1 class="title">Course Intro and Design Flow</h1>
-  <p class="sub" lang="ko">칩이 만들어지는 길 일곱 칸, 우리가 서 있는 칸, 그리고 그 위에 붙는 헷갈리는 이름 넷.</p>
-  <p class="sub" lang="en">The seven steps a chip travels, the one we stand on, and the four confusing names stuck on top of it.</p>
-  <p class="meta" lang="ko"><a href="L01-course-intro.html">자세한 판 보기</a> &middot; 이 판은 훑고 다시 읽기 위한 것이다</p>
-  <p class="meta" lang="en"><a href="L01-course-intro.html">Full version</a> &middot; this one is for skimming and re-reading</p>
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 1<br>Course Intro and Design Flow</h1>
+  <p class="subtitle" lang="ko">칩이 만들어지는 길 일곱 칸, 우리가 서 있는 칸, 그리고 그 위에 붙는 헷갈리는 이름 넷.</p>
+  <p class="subtitle" lang="en">The seven steps a chip travels, the one we stand on, and the four confusing names stuck on top of it.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L01-course-intro.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L01-course-intro.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
   <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
   <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
 </header>
@@ -362,7 +368,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <section id="q1">
   <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
 
-  <p lang="ko">1강은 새 기술이 하나도 안 나온다. 대신 <strong>앞으로 23강 내내 쓸 단어들이 한꺼번에 쏟아진다.</strong> 그래서 지금 이걸 정리해두면 나중에 편하고, 안 해두면 계속 헷갈린다.</p>
+  <p lang="ko">1강은 새 기술이 하나도 안 나온다. 대신 <strong>앞으로 23강 내내 쓸 단어들이 한꺼번에 쏟아진다.</strong> 지금 정리해두면 나중이 편하고, 안 해두면 계속 헷갈린다.</p>
   <p lang="en">Lecture 1 teaches no new technology. What it does is <strong>dump every word you will use for the next 23 lectures all at once.</strong> Sort it now and the rest is easy; skip it and you stay confused.</p>
 
   <div class="def">
@@ -370,8 +376,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <p lang="en">A chip goes <strong>document &rarr; block diagram &rarr; RTL &rarr; netlist &rarr; mask &rarr; physical part</strong>. And <strong>at every one of those points sits a differently named kind of checking.</strong> Lecture 1 is those two lines laid side by side. That is it.</p>
   </div>
 
-  <p lang="ko">그리고 이 수업의 성격을 한 문장으로 하면 이거다. <strong>우리는 ASIC 을 다룬다. ASIC 은 틀리면 되돌릴 수 없다.</strong> 이 한 줄이 왜 이 과목이 검증에 그렇게 집착하는지를 전부 설명한다. FPGA 였으면 다시 구우면 그만이다. ASIC 은 mask 를 이미 만들었으면 끝이다.</p>
-  <p lang="en">And the whole course in one sentence: <strong>we work on ASICs, and an ASIC cannot be taken back once it is wrong.</strong> That single line explains why this subject is so obsessed with verification. On an FPGA you just reflash it. On an ASIC, once the masks exist, that is that.</p>
+  <p lang="ko">수업의 성격도 한 문장이면 된다. <strong>우리는 ASIC 을 다루고, ASIC 은 틀리면 되돌릴 수 없다.</strong> 이 줄이 왜 이 과목이 검증에 집착하는지를 전부 설명한다. FPGA 였으면 다시 구우면 그만인데, ASIC 은 mask 를 만들었으면 끝이다.</p>
+  <p lang="en">The course in one sentence: <strong>we work on ASICs, and an ASIC cannot be taken back once it is wrong.</strong> That line explains the whole obsession with verification. On an FPGA you reflash it. On an ASIC, once the masks exist, that is that.</p>
 
   <div class="jargon">
     <details open>
@@ -385,8 +391,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     </details>
   </div>
 
-  <p lang="ko">실무 수업이라는 것도 미리 알아두면 좋다. 강사 Aman Arora 는 Freescale 에서 DFT 3 년, <strong>NVIDIA 에서 Design &middot; Verification &middot; Architecture 를 8 년</strong> 하고 왔다. 그래서 수업에서 나오는 말이 교과서 정의가 아니라 <strong>현장에서 실제로 쓰이는 말</strong>이다. 정의를 외우는 것보다 <strong>누가 언제 그 말을 쓰는지</strong>를 아는 게 중요한 이유다.</p>
-  <p lang="en">Worth knowing this is an industry course. The instructor, Aman Arora, did three years of DFT at Freescale and <strong>eight years of design, verification and architecture at NVIDIA</strong>. So the vocabulary here is not textbook definitions, it is <strong>what people actually say on the job</strong>. Which is why knowing <strong>who says a word and when</strong> beats memorising a definition.</p>
+  <p lang="ko">실무 수업이라는 것도 알아두면 좋다. 강사 Aman Arora 는 Freescale 에서 DFT 3 년, <strong>NVIDIA 에서 Design &middot; Verification &middot; Architecture 를 8 년</strong> 하고 왔다. 그래서 수업에서 나오는 말이 교과서 정의가 아니라 <strong>현장에서 실제로 쓰이는 말</strong>이다. 정의를 외우기보다 <strong>누가 언제 그 말을 쓰는지</strong>가 중요한 이유다.</p>
+  <p lang="en">Worth knowing this is an industry course. Aman Arora did three years of DFT at Freescale and <strong>eight years of design, verification and architecture at NVIDIA</strong>. So the vocabulary is not textbook definitions, it is <strong>what people actually say on the job</strong>, which is why knowing <strong>who says a word and when</strong> beats memorising it.</p>
 
   <div class="trap">
     <p lang="ko"><strong>과제 제출 정책이 양방향이다.</strong> 늦으면 24 시간마다 15% 씩 깎이고(최대 3 구간, 그 뒤는 0 점), <strong>일찍 내면 24 시간마다 5% 씩 붙는다</strong>(최대 10%). 48 시간 일찍 내면 그냥 10 점을 얻는 거다. 마감에 맞춰 내는 습관이 여기서는 손해다.</p>
@@ -397,8 +403,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <section id="q2">
   <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">칩이 만들어지는 길</h2><h2 lang="en">How a chip gets made</h2></div>
 
-  <p lang="ko">이 그림 하나가 과목 전체의 지도다. 앞으로 새 강의를 시작할 때마다 <strong>"지금 여기 어디쯤인가"</strong>를 이 그림에서 짚게 된다. 한 번 제대로 보고 넘어가자.</p>
-  <p lang="en">This one diagram is the map for the whole course. Every new lecture from here starts with <strong>"so where are we on this?"</strong> Worth looking at properly once.</p>
+  <p lang="ko">이 그림 하나가 과목 전체의 지도다. 앞으로 새 강의를 시작할 때마다 <strong>"지금 여기 어디쯤인가"</strong>를 여기서 짚게 된다.</p>
+  <p lang="en">This one diagram is the map for the whole course. Every new lecture starts with <strong>"so where are we on this?"</strong></p>
 
 <figure>
     <svg viewBox="0 0 700 400" role="img" aria-label="Specification부터 Board/Product까지 일곱 단계와 각 단계가 넘기는 산출물">
@@ -474,18 +480,18 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Slide 13. The labels on the right are <strong>what each stage hands to the next one</strong>, so every arrow is one handover. The red arrow on the slide points at the <strong>Design box</strong>: part one of the course lives in that one cell, where the RTL gets written.</figcaption>
   </figure>
 
-  <p lang="ko">화살표 하나가 <strong>한 번의 인수인계</strong>다. 오른쪽에 적힌 게 그 단계가 다음 단계로 넘기는 산출물이고. 여기서 기억할 건 두 가지뿐이다.</p>
+  <p lang="ko">화살표 하나가 <strong>한 번의 인수인계</strong>이고, 오른쪽에 적힌 게 그 단계가 넘기는 산출물이다. 기억할 건 둘뿐이다.</p>
   <p lang="en">Each arrow is <strong>one handover</strong>, and the label on the right is what that step passes along. Two things to take away.</p>
 
   <ul>
-    <li lang="ko"><strong>RTL 이 사람이 쓰는 마지막 지점이다.</strong> 그 뒤로는 도구가 받아서 기계적으로 변환한다</li>
+    <li lang="ko"><strong>RTL 이 사람이 쓰는 마지막 지점이다.</strong> 그 뒤로는 도구가 받아 기계적으로 변환한다</li>
     <li lang="en"><strong>RTL is the last thing a human writes.</strong> After that the tools take over and transform it mechanically</li>
-    <li lang="ko"><strong>뒤로 갈수록 고치는 비용이 폭발한다.</strong> RTL 에서 고치면 재컴파일이고, mask 를 만든 뒤에 고치면 수억이 날아간다</li>
+    <li lang="ko"><strong>뒤로 갈수록 고치는 비용이 폭발한다.</strong> RTL 에서 고치면 재컴파일이고, mask 뒤에 고치면 수억이 날아간다</li>
     <li lang="en"><strong>The cost of a fix explodes as you move right.</strong> Fix it in RTL and you recompile; fix it after masks and you burn a fortune</li>
   </ul>
 
-  <p lang="ko">그리고 이 길 위에 <strong>Front-End 와 Back-End 라는 경계</strong>가 하나 그어져 있다. 회사 조직이 실제로 이 선을 따라 갈린다.</p>
-  <p lang="en">There is also a <strong>front-end / back-end line</strong> drawn across this path. Real companies split their org charts along it.</p>
+  <p lang="ko">이 길 위에 <strong>Front-End 와 Back-End 경계</strong>가 하나 그어져 있다. 회사 조직이 실제로 이 선을 따라 갈린다.</p>
+  <p lang="en">There is also a <strong>front-end / back-end line</strong> across this path. Real org charts split along it.</p>
 
 <figure>
     <svg viewBox="0 0 700 230" role="img" aria-label="Front-End와 Back-End의 경계, Synthesis가 그 가운데 걸쳐 있다">
@@ -527,18 +533,18 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Slide 14. <strong>The two brackets on the slide meet in the middle of the Synthesis box</strong>, which means the slide does not decide which side it belongs to. It genuinely varies by company and by team, so these notes do not force it either. Synthesis itself gets proper treatment in <a href="L02-design-and-verification-overview.html#s4">Lecture 2, §04</a>.</figcaption>
   </figure>
 
-  <p lang="ko">재밌는 건 <strong>Synthesis 가 그 경계에 걸쳐 있다</strong>는 거다. RTL(사람의 언어)을 netlist(게이트)로 바꾸는 단계라 양쪽 다 걸친다. Lab 0 에서 Design Compiler 를 돌려보는 게 정확히 이 지점이다.</p>
-  <p lang="en">The fun part is that <strong>synthesis straddles that line</strong>. It turns RTL (human language) into a netlist (gates), so it belongs to both sides. Running Design Compiler in Lab 0 is exactly this step.</p>
+  <p lang="ko">재밌는 건 <strong>Synthesis 가 그 경계에 걸쳐 있다</strong>는 거다. RTL(사람의 언어)을 netlist(게이트)로 바꾸니 양쪽에 다 속한다. Lab 0 에서 Design Compiler 를 돌리는 게 정확히 이 지점이다.</p>
+  <p lang="en">The fun part is that <strong>synthesis straddles that line</strong>: it turns RTL into a netlist, so it belongs to both sides. Running Design Compiler in Lab 0 is exactly this step.</p>
 </section>
 
 <section id="q3">
   <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">우리는 어디에 있나</h2><h2 lang="en">Where we stand</h2></div>
 
-  <p lang="ko">지도를 폈으니 우리 위치를 찍자. <strong>이 수업은 Front-End 안에서도 Design 과 Verification 두 칸에 산다.</strong> 슬라이드의 빨간 화살표가 Design 박스를 가리키는 게 그 뜻이다.</p>
-  <p lang="en">Map is open, so mark your position. <strong>This course lives in two cells of the front end: design and verification.</strong> That is what the red arrow pointing at the design box on the slide means.</p>
+  <p lang="ko">지도를 폈으니 위치를 찍자. <strong>이 수업은 Front-End 안에서도 Design 과 Verification 두 칸에 산다.</strong> 슬라이드의 빨간 화살표가 Design 박스를 가리키는 게 그 뜻이다.</p>
+  <p lang="en">Map is open, so mark your position. <strong>This course lives in two cells of the front end: design and verification.</strong> That is what the red arrow on the slide means.</p>
 
-  <p lang="ko">근데 여기서 오해하기 쉬운 게 있다. <strong>Verification 은 한 칸이 아니다.</strong> 흐름 전체에 걸쳐 구간마다 다른 형태로 붙어 있다.</p>
-  <p lang="en">Easy thing to get wrong, though: <strong>verification is not one cell.</strong> It clings to the whole flow, taking a different shape at each stretch.</p>
+  <p lang="ko">여기서 오해하기 쉬운 게 있다. <strong>Verification 은 한 칸이 아니다.</strong> 흐름 전체에 걸쳐 구간마다 다른 형태로 붙어 있다.</p>
+  <p lang="en">Easy thing to get wrong: <strong>verification is not one cell.</strong> It clings to the whole flow, taking a different shape at each stretch.</p>
 
 <figure>
     <svg viewBox="0 0 700 330" role="img" aria-label="설계 흐름의 각 구간에 붙는 세 종류의 verification">
@@ -589,11 +595,11 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Slide 16. All three are called verification, but <strong>each hunts a different thing</strong>: the top one asks whether the logic is wrong, the middle one whether a physical constraint was missed, the bottom one whether the process introduced a defect. Part two of this course is <strong>only the top one</strong>.</figcaption>
   </figure>
 
-  <p lang="ko">그러니까 "검증 엔지니어" 라고 해도 <strong>어느 구간에 있느냐에 따라 하는 일이 완전히 다르다.</strong> 이게 다음 절에서 이름이 넷으로 갈리는 이유다.</p>
-  <p lang="en">So "verification engineer" means <strong>completely different work depending on which stretch you are on.</strong> That is precisely why the next section has four different names for it.</p>
+  <p lang="ko">그러니까 "검증 엔지니어" 라고 해도 <strong>어느 구간에 있느냐에 따라 하는 일이 완전히 다르다.</strong> 다음 절에서 이름이 넷으로 갈리는 이유가 이거다.</p>
+  <p lang="en">So "verification engineer" means <strong>completely different work depending on the stretch.</strong> That is why the next section has four names for it.</p>
 
-  <p lang="ko">한 가지 더. 흐름에는 <strong>얼어붙는 지점</strong>이 있다. Spec Freeze, Logic Freeze, Tapeout. 얼었다고 다시 못 고치는 건 아닌데, 그 뒤의 수정은 <strong>ECO</strong> 라는 별도 절차를 탄다.</p>
-  <p lang="en">One more thing. The flow has <strong>freeze points</strong>: spec freeze, logic freeze, tapeout. Frozen does not mean unfixable, but any change after one goes through a separate process called an <strong>ECO</strong>.</p>
+  <p lang="ko">한 가지 더. 흐름에는 <strong>얼어붙는 지점</strong>이 있다. Spec Freeze, Logic Freeze, Tapeout. 얼었다고 못 고치는 건 아닌데, 그 뒤의 수정은 <strong>ECO</strong> 라는 별도 절차를 탄다.</p>
+  <p lang="en">One more thing: the flow has <strong>freeze points</strong>, namely spec freeze, logic freeze and tapeout. Frozen does not mean unfixable, but changes after one go through a separate process called an <strong>ECO</strong>.</p>
 
 <figure>
     <svg viewBox="0 0 700 200" role="img" aria-label="Spec Freeze, Logic Freeze, Tapeout 순서와 그 사이의 ECO 구간">
@@ -634,7 +640,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
       <summary><span lang="ko">용어 뜯어보기 &middot; ECO</span><span lang="en">Jargon &middot; ECO</span></summary>
       <table class="parts">
         <tr><td lang="ko">풀네임</td><td lang="en">Full name</td><td>Engineering Change Order</td></tr>
-        <tr><td lang="ko">한 줄</td><td lang="en">In one line</td><td><span lang="ko">이미 얼린 설계에 넣는 <strong>최소한의</strong> 수정. 전체를 다시 돌리지 않는다.</span><span lang="en">A <strong>minimal</strong> patch to an already-frozen design, without rerunning everything.</span></td></tr>
+        <tr><td lang="ko">한 줄</td><td lang="en">In one line</td><td><span lang="ko">이미 얼린 설계에 넣는 <strong>최소한의</strong> 수정. 전체를 다시 돌리지 않는다.</span><span lang="en">A <strong>minimal</strong> patch to a frozen design, without rerunning everything.</span></td></tr>
         <tr><td lang="ko">언제</td><td lang="en">When</td><td><span lang="ko">Logic Freeze 이후, 심하면 tapeout 직전에도.</span><span lang="en">After logic freeze, sometimes right up against tapeout.</span></td></tr>
         <tr><td lang="ko">헷갈리는 것</td><td lang="en">Easy to misread</td><td><span lang="ko">ECO 는 "급하게 고친다" 가 아니라 <strong>"영향 범위를 최소로 막으면서 고친다"</strong> 는 뜻이다.</span><span lang="en">ECO does not mean "fix it in a hurry". It means <strong>"fix it while containing the blast radius"</strong>.</span></td></tr>
       </table>
@@ -645,31 +651,31 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <section id="q4">
   <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">헷갈리는 이름 넷</h2><h2 lang="en">The four confusing names</h2></div>
 
-  <p lang="ko"><strong>여기가 1강의 진짜 알맹이다.</strong> 그리고 <strong>quiz 단골</strong>이다. Verification, Testing, Validation, Emulation. 넷 다 "확인한다" 는 뜻인데 <strong>확인하는 대상과 시점이 전부 다르다.</strong></p>
-  <p lang="en"><strong>This is the actual meat of lecture 1</strong>, and <strong>a quiz favourite</strong>. Verification, testing, validation, emulation. All four mean "checking", but <strong>what gets checked and when differs every time.</strong></p>
+  <p lang="ko"><strong>여기가 1강의 알맹이고 quiz 단골이다.</strong> Verification, Testing, Validation, Emulation. 넷 다 "확인한다" 는 뜻인데 <strong>확인하는 대상과 시점이 전부 다르다.</strong></p>
+  <p lang="en"><strong>This is the meat of lecture 1 and a quiz favourite.</strong> Verification, testing, validation, emulation. All four mean "checking", but <strong>what gets checked and when differs every time.</strong></p>
 
   <p lang="ko">표 하나로 끝내자. 다시 읽을 때는 이것만 봐도 된다.</p>
   <p lang="en">One table settles it. On a re-read, this is the only thing you need.</p>
 
   <table>
     <thead><tr>
-      <th lang="ko">이름</th><th lang="en">Name</th>
-      <th lang="ko">무엇을 확인하나</th><th lang="en">Checks what</th>
-      <th lang="ko">언제</th><th lang="en">When</th>
-      <th lang="ko">한 줄로</th><th lang="en">In a line</th>
+      <th><span lang="ko">이름</span><span lang="en">Name</span></th>
+      <th><span lang="ko">무엇을 확인하나</span><span lang="en">Checks what</span></th>
+      <th><span lang="ko">언제</span><span lang="en">When</span></th>
+      <th><span lang="ko">한 줄로</span><span lang="en">In a line</span></th>
     </tr></thead>
     <tbody>
       <tr>
         <td><strong>Verification</strong></td>
         <td><span lang="ko">설계가 <strong>명세대로</strong> 동작하나</span><span lang="en">Does the design match <strong>the spec</strong></span></td>
         <td><span lang="ko">제조 <strong>전</strong></span><span lang="en"><strong>Before</strong> manufacturing</span></td>
-        <td><span lang="ko">"우리가 만든 게 <strong>맞게</strong> 만들어졌나"</span><span lang="en">"Did we build it <strong>right</strong>"</span></td>
+        <td><span lang="ko">"<strong>맞게</strong> 만들었나"</span><span lang="en">"Did we build it <strong>right</strong>"</span></td>
       </tr>
       <tr>
         <td><strong>Testing</strong></td>
-        <td><span lang="ko">실제로 나온 <strong>칩에 제조 결함</strong>이 있나</span><span lang="en">Does the <strong>physical chip</strong> have manufacturing defects</span></td>
+        <td><span lang="ko">나온 <strong>칩에 제조 결함</strong>이 있나</span><span lang="en">Does the <strong>physical chip</strong> have defects</span></td>
         <td><span lang="ko">제조 <strong>후</strong></span><span lang="en"><strong>After</strong> manufacturing</span></td>
-        <td><span lang="ko">"이번에 구운 게 <strong>제대로 구워졌나</strong>"</span><span lang="en">"Did this particular one <strong>come out intact</strong>"</span></td>
+        <td><span lang="ko">"이번 건 <strong>제대로 구워졌나</strong>"</span><span lang="en">"Did this one <strong>come out intact</strong>"</span></td>
       </tr>
       <tr>
         <td><strong>Validation</strong></td>
@@ -679,15 +685,15 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
       </tr>
       <tr>
         <td><strong>Emulation</strong></td>
-        <td><span lang="ko">설계를 <strong>빠르게</strong> 돌려보기 (전용 하드웨어에 얹어서)</span><span lang="en">Running the design <strong>fast</strong>, mapped onto dedicated hardware</span></td>
+        <td><span lang="ko">설계를 <strong>빠르게</strong> 돌려보기 (전용 하드웨어에 얹어서)</span><span lang="en">Running the design <strong>fast</strong> on dedicated hardware</span></td>
         <td><span lang="ko">제조 전, 시뮬레이션이 너무 느릴 때</span><span lang="en">Pre-silicon, when simulation is too slow</span></td>
-        <td><span lang="ko">"시뮬레이션이 <strong>느려서</strong> 못 하는 걸 한다"</span><span lang="en">"Does what simulation is <strong>too slow</strong> to do"</span></td>
+        <td><span lang="ko">"시뮬레이션이 <strong>느려서</strong> 못 하는 걸 한다"</span><span lang="en">"Does what simulation is <strong>too slow</strong> for"</span></td>
       </tr>
     </tbody>
   </table>
 
   <p lang="ko">제일 많이 헷갈리는 <strong>Verification 과 Testing</strong> 만 그림으로 한 번 더 보자. 경계가 <strong>제조</strong>다.</p>
-  <p lang="en">The pair people mix up most is <strong>verification and testing</strong>, so here it is drawn. The dividing line is <strong>manufacturing</strong>.</p>
+  <p lang="en">The pair people mix up most is <strong>verification and testing</strong>. The dividing line is <strong>manufacturing</strong>.</p>
 
 <figure>
     <svg viewBox="0 0 700 300" role="img" aria-label="제조를 경계로 갈라지는 verification과 testing의 관찰 범위 비교">
@@ -757,12 +763,12 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   </figure>
 
   <div class="trap">
-    <p lang="ko"><strong>"Test" 라는 단어가 두 가지로 쓰인다.</strong> 일상에서 "테스트해봐" 는 시뮬레이션 돌려보라는 뜻으로 쓰지만, 이 판에서 <strong>Testing 은 제조 후 결함 검사</strong>를 가리키는 정식 용어다. DFT(Design For Testability)의 T 가 이 Testing 이다. <strong>시뮬레이션은 Testing 이 아니라 Verification 이다.</strong></p>
-    <p lang="en"><strong>The word "test" does double duty.</strong> Casually, "go test it" means run a simulation. In this field, <strong>testing</strong> is the formal term for post-manufacturing defect screening. The T in DFT (Design For Testability) is that testing. <strong>Simulation is verification, not testing.</strong></p>
+    <p lang="ko"><strong>"Test" 라는 단어가 두 가지로 쓰인다.</strong> 일상에서 "테스트해봐" 는 시뮬레이션 돌려보라는 뜻이지만, 이 판에서 <strong>Testing 은 제조 후 결함 검사</strong>를 가리키는 정식 용어다. DFT(Design For Testability)의 T 가 이 Testing 이다. <strong>시뮬레이션은 Testing 이 아니라 Verification 이다.</strong></p>
+    <p lang="en"><strong>The word "test" does double duty.</strong> Casually it means run a simulation. Here, <strong>testing</strong> is the formal term for post-manufacturing defect screening, and the T in DFT is that testing. <strong>Simulation is verification, not testing.</strong></p>
   </div>
 
-  <p lang="ko">Validation 은 시점이 하나 더 뒤다. 칩이 실제로 나온 다음, <strong>EVB(Evaluation Board)</strong> 같은 데 얹어서 진짜 시스템처럼 굴려본다. Verification 이 "명세대로 됐나" 를 본다면 Validation 은 <strong>"명세 자체가 맞았나"</strong> 를 본다.</p>
-  <p lang="en">Validation sits one step later still. Once real silicon exists you drop it on something like an <strong>EVB (evaluation board)</strong> and run it as a real system. Where verification asks "does it match the spec", validation asks <strong>"was the spec right in the first place"</strong>.</p>
+  <p lang="ko">Validation 은 한 걸음 더 뒤다. 칩이 실제로 나온 다음 <strong>EVB(Evaluation Board)</strong> 같은 데 얹어 진짜 시스템처럼 굴려본다. Verification 이 "명세대로 됐나" 라면 Validation 은 <strong>"명세 자체가 맞았나"</strong> 다.</p>
+  <p lang="en">Validation sits one step later. With real silicon you drop it on an <strong>EVB (evaluation board)</strong> and run it as a real system. Verification asks "does it match the spec"; validation asks <strong>"was the spec right"</strong>.</p>
 
 <figure>
     <svg viewBox="0 0 700 200" role="img" aria-label="Design부터 Customer까지의 순서와 실리콘 이전 이후의 경계">
@@ -816,8 +822,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <section id="q5">
   <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">추상화 3단</h2><h2 lang="en">Three levels of abstraction</h2></div>
 
-  <p lang="ko">이름 헷갈리는 게 하나 더 있다. <strong>Architecture, Microarchitecture, Design.</strong> 이건 셋이 나란한 게 아니라 <strong>위에서 아래로 내려가는 계단</strong>이다.</p>
-  <p lang="en">One more naming trap: <strong>architecture, microarchitecture, design.</strong> These are not three siblings, they are <strong>a staircase going down</strong>.</p>
+  <p lang="ko">이름 헷갈리는 게 하나 더 있다. <strong>Architecture, Microarchitecture, Design.</strong> 셋이 나란한 게 아니라 <strong>위에서 아래로 내려가는 계단</strong>이다.</p>
+  <p lang="en">One more naming trap: <strong>architecture, microarchitecture, design.</strong> Not three siblings, <strong>a staircase going down</strong>.</p>
 
 <figure>
     <svg viewBox="0 0 700 250" role="img" aria-label="Architecture에서 Microarchitecture를 거쳐 Design으로 내려가는 추상화 단계">
@@ -861,9 +867,9 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 
   <table>
     <thead><tr>
-      <th lang="ko">단계</th><th lang="en">Level</th>
-      <th lang="ko">답하는 질문</th><th lang="en">Answers</th>
-      <th lang="ko">산출물</th><th lang="en">Output</th>
+      <th><span lang="ko">단계</span><span lang="en">Level</span></th>
+      <th><span lang="ko">답하는 질문</span><span lang="en">Answers</span></th>
+      <th><span lang="ko">산출물</span><span lang="en">Output</span></th>
     </tr></thead>
     <tbody>
       <tr><td><strong>Architecture</strong></td>
@@ -878,27 +884,27 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     </tbody>
   </table>
 
-  <p lang="ko">쉽게 기억하려면 <strong>"무엇 &rarr; 어떻게 &rarr; 코드"</strong>. 예를 들어 "캐시를 넣는다" 가 architecture, "2-way set associative 에 32KB" 가 microarchitecture, 그걸 SystemVerilog 로 쓰는 게 design 이다.</p>
+  <p lang="ko">기억하려면 <strong>"무엇 &rarr; 어떻게 &rarr; 코드"</strong>. "캐시를 넣는다" 가 architecture, "32KB 2-way set associative" 가 microarchitecture, 그걸 SystemVerilog 로 쓰는 게 design 이다.</p>
   <p lang="en">Easiest hook: <strong>what &rarr; how &rarr; code</strong>. "We will have a cache" is architecture, "32KB, two-way set associative" is microarchitecture, writing it in SystemVerilog is design.</p>
 </section>
 
 <section id="q6">
   <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">회사마다 말이 다르다</h2><h2 lang="en">Every company renames things</h2></div>
 
-  <p lang="ko">이건 시험에는 안 나오는데 <strong>취업하면 바로 겪는 것</strong>이라 적어둔다. 같은 일을 회사마다 다른 이름으로 부른다.</p>
-  <p lang="en">This will not be on a quiz but <strong>you hit it the week you start a job</strong>, so it is worth writing down. The same role gets a different name at every company.</p>
+  <p lang="ko">시험에는 안 나오는데 <strong>취업하면 바로 겪는 것</strong>이라 적어둔다. 같은 일을 회사마다 다른 이름으로 부른다.</p>
+  <p lang="en">Not quiz material, but <strong>you hit it the week you start a job</strong>. The same role gets a different name at every company.</p>
 
   <ul>
-    <li lang="ko"><strong>DV</strong> (Design Verification) 가 제일 흔한 이름이다. NVIDIA 계열에서 많이 쓴다</li>
+    <li lang="ko"><strong>DV</strong> (Design Verification) 가 제일 흔하다. NVIDIA 계열에서 많이 쓴다</li>
     <li lang="en"><strong>DV</strong> (design verification) is the most common label, widely used around NVIDIA</li>
-    <li lang="ko">Intel 에서는 같은 일을 다른 이름으로 부른다. <strong>"Emulation" 이라는 말도 회사마다 가리키는 범위가 다르다</strong></li>
+    <li lang="ko">Intel 은 같은 일을 다른 이름으로 부르고, <strong>"Emulation" 도 회사마다 가리키는 범위가 다르다</strong></li>
     <li lang="en">Intel calls the same work something else, and <strong>even "emulation" covers different ground depending on who says it</strong></li>
-    <li lang="ko">그래서 <strong>채용 공고를 읽을 때 직함이 아니라 업무 설명을 봐야 한다</strong></li>
-    <li lang="en">Which is why <strong>you read the job description, not the job title</strong></li>
+    <li lang="ko">그래서 <strong>채용 공고는 직함이 아니라 업무 설명을 읽어야 한다</strong></li>
+    <li lang="en">Which is why <strong>you read the job description, not the title</strong></li>
   </ul>
 
   <div class="callout">
-    <p lang="ko">이 노트가 용어마다 <strong>"누가 언제 쓰는 말인가"</strong>를 굳이 적는 이유가 이거다. 정의는 검색하면 나오지만, <strong>그 말을 어느 자리에서 쓰는지</strong>는 안 나온다.</p>
+    <p lang="ko">이 노트가 용어마다 <strong>"누가 언제 쓰는 말인가"</strong>를 굳이 적는 이유가 이거다. 정의는 검색하면 나오지만 <strong>그 말을 어느 자리에서 쓰는지</strong>는 안 나온다.</p>
     <p lang="en">This is why these notes keep noting <strong>who uses a word and when</strong>. Definitions are a search away; <strong>knowing which room a word belongs in</strong> is not.</p>
   </div>
 </section>
@@ -907,10 +913,10 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
 
   <p lang="ko">1 강에서 quiz 로 나올 만한 건 사실상 <strong>용어 구분</strong> 하나다.</p>
-  <p lang="en">Realistically there is one quiz-shaped thing in lecture 1: <strong>telling the terms apart</strong>.</p>
+  <p lang="en">Realistically there is one quiz-shaped thing here: <strong>telling the terms apart</strong>.</p>
 
   <ul>
-    <li lang="ko"><strong>Verification vs. Testing.</strong> 경계는 <strong>제조</strong>다. 제조 전이면 verification, 제조 후 결함 검사면 testing</li>
+    <li lang="ko"><strong>Verification vs. Testing.</strong> 경계는 <strong>제조</strong>. 제조 전이면 verification, 제조 후 결함 검사면 testing</li>
     <li lang="en"><strong>Verification vs. testing.</strong> The line is <strong>manufacturing</strong>. Before it, verification; defect screening after it, testing</li>
     <li lang="ko"><strong>Verification vs. Validation.</strong> "맞게 만들었나" 와 <strong>"맞는 걸 만들었나"</strong></li>
     <li lang="en"><strong>Verification vs. validation.</strong> "Built it right" versus <strong>"built the right thing"</strong></li>
@@ -921,12 +927,9 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   </ul>
 
   <div class="callout">
-    <p lang="ko"><strong>다음 강의(2 강)</strong>는 여기서 지도만 봤던 Design 과 Verification 을 안으로 들어가서 본다. testbench 가 어떻게 생겼는지, 무엇이 무엇을 확인하는지가 거기서 나온다.</p>
+    <p lang="ko"><strong>다음 강의(2 강)</strong>는 여기서 지도만 봤던 Design 과 Verification 안으로 들어간다. testbench 가 어떻게 생겼는지, 무엇이 무엇을 확인하는지가 거기서 나온다.</p>
     <p lang="en"><strong>Lecture 2</strong> climbs inside the design and verification cells we only mapped here: what a testbench looks like, and what checks what.</p>
   </div>
-
-  <p class="meta" lang="ko">더 자세한 설명, 각 용어의 전체 분해, 직접 분류해보는 연습은 <a href="L01-course-intro.html">자세한 판</a>에 있다.</p>
-  <p class="meta" lang="en">Fuller explanations, every term broken down, and a sorting exercise live in the <a href="L01-course-intro.html">full version</a>.</p>
 </section>
 
 </main>

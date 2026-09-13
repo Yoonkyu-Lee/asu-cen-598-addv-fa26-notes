@@ -374,6 +374,11 @@ a.mod:hover .num{color:var(--blue)}
 .tag.v{background:rgba(var(--pink-rgb),.1);color:var(--pink)}
 .tag.t{background:rgba(var(--violet-rgb),.1);color:var(--violet)}
 .tag.p{background:rgba(var(--brown-rgb),.12);color:var(--brown)}
+/* 빠른 읽기 판 링크. 강의 줄 바로 아래에 얇게 붙는다 */
+.qk{display:flex;gap:7px;align-items:baseline;flex-wrap:wrap;margin:-4px 0 12px;padding:0 18px 0 64px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--ink3)}
+.qk a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.35)}
+.qk a:hover{border-bottom-color:var(--blue)}
 .status{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;padding:4px 10px;border-radius:999px;white-space:nowrap;margin-top:3px}
 .status.done{background:rgba(var(--green-rgb),.12);color:var(--green)}
 .status.wait{background:var(--chip);color:var(--ink3)}
@@ -381,6 +386,7 @@ a.mod:hover .num{color:var(--blue)}
 @media(max-width:600px){
   .mod{grid-template-columns:36px minmax(0,1fr);gap:12px;padding:14px 14px}
   .mod .num{font-size:16px}
+  .qk{padding-left:48px}
   .status{grid-column:2;justify-self:start;margin-top:9px}
 }
 
@@ -477,6 +483,11 @@ a.mod:hover .num{color:var(--blue)}
   </div>
   <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
 </a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L01-course-intro-quick.html" lang="ko">7절로 줄인 판</a>
+  <a href="notes/L01-course-intro-quick.html" lang="en">the same lecture in seven sections</a>
+</div>
 
 <a class="mod" href="notes/L02-design-and-verification-overview.html">
   <div class="num">02</div>
@@ -496,7 +507,11 @@ a.mod:hover .num{color:var(--blue)}
   </div>
   <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
 </a>
-
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L02-design-and-verification-overview-quick.html" lang="ko">59쪽을 8절로 줄인 판</a>
+  <a href="notes/L02-design-and-verification-overview-quick.html" lang="en">fifty-nine slides in eight sections</a>
+</div>
 
 <a class="mod" href="notes/L03-system-verilog-for-design.html">
   <div class="num">03</div>
@@ -514,6 +529,11 @@ a.mod:hover .num{color:var(--blue)}
   </div>
   <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
 </a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L03-system-verilog-for-design-quick.html" lang="ko">문법 목록 대신 결정표 한 장으로</a>
+  <a href="notes/L03-system-verilog-for-design-quick.html" lang="en">one decision table instead of a feature list</a>
+</div>
 
 <a class="mod" href="notes/L04-clock-and-reset.html">
   <div class="num">04</div>
@@ -531,6 +551,11 @@ a.mod:hover .num{color:var(--blue)}
   </div>
   <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
 </a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L04-clock-and-reset-quick.html" lang="ko">STA 가 손을 놓는 지점부터 7절로</a>
+  <a href="notes/L04-clock-and-reset-quick.html" lang="en">seven sections, starting where STA gives up</a>
+</div>
 
 <div class="mod soon">
   <div class="num">05</div>

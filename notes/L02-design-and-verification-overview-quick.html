@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 2 빠른 읽기 · Design and Verification Overview · CEN 598 ADDV</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 2<br>Design and Verification Overview</h1>
+  <p class="subtitle" lang="ko">설계자가 하는 일과 검증자가 하는 일. 그리고 둘을 잇는 숫자 하나: 노력의 50~80% 가 검증이다.</p>
+  <p class="subtitle" lang="en">What a designer does, what a verification engineer does, and the number joining them: 50 to 80 percent of the effort is verification.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L02-design-and-verification-overview.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L02-design-and-verification-overview.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 2</div>
+    <div class="name">Design and Verification Overview</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">추상화 수준과 두 갈래 길</span><span lang="en">Abstraction levels and two paths</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">Synthesis: 번역기</span><span lang="en">Synthesis: a translator</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">공짜 점심은 없다</span><span lang="en">No free lunch</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">왜 검증인가</span><span lang="en">Why verification</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">검증의 삼각대</span><span lang="en">The verification tripod</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">Testbench 는 왜 그렇게 생겼나</span><span lang="en">Why a testbench looks like that</span></a>
+  <a href="#q8"><span class="n">8</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+
+  <p lang="ko">59 쪽짜리다. <strong>이 과목에서 가장 밀도 높은 한 시간</strong>이고, 앞으로 나올 거의 모든 주제의 씨앗이 여기 한 번씩 뿌려진다. 그래서 한 번에 다 이해하려 들면 실패한다.</p>
+  <p lang="en">Fifty-nine slides. <strong>The densest hour in the course</strong>, seeding almost every topic that comes later. Trying to absorb it all in one pass is a losing move.</p>
+
+  <div class="def">
+    <p lang="ko">이 강의는 <strong>두 반쪽</strong>이다. 앞쪽은 <strong>설계자가 무슨 일을 하는가</strong>, 뒤쪽은 <strong>검증자가 무슨 일을 하는가</strong>. 그리고 두 반쪽을 잇는 숫자가 하나 있다. <strong>설계 노력의 50~80% 가 verification 이다.</strong></p>
+    <p lang="en">The lecture is <strong>two halves</strong>: what a designer does, and what a verification engineer does. One number joins them. <strong>Between 50 and 80 percent of design effort is verification.</strong></p>
+  </div>
+
+  <p lang="ko">그러니까 이 강의를 한 줄로 줄이면 <strong>"설계는 이런 일이고, 검증은 그보다 큰 일이다"</strong> 가 된다. 나머지는 그 두 문장을 뒷받침하는 재료다.</p>
+  <p lang="en">Compress it to one line and you get <strong>"here is what design is, and verification is the bigger job"</strong>. Everything else backs those two sentences up.</p>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">추상화 수준과 두 갈래 길</h2><h2 lang="en">Abstraction levels and two paths</h2></div>
+
+  <p lang="ko">같은 덧셈기를 <strong>네 가지 높이</strong>에서 쓸 수 있다. 어느 높이에서 쓰느냐가 곧 <strong>무엇을 자동화에 맡기느냐</strong>다.</p>
+  <p lang="en">You can write the same adder at <strong>four different heights</strong>. Which height you pick decides <strong>how much you hand to automation</strong>.</p>
+
+<figure>
+    <svg viewBox="0 0 700 320" role="img" aria-label="Functional, Behavioral, Structural, Physical 네 추상화 수준과 각 수준의 코드 예시">
+      <defs>
+        <marker id="g1-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <text class="svglab" x="200" y="16" text-anchor="middle" style="fill:var(--ink);font-weight:700">Levels of Abstraction</text>
+
+      <!-- Functional -->
+      <rect x="60" y="26" width="280" height="30" rx="6" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.5"/>
+      <text class="svgtxt" x="200" y="46" text-anchor="middle" style="font-size:13.5px;font-weight:650">Functional</text>
+      <text class="svglab" x="60" y="72" style="font-size:10px">func adder() { result = a + b; }</text>
+      <text class="svglab" x="356" y="40" style="fill:var(--ink2)" lang="ko">C 같은 언어로 쓸 수 있다</text>
+      <text class="svglab" x="356" y="40" style="fill:var(--ink2)" lang="en">you can write this in a language like C</text>
+
+      <!-- Behavioral -->
+      <rect x="60" y="90" width="280" height="30" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="200" y="110" text-anchor="middle" style="font-size:13.5px;font-weight:650">Behavioral</text>
+      <text class="svglab" x="60" y="136" style="font-size:10px">module adder(a,b,enable,clk,result)</text>
+      <text class="svglab" x="60" y="150" style="font-size:10px">{ if (enable and clk) result = a + b; }</text>
+
+      <!-- Structural -->
+      <rect x="60" y="168" width="280" height="30" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svgtxt" x="200" y="188" text-anchor="middle" style="font-size:13.5px;font-weight:650">Structural</text>
+      <text class="svglab" x="60" y="214" style="font-size:10px">module adder(a,b,enable,clk,result)</text>
+      <text class="svglab" x="60" y="228" style="font-size:10px">{ and_gate g(...); or_gate h(...); }</text>
+
+      <!-- Physical -->
+      <rect x="60" y="246" width="280" height="30" rx="6" fill="rgba(var(--brown-rgb),.16)" stroke="var(--brown)" stroke-width="1.5"/>
+      <text class="svgtxt" x="200" y="266" text-anchor="middle" style="font-size:13.5px;font-weight:650">Physical</text>
+      <text class="svglab" x="356" y="266" style="fill:var(--ink2)" lang="ko">회로 또는 layout 수준</text>
+      <text class="svglab" x="356" y="266" style="fill:var(--ink2)" lang="en">circuit or layout level</text>
+
+      <!-- Verilog 범위 -->
+      <path d="M348 90 h10 v108 h-10" fill="none" stroke="var(--blue)" stroke-width="1.5"/>
+      <text class="svglab" x="366" y="130" style="fill:var(--blue);font-weight:700" lang="ko">Verilog로 이 범위를</text>
+      <text class="svglab" x="366" y="146" style="fill:var(--blue);font-weight:700" lang="ko">전부 기술할 수 있다</text>
+      <text class="svglab" x="366" y="130" style="fill:var(--blue);font-weight:700" lang="en">Verilog can describe</text>
+      <text class="svglab" x="366" y="146" style="fill:var(--blue);font-weight:700" lang="en">every one of these</text>
+
+      <!-- RTL 위치 -->
+      <rect x="14" y="122" width="34" height="44" rx="6" fill="rgba(var(--violet-rgb),.2)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="31" y="149" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--violet)">RTL</text>
+      <line x1="48" y1="132" x2="58" y2="118" stroke="var(--violet)" stroke-width="1.3"/>
+      <line x1="48" y1="156" x2="58" y2="170" stroke="var(--violet)" stroke-width="1.3"/>
+
+      <!-- 아래 요약 -->
+      <line x1="60" y1="294" x2="640" y2="294" stroke="var(--rule)" stroke-width="1"/>
+      <text class="svglab" x="60" y="312" lang="ko">위로 갈수록: 합성이 안 될 만큼 추상적</text>
+      <text class="svglab" x="60" y="312" lang="en">higher up: too abstract to synthesise</text>
+      <text class="svglab" x="640" y="312" text-anchor="end" lang="ko">아래로 갈수록: 손으로 쓰기엔 너무 지루함</text>
+      <text class="svglab" x="640" y="312" text-anchor="end" lang="en">further down: too tedious to write by hand</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 5쪽. <strong>RTL은 Behavioral과 Structural 사이에 있다.</strong> 위쪽은 합성이 안 될 수 있고, 아래쪽은 사람이 손으로 쓰기엔 너무 지루해서 합성 도구가 만들어준다. RTL은 그 사이의 <strong>실용적인 타협점</strong>이다. 슬라이드가 마지막 줄에 "이 용어들은 전부 느슨하게 정의돼 있다"고 못 박아뒀다.</figcaption>
+    <figcaption lang="en">Slide 5. <strong>RTL sits between behavioral and structural.</strong> Above it, things may not synthesise; below it, nobody writes by hand and synthesis tools generate it instead. RTL is the <strong>practical compromise</strong> in between. The slide closes by stating flatly that all these terms are loosely defined.</figcaption>
+  </figure>
+
+  <p lang="ko">여기서 알맹이는 <strong>RTL 의 위치</strong>다. RTL 은 Behavioral 과 Structural <strong>사이</strong>에 있다. 위쪽은 합성이 안 될 수 있고, 아래쪽은 사람이 손으로 쓰기엔 너무 지루해서 도구가 만들어준다. <strong>RTL 은 그 사이의 실용적 타협점이다.</strong></p>
+  <p lang="en">The point is <strong>where RTL sits</strong>: <strong>between</strong> behavioral and structural. Above it things may not synthesise; below it nobody writes by hand and the tools generate it. <strong>RTL is the practical compromise in the middle.</strong></p>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; behavioral / structural</span><span lang="en">Jargon &middot; behavioral / structural</span></summary>
+      <table class="parts">
+        <tr><td>behavioral</td><td><span lang="ko">"무슨 일이 일어나야 하는가" 를 적는다. <code>result = a + b</code> 처럼. 부품 목록이 없다.</span><span lang="en">Writes what should happen, as in <code>result = a + b</code>. No parts list.</span></td></tr>
+        <tr><td>structural</td><td><span lang="ko">"어떤 부품이 어떻게 연결되는가" 를 적는다. 인스턴스를 나열한다.</span><span lang="en">Writes which parts connect to which, listing instances.</span></td></tr>
+        <tr><td><span lang="ko">구별 기준</span><span lang="en">The test</span></td><td><span lang="ko">모듈 인스턴스를 나열하면 structural, 동작을 서술하면 behavioral.</span><span lang="en">Listing module instances means structural; describing behaviour means behavioral.</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to misread</span></td><td><span lang="ko"><strong>언어의 구분이 아니다.</strong> 같은 파일 안에 둘이 섞일 수 있고 실제 설계는 대개 섞여 있다.</span><span lang="en"><strong>Not a distinction between languages.</strong> One file can hold both, and real designs usually do.</span></td></tr>
+      </table>
+    </details>
+  </div>
+
+  <p lang="ko">또 하나 <strong>평생 쓰는 습관</strong>이 여기서 나온다. 어떤 디지털 시스템이든 <strong>Data Path 와 Control Path</strong> 로 쪼개서 본다. 데이터가 흘러가는 길과, 그 길을 지시하는 길이다. 이 습관이 나중에 <strong>verification plan 을 쓸 때 그대로 쓰인다.</strong></p>
+  <p lang="en">Another habit here <strong>you keep for life</strong>: split any digital system into a <strong>data path and a control path</strong>. The road the data travels, and the road that tells it where to go. That same split <strong>shows up again when you write a verification plan.</strong></p>
+
+  <div class="callout">
+    <p lang="ko">참고로 <strong>RTL 을 쓰는 시간은 설계자 하루의 여덟 칸 중 한 칸</strong>이다. 나머지는 읽고, 계획하고, 남과 맞추는 일이다. 코딩이 일의 전부일 거라고 생각하면 현실과 어긋난다.</p>
+    <p lang="en">For context, <strong>writing RTL is one of eight boxes in a designer's day.</strong> The rest is reading, planning and aligning with other people. Expecting the job to be coding is a mismatch with reality.</p>
+  </div>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">Synthesis: 번역기</h2><h2 lang="en">Synthesis: a translator</h2></div>
+
+  <p lang="ko">1 강에서 이름만 나왔던 칸이다. 실제로는 <strong>번역기</strong>다. 당신이 쓴 <code>+</code> 를 <strong>foundry 가 실제로 만들 수 있는 부품</strong>으로 바꾼다.</p>
+  <p lang="en">In lecture 1 this was just a box on a map. It is really a <strong>translator</strong>: it turns the <code>+</code> you wrote into <strong>parts the fab can actually manufacture</strong>.</p>
+
+<figure>
+    <svg viewBox="0 0 700 240" role="img" aria-label="Synthesis의 세 입력과 두 출력">
+      <defs>
+        <marker id="g3-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <!-- 입력 -->
+      <rect x="16" y="26" width="170" height="38" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgtxt" x="101" y="50" text-anchor="middle" style="font-size:12.5px">RTL Design</text>
+      <rect x="16" y="84" width="170" height="38" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgtxt" x="101" y="108" text-anchor="middle" style="font-size:12.5px">Constraints</text>
+      <rect x="16" y="142" width="170" height="38" rx="6" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svgtxt" x="101" y="166" text-anchor="middle" style="font-size:12.5px">Tech Library</text>
+      <text class="svglab" x="101" y="200" text-anchor="middle" style="font-size:10px" lang="ko">foundry가 준다</text>
+      <text class="svglab" x="101" y="200" text-anchor="middle" style="font-size:10px" lang="en">comes from the foundry</text>
+
+      <line x1="190" y1="45" x2="256" y2="90" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+      <line x1="190" y1="103" x2="256" y2="103" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+      <line x1="190" y1="161" x2="256" y2="116" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+
+      <!-- 도구 -->
+      <rect x="262" y="72" width="164" height="62" rx="9" fill="rgba(var(--violet-rgb),.18)" stroke="var(--violet)" stroke-width="2.2"/>
+      <text class="svgtxt" x="344" y="100" text-anchor="middle" style="font-size:15px;font-weight:700">Synthesis</text>
+      <text class="svglab" x="344" y="120" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="ko">도구가 하는 일</text>
+      <text class="svglab" x="344" y="120" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="en">the tool does this</text>
+
+      <line x1="430" y1="90" x2="496" y2="60" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+      <line x1="430" y1="116" x2="496" y2="146" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g3-ar)"/>
+
+      <!-- 출력 -->
+      <rect x="502" y="34" width="182" height="38" rx="6" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgtxt" x="593" y="58" text-anchor="middle" style="font-size:12.5px;font-weight:650">Netlist</text>
+      <rect x="502" y="128" width="182" height="52" rx="6" fill="rgba(var(--violet-rgb),.08)" stroke="var(--violet)" stroke-width="1.4"/>
+      <text class="svgtxt" x="593" y="150" text-anchor="middle" style="font-size:11.5px">Area, Timing, Power</text>
+      <text class="svgtxt" x="593" y="167" text-anchor="middle" style="font-size:11.5px">Reports</text>
+
+      <text class="svglab" x="593" y="200" text-anchor="middle" style="font-size:10px" lang="ko">"됐다"가 아니라 "이만큼 들었다"</text>
+      <text class="svglab" x="593" y="200" text-anchor="middle" style="font-size:10px" lang="en">not "it worked" but "here is what it cost"</text>
+      <text class="svglab" x="350" y="228" text-anchor="middle" lang="ko">입력이 셋이고 출력이 둘이다. 셋 중 하나만 바뀌어도 결과 netlist가 달라진다.</text>
+      <text class="svglab" x="350" y="228" text-anchor="middle" lang="en">three inputs, two outputs. Change any one input and the netlist comes out different.</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 9쪽. <strong>입력이 셋이라는 게 핵심이다.</strong> 같은 RTL이라도 constraint를 바꾸거나 tech library를 바꾸면 전혀 다른 netlist가 나온다. 그래서 <a href="L01-course-intro.html#s7">Lecture 1에서 본 ECO</a>가 필요했던 것이다. 합성을 다시 돌리면 "그때 그 netlist"가 재현된다는 보장이 없다.</figcaption>
+    <figcaption lang="en">Slide 9. <strong>The point is that there are three inputs.</strong> The same RTL with different constraints, or a different tech library, produces a completely different netlist. That is precisely why the <a href="L01-course-intro.html#s7">ECO from Lecture 1</a> exists: re-running synthesis gives no guarantee of reproducing the netlist you had.</figcaption>
+  </figure>
+
+  <p lang="ko"><strong>입력이 셋이라는 게 핵심이다.</strong> 같은 RTL 이라도 constraint 를 바꾸거나 tech library 를 바꾸면 <strong>전혀 다른 netlist 가 나온다.</strong></p>
+  <p lang="en"><strong>The key is that there are three inputs.</strong> The same RTL with different constraints, or a different tech library, produces <strong>a completely different netlist.</strong></p>
+
+  <div class="trap">
+    <p lang="ko">그래서 1 강의 <strong>ECO</strong> 가 필요했던 거다. 합성을 다시 돌리면 <strong>"그때 그 netlist" 가 재현된다는 보장이 없다.</strong> 이미 검증을 마친 netlist 를 통째로 갈아엎지 않으려고 최소 수정만 얹는 것이다.</p>
+    <p lang="en">This is exactly why the <strong>ECO</strong> from lecture 1 exists. Re-running synthesis gives <strong>no guarantee of reproducing the netlist you had.</strong> Rather than throw away an already-verified netlist, you patch it minimally.</p>
+  </div>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; standard cell</span><span lang="en">Jargon &middot; standard cell</span></summary>
+      <table class="parts">
+        <tr><td><span lang="ko">한 줄</span><span lang="en">In one line</span></td><td><span lang="ko">foundry 가 <strong>미리 만들어 두고 특성까지 재놓은 부품</strong>. AND 게이트 하나, flip-flop 하나가 각각 하나의 cell 이다.</span><span lang="en">A part the fab has <strong>pre-built and fully characterised</strong>. One AND gate or one flip-flop is one cell.</span></td></tr>
+        <tr><td><span lang="ko">왜 "standard"</span><span lang="en">Why "standard"</span></td><td><span lang="ko">높이가 전부 같아서 <strong>줄 세워 늘어놓을 수 있다.</strong> 그래야 place and route 가 자동화된다.</span><span lang="en">They all share a height, so they <strong>line up in rows</strong>, which is what makes place and route automatable.</span></td></tr>
+        <tr><td><span lang="ko">어디서 오나</span><span lang="en">Where from</span></td><td><span lang="ko">back-end 의 library 엔지니어가 트랜지스터를 직접 배치하고 특성을 측정해 만든다.</span><span lang="en">Back-end library engineers lay out the transistors and measure the characteristics.</span></td></tr>
+      </table>
+    </details>
+  </div>
+
+  <p lang="ko">합성 결과가 클럭에 맞는지 보는 게 <strong>STA (Static Timing Analysis)</strong> 다. 이름의 <strong>static</strong> 은 <strong>"입력 벡터 없이"</strong> 라는 뜻이다. 값을 흘려보지 않고 구조만 보고 판단한다. 결론은 한 숫자로 나온다.</p>
+  <p lang="en">Checking whether the result meets the clock is <strong>STA (static timing analysis)</strong>. The <strong>static</strong> means <strong>"without input vectors"</strong>: judge from the structure, never running values through. It lands on one number.</p>
+
+  <div class="def">
+    <p lang="ko"><strong>slack</strong> = 신호가 <strong>도착해야 하는 시각</strong> 빼기 <strong>실제 도착한 시각</strong>. 양수면 여유가 있다는 뜻이고 <code>(MET)</code>, 음수면 늦었다는 뜻이고 <code>(VIOLATED)</code> 다.</p>
+    <p lang="en"><strong>Slack</strong> = <strong>time the signal was required</strong> minus <strong>time it actually arrived</strong>. Positive means margin, printed <code>(MET)</code>; negative means late, printed <code>(VIOLATED)</code>.</p>
+  </div>
+
+  <p lang="ko">Lab 0 에서 합성을 돌리고 timing 리포트 맨 아래를 보면 정확히 이 줄이 나온다.</p>
+  <p lang="en">Run synthesis in Lab 0, look at the bottom of the timing report, and this is the line you get.</p>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">공짜 점심은 없다</h2><h2 lang="en">No free lunch</h2></div>
+
+  <p lang="ko">설계 목표가 일곱 가지쯤 나열되는데, 슬라이드가 한 줄로 정리한다. <strong>"공짜 점심은 없다."</strong> 하나를 좋게 하면 다른 하나가 나빠진다.</p>
+  <p lang="en">Seven-odd design goals get listed, and the slide sums them up in one line: <strong>"there is no free lunch."</strong> Improve one and another gets worse.</p>
+
+<figure>
+    <svg viewBox="0 0 700 240" role="img" aria-label="면적과 지연의 트레이드오프 곡선, Ripple Carry Adder와 Carry Lookahead Adder의 위치">
+      <defs>
+        <marker id="g4-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+      <line x1="90" y1="200" x2="470" y2="200" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g4-ar)"/>
+      <line x1="90" y1="200" x2="90" y2="24" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g4-ar)"/>
+      <text class="svglab" x="480" y="204" style="fill:var(--ink)">Area</text>
+      <text class="svglab" x="90" y="16" text-anchor="middle" style="fill:var(--ink)">Delay</text>
+
+      <path d="M120 46 C 190 150, 250 178, 440 188" fill="none" stroke="var(--blue)" stroke-width="2.2"/>
+
+      <circle cx="132" cy="58" r="6" fill="var(--blue)"/>
+      <text class="svglab" x="146" y="50" style="fill:var(--ink);font-weight:650">Ripple Carry Adder</text>
+      <text class="svglab" x="146" y="66" style="font-size:10px" lang="ko">면적은 작고 느리다</text>
+      <text class="svglab" x="146" y="66" style="font-size:10px" lang="en">small area, slow</text>
+
+      <circle cx="400" cy="186" r="6" fill="var(--blue)"/>
+      <text class="svglab" x="300" y="160" style="fill:var(--ink);font-weight:650">Carry Lookahead Adder</text>
+      <text class="svglab" x="300" y="176" style="font-size:10px" lang="ko">빠르지만 면적을 많이 쓴다</text>
+      <text class="svglab" x="300" y="176" style="font-size:10px" lang="en">fast, but it costs area</text>
+
+      <text class="svglab" x="516" y="86" style="fill:var(--ink2)" lang="ko">같은 덧셈을 하는데</text>
+      <text class="svglab" x="516" y="102" style="fill:var(--ink2)" lang="ko">둘은 곡선 위의</text>
+      <text class="svglab" x="516" y="118" style="fill:var(--ink2)" lang="ko">다른 점일 뿐이다</text>
+      <text class="svglab" x="516" y="86" style="fill:var(--ink2)" lang="en">same addition,</text>
+      <text class="svglab" x="516" y="102" style="fill:var(--ink2)" lang="en">two different points</text>
+      <text class="svglab" x="516" y="118" style="fill:var(--ink2)" lang="en">on one curve</text>
+
+      <text class="svglab" x="90" y="228" lang="ko">Area Delay Product는 이 곡선 위의 점들을 하나의 숫자로 비교하려는 시도다</text>
+      <text class="svglab" x="90" y="228" lang="en">Area delay product is an attempt to compare points on this curve with a single number</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 19쪽. <strong>디지털 설계와 컴퓨터 아키텍처의 근본 트레이드오프.</strong> 빠르게 하려면 면적을 더 써야 하고, 면적을 줄이면 시간이 더 걸린다. 두 설계를 비교할 때 <strong>Area Delay Product</strong>를 흔히 쓴다.</figcaption>
+    <figcaption lang="en">Slide 19. <strong>The fundamental trade-off in digital design and computer architecture.</strong> Going faster costs area; saving area costs time. To compare two designs, people commonly use the <strong>area delay product.</strong></figcaption>
+  </figure>
+
+  <p lang="ko">이 곡선 하나가 전부를 설명한다. <strong>Ripple Carry Adder</strong> 는 작고 느리다. <strong>Carry Lookahead Adder</strong> 는 빠르고 크다. <strong>어느 쪽이 정답이 아니라, 무엇을 포기할 것인지의 선택이다.</strong></p>
+  <p lang="en">This one curve says it all. A <strong>ripple carry adder</strong> is small and slow; a <strong>carry lookahead adder</strong> is fast and large. <strong>Neither is correct. You are choosing what to give up.</strong></p>
+
+  <p lang="ko">그래서 설계 관행 목록 옆에 슬라이드가 한 단어를 크게 적어놨다. <strong>REUSE.</strong> 매번 새로 고민하지 말고 이미 검증된 걸 다시 쓰라는 것이다. <strong>검증 비용이 설계 비용보다 크기 때문에</strong> 재사용의 가치가 코드 절약이 아니라 <strong>검증 절약</strong>에 있다.</p>
+  <p lang="en">Which is why one word sits in large type beside the list of design practices: <strong>REUSE.</strong> Do not re-derive; reuse what is already verified. <strong>Because verification costs more than design</strong>, the value of reuse is not saved code but <strong>saved verification</strong>.</p>
+
+  <p lang="ko"><strong>Lint</strong> 도 여기 나온다. 코드를 <strong>돌리지 않고 읽기만 해서</strong> 문제를 찾는 것이다. 소프트웨어의 linter 와 발상은 같은데 잡는 게 다르다. 합성 안 되는 구문, 의도치 않은 latch, 폭이 안 맞는 연결 같은 <strong>하드웨어 특유의 실수</strong>를 잡는다.</p>
+  <p lang="en"><strong>Lint</strong> shows up here too: finding problems <strong>by reading the code, never running it</strong>. Same idea as a software linter, different catch. It flags <strong>hardware-specific mistakes</strong> like unsynthesisable constructs, accidental latches and width mismatches.</p>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">왜 검증인가</h2><h2 lang="en">Why verification</h2></div>
+
+  <p lang="ko">여기서부터 강의 후반부다. 답이 <strong>감정이 아니라 숫자로</strong> 나온다.</p>
+  <p lang="en">The back half starts here, and the answer arrives <strong>as numbers, not feelings</strong>.</p>
+
+<figure>
+    <svg viewBox="0 0 700 270" role="img" aria-label="버그를 어느 단계에서 찾느냐에 따라 비용이 10배씩 뛰는 Rule of 10">
+      <rect x="30" y="20" width="120" height="34" rx="5" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="90" y="42" text-anchor="middle" style="fill:var(--green)">1</text>
+      <rect x="166" y="20" width="180" height="34" rx="5" fill="rgba(var(--blue-rgb),.10)" stroke="var(--blue)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="42" text-anchor="middle" style="font-size:13px">Design</text>
+
+      <rect x="30" y="68" width="120" height="34" rx="5" fill="rgba(var(--amber-rgb),.12)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svgnum" x="90" y="90" text-anchor="middle" style="fill:var(--amber)">10</text>
+      <rect x="166" y="68" width="180" height="34" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="90" text-anchor="middle" style="font-size:13px">Wafer</text>
+
+      <rect x="30" y="116" width="120" height="34" rx="5" fill="rgba(var(--amber-rgb),.18)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svgnum" x="90" y="138" text-anchor="middle" style="fill:var(--amber)">100</text>
+      <rect x="166" y="116" width="180" height="34" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="138" text-anchor="middle" style="font-size:13px">Chip</text>
+
+      <rect x="30" y="164" width="120" height="34" rx="5" fill="rgba(var(--amber-rgb),.24)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svgnum" x="90" y="186" text-anchor="middle" style="fill:var(--amber)">1000</text>
+      <rect x="166" y="164" width="180" height="34" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="186" text-anchor="middle" style="font-size:13px">System</text>
+
+      <rect x="30" y="212" width="120" height="34" rx="5" fill="rgba(var(--amber-rgb),.32)" stroke="var(--amber)" stroke-width="2"/>
+      <text class="svgnum" x="90" y="234" text-anchor="middle" style="fill:var(--amber)">10000</text>
+      <rect x="166" y="212" width="180" height="34" rx="5" fill="rgba(var(--brown-rgb),.10)" stroke="var(--brown)" stroke-width="1.2"/>
+      <text class="svgtxt" x="256" y="234" text-anchor="middle" style="font-size:13px">Application</text>
+
+      <text class="svglab" x="90" y="14" text-anchor="middle" style="font-size:10px" lang="ko">상대 비용</text>
+      <text class="svglab" x="90" y="14" text-anchor="middle" style="font-size:10px" lang="en">relative cost</text>
+      <text class="svglab" x="256" y="14" text-anchor="middle" style="font-size:10px" lang="ko">버그를 발견한 곳</text>
+      <text class="svglab" x="256" y="14" text-anchor="middle" style="font-size:10px" lang="en">where the bug was found</text>
+
+      <text class="svglab" x="380" y="50" style="fill:var(--green);font-weight:700" lang="ko">여기서 잡으면 제일 싸다</text>
+      <text class="svglab" x="380" y="50" style="fill:var(--green);font-weight:700" lang="en">cheapest to catch here</text>
+      <text class="svglab" x="380" y="66" style="font-size:10px" lang="ko">이 수업 2부가 하려는 일</text>
+      <text class="svglab" x="380" y="66" style="font-size:10px" lang="en">this is what part 2 of the course is for</text>
+
+      <text class="svglab" x="380" y="232" style="fill:var(--amber);font-weight:700" lang="ko">고객이 먼저 찾으면 여기다</text>
+      <text class="svglab" x="380" y="232" style="fill:var(--amber);font-weight:700" lang="en">this is where the customer finds it</text>
+      <text class="svglab" x="380" y="248" style="font-size:10px" lang="ko">한 칸 내려갈 때마다 10배</text>
+      <text class="svglab" x="380" y="248" style="font-size:10px" lang="en">ten times worse per row</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 29쪽. 왼쪽 숫자는 <strong>상대 비용</strong>이다. 설계 단계에서 잡으면 1, 응용 단계에서 잡으면 10000. 발표자 노트가 구체적인 예를 적어놨다: <strong>Intel 프로세서의 부동소수점 유닛 버그가 약 10억 달러를 물렸다.</strong></figcaption>
+    <figcaption lang="en">Slide 29. The numbers on the left are <strong>relative cost</strong>: one if you catch it during design, ten thousand if it surfaces in the application. The speaker notes give the concrete case: <strong>the floating point bug in Intel processors cost around a billion dollars.</strong></figcaption>
+  </figure>
+
+  <p lang="ko"><strong>Rule of 10.</strong> 왼쪽 숫자가 <strong>상대 비용</strong>이다. 설계 단계에서 잡으면 1, 응용 단계까지 가면 <strong>10000</strong>. 한 단계 늦을 때마다 10 배씩 뛴다.</p>
+  <p lang="en"><strong>The rule of 10.</strong> The left column is <strong>relative cost</strong>: one if you catch it during design, <strong>ten thousand</strong> if it reaches the application. Every stage you miss it by multiplies the cost tenfold.</p>
+
+  <div class="callout">
+    <p lang="ko">발표자 노트가 구체적인 예를 적어놨다. <strong>Intel 프로세서의 부동소수점 유닛 버그가 약 10 억 달러를 물렸다.</strong> 이게 "늦게 잡으면 비싸다" 의 실제 가격표다.</p>
+    <p lang="en">The speaker notes give the concrete case: <strong>the floating point bug in Intel processors cost around a billion dollars.</strong> That is the actual price tag on "caught it too late".</p>
+  </div>
+
+  <p lang="ko">규모의 숫자도 같이 나온다.</p>
+  <p lang="en">The scale numbers come with it.</p>
+
+  <ul>
+    <li lang="ko">설계 노력의 <strong>50% 에서 80% 이상이 verification</strong></li>
+    <li lang="en"><strong>50 to over 80 percent</strong> of design effort is verification</li>
+    <li lang="ko">설계 엔지니어 1 명당 <strong>검증 엔지니어 3~5 명</strong></li>
+    <li lang="en"><strong>Three to five verification engineers</strong> per design engineer</li>
+  </ul>
+
+  <p lang="ko">강사가 첫 강의 발표자 노트에 <strong>"대부분은 검증 쪽 일자리를 갖게 된다"</strong> 고 적어뒀다. 이 과목이 왜 이렇게 짜여 있는지의 답이다.</p>
+  <p lang="en">The instructor's own speaker notes say <strong>"most of you will end up in verification jobs"</strong>. That is why the course is shaped the way it is.</p>
+
+  <p lang="ko">그리고 Verification 전체가 <strong>두 갈래</strong>로 갈린다. 별칭이 더 자주 쓰이니 그쪽을 기억해두는 게 낫다.</p>
+  <p lang="en">All of verification splits <strong>two ways</strong>, and the nicknames get used more than the formal names.</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">이름</span><span lang="en">Name</span></th>
+      <th><span lang="ko">별칭 (더 자주 쓰임)</span><span lang="en">Nickname (used more)</span></th>
+      <th><span lang="ko">방식</span><span lang="en">How</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>Dynamic verification</td><td><strong>Simulation-based</strong></td>
+        <td><span lang="ko">값을 실제로 흘려보고 결과를 본다</span><span lang="en">Push values through and look at the result</span></td></tr>
+      <tr><td>Static verification</td><td><strong>Formal</strong></td>
+        <td><span lang="ko">값을 안 흘리고 수학으로 증명한다</span><span lang="en">Prove it mathematically, no values pushed</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="trap">
+    <p lang="ko"><strong>"static" 이 이 강의에서 두 번 나온다.</strong> STA 의 static 도, formal verification 의 static 도 <strong>"값을 흘려보지 않고 구조만 보고 판단한다"</strong> 로 같은 뜻이다. 다만 <strong>STA 는 타이밍</strong>을 보고 <strong>formal 은 기능</strong>을 본다. 그리고 슬라이드는 마지막에 <strong>"대개 둘을 섞어 쓴다"</strong> 고 적었다. 고르는 문제가 아니다.</p>
+    <p lang="en"><strong>"Static" appears twice in this lecture.</strong> In STA and in formal verification it means the same thing: <strong>judge from structure without running values</strong>. The difference is that <strong>STA looks at timing</strong> and <strong>formal looks at function</strong>. And the slide closes by noting <strong>you usually mix both</strong>. It is not a choice.</p>
+  </div>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">검증의 삼각대</h2><h2 lang="en">The verification tripod</h2></div>
+
+  <p lang="ko"><strong>Stimulus &middot; Checkers &middot; Coverage.</strong> 이 과목 2 부 전체가 이 세 단어 위에 올라간다. <strong>Lab 4 &middot; 5 &middot; 6 도 각각 이 셋 중 하나씩</strong>을 다룬다.</p>
+  <p lang="en"><strong>Stimulus, checkers, coverage.</strong> The entire back half of the course stands on these three words, and <strong>labs 4, 5 and 6 take one each</strong>.</p>
+
+  <p lang="ko">왜 셋이 <strong>함께여야</strong> 하는지가 핵심이다. 하나씩 빼보면 안다.</p>
+  <p lang="en">The point is why all three must be <strong>together</strong>. Remove them one at a time and you see it.</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">가진 것</span><span lang="en">What you have</span></th>
+      <th><span lang="ko">결과</span><span lang="en">What happens</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">Stimulus 만</span><span lang="en">Stimulus only</span></td>
+        <td><span lang="ko">자극은 들어가는데 <strong>아무도 결과가 옳은지 안 본다.</strong> 시뮬레이션이 항상 통과한다</span><span lang="en">Things go in, but <strong>nobody checks the answer.</strong> The simulation always passes</span></td></tr>
+      <tr><td><span lang="ko">Stimulus + Checkers</span><span lang="en">Stimulus + checkers</span></td>
+        <td><span lang="ko">틀리면 잡는다. 그런데 <strong>무엇을 안 해봤는지 모른다</strong></span><span lang="en">Mistakes get caught, but <strong>you have no idea what you never tried</strong></span></td></tr>
+      <tr><td><span lang="ko"><strong>셋 다</strong></span><span lang="en"><strong>All three</strong></span></td>
+        <td><span lang="ko">자극을 넣고, 틀리면 잡고, 무엇이 남았는지 안다. <strong>그제야 "다 했다" 고 말할 근거가 생긴다</strong></span><span lang="en">You drive it, catch mistakes, and know what is untouched. <strong>Only then is there a basis for saying you are done</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; DUT</span><span lang="en">Jargon &middot; DUT</span></summary>
+      <table class="parts">
+        <tr><td lang="ko">풀네임</td><td lang="en">Full name</td><td>Design Under Test</td></tr>
+        <tr><td><span lang="ko">한 줄</span><span lang="en">In one line</span></td><td><span lang="ko">지금 검증하고 있는 그 설계. testbench 가 둘러싸고 두들기는 대상.</span><span lang="en">The design being verified: what the testbench surrounds and hammers.</span></td></tr>
+        <tr><td><span lang="ko">범위가 바뀐다</span><span lang="en">Its scope moves</span></td><td><span lang="ko">FIFO 하나가 DUT 일 수도 있고 <strong>SoC 전체가 DUT</strong> 일 수도 있다. unit / sub-system / top level 로 나눠 배우는 게 그 얘기다.</span><span lang="en">A single FIFO can be the DUT, and so can <strong>an entire SoC</strong>. That is what unit, sub-system and top level mean.</span></td></tr>
+        <tr><td><span lang="ko">헷갈리는 것</span><span lang="en">Easy to misread</span></td><td><span lang="ko">이름에 Test 가 들어가지만 <strong>1 강의 Testing 과 무관하다.</strong> DUT 는 verification 쪽 용어다.</span><span lang="en">The name contains "test" but it has <strong>nothing to do with testing from lecture 1</strong>. DUT is a verification term.</span></td></tr>
+      </table>
+    </details>
+  </div>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">Testbench 는 왜 그렇게 생겼나</h2><h2 lang="en">Why a testbench looks like that</h2></div>
+
+  <p lang="ko">슬라이드 다섯 장이 <strong>같은 그림에 한 칸씩 얹어가며</strong> testbench 를 완성한다. <strong>그 순서 자체가 설명이다.</strong> 각 칸이 없으면 무엇을 못 하는지가 순서에서 나온다.</p>
+  <p lang="en">Five slides build a testbench by <strong>adding one box at a time to the same picture</strong>. <strong>The order is the explanation</strong>: what you lose without each box falls out of the sequence.</p>
+
+<figure>
+    <svg viewBox="0 0 700 340" role="img" aria-label="완성된 testbench 구성도: Stimulus, Driver, DUT, Monitor, Checker, Coverage, Assertions">
+      <defs>
+        <marker id="g5-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <!-- Coverage / Checker -->
+      <rect x="272" y="14" width="156" height="34" rx="6" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.5"/>
+      <text class="svgtxt" x="350" y="36" text-anchor="middle" style="font-size:13px;font-weight:650">Coverage</text>
+      <rect x="272" y="60" width="156" height="34" rx="6" fill="rgba(var(--pink-rgb),.16)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="350" y="82" text-anchor="middle" style="font-size:13px;font-weight:650">Checker</text>
+
+      <!-- agent 경계 -->
+      <rect x="108" y="112" width="484" height="140" rx="10" fill="rgba(var(--ink-rgb),.03)" stroke="var(--rule)" stroke-width="1.4"/>
+
+      <!-- Monitor -->
+      <rect x="150" y="124" width="120" height="32" rx="6" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.4"/>
+      <text class="svgtxt" x="210" y="145" text-anchor="middle" style="font-size:12px">Monitor</text>
+      <rect x="430" y="124" width="120" height="32" rx="6" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.4"/>
+      <text class="svgtxt" x="490" y="145" text-anchor="middle" style="font-size:12px">Monitor</text>
+
+      <!-- Driver / DUT -->
+      <rect x="150" y="180" width="120" height="52" rx="6" fill="rgba(var(--pink-rgb),.2)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="210" y="211" text-anchor="middle" style="font-size:12.5px">Driver</text>
+      <rect x="430" y="180" width="120" height="52" rx="6" fill="rgba(var(--pink-rgb),.2)" stroke="var(--pink)" stroke-width="1.5"/>
+      <text class="svgtxt" x="490" y="211" text-anchor="middle" style="font-size:12.5px">Driver</text>
+
+      <rect x="298" y="180" width="104" height="52" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="2.2"/>
+      <text class="svgtxt" x="350" y="211" text-anchor="middle" style="font-size:14px;font-weight:750">DUT</text>
+
+      <!-- Stimulus -->
+      <rect x="14" y="180" width="112" height="52" rx="6" fill="rgba(var(--violet-rgb),.16)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="70" y="211" text-anchor="middle" style="font-size:12.5px">Stimulus</text>
+      <rect x="574" y="180" width="112" height="52" rx="6" fill="rgba(var(--violet-rgb),.16)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="630" y="211" text-anchor="middle" style="font-size:12.5px">Stimulus</text>
+
+      <!-- Assertions -->
+      <rect x="272" y="272" width="156" height="34" rx="6" fill="rgba(var(--amber-rgb),.16)" stroke="var(--amber)" stroke-width="1.5"/>
+      <text class="svgtxt" x="350" y="294" text-anchor="middle" style="font-size:13px;font-weight:650">Assertions</text>
+
+      <!-- 연결 -->
+      <line x1="128" y1="206" x2="146" y2="206" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g5-ar)"/>
+      <line x1="572" y1="206" x2="554" y2="206" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g5-ar)"/>
+      <line x1="272" y1="206" x2="294" y2="206" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g5-ar)"/>
+      <line x1="428" y1="206" x2="406" y2="206" stroke="var(--ink3)" stroke-width="1.5" marker-end="url(#g5-ar)"/>
+      <line x1="210" y1="178" x2="210" y2="160" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g5-ar)"/>
+      <line x1="490" y1="178" x2="490" y2="160" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g5-ar)"/>
+      <path d="M210 122 V102 H268" fill="none" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g5-ar)"/>
+      <path d="M490 122 V102 H432" fill="none" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#g5-ar)"/>
+      <path d="M280 77 H262 V31 H268" fill="none" stroke="var(--ink3)" stroke-width="1.2" marker-end="url(#g5-ar)"/>
+      <line x1="350" y1="234" x2="350" y2="268" stroke="var(--amber)" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#g5-ar)"/>
+
+      <!-- 라벨 -->
+      <text class="svglab" x="580" y="246" text-anchor="end" style="fill:var(--ink2);font-size:10px" lang="ko">이 테두리 = Driver + Monitor = Agent (= BFM = Transactor)</text>
+      <text class="svglab" x="580" y="246" text-anchor="end" style="fill:var(--ink2);font-size:10px" lang="en">this border: driver + monitor = Agent (= BFM = Transactor)</text>
+      <text class="svglab" x="14" y="264" style="font-size:10px" lang="ko">transaction 수준</text>
+      <text class="svglab" x="14" y="264" style="font-size:10px" lang="en">transaction level</text>
+      <text class="svglab" x="150" y="264" style="font-size:10px" lang="ko">신호 수준으로 번역</text>
+      <text class="svglab" x="150" y="264" style="font-size:10px" lang="en">translated to signal level</text>
+      <text class="svglab" x="350" y="324" text-anchor="middle" style="font-size:10px;fill:var(--amber)" lang="ko">DUT 안에 박혀서 항상 감시한다</text>
+      <text class="svglab" x="350" y="324" text-anchor="middle" style="font-size:10px;fill:var(--amber)" lang="en">bound inside the DUT, watching always</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 47~51쪽을 합친 것. <strong>인터페이스가 둘이라 Driver와 Monitor도 둘이다.</strong> Checker와 Coverage는 양쪽 Monitor에서 다 받는다. 한쪽만 보면 "들어간 것"이나 "나온 것" 중 하나밖에 모르기 때문이다.</figcaption>
+    <figcaption lang="en">Slides 47 to 51 combined. <strong>Two interfaces means two drivers and two monitors.</strong> The checker and the coverage collector both feed from both monitors, because one side alone tells you only what went in, or only what came out.</figcaption>
+  </figure>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; Driver / Monitor / Agent / BFM</span><span lang="en">Jargon &middot; Driver / Monitor / Agent / BFM</span></summary>
+      <table class="parts">
+        <tr><td>Driver</td><td><span lang="ko">추상적인 요청을 <strong>실제 신호 흔들기로 바꿔</strong> DUT 에 밀어 넣는다</span><span lang="en">Turns an abstract request into <strong>actual pin wiggling</strong> into the DUT</span></td></tr>
+        <tr><td>Monitor</td><td><span lang="ko">DUT 의 신호를 보고 <strong>다시 추상적인 사건으로 되돌린다.</strong> 아무것도 밀어 넣지 않는다</span><span lang="en">Watches DUT pins and <strong>turns them back into abstract events</strong>. Drives nothing</span></td></tr>
+        <tr><td>Agent</td><td><span lang="ko">Driver 와 Monitor 를 <strong>한 인터페이스 단위로 묶은 것</strong></span><span lang="en">Driver and monitor <strong>bundled per interface</strong></span></td></tr>
+        <tr><td>BFM</td><td><span lang="ko">Bus Functional Model. 프로토콜을 아는 <strong>Driver 의 다른 이름</strong>으로 자주 쓰인다</span><span lang="en">Bus functional model, often just <strong>another name for a protocol-aware driver</strong></span></td></tr>
+      </table>
+    </details>
+  </div>
+
+  <p lang="ko">이 구조가 왜 이렇게 갈라져 있냐면 <strong>추상화 수준을 맞추기 위해서</strong>다. 그게 <strong>TLM (Transaction Level Modeling)</strong> 이다. 신호를 하나하나 흔드는 대신 <strong>"쓰기 한 건"</strong> 을 통째로 다룬다.</p>
+  <p lang="en">The reason it splits this way is <strong>to keep abstraction levels apart</strong>. That is <strong>TLM (transaction level modeling)</strong>: instead of wiggling individual signals you deal in <strong>"one write"</strong> as a unit.</p>
+
+  <div class="def">
+    <p lang="ko">테스트를 쓰는 사람은 <strong>"주소 0x40 에 0xFF 를 써라"</strong> 라고만 말한다. 그걸 <strong>클럭에 맞춰 핀을 흔드는 일</strong>로 번역하는 건 Driver 의 몫이다. 그래서 프로토콜이 바뀌어도 <strong>테스트는 안 고쳐도 된다.</strong></p>
+    <p lang="en">Whoever writes the test only says <strong>"write 0xFF to address 0x40"</strong>. Translating that into <strong>clock-aligned pin wiggling</strong> is the driver's job. Change the protocol and <strong>the tests need no edits.</strong></p>
+  </div>
+
+  <p lang="ko">그리고 <strong>왜 Verilog 만으로는 부족한가</strong>. 무작위 자극을 제약과 함께 만들고, 커버리지를 모으고, 객체로 재사용하려면 언어에 그 기능이 있어야 한다. 그래서 <strong>SystemVerilog</strong> 가 나왔고, 그것마저 팀마다 제각각으로 쓰니 <strong>UVM 같은 방법론</strong>이 생겼다. 학기 후반 세 강의가 그 이야기다.</p>
+  <p lang="en">And <strong>why Verilog alone falls short</strong>: generating constrained random stimulus, collecting coverage and reusing things as objects all need language support. Hence <strong>SystemVerilog</strong>, and because even that gets used differently by every team, hence <strong>methodologies like UVM</strong>. Three late-semester lectures cover that.</p>
+</section>
+
+<section id="q8">
+  <div class="sec-head"><span class="sec-num">8</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+
+  <ul>
+    <li lang="ko"><strong>slack 의 정의와 부호.</strong> 슬라이드가 대놓고 물어본다. 양수면 <code>(MET)</code>, 음수면 <code>(VIOLATED)</code></li>
+    <li lang="en"><strong>The definition and sign of slack.</strong> The slide asks outright. Positive is <code>(MET)</code>, negative is <code>(VIOLATED)</code></li>
+    <li lang="ko"><strong>Rule of 10.</strong> 설계에서 1, 응용에서 10000</li>
+    <li lang="en"><strong>The rule of 10.</strong> One at design, ten thousand in the application</li>
+    <li lang="ko"><strong>Dynamic vs. Static</strong> 그리고 그 별칭(simulation-based / formal)</li>
+    <li lang="en"><strong>Dynamic vs. static</strong> and their nicknames, simulation-based and formal</li>
+    <li lang="ko"><strong>삼각대 셋</strong>과 하나씩 빠졌을 때 무엇을 못 하는지</li>
+    <li lang="en"><strong>The three legs of the tripod</strong> and what you lose when one is missing</li>
+    <li lang="ko"><strong>Synthesis 입력 셋.</strong> RTL, constraint, tech library</li>
+    <li lang="en"><strong>The three synthesis inputs</strong>: RTL, constraints, tech library</li>
+    <li lang="ko"><strong>behavioral vs. structural</strong> 구별 기준</li>
+    <li lang="en">How to tell <strong>behavioral from structural</strong></li>
+  </ul>
+
+  <div class="callout">
+    <p lang="ko"><strong>다음 강의(3 강)</strong>는 여기서 "RTL 을 쓴다" 고만 했던 것을 실제 SystemVerilog 문법으로 내려간다. 이 강의가 지도였다면 다음은 손을 쓰는 시간이다.</p>
+    <p lang="en"><strong>Lecture 3</strong> takes "you write RTL" and drops it into actual SystemVerilog syntax. This lecture was the map; the next one is hands on.</p>
+  </div>
+</section>
+
+</main>
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 2 개인 학습 노트<br>
+  강의: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 2 personal study notes<br>
+  Course: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// Testbench 조립기. 부품을 하나씩 켜면서 "그게 없으면 무엇을 못 잡는지"를 보여준다.
+// 결과를 나열하는 게 아니라 사용자가 눌러서 발견하게 하는 것이 목적이다.
+(function () {
+  var svg = document.getElementById('tbsvg');
+  if (!svg) return;
+  var box = document.getElementById('tbbtn');
+  var verdict = document.getElementById('tbv');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var on = { monitor: false, checker: false, coverage: false, assert: false };
+
+  var PARTS = [
+    { key: 'monitor',  ko: 'Monitor',    en: 'Monitor' },
+    { key: 'checker',  ko: 'Checker',    en: 'Checker' },
+    { key: 'coverage', ko: 'Coverage',   en: 'Coverage' },
+    { key: 'assert',   ko: 'Assertions', en: 'Assertions' }
+  ];
+
+  // Checker와 Coverage는 Monitor 없이 못 붙는다. 관측을 안 하는데 판단하거나 셀 수 없다.
+  function needsMonitor(k) { return k === 'checker' || k === 'coverage'; }
+
+  var btns = {};
+  PARTS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.addEventListener('click', function () {
+      if (needsMonitor(p.key) && !on.monitor) { flash(p.key); return; }
+      on[p.key] = !on[p.key];
+      // Monitor를 끄면 그것에 매달린 것도 같이 떨어진다.
+      if (p.key === 'monitor' && !on.monitor) { on.checker = false; on.coverage = false; }
+      render();
+    });
+    box.appendChild(b);
+    btns[p.key] = b;
+  });
+
+  var clr = document.createElement('button');
+  clr.type = 'button';
+  clr.addEventListener('click', function () {
+    on = { monitor: false, checker: false, coverage: false, assert: false };
+    render();
+  });
+  box.appendChild(clr);
+
+  var flashing = null;
+  function flash(k) {
+    flashing = k;
+    render();
+    setTimeout(function () { flashing = null; render(); }, 1400);
+  }
+
+  function verdictText() {
+    if (flashing) {
+      return { cls: 'bad', hd: L('아직 못 붙인다', 'not yet'),
+        body: L('<strong>Monitor가 먼저다.</strong> 인터페이스의 신호를 읽어서 transaction으로 되돌리는 부품이 없으면, ' +
+                'Checker는 무엇을 판정할지 알 수 없고 Coverage는 무엇을 셀지 알 수 없다.',
+                '<strong>The monitor comes first.</strong> Without the component that reads interface signals back into transactions, ' +
+                'a checker has nothing to judge and a coverage collector has nothing to count.') };
+    }
+    if (!on.monitor && !on.assert) {
+      return { cls: 'bad', hd: L('아무도 안 보고 있다', 'nobody is watching'),
+        body: L('자극은 DUT에 들어가고 있다. 그런데 <strong>결과가 옳은지 보는 사람이 없다.</strong> ' +
+                '이 상태에서 시뮬레이션을 아무리 오래 돌려도 <strong>항상 통과한다.</strong> 버그가 있어도 아무 일도 안 일어난다.',
+                'Stimulus is going into the DUT, but <strong>nobody looks at whether the result is right.</strong> ' +
+                'Run this for as long as you like and it <strong>always passes.</strong> A bug produces no event at all.') };
+    }
+    if (on.monitor && !on.checker && !on.assert) {
+      return { cls: 'bad', hd: L('보기는 하는데 판단은 안 한다', 'observed, not judged'),
+        body: L('Monitor가 신호를 읽어서 transaction으로 되돌리고 있다. 파형도 뜬다. ' +
+                '<strong>하지만 옳은지 틀린지를 말하는 부품이 아직 없다.</strong> 사람이 파형을 눈으로 보고 판단해야 한다.',
+                'The monitor is reading signals back into transactions and the waves are there. ' +
+                '<strong>But no component says whether any of it is right.</strong> A human has to read the waveform and decide.') };
+    }
+    if (on.checker && !on.coverage) {
+      return { cls: 'bad', hd: L('틀리면 잡는다. 그런데 얼마나 했는지 모른다', 'catches mistakes, but you cannot tell how far you got'),
+        body: L('이제 DUT가 틀리게 동작하면 Checker가 오류를 띄운다. ' +
+                '<strong>그런데 무엇을 아직 안 해봤는지 알 방법이 없다.</strong> ' +
+                '테스트가 전부 통과했다는 게 "버그가 없다"는 뜻인지 "그 버그를 밟는 자극을 안 넣었다"는 뜻인지 구별이 안 된다.',
+                'Now the checker raises an error when the DUT misbehaves. ' +
+                '<strong>But there is no way to know what has not been tried.</strong> ' +
+                'All tests passing could mean there are no bugs, or it could mean you never drove the stimulus that steps on one.') };
+    }
+    if (on.checker && on.coverage && !on.assert) {
+      return { cls: 'ok', hd: L('삼각대가 섰다', 'the trifecta stands'),
+        body: L('Stimulus · Checkers · Coverage 셋이 다 있다. 자극을 넣고, 틀리면 잡고, 무엇을 안 해봤는지 안다. ' +
+                '<strong>이제 "다 했다"고 말할 근거가 생긴다.</strong><br>' +
+                '남은 하나는 Assertions다. Checker는 인터페이스 <em>밖에서</em> 보는 것이라, ' +
+                'DUT <strong>안쪽의</strong> 불변식이 깨져도 겉으로 안 드러나면 못 잡는다.',
+                'Stimulus, checkers and coverage are all present. You drive it, you catch mistakes, and you know what is untouched. ' +
+                '<strong>Now there is a basis for saying you are done.</strong><br>' +
+                'One thing is left: assertions. A checker watches from <em>outside</em> the interface, so an invariant broken ' +
+                '<strong>inside</strong> the DUT goes unnoticed if it never shows on the outside.') };
+    }
+    if (on.assert && !on.monitor) {
+      return { cls: 'bad', hd: L('내부는 보는데 바깥은 안 본다', 'watching inside, blind outside'),
+        body: L('Assertion은 DUT 안에 박혀서 <strong>항상 켜진</strong> 상태로 불변식을 감시한다. ' +
+                '두 grant가 동시에 뜨는 것 같은 위반은 이제 잡힌다. ' +
+                '<strong>하지만 "들어간 것에 맞는 결과가 나왔는가"는 못 본다.</strong> 그건 Monitor와 Checker의 일이다.',
+                'Assertions bind inside the DUT and watch invariants with the check <strong>always on</strong>. ' +
+                'A violation such as two grants rising together now gets caught. ' +
+                '<strong>But "did the right result come out for what went in" is invisible to them.</strong> That belongs to the monitor and checker.') };
+    }
+    if (on.monitor && on.checker && on.coverage && on.assert) {
+      return { cls: 'ok', hd: L('완성. 슬라이드 51쪽의 그림이다', 'complete: this is slide 51'),
+        body: L('두 층이 함께 일한다. <strong>Assertion은 안에서 항상</strong> 감시하고, ' +
+                '<strong>Checker는 밖에서 transaction 단위로</strong> 맞춰본다. Coverage가 얼마나 두들겼는지를 재고, ' +
+                'Driver와 Monitor를 묶은 것이 Agent(=BFM=Transactor)다.<br>' +
+                '<strong>Lab 4·5·6이 이 그림을 하나씩 만들어보는 과제다.</strong>',
+                'Two layers working together. <strong>Assertions watch from inside, always</strong>, and ' +
+                '<strong>the checker matches transactions from outside.</strong> Coverage measures how hard it was exercised, ' +
+                'and the driver plus monitor bundle is the agent, also called a BFM or transactor.<br>' +
+                '<strong>Labs 4, 5 and 6 build this picture one piece at a time.</strong>') };
+    }
+    return { cls: 'ok', hd: L('감시 두 층이 붙었다', 'both watchers attached'),
+      body: L('Assertion이 안에서, Monitor가 밖에서 본다. Checker나 Coverage를 더 붙여보면 무엇이 달라지는지 확인할 것.',
+              'Assertions watch from inside and the monitor from outside. Add the checker or coverage and see what changes.') };
+  }
+
+  function render() {
+    PARTS.forEach(function (p) {
+      var g = svg.querySelector('[data-part="' + p.key + '"]');
+      if (g) g.style.opacity = on[p.key] ? '1' : '.13';
+      var b = btns[p.key];
+      b.textContent = (on[p.key] ? '✓ ' : '+ ') + L(p.ko, p.en);
+      b.className = on[p.key] ? 'act' : '';
+    });
+    clr.textContent = L('지우기', 'clear');
+    var v = verdictText();
+    verdict.className = 'verdict ' + v.cls;
+    verdict.innerHTML = "<span class='hd'>" + v.hd + '</span>' + v.body;
+  }
+
+  window.addEventListener('langchange', render);
+  render();
+})();
+</script>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
+
