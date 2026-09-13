@@ -1237,6 +1237,85 @@ dc_shell-topo&gt; <span class="k">report_constraint</span> -all_violators
   <p lang="en"><code>synth/Makefile</code> feeds <code>compile_dc.tcl</code> to DC and runs it. Out come a gate-level netlist and a set of reports. <strong>Open the script and find where <code>target_library</code> and <code>link_library</code> get set.</strong> Those two lines are what <a href="#s11">section 11</a> is all about.</p>
   <p lang="ko">그리고 <strong>timing 리포트를 열어 맨 아래 <code>slack</code> 줄부터 봐라.</strong> <code>(MET)</code>인지 <code>(VIOLATED)</code>인지가 이 설계가 지금 클럭에서 도는지 아닌지다. 위쪽 세 구역은 그 한 줄이 왜 그 값인지를 설명하는 재료다.</p>
   <p lang="en">Then <strong>open the timing report and start at the <code>slack</code> line at the bottom.</strong> Whether it says <code>(MET)</code> or <code>(VIOLATED)</code> is whether this design runs at the clock you asked for. The three sections above it are the workings behind that one number.</p>
+
+  <h3 lang="ko">따라치기 압축판</h3>
+  <h3 lang="en">The condensed walkthrough</h3>
+  <p lang="ko">위까지가 <strong>왜</strong>이고 여기부터는 <strong>그냥 이대로 치면 됨</strong>이다. 실제로 끝까지 돌려본 순서 그대로다.</p>
+  <p lang="en">Everything above is the <strong>why</strong>. From here it is <strong>just type this</strong>, in the exact order that actually worked end to end.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>0단계.</strong> Canvas 왼쪽 <em>Apporto - ECEE Cad Lab</em> 클릭 &rarr; 리눅스 데스크톱이 뜬다 &rarr; <strong>keyring 비밀번호 창은 Cancel</strong> (터미널만 쓸 거면 필요 없다) &rarr; 좌상단 <em>Activities</em> &rarr; dock에서 터미널 아이콘.</p>
+    <p lang="en"><strong>Step 0.</strong> Click <em>Apporto - ECEE Cad Lab</em> in Canvas &rarr; a Linux desktop opens &rarr; <strong>hit Cancel on the keyring password box</strong> (you do not need it for terminal work) &rarr; <em>Activities</em> top left &rarr; terminal icon in the dock.</p>
+  </div>
+
+  <p lang="ko"><strong>1. 파일 복사.</strong> 원본은 읽기 전용이라 거기서 작업하면 안 된다.</p>
+  <p lang="en"><strong>1. Copy the files.</strong> The originals are read-only, so you cannot work in place.</p>
+<pre class="code" lang="ko">mkdir -p ~/lab0/work
+cp -r /usr/local2/COURSES/ADDV/LAB0/* ~/lab0/work/
+cd ~/lab0/work
+grep -nE "^[a-zA-Z_][a-zA-Z0-9_]*:" sim/Makefile   <span class="c">// 타겟 이름만 뽑아본다</span></pre>
+<pre class="code" lang="en">mkdir -p ~/lab0/work
+cp -r /usr/local2/COURSES/ADDV/LAB0/* ~/lab0/work/
+cd ~/lab0/work
+grep -nE "^[a-zA-Z_][a-zA-Z0-9_]*:" sim/Makefile   <span class="c">// pull out just the target names</span></pre>
+
+  <p lang="ko"><strong>2. 환경.</strong> <strong>여기서 제일 많이 죽는다.</strong> bash에서 하면 <code>setenv: command not found</code>가 줄줄이 뜨는데 <strong>멈추지를 않아서</strong> 성공한 줄 안다. 그 상태로 make를 돌리면 엉뚱한 데서 터진다.</p>
+  <p lang="en"><strong>2. Environment.</strong> <strong>This is where most people die.</strong> Do it in bash and you get a wall of <code>setenv: command not found</code>, and because it <strong>does not stop</strong>, you think it worked. Run make from there and it blows up somewhere unrelated.</p>
+<pre class="code" lang="ko">tcsh                        <span class="c">// 먼저 tcsh로 들어간다. 이게 핵심</span>
+source ~/lab0/work/env.cshrc
+which vcs verdi dc_shell    <span class="c">// 셋 다 경로가 나와야 정상</span></pre>
+<pre class="code" lang="en">tcsh                        <span class="c">// get into tcsh first. this is the whole trick</span>
+source ~/lab0/work/env.cshrc
+which vcs verdi dc_shell    <span class="c">// all three must print a path</span></pre>
+  <p lang="ko">터미널을 새로 열면 <strong>매번 다시</strong> 해야 한다. 환경은 셸마다 따로다.</p>
+  <p lang="en">You must redo this <strong>every time</strong> you open a new terminal. The environment is per-shell.</p>
+
+  <p lang="ko"><strong>3. Task 1 &middot; VCS.</strong></p>
+  <p lang="en"><strong>3. Task 1 &middot; VCS.</strong></p>
+<pre class="code" lang="ko">cd ~/lab0/work/sim
+ls -A                       <span class="c">// 찍어둔다. 나중에 "뭐가 생겼나"의 기준선</span>
+make compile                <span class="c">// simv, simv.daidir/, csrc/, compile.log</span>
+make sim                    <span class="c">// novas.fsdb, novas_dump.log, ucli.key</span></pre>
+<pre class="code" lang="en">cd ~/lab0/work/sim
+ls -A                       <span class="c">// note this down. it is your before/after baseline</span>
+make compile                <span class="c">// simv, simv.daidir/, csrc/, compile.log</span>
+make sim                    <span class="c">// novas.fsdb, novas_dump.log, ucli.key</span></pre>
+  <p lang="ko"><strong>스크린샷만 찍고 끝내면 감점이다.</strong> 제출물에 <em>compile 단계</em>와 <em>simulation 단계</em>에서 생긴 파일과 폴더를 <strong>글로 나눠 적으라</strong>고 따로 요구한다. 그래서 <code>ls -A</code>를 단계마다 찍어 before/after로 대조해두면 그대로 근거가 된다.</p>
+  <p lang="en"><strong>Screenshots alone lose points here.</strong> The deliverable separately asks you to <strong>list in writing</strong> the files and folders created by the <em>compilation step</em> and by the <em>simulation step</em>. Run <code>ls -A</code> at each step and the before/after diff writes that list for you.</p>
+
+  <p lang="ko"><strong>4. Task 2 &middot; Verdi.</strong> <code>make compile</code> 결과로는 <strong>안 된다.</strong> Verdi가 읽는 DB는 <code>-kdb</code>로 만들어지고 그건 <code>compile_verdi</code>에만 붙어 있다.</p>
+  <p lang="en"><strong>4. Task 2 &middot; Verdi.</strong> The output of <code>make compile</code> <strong>will not do.</strong> The database Verdi reads comes from <code>-kdb</code>, and that switch only appears in <code>compile_verdi</code>.</p>
+<pre class="code" lang="ko">make clean
+make compile_verdi          <span class="c">// "Verdi KDB elaboration done" 줄이 떠야 성공</span>
+make sim
+make waves_verdi            <span class="c">// Verdi + 파형 같이 뜬다</span></pre>
+<pre class="code" lang="en">make clean
+make compile_verdi          <span class="c">// look for the "Verdi KDB elaboration done" line</span>
+make sim
+make waves_verdi            <span class="c">// opens Verdi with the waveform loaded</span></pre>
+  <p lang="ko">창이 뜨면 <strong>왼쪽 Hierarchy에서 스코프를 우클릭 &rarr; Add to Waveform &rarr; Add to Wave2.</strong> 신호를 하나씩 고를 필요 없이 스코프 통째로 들어간다. <strong>testbench 스코프와 DUT 스코프를 각각 한 번씩</strong> 해라. 제출물이 "설계 신호와 testbench 신호가 <em>둘 다</em>"를 요구한다. 한쪽만 있으면 미달이다. 다 넣었으면 <strong><code>F</code>(Zoom All)</strong>로 전체 구간을 맞추고, 이름이 잘리면 이름 칸 경계를 오른쪽으로 끈다.</p>
+  <p lang="en">Once it opens, <strong>right-click a scope in the Hierarchy pane &rarr; Add to Waveform &rarr; Add to Wave2.</strong> That pulls the whole scope in, no picking signals one by one. <strong>Do it once for the testbench scope and once for the DUT scope.</strong> The deliverable asks for signals from the design <em>and</em> from the testbench; one side only is a miss. Then press <strong><code>F</code> (Zoom All)</strong> to fit the whole run, and drag the name column wider if names are clipped.</p>
+
+  <p lang="ko"><strong>5. Task 3 &middot; Design Compiler.</strong></p>
+  <p lang="en"><strong>5. Task 3 &middot; Design Compiler.</strong></p>
+<pre class="code" lang="ko">cd ~/lab0/work/synth
+cat -n compile_dc.tcl       <span class="c">// target_library / link_library 줄을 찾는다. 리포트 질문 답</span>
+make synth                  <span class="c">// 10초쯤. timing.rep cell.rep power.rep area.rep</span>
+tail -20 timing.rep         <span class="c">// 맨 아래 slack (MET) 인지 (VIOLATED) 인지</span></pre>
+<pre class="code" lang="en">cd ~/lab0/work/synth
+cat -n compile_dc.tcl       <span class="c">// find the target_library / link_library lines. that is a report answer</span>
+make synth                  <span class="c">// about 10 seconds. timing.rep cell.rep power.rep area.rep</span>
+tail -20 timing.rep         <span class="c">// the slack (MET) or (VIOLATED) line at the bottom</span></pre>
+  <p lang="ko">로그에 <code>Error: unknown command &apos;set_ultra_optimization&apos;</code>이 두 번 뜨는데 <strong>무시해도 된다.</strong> DC Ultra 라이선스가 없어서 그 명령을 모르는 것뿐이고, 합성은 그대로 끝까지 간다. <strong>"에러가 있다"와 "실패했다"는 다르다.</strong> 리포트 네 개가 다 생겼는지로 판단해라.</p>
+  <p lang="en">The log prints <code>Error: unknown command &apos;set_ultra_optimization&apos;</code> twice. <strong>Ignore it.</strong> It just means there is no DC Ultra licence, so the command is unknown; synthesis runs to completion anyway. <strong>"There are errors" and "it failed" are not the same thing.</strong> Judge by whether all four reports appeared.</p>
+
+  <div class="trap">
+    <p lang="ko"><strong>tcsh에서는 <code>2&gt;&amp;1</code>이 안 먹는다.</strong> <code>Ambiguous output redirect.</code>가 뜬다. tcsh는 <code>&gt;&amp;</code>를 쓴다. 로그를 파일로 남기려다 여기서 한 번 넘어진다.</p>
+    <p lang="en"><strong><code>2&gt;&amp;1</code> does not work in tcsh.</strong> You get <code>Ambiguous output redirect.</code> tcsh uses <code>&gt;&amp;</code> instead. This trips you the first time you try to tee a log.</p>
+  </div>
+
+  <p lang="ko">여기까지가 Part II 전부다. 남는 건 리포트 질문 다섯 개인데, <strong>1번과 2번은 <code>compile_dc.tcl</code>, 3번은 <code>sim/Makefile</code>, 4번은 testbench 안에 답이 그냥 적혀 있다.</strong> 5번만 설계 파일을 읽고 <strong>그림을 그려야</strong> 한다.</p>
+  <p lang="en">That is all of Part II. What is left is the five report questions, and <strong>the answers to 1 and 2 sit in <code>compile_dc.tcl</code>, 3 in <code>sim/Makefile</code>, and 4 inside the testbench.</strong> Only question 5 needs you to read the design and <strong>draw diagrams</strong>.</p>
 </section>
 
 <!-- ══════════════════════════════════════════════════════ 14 -->
@@ -1337,12 +1416,6 @@ dc_shell-topo&gt; <span class="k">report_constraint</span> -all_violators
     <span class="tag" lang="ko">제출물</span><span class="tag" lang="en">Deliverables</span>
     <p lang="ko"><strong>Part I (20점):</strong> 지정된 레슨을 완료했다는 것을 보여주는 <strong>스크린샷을 트레이닝마다</strong> 리포트에 넣는다. 완료 표시가 보이게 찍어야 한다. <strong>Part II:</strong> 세 Task를 돌린 결과. 리포트 하나만 낸다. <strong>코드도 데모도 없다.</strong></p>
     <p lang="en"><strong>Part I (20 points):</strong> a <strong>screenshot per training</strong> showing that the required lessons are complete, pasted into the report. Make sure the completion marker is visible. <strong>Part II:</strong> the results of the three tasks. One report, that is all. <strong>No code, no demo.</strong></p>
-  </div>
-
-  <div class="trap">
-    <span class="tag" lang="ko">빠뜨리기 제일 쉬운 것</span><span class="tag" lang="en">The easiest thing to forget</span>
-    <p lang="ko"><strong>AI 도구를 썼으면 그 사실을 제출물에 적어야 한다.</strong> 이 과목은 AI 사용을 허용하는 대신 사용 내역 기재를 요구한다. 결과물만 챙기고 이 줄을 빼먹기가 정확히 딱 좋은데, 빼먹으면 감점이다. 그리고 <strong>제출 시점 정책</strong>도 같이 기억해라. 늦으면 24시간마다 15%씩 최대 세 구간까지 깎이고, <strong>일찍 내면 24시간마다 5%씩 최대 10%까지 붙는다.</strong> 하루 일찍 내는 것만으로 5%다. 안 챙기면 그냥 버리는 점수다.</p>
-    <p lang="en"><strong>If you used AI tools, say so in what you hand in.</strong> This course permits AI use but requires you to record it. Gathering the results and dropping that one line is exactly the mistake that is easy to make, and it costs marks. Remember <strong>the timing policy</strong> too: late work loses 15% per 24 hours for up to three blocks, and <strong>early work gains 5% per 24 hours up to 10%.</strong> Submitting one day early is 5% for free. Not claiming it is simply throwing points away.</p>
   </div>
 
   <h3 lang="ko">다음으로</h3>
