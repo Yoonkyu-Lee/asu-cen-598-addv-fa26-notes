@@ -420,14 +420,14 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt slide by slide from the lecture deck. What blocks you in this course is not maths but <strong>industry vocabulary</strong>, so every term comes with its full name and a note on who says it and when.</p>
 
   <div class="facts" lang="ko">
-    <span class="chip">4 / 23강 완료</span>
-    <span class="chip">약어 사전 133항목</span>
+    <span class="chip">5 / 23강 완료</span>
+    <span class="chip">약어 사전 137항목</span>
     <span class="chip">슬라이드 동기화</span>
     <span class="chip">한국어 · English</span>
   </div>
   <div class="facts" lang="en">
-    <span class="chip">4 of 23 lectures</span>
-    <span class="chip">133 glossary entries</span>
+    <span class="chip">5 of 23 lectures</span>
+    <span class="chip">137 glossary entries</span>
     <span class="chip">slide sync</span>
     <span class="chip">Korean &amp; English</span>
   </div>
@@ -557,15 +557,26 @@ a.mod:hover .num{color:var(--blue)}
   <a href="notes/L04-clock-and-reset-quick.html" lang="en">seven sections, starting where STA gives up</a>
 </div>
 
-<div class="mod soon">
+<a class="mod" href="notes/L05-fifo-design.html">
   <div class="num">05</div>
   <div>
     <div class="when">9/9 (Wed) · <span class="who">Igor Miranda</span></div>
-    <h3>FIFO design</h3>
-    <p lang="ko">Lab 1의 대상. Lecture 2에서 assertion 예시로 나왔던 "FIFO는 overflow 하면 안 된다"가 여기서 설계 문제가 된다.</p>
-    <p lang="en">The subject of Lab 1. The assertion example from Lecture 2, that a FIFO must not overflow, becomes a design problem here.</p>
+    <h3>FIFO Design</h3>
+    <p lang="ko">Lab 1의 대상. Lecture 2에서 assertion 예시로 나왔던 "FIFO는 overflow 하면 안 된다"가 여기서 설계 문제가 된다. 어려운 건 저장이 아니라 <strong>가득 찼는지 비었는지를 아는 것</strong>이고, 답은 포인터에 붙은 한 비트다. 깊이 4짜리 FIFO를 직접 눌러보는 도구가 들어 있다.</p>
+    <p lang="en">The subject of Lab 1. The assertion example from Lecture 2, that a FIFO must not overflow, becomes a design problem here. The hard part is not storing but <strong>knowing whether it is full or empty</strong>, and the answer is one extra bit on the pointer. Includes a depth-four FIFO you can drive by hand.</p>
+    <div class="tags">
+      <span class="tag d">circular buffer</span>
+      <span class="tag d">wrap bit · full · empty</span>
+      <span class="tag d">gray code</span>
+      <span class="tag d">async FIFO · synchronizer</span>
+    </div>
   </div>
-  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L05-fifo-design-quick.html" lang="ko">포인터 한 비트로 끝내는 판</a>
+  <a href="notes/L05-fifo-design-quick.html" lang="en">the whole thing hanging off one pointer bit</a>
 </div>
 
 

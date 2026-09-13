@@ -932,7 +932,6 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   </div>
 </section>
 
-</main>
 <footer>
   <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 1 개인 학습 노트<br>
   강의: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
@@ -946,136 +945,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </main>
 </div>
 
-<script>
-// 분류 연습. 상황을 주고 네 용어 중 하나를 고르게 한다.
-// 결과를 보여주는 게 아니라 사용자가 눌러서 발견하게 하는 것이 목적이다.
-(function () {
-  var host = document.getElementById('qs');
-  if (!host) return;
-  var scv = document.getElementById('scv');
-  var rst = document.getElementById('rst');
 
-  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
-
-  var OPTS = ['Verification', 'Emulation', 'Testing', 'Validation'];
-
-  var ITEMS = [
-    { a: 0,
-      ko: 'RTL을 시뮬레이터에 넣고 testbench로 랜덤 자극을 넣어 FIFO가 overflow 하는지 본다.',
-      en: 'You load the RTL into a simulator and throw random stimulus at it from a testbench to see whether the FIFO overflows.',
-      wko: '아직 칩이 없고, 손에 든 건 파일이다. 시뮬레이터 안에서 설계 버그를 찾고 있으므로 Verification.',
-      wen: 'There is no chip yet and what you hold is a file. Hunting design bugs inside a simulator makes it verification.' },
-    { a: 2,
-      ko: '공장에서 갓 나온 웨이퍼의 die 하나하나에 패턴을 넣어보고 불량을 골라낸다.',
-      en: 'Patterns get applied to each die on a wafer fresh out of the fab, and the bad ones are sorted out.',
-      wko: '칩이 이미 만들어졌고, 칩 하나하나마다 한다. 잡는 건 설계 버그가 아니라 제조 결함이다. Testing.',
-      wen: 'The chip already exists and this happens on every single part. What it catches is a process defect, not a design bug. Testing.' },
-    { a: 3,
-      ko: '보드에 칩을 꽂고 Linux를 부팅한 다음 벤치마크를 돌려 실제 전력을 측정한다.',
-      en: 'The chip goes onto a board, Linux boots, a benchmark runs, and real power draw gets measured.',
-      wko: '살아 있는 실리콘이고, OS를 부팅하고 있고, 전력을 실측하고 있다. 슬라이드 22쪽의 Validation 정의 그대로다.',
-      wen: 'Alive silicon, an OS booting, real power measurements. That is the definition of validation on slide 22, word for word.' },
-    { a: 1,
-      ko: '실리콘이 아직 안 왔는데, 설계를 Palladium에 올려서 드라이버를 미리 돌려본다.',
-      en: 'Silicon has not arrived, so the design is mapped onto a Palladium box and the drivers are exercised early.',
-      wko: '제조 전인데 시뮬레이터가 아니라 전용 하드웨어를 쓴다. Palladium은 슬라이드가 예로 든 프로세서 기반 emulator다.',
-      wen: 'Pre-manufacturing, but on dedicated hardware rather than a simulator. Palladium is the processor based emulator the slide names.' },
-    { a: 0,
-      ko: 'Logic Freeze 전에 assertion을 걸어 두 grant 신호가 동시에 뜨지 않는지 확인한다.',
-      en: 'Before logic freeze, an assertion checks that two grant signals never rise together.',
-      wko: '제조는커녕 RTL도 아직 얼지 않았다. 설계가 사양대로인지 보는 일이므로 Verification.',
-      wen: 'Nothing has been manufactured and the RTL is not even frozen. Checking the design against the spec is verification.' },
-    { a: 2,
-      ko: '설계에 scan chain을 넣어두고, 나중에 그 chain으로 내부 flip-flop 값을 밖으로 뽑는다.',
-      en: 'Scan chains go into the design so that later the internal flip-flop values can be shifted out through them.',
-      wko: 'scan chain은 DFT의 대표 장치다. 목적은 <strong>제조된 칩</strong>에서 핀만으로 안을 들여다보는 것. 넣는 시점은 설계 때지만 쓰는 곳은 Testing이다.',
-      wen: 'Scan chains are the signature DFT structure. Their purpose is to see inside <strong>a manufactured part</strong> using only its pins. They are inserted at design time but used in testing.' },
-    { a: 3,
-      ko: '새로 도착한 칩에 전원을 넣었더니 클럭이 안 돈다. 왜인지 파고 있다.',
-      en: 'Power goes into a newly arrived chip and the clock does not run. Someone is digging into why.',
-      wko: '살아 있는 물건에서 처음 동작을 만들어가는 단계, 즉 bring-up이다. NVIDIA에는 이걸 부르는 고유 이름이 없다고 슬라이드 25쪽이 적어놨다.',
-      wen: 'This is bring-up: coaxing first signs of life out of a physical part. Slide 25 notes that NVIDIA has no specific name for it.' },
-    { a: 1,
-      ko: '시뮬레이션으로는 부팅 한 번에 몇 주가 걸려서, FPGA 박스에 설계를 올려 몇 시간으로 줄였다.',
-      en: 'A single boot takes weeks in simulation, so the design is mapped onto an FPGA box and the same boot takes hours.',
-      wko: '"simulation acceleration"이 emulation의 존재 이유다. 슬라이드 23쪽의 첫 번째 항목.',
-      wen: 'Simulation acceleration is the whole reason emulation exists. It is the first bullet on slide 23.' },
-    { a: 0,
-      ko: '합성된 netlist가 원래 RTL과 논리적으로 같은지 도구로 증명한다.',
-      en: 'A tool proves that the synthesised netlist is logically the same as the original RTL.',
-      wko: '함정 문항이다. 물건이 아직 없으므로 Testing이 아니다. 이건 equivalence checking이고 formal verification의 한 종류다. <a href="L02-design-and-verification-overview.html#s12">Lecture 2의 12절</a>에서 다룬다.',
-      wen: 'A trap. Nothing physical exists, so it is not testing. This is equivalence checking, a form of formal verification, covered in <a href="L02-design-and-verification-overview.html#s12">Lecture 2, §12</a>.' },
-    { a: 2,
-      ko: '출하 전 마지막 관문에서, 팔 물건 100%에 대해 같은 패턴을 돌린다.',
-      en: 'At the last gate before shipping, the same pattern set runs on 100% of the parts to be sold.',
-      wko: '"칩마다 한다"가 결정적이다. Verification은 제조 전에 <strong>한 번</strong> 하고, Testing은 <strong>모든 칩에</strong> 한다.',
-      wen: '"Every part" settles it. Verification happens <strong>once</strong> before manufacturing; testing happens <strong>on every chip</strong>.' }
-  ];
-
-  var picked = [];
-
-  function paintScore() {
-    var done = 0, right = 0;
-    for (var i = 0; i < ITEMS.length; i++) {
-      if (picked[i] !== undefined) { done++; if (picked[i] === ITEMS[i].a) right++; }
-    }
-    scv.textContent = L(
-      right + ' / ' + done + ' 맞음  (전체 ' + ITEMS.length + '문항)',
-      right + ' of ' + done + ' correct  (' + ITEMS.length + ' in all)'
-    );
-    rst.textContent = L('다시', 'reset');
-  }
-
-  function build() {
-    host.textContent = '';
-    ITEMS.forEach(function (it, i) {
-      var row = document.createElement('div');
-      row.className = 'qrow';
-
-      var q = document.createElement('div');
-      q.className = 'q';
-      q.textContent = (i + 1) + '. ' + L(it.ko, it.en);
-      row.appendChild(q);
-
-      var opts = document.createElement('div');
-      opts.className = 'opts';
-      OPTS.forEach(function (name, oi) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.textContent = name;
-        b.addEventListener('click', function () {
-          if (picked[i] !== undefined) return;
-          picked[i] = oi;
-          build();
-        });
-        if (picked[i] !== undefined) {
-          b.disabled = true;
-          if (oi === it.a) b.className = 'right';
-          else if (oi === picked[i]) b.className = 'wrong';
-        }
-        opts.appendChild(b);
-      });
-      row.appendChild(opts);
-
-      var why = document.createElement('div');
-      why.className = 'why';
-      why.innerHTML = L(it.wko, it.wen);
-      row.appendChild(why);
-
-      if (picked[i] !== undefined) {
-        row.classList.add('done');
-        row.classList.add(picked[i] === it.a ? 'ok' : 'no');
-      }
-      host.appendChild(row);
-    });
-    paintScore();
-  }
-
-  rst.addEventListener('click', function () { picked = []; build(); });
-  window.addEventListener('langchange', build);
-  build();
-})();
-</script>
 <script>
 // 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
 (function () {

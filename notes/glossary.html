@@ -524,6 +524,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Circular Buffer</div>
+  <div class="d" lang="ko">끝에 닿으면 처음으로 되돌아오는 고정 크기 저장소. FIFO 의 알맹이다. <strong>되돌아오는 데 별도 로직이 필요 없다는 것</strong>이 요점으로, 주소 비트 수만큼만 남기고 자르면 덧셈이 저절로 wrap 한다. 대신 <strong>가득 참과 비어 있음이 같은 주소에서 만나는</strong> 문제가 생기고, 그 답이 <a href="L05-fifo-design.html#s8">wrap bit</a> 다.</div>
+  <div class="d" lang="en">A fixed-size store whose addresses run back to the start at the end. It is the core of a FIFO. The point is that <strong>wrapping needs no logic of its own</strong>: truncate to the address width and the arithmetic wraps by itself. The cost is that <strong>full and empty meet at the same address</strong>, which is what the <a href="L05-fifo-design.html#s8">wrap bit</a> exists to resolve.</div>
+  <div class="src"><a href="L05-fifo-design.html#s6">Lecture 5 · 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Clock Gating</div>
   <div class="d" lang="ko">회로에서 <strong>지금 쓰지 않는 부분에 클럭을 끊어</strong> 전력을 아끼는 기법. 클럭이 안 도는 flip-flop은 동적 전력을 거의 안 쓴다. 전원을 통째로 끄는 power gating과 다르다.</div>
   <div class="d" lang="en">Saving power by <strong>stopping the clock to parts of the circuit that are idle.</strong> A flip-flop with no clock burns almost no dynamic power. Distinct from power gating, which shuts the supply off entirely.</div>
@@ -651,6 +658,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Dual-Port Memory</div>
+  <div class="d" lang="ko">읽기 주소와 쓰기 주소를 <strong>따로 받는</strong> 메모리. 같은 사이클에 한 곳을 읽으면서 다른 곳에 쓸 수 있다. FIFO 는 <strong>읽기와 쓰기가 동시에 일어나는 게 정상</strong>이라 이게 없으면 매 사이클 한쪽이 기다린다. ASIC 에서는 메모리 컴파일러가 만들고 FPGA 에서는 block RAM 이 원래 이렇다. <strong>dual-port, two-port, true dual-port 가 서로 다른 물건이다.</strong></div>
+  <div class="d" lang="en">Memory that takes <strong>separate</strong> read and write addresses, so one place can be read while another is written in the same cycle. A FIFO <strong>normally reads and writes at once</strong>, and without this one side waits every cycle. A memory compiler produces it in an ASIC; on an FPGA, block RAM is already like this. <strong>Dual-port, two-port and true dual-port are three different things.</strong></div>
+  <div class="src"><a href="L05-fifo-design.html#s6">Lecture 5 · 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">DUT</div>
   <div class="f">Design Under Test</div>
   <div class="d" lang="ko">지금 검증하고 있는 그 설계. testbench가 둘러싸고 두들기는 대상이다. <strong>크기가 고정돼 있지 않다.</strong> FIFO 하나일 수도 SoC 전체일 수도 있다. 이름에 Test가 들어가지만 <strong>manufacturing test와 무관한 verification 용어다.</strong></div>
@@ -739,6 +753,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">FIFO</div>
+  <div class="f">First-In, First-Out</div>
+  <div class="d" lang="ko">먼저 들어온 데이터가 먼저 나오는 버퍼. 소프트웨어의 queue 와 같은 개념인데 <strong>하드웨어에서는 거의 항상 FIFO 라고 쓴다.</strong> 속도가 안 맞는 두 블록 사이를 잇는 데 쓰지만 <strong>평균 속도를 바꿔주지는 않는다.</strong> 흡수하는 것은 순간의 burst 이고, 평균이 안 맞으면 깊이를 늘려도 결국 넘치거나 마른다. <strong>LIFO(stack) 와 반대</strong>이고, 그냥 "buffer" 는 순서를 안 지킬 수도 있다.</div>
+  <div class="d" lang="en">A buffer where the first item in is the first item out. The same idea software calls a queue, but <strong>hardware almost always says FIFO.</strong> It joins two blocks whose rates disagree, yet it <strong>does not change the average rate</strong>: it absorbs bursts, and if the averages differ it will eventually overflow or run dry however deep it is. <strong>The opposite of a LIFO, a stack</strong>, and something merely called a buffer need not preserve order.</div>
+  <div class="src"><a href="L05-fifo-design.html#s1">Lecture 5 · 01</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Formal Verification</div>
   <div class="d" lang="ko">검증 문제를 <strong>수학으로</strong> 푸는 것. 설계를 수식으로 표현하고 제약 아래 성립함을 증명한다. Static verification이라고도 한다. <strong>Exhaustive하지만 state explosion problem 때문에 확장이 안 된다.</strong> 슬라이드가 "이 과목의 초점이 아니다"라고 명시했다. 기법은 equivalence checking, model checking, theorem proving 셋.</div>
   <div class="d" lang="en">Solving the verification problem <strong>with mathematics</strong>: express the design as a formula and prove it holds under constraints. Also called static verification. <strong>Exhaustive, but it does not scale, because of the state explosion problem.</strong> The slides state outright that it is not a focus of this course. The three techniques are equivalence checking, model checking and theorem proving.</div>
@@ -787,7 +809,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Gray Code</div>
   <div class="d" lang="ko">인접한 두 값 사이에 <strong>딱 한 비트만</strong> 바뀌는 이진 코드. 멀티비트 카운터(FIFO의 read/write pointer)를 CDC로 넘길 때, <strong>double-FF synchronizer가 버스에서도 통하게 해주는 전제 조건</strong>이다.</div>
   <div class="d" lang="en">A binary encoding where adjacent values differ by <strong>exactly one bit.</strong> It is the precondition that lets a <strong>double-FF synchroniser work on a multi-bit bus</strong>, such as FIFO read and write pointers, crossing a CDC.</div>
-  <div class="src"><a href="L04-clock-and-reset.html#s7">Lecture 4 · 07</a></div>
+  <div class="src"><a href="L04-clock-and-reset.html#s7">Lecture 4 · 07</a> · <a href="L05-fifo-design.html#s15">Lecture 5 · 15</a></div>
 </div>
 
 <h2 class="gletter" id="gH">H</h2>
@@ -1388,6 +1410,15 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">재사용 가능한 검증 자산. 예를 들어 EDA 벤더에게서 checker나 agent를 <strong>사서 우리 testbench에 끼워 넣는다.</strong> 이게 가능하려면 부품의 모양이 표준화돼 있어야 하고, 그래서 UVM 같은 방법론이 필요하다.</div>
   <div class="d" lang="en">A reusable verification asset: <strong>buy a checker or an agent from an EDA vendor and plug it into your testbench.</strong> That only works if component shapes are standardised, which is what a methodology such as UVM is for.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+</div>
+
+<h2 class="gletter" id="gW">W</h2>
+
+<div class="gterm">
+  <div class="t">Wrap Bit</div>
+  <div class="d" lang="ko">FIFO 포인터에서 <strong>주소로 쓰이지 않는 맨 위 한 비트.</strong> 주소부가 한 바퀴 돌 때마다 저절로 뒤집혀서 <strong>"몇 바퀴째인가" 를 기록한다.</strong> 이것 덕분에 두 포인터가 같은 주소에 있을 때 <strong>전부 같으면 empty, wrap bit 만 다르면 full</strong> 로 가를 수 있다. 주소가 <code>ADDR_WIDTH</code> 비트면 포인터는 <code>ADDR_WIDTH+1</code> 비트다. <strong>슬라이드는 이 비트를 숫자로만 보여주고 이름을 붙이지 않는다.</strong> 업계에서 쓰는 이름이다.</div>
+  <div class="d" lang="en">The <strong>top bit of a FIFO pointer that is never used as an address.</strong> It flips by itself each time the address part wraps, so it <strong>records which lap you are on.</strong> That is what lets two pointers sitting on the same address be told apart: <strong>all bits equal means empty, wrap bits differing means full.</strong> If the address is <code>ADDR_WIDTH</code> bits, the pointer is <code>ADDR_WIDTH+1</code>. <strong>The slides only ever show it as a number and never name it</strong>; this is the industry name.</div>
+  <div class="src"><a href="L05-fifo-design.html#s8">Lecture 5 · 08</a></div>
 </div>
 
 </div>

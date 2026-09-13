@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV · Lecture 5 — FIFO Design</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Igor D. S. Miranda (UFRB)</div>
+  <h1 class="title">Lecture 5<br>FIFO Design</h1>
+  <p class="subtitle" lang="ko">먼저 넣은 게 먼저 나온다. 정의는 한 줄인데 슬라이드는 44쪽이다. 어려운 것은 저장이 아니라 <strong>가득 찼는지 비었는지를 아는 것</strong>과 <strong>읽는 쪽과 쓰는 쪽의 클럭이 다를 때</strong>다.</p>
+  <p class="subtitle" lang="en">First in, first out. The definition is one line and the deck is 44 slides, because the hard part is not storing. It is <strong>knowing whether it is full or empty</strong>, and <strong>what to do when the reader and the writer run on different clocks</strong>.</p>
+  <div class="meta" lang="ko">
+    <span class="chip">슬라이드 44쪽</span>
+    <span class="chip">2026년 9월 9일 (수)</span>
+    <span class="chip">외부 강사 &middot; UFRB, Brazil</span>
+    <span class="chip hot">Lab 1 에서 이걸 그대로 만든다</span>
+    <span class="chip dim">PDF 로 배포되어 발표자 노트가 없다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip">44 slides</span>
+    <span class="chip">Wednesday, September 9, 2026</span>
+    <span class="chip">guest lecture &middot; UFRB, Brazil</span>
+    <span class="chip hot">Lab 1 is this, built</span>
+    <span class="chip dim">distributed as a PDF, so there are no speaker notes</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 5</div>
+    <div class="name">FIFO Design</div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#s0"><span class="n">00</span><span lang="ko">이 강의가 하는 일</span><span lang="en">What this lecture does</span></a>
+  <a href="#s1"><span class="n">01</span><span lang="ko">FIFO 란 무엇인가</span><span lang="en">What a FIFO is</span></a>
+  <a href="#s2"><span class="n">02</span><span lang="ko">모듈의 바깥 모습</span><span lang="en">The module from outside</span></a>
+  <a href="#s3"><span class="n">03</span><span lang="ko">기본 동작</span><span lang="en">Basic behaviour</span></a>
+  <a href="#s4"><span class="n">04</span><span lang="ko">어디에 쓰나</span><span lang="en">Where it gets used</span></a>
+  <a href="#s5"><span class="n">05</span><span lang="ko">동기와 비동기</span><span lang="en">Synchronous and asynchronous</span></a>
+  <a href="#s6"><span class="n">06</span><span lang="ko">원형 버퍼와 포인터 둘</span><span lang="en">A circular buffer and two pointers</span></a>
+  <a href="#s7"><span class="n">07</span><span lang="ko">네 번 쓰고 네 번 읽기</span><span lang="en">Four writes and four reads</span></a>
+  <a href="#s8"><span class="n">08</span><span lang="ko">full 과 empty 를 가르는 한 비트</span><span lang="en">The one bit that separates them</span></a>
+  <a href="#s9"><span class="n">09</span><span lang="ko">동기 FIFO 아키텍처</span><span lang="en">Synchronous FIFO architecture</span></a>
+  <a href="#s10"><span class="n">10</span><span lang="ko">메모리 모듈</span><span lang="en">The memory module</span></a>
+  <a href="#s11"><span class="n">11</span><span lang="ko">포인터와 플래그 로직</span><span lang="en">Pointer and flag logic</span></a>
+  <a href="#s12"><span class="n">12</span><span lang="ko">포인터와 플래그 register</span><span lang="en">Pointer and flag registers</span></a>
+  <a href="#s13"><span class="n">13</span><span lang="ko">비동기 FIFO 아키텍처</span><span lang="en">Asynchronous FIFO architecture</span></a>
+  <a href="#s14"><span class="n">14</span><span lang="ko">무엇이 깨지는가</span><span lang="en">What breaks</span></a>
+  <a href="#s15"><span class="n">15</span><span lang="ko">Gray code</span><span lang="en">Gray code</span></a>
+  <a href="#s16"><span class="n">16</span><span lang="ko">동기화 해법</span><span lang="en">The synchronisation solution</span></a>
+  <a href="#s17"><span class="n">17</span><span lang="ko">직접 돌려보기</span><span lang="en">Drive it yourself</span></a>
+  <a href="#s18"><span class="n">18</span><span lang="ko">정리 &amp; 다음 강의</span><span lang="en">Recap &amp; next lecture</span></a>
+  <a href="L05-fifo-design-quick.html" style="margin-top:10px"><span class="n">&rarr;</span><span lang="ko">빠른 읽기 판</span><span lang="en">Quick read</span></a>
+</nav>
+
+<main>
+<section id="s0">
+  <div class="sec-head" data-slide="2"><span class="sec-num">00</span><h2 lang="ko">이 강의가 하는 일</h2><h2 lang="en">What this lecture does</h2></div>
+
+  <p lang="ko">외부 강사 강의다. 브라질 UFRB 의 Igor D. S. Miranda 가 맡았고, 슬라이드가 <strong>PPTX 가 아니라 PDF 로 배포됐다.</strong> 그래서 이 노트에는 <strong>발표자 노트에서 가져온 내용이 없다.</strong> 다른 강의 노트에서 "강사가 수업에서 덧붙인 이야기" 로 적던 층이 여기는 통째로 빠져 있다.</p>
+  <p lang="en">A guest lecture by Igor D. S. Miranda of UFRB in Brazil, and the slides came <strong>as a PDF rather than a PPTX.</strong> So this note has <strong>nothing drawn from speaker notes.</strong> The layer that other notes label as "what the lecturer added in class" is simply absent here.</p>
+
+  <p lang="ko">그리고 슬라이드 22쪽이 한 줄 밝혀둔다. <strong>"Some images and source-codes in this section were adapted from Cadence training course."</strong> 동기 FIFO 절의 그림과 코드가 Cadence 트레이닝에서 온 것이라는 뜻이다.</p>
+  <p lang="en">Slide 22 also notes: <strong>"Some images and source-codes in this section were adapted from Cadence training course."</strong> The figures and code in the synchronous FIFO section come from there.</p>
+
+  <p lang="ko">Agenda 가 네 덩어리다.</p>
+  <p lang="en">The agenda has four parts.</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">덩어리</span><span lang="en">Part</span></th>
+      <th><span lang="ko">쪽</span><span lang="en">Slides</span></th>
+      <th><span lang="ko">무엇을 하나</span><span lang="en">What it does</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>FIFO Basics</td><td>4&ndash;15</td>
+        <td><span lang="ko">정의와 포트, 그리고 밀어넣고 빼는 동작을 한 장씩 보여준다</span><span lang="en">Definition, ports, and the push and pop animated a slide at a time</span></td></tr>
+      <tr><td>Applications</td><td>17&ndash;19</td>
+        <td><span lang="ko">쓰임새 세 가지</span><span lang="en">Three use cases</span></td></tr>
+      <tr><td><span lang="ko">Synchronous FIFO 설계</span><span lang="en">Synchronous FIFO design</span></td><td>21&ndash;35</td>
+        <td><span lang="ko">이 강의의 본론. <strong>포인터와 플래그가 전부다</strong></span><span lang="en">The real content. <strong>Pointers and flags, and nothing else</strong></span></td></tr>
+      <tr><td><span lang="ko">Asynchronous FIFO 설계</span><span lang="en">Asynchronous FIFO design</span></td><td>37&ndash;43</td>
+        <td><span lang="ko">거기에 <strong>4 강의 CDC 를 덧붙인다</strong></span><span lang="en">The same thing with <strong>Lecture 4's CDC bolted on</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>이 강의는 지도의 어디인가.</strong> 1 강의 Design Flow 그림에서 <strong>RTL Design</strong> 칸이다. 그런데 다른 강의와 위치가 좀 다르다. 2 강이 그 칸이 무엇인지 설명했고 3 강이 그 칸에서 무엇을 타이핑하는지 가르쳤다면, <strong>이 강의는 그 칸에서 실제로 물건 하나를 만든다.</strong> 그래서 개념 강의가 아니라 <strong>설계 사례 연구</strong>에 가깝다.</p>
+    <p lang="en"><strong>Where this sits on the map.</strong> It is the <strong>RTL Design</strong> box from Lecture 1's design flow, but it occupies that box differently from the others. Lecture 2 explained what the box is and Lecture 3 taught what you type inside it; <strong>this lecture actually builds one object there.</strong> It is less a concept lecture than <strong>a design case study.</strong></p>
+  </div>
+
+  <p lang="ko"><strong>오늘 나오는 약어와 용어.</strong> 대부분 4 강에서 이미 봤다. 새로 나오는 것은 <strong>wrap bit</strong> 하나이고, 그나마 슬라이드는 그 이름을 쓰지 않는다.</p>
+  <p lang="en"><strong>Today's abbreviations.</strong> Most appeared in Lecture 4 already. The one genuinely new idea is the <strong>wrap bit</strong>, and the slides never even name it.</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">약어</span><span lang="en">Term</span></th>
+      <th><span lang="ko">풀네임</span><span lang="en">Full name</span></th>
+      <th><span lang="ko">여기서 어느 절</span><span lang="en">Section here</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><strong>FIFO</strong></td><td>First-In, First-Out</td><td><a href="#s1">01</a></td></tr>
+      <tr><td><strong>WP / RP</strong></td><td><span lang="ko">Write Pointer / Read Pointer. 슬라이드 그림의 블록 이름이다</span><span lang="en">Write Pointer / Read Pointer, the block names in the slide figures</span></td><td><a href="#s6">06</a></td></tr>
+      <tr><td><strong>EOP</strong></td><td>End of Packet</td><td><a href="#s4">04</a></td></tr>
+      <tr><td><strong>CDC</strong></td><td><span lang="ko">Clock Domain Crossing. <a href="L04-clock-and-reset.html#s6">4 강 06 절</a>에서 이미 풀었다</span><span lang="en">Clock Domain Crossing, already unpacked in <a href="L04-clock-and-reset.html#s6">Lecture 4 &sect;06</a></span></td><td><a href="#s14">14</a></td></tr>
+      <tr><td><strong>Gray code</strong></td><td><span lang="ko">약어가 아니라 사람 이름이다. Frank Gray</span><span lang="en">Not an abbreviation; a person's name, Frank Gray</span></td><td><a href="#s15">15</a></td></tr>
+    </tbody>
+  </table>
+
+</section>
+
+<section id="s1">
+  <div class="sec-head" data-slide="4-5"><span class="sec-num">01</span><h2 lang="ko">FIFO 란 무엇인가</h2><h2 lang="en">What a FIFO is</h2></div>
+
+  <div class="def">
+    <p lang="ko">슬라이드 4쪽의 정의 그대로다. <strong>"A First-In, First-Out (FIFO) buffer that temporarily stores data in the order it was received."</strong></p>
+    <p lang="ko">두 가지를 동시에 말하고 있다. <strong>임시로 저장한다</strong>는 것, 그리고 <strong>받은 순서를 지킨다</strong>는 것.</p>
+    <p lang="en">Straight from slide 4: <strong>"A First-In, First-Out (FIFO) buffer that temporarily stores data in the order it was received."</strong></p>
+    <p lang="en">It says two things at once: that it <strong>stores temporarily</strong>, and that it <strong>preserves the order it received things in.</strong></p>
+  </div>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; FIFO</span><span lang="en">Unpacking the jargon &middot; FIFO</span></summary>
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>First-In, First-Out</td></tr>
+        <tr><td>한 줄</td><td>먼저 들어온 데이터가 먼저 나오는 버퍼. 소프트웨어에서 queue 라고 부르는 것과 같은 개념인데, <strong>하드웨어 쪽에서는 거의 항상 FIFO 라고 쓴다</strong></td></tr>
+        <tr><td>언제</td><td>속도나 시점이 안 맞는 두 블록 사이를 이을 때. <strong>SoC 안에 수십 개가 들어간다.</strong> 버스 인터페이스, DMA, 네트워크 포트마다 있다</td></tr>
+        <tr><td>누가</td><td>RTL 설계자가 만든다. 다만 <strong>대개 회사 라이브러리나 IP 벤더의 것을 인스턴스한다.</strong> 직접 쓰는 일은 흔치 않고, 그래서 더더욱 <strong>한 번은 직접 써봐야 안이 보인다.</strong> Lab 1 이 그 한 번이다</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>LIFO (stack) 와 반대다.</strong> 그리고 <strong>"buffer" 라고만 하면 FIFO 가 아닐 수도 있다.</strong> 순서를 안 지키는 버퍼도 버퍼다</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>First-In, First-Out</td></tr>
+        <tr><td>In a line</td><td>A buffer where the first item in is the first item out. The same idea software calls a queue, but <strong>hardware almost always says FIFO</strong></td></tr>
+        <tr><td>When</td><td>Whenever two blocks disagree on rate or timing. <strong>An SoC contains dozens</strong>, on every bus interface, DMA and network port</td></tr>
+        <tr><td>Who</td><td>An RTL designer, though <strong>usually by instancing one from a company library or an IP vendor.</strong> Writing one yourself is rare, which is exactly why <strong>doing it once is how you get to see inside.</strong> Lab 1 is that once</td></tr>
+        <tr><td>Easily confused</td><td><strong>The opposite of a LIFO, a stack.</strong> And <strong>a thing called a "buffer" is not necessarily a FIFO</strong>: a buffer that does not preserve order is still a buffer</td></tr>
+      </table>
+    </details>
+  </div>
+
+  <p lang="ko">슬라이드 4쪽이 비유로 시작한다. 노트북 공장이 <strong>학기당 한 번 1800 대를 보내고</strong> 매장은 <strong>하루 10 대씩 판다.</strong> 그 사이에 창고가 있다.</p>
+  <p lang="en">Slide 4 opens with an analogy: a laptop factory ships <strong>1800 units once a semester</strong> while the shop sells <strong>ten a day.</strong> A warehouse sits between them.</p>
+
+  <p lang="ko">비유가 잘 골라진 이유는 <strong>숫자가 실제로 맞기 때문</strong>이다. 한 학기를 180 일이라고 치면 1800 대를 다 판다. <strong>평균은 맞고 순간만 안 맞는 상황</strong>이고, 그게 정확히 FIFO 가 쓸모 있는 조건이다.</p>
+  <p lang="en">The analogy is well chosen because <strong>the numbers actually work out</strong>: at ten a day, 180 days clears 1800 units. <strong>The averages match and only the instants disagree</strong>, which is exactly the condition under which a FIFO helps.</p>
+
+  <div class="trap">
+    <p lang="ko"><strong>FIFO 는 속도를 바꾸지 않는다.</strong> 이걸 놓치면 설계 전체가 틀어진다. 평균 생산량이 평균 소비량보다 크면, <strong>FIFO 를 아무리 깊게 파도 언젠가 반드시 가득 찬다.</strong> 깊이를 늘리는 것은 <strong>넘치는 시점을 미루는 것</strong>이지 막는 게 아니다.</p>
+    <p lang="ko">반대도 같다. 평균 소비량이 더 크면 언젠가 반드시 마른다. <strong>FIFO 가 흡수하는 것은 평균의 차이가 아니라 순간의 들쭉날쭉함(burst)이다.</strong></p>
+    <p lang="ko">그래서 실무에서 "FIFO 가 자꾸 넘쳐요" 는 대개 <strong>FIFO 가 얕아서가 아니라 상류가 너무 빨라서</strong>다. 깊이를 두 배로 늘리기 전에 <strong>평균이 맞는지부터</strong> 본다.</p>
+    <p lang="en"><strong>A FIFO does not change rates.</strong> Miss this and the whole design goes wrong. If average production exceeds average consumption, <strong>no depth prevents it filling up eventually.</strong> Adding depth <strong>postpones</strong> the overflow; it does not stop it.</p>
+    <p lang="en">The reverse holds too: if consumption is faster on average, it will eventually run dry. <strong>What a FIFO absorbs is burstiness, not a difference in averages.</strong></p>
+    <p lang="en">So "our FIFO keeps overflowing" usually means <strong>the upstream is too fast, not that the FIFO is too shallow.</strong> Check that the averages balance before doubling the depth.</p>
+  </div>
+
+</section>
+
+<section id="s2">
+  <div class="sec-head" data-slide="6"><span class="sec-num">02</span><h2 lang="ko">모듈의 바깥 모습</h2><h2 lang="en">The module from outside</h2></div>
+
+  <p lang="ko">슬라이드 6쪽이 모듈을 바깥에서 본 그림이다. <strong>이 한 장이 Lab 1 의 포트 목록</strong>이므로 눈에 익혀두면 좋다.</p>
+  <p lang="en">Slide 6 shows the module from outside. <strong>This one picture is the Lab 1 port list</strong>, so it pays to know it by sight.</p>
+
+<figure>
+    <svg viewBox="0 0 700 292" role="img" aria-label="FIFO 모듈의 포트 목록. 쓰는 쪽과 읽는 쪽이 대칭이고 reset 만 공용이다">
+      <defs>
+        <marker id="fpb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+        <marker id="fpg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--green)"/>
+        </marker>
+        <marker id="fpn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--brown)"/>
+        </marker>
+      </defs>
+      <rect x="250" y="56" width="200" height="168" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="350.0" y="144.66666666666666" text-anchor="middle" style="font-size:14px;fill:var(--blue)" lang="ko">FIFO</text>
+      <text class="svgtxt" x="350.0" y="144.66666666666666" text-anchor="middle" style="font-size:14px;fill:var(--blue)" lang="en">FIFO</text>
+      <text class="svglab" x="350" y="202" text-anchor="middle" style="font-size:10px;fill:var(--blue)">width x depth</text>
+      <path d="M96 86 L246 86" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#fpb)"/>
+      <text class="svglab" x="92" y="90" text-anchor="end" style="font-size:10px;fill:var(--blue)">wr_clk</text>
+      <path d="M96 110 L246 110" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#fpb)"/>
+      <text class="svglab" x="92" y="114" text-anchor="end" style="font-size:10px;fill:var(--blue)">wr_ena</text>
+      <path d="M96 134 L246 134" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#fpb)"/>
+      <text class="svglab" x="92" y="138" text-anchor="end" style="font-size:10px;fill:var(--blue)">din</text>
+      <path d="M250 168 L100 168" stroke="var(--green)" stroke-width="1.6" marker-end="url(#fpg)"/>
+      <text class="svglab" x="92" y="172" text-anchor="end" style="font-size:10px;fill:var(--green)">full</text>
+      <path d="M604 86 L454 86" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#fpb)"/>
+      <text class="svglab" x="608" y="90" text-anchor="start" style="font-size:10px;fill:var(--blue)">rd_clk</text>
+      <path d="M604 110 L454 110" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#fpb)"/>
+      <text class="svglab" x="608" y="114" text-anchor="start" style="font-size:10px;fill:var(--blue)">rd_ena</text>
+      <path d="M450 134 L600 134" stroke="var(--green)" stroke-width="1.6" marker-end="url(#fpg)"/>
+      <text class="svglab" x="608" y="138" text-anchor="start" style="font-size:10px;fill:var(--green)">dout</text>
+      <path d="M450 168 L600 168" stroke="var(--green)" stroke-width="1.6" marker-end="url(#fpg)"/>
+      <text class="svglab" x="608" y="172" text-anchor="start" style="font-size:10px;fill:var(--green)">empty</text>
+      <path d="M350 262 L350 228" stroke="var(--brown)" stroke-width="1.6" marker-end="url(#fpn)"/>
+      <text class="svglab" x="350" y="276" text-anchor="middle" style="font-size:10px;fill:var(--brown)">reset_n</text>
+      <text class="svgtxt" x="160" y="42" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="ko">쓰는 쪽</text>
+      <text class="svgtxt" x="160" y="42" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="en">write side</text>
+      <text class="svgtxt" x="540" y="42" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="ko">읽는 쪽</text>
+      <text class="svgtxt" x="540" y="42" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="en">read side</text>
+      
+    </svg>
+    <figcaption lang="ko">포트가 <strong>완전히 대칭</strong>이다. 쓰는 쪽에 <code>clk</code>, <code>ena</code>, 데이터, 그리고 <strong>거절 신호 하나</strong>. 읽는 쪽도 같은 넷. 공용은 <code>reset_n</code> 뿐이고, <strong>비동기 FIFO 에서는 그 하나마저 둘로 갈라진다.</strong> 초록색 둘은 FIFO 가 <strong>내보내는</strong> 신호라는 뜻이다. 받는 게 아니라 주는 것이라, 이걸 안 보고 쓰면 사고가 난다.</figcaption>
+    <figcaption lang="en">The ports are <strong>perfectly symmetric</strong>: a clock, an enable, data, and <strong>one refusal signal</strong> on each side. The only shared port is <code>reset_n</code>, and <strong>in the asynchronous FIFO even that splits in two.</strong> The two green signals are what the FIFO <strong>drives out</strong>. They are given to you, not taken from you, and ignoring them is how you break it.</figcaption>
+  </figure>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; width 와 depth</span><span lang="en">Unpacking the jargon &middot; width and depth</span></summary>
+      <table class="parts" lang="ko">
+        <tr><td>한 줄</td><td><strong>width</strong> 는 한 칸에 들어가는 비트 수이고 <strong>depth</strong> 는 칸의 개수다. 슬라이드 그림에서 각각 가로 화살표와 세로 화살표로 표시돼 있다</td></tr>
+        <tr><td>왜 따로 있나</td><td>둘이 정하는 것이 다르다. <strong>width 는 데이터 한 덩어리의 크기</strong>라 상류가 정하고, <strong>depth 는 얼마나 참아줄 수 있는가</strong>라 burst 크기가 정한다</td></tr>
+        <tr><td>어디서 보나</td><td>Lab 1 코드에서 <code>FIFO_WIDTH</code>, <code>FIFO_DEPTH</code>, <code>ADDR_WIDTH</code> 세 parameter 로 나온다. <strong>세 번째가 앞의 둘에서 유도된다는 것이 요점</strong>이고, <a href="#s8">08 절</a>에서 그 관계가 정확히 무엇인지 나온다</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>depth 와 저장 가능한 개수가 항상 같지는 않다.</strong> 설계에 따라 한 칸을 비워두고 쓰는 방식도 있다. 이 강의는 <strong>full 을 wrap bit 로 판정하므로 depth 칸을 전부 쓴다</strong></td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>In a line</td><td><strong>Width</strong> is how many bits fit in one slot; <strong>depth</strong> is how many slots there are. The slide marks them with a horizontal and a vertical arrow</td></tr>
+        <tr><td>Why both</td><td>They are decided by different things. <strong>Width is the size of one datum</strong>, set by whatever is upstream; <strong>depth is how much you can tolerate</strong>, set by the burst size</td></tr>
+        <tr><td>Where you see it</td><td>In the Lab 1 code as three parameters, <code>FIFO_WIDTH</code>, <code>FIFO_DEPTH</code> and <code>ADDR_WIDTH</code>. <strong>The point is that the third is derived from the first two</strong>, and <a href="#s8">&sect;08</a> says exactly how</td></tr>
+        <tr><td>Easily confused</td><td><strong>Depth is not always the number of items you can hold.</strong> Some designs deliberately leave one slot empty. This one <strong>decides full with a wrap bit, so it uses every slot</strong></td></tr>
+      </table>
+    </details>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong><code>full</code> 과 <code>empty</code> 는 입력이 아니라 출력이다.</strong> 그림에서 초록색으로 칠한 이유가 이것이다. FIFO 가 바깥에 알려주는 신호이고, <strong>바깥이 그걸 보고 자기 요청을 접어야 한다.</strong></p>
+    <p lang="ko">그리고 <strong>쓰는 쪽이 볼 것과 읽는 쪽이 볼 것이 다르다.</strong> 쓰는 쪽은 <code>full</code> 만 보면 되고 <code>empty</code> 는 자기와 상관없다. 읽는 쪽은 그 반대다. <strong>이걸 뒤집어 보면 가득 찬 FIFO 에 쓰거나 빈 FIFO 를 읽는다.</strong></p>
+    <p lang="ko">다만 이 설계는 <a href="#s11">11 절</a>에서 보듯 <strong>FIFO 안쪽에서도 한 번 더 막아준다.</strong> 그게 없는 FIFO 도 세상에 많으므로, 남의 IP 를 쓸 때는 <strong>막아주는지를 문서에서 확인해야 한다.</strong></p>
+    <p lang="en"><strong><code>full</code> and <code>empty</code> are outputs, not inputs.</strong> That is why they are green in the figure. The FIFO tells the outside world, and <strong>the outside world is expected to hold back its own request.</strong></p>
+    <p lang="en">And <strong>each side watches a different one.</strong> The writer only needs <code>full</code>; <code>empty</code> is none of its business, and the reverse for the reader. <strong>Swap them and you write into a full FIFO or read an empty one.</strong></p>
+    <p lang="en">This particular design also <strong>blocks the request internally</strong>, as <a href="#s11">&sect;11</a> shows. Plenty of FIFOs do not, so when you instance somebody else's IP, <strong>check the documentation for whether it does.</strong></p>
+  </div>
+
+  <p lang="ko">포트 이름에 <code>wr_</code> 와 <code>rd_</code> 접두사가 붙은 것도 그냥 스타일이 아니다. <strong>동기 FIFO 에서는 <code>wr_clk</code> 과 <code>rd_clk</code> 이 같은 신호</strong>인데도 이름을 갈라놨다. <a href="#s13">13 절</a>에서 둘이 진짜로 갈라질 때 <strong>포트 목록을 안 고쳐도 되게 하려는 것</strong>이다.</p>
+  <p lang="en">The <code>wr_</code> and <code>rd_</code> prefixes are not just style either. <strong>In a synchronous FIFO <code>wr_clk</code> and <code>rd_clk</code> are the same signal</strong>, yet the names are already split, so that when they genuinely diverge in <a href="#s13">&sect;13</a> <strong>the port list does not have to change.</strong></p>
+
+</section>
+
+<section id="s3">
+  <div class="sec-head" data-slide="7-15"><span class="sec-num">03</span><h2 lang="ko">기본 동작</h2><h2 lang="en">Basic behaviour</h2></div>
+
+  <p lang="ko">슬라이드 7쪽부터 15쪽까지 <strong>아홉 장이 한 애니메이션</strong>이다. 같은 그림에 내용물만 바뀐다. 네 번 밀어넣고 네 번 뺀다.</p>
+  <p lang="en">Slides 7 through 15 are <strong>nine slides of one animation</strong>: the same picture with different contents. Four pushes, then four pops.</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">쪽</span><span lang="en">Slide</span></th>
+      <th><span lang="ko">한 일</span><span lang="en">Action</span></th>
+      <th><span lang="ko">안에 남은 것</span><span lang="en">Contents</span></th>
+      <th><span lang="ko"><code>dout</code></span><span lang="en"><code>dout</code></span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>7</td><td><span lang="ko">리셋 직후</span><span lang="en">after reset</span></td><td><span lang="ko">비어 있다</span><span lang="en">empty</span></td><td><code>X</code></td></tr>
+      <tr><td>8&ndash;11</td><td><span lang="ko"><code>D0</code>, <code>D1</code>, <code>D2</code>, <code>D3</code> 을 차례로 쓴다</span><span lang="en">write <code>D0</code>, <code>D1</code>, <code>D2</code>, <code>D3</code></span></td><td><code>D0 D1 D2 D3</code></td><td><code>X</code></td></tr>
+      <tr><td>12&ndash;15</td><td><span lang="ko">네 번 읽는다</span><span lang="en">read four times</span></td><td><span lang="ko">하나씩 줄어든다</span><span lang="en">drains one at a time</span></td><td><code>D0 &rarr; D1 &rarr; D2 &rarr; D3</code></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">그림에서 가져갈 것은 셋이다.</p>
+  <p lang="en">Three things to take from it.</p>
+
+  <p lang="ko"><strong>1. 나오는 순서가 들어간 순서와 같다.</strong> <code>D0</code> 이 먼저 들어갔으니 <code>D0</code> 이 먼저 나온다. 이름값을 하는 부분이고, 사실 이 그림에서 유일하게 당연한 부분이다.</p>
+  <p lang="en"><strong>1. Things come out in the order they went in.</strong> <code>D0</code> went in first, so <code>D0</code> comes out first. The part that earns the name, and honestly the only obvious part of the picture.</p>
+
+  <p lang="ko"><strong>2. 쓰는 동안 <code>dout</code> 은 <code>X</code> 다.</strong> 슬라이드가 이걸 명시적으로 그린다. 아직 읽으라고 시킨 적이 없으니 출력이 무엇이든 <strong>의미가 없다</strong>는 뜻이다.</p>
+  <p lang="en"><strong>2. <code>dout</code> stays <code>X</code> while you are writing.</strong> The slide draws this explicitly: nothing has asked for a read yet, so whatever is on the output <strong>carries no meaning.</strong></p>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; <code>X</code></span><span lang="en">Unpacking the jargon &middot; <code>X</code></span></summary>
+      <table class="parts" lang="ko">
+        <tr><td>한 줄</td><td>SystemVerilog 의 4-state 값 중 하나로 <strong>"알 수 없음"</strong>이다. <code>0</code>, <code>1</code>, <code>z</code>, <code>x</code> 중 마지막</td></tr>
+        <tr><td>여기서는</td><td><strong>실물 회로에 <code>x</code> 라는 전압은 없다.</strong> 실제로는 0 이나 1 중 하나가 나온다. <code>x</code> 는 <strong>시뮬레이터가 "나도 모른다" 를 표현하는 방법</strong>이고, 그림에서는 "이 값을 믿지 마라" 는 뜻이다</td></tr>
+        <tr><td>왜 중요한가</td><td>4 강에서 <strong>multiple driver 가 있으면 <code>x</code> 가 뜬다</strong>고 했다. 그러니 파형에 <code>x</code> 가 보이면 두 가지다. <strong>초기화를 안 했거나, 드라이버가 둘이거나</strong></td></tr>
+        <tr><td>헷갈리는 것</td><td><code>z</code> 와 다르다. <code>z</code> 는 <strong>아무도 안 몰고 있다</strong>는 뜻이고 <code>x</code> 는 <strong>몰고 있는데 값을 모르겠다</strong>는 뜻이다</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>In a line</td><td>One of SystemVerilog's four states, meaning <strong>unknown</strong>. The last of <code>0</code>, <code>1</code>, <code>z</code>, <code>x</code></td></tr>
+        <tr><td>Here</td><td><strong>No real circuit carries a voltage called <code>x</code>.</strong> In silicon it is a 0 or a 1. <code>x</code> is <strong>how a simulator says it does not know</strong>, and in this figure it means "do not trust this value"</td></tr>
+        <tr><td>Why it matters</td><td>Lecture 4 said <strong>multiple drivers produce <code>x</code>.</strong> So an <code>x</code> in a waveform means one of two things: <strong>something was never initialised, or something has two drivers</strong></td></tr>
+        <tr><td>Easily confused</td><td>Not the same as <code>z</code>. <code>z</code> means <strong>nobody is driving it</strong>; <code>x</code> means <strong>somebody is, and the value is unknown</strong></td></tr>
+      </table>
+    </details>
+  </div>
+
+  <p lang="ko"><strong>3. 그림에는 안 나오는 것이 있다.</strong> 슬라이드 7&ndash;15 쪽은 <strong>가득 찼을 때 한 번 더 쓰면 어떻게 되는지</strong>를 안 보여준다. 네 번만 쓰고 멈춘다. 그 질문의 답이 이 강의 본론이고 <a href="#s7">07 절</a>부터 나온다.</p>
+  <p lang="en"><strong>3. Something is missing from the picture.</strong> Slides 7 to 15 never show <strong>what happens if you write once more when it is full.</strong> They stop at four. That question is the body of the lecture, starting at <a href="#s7">&sect;07</a>.</p>
+
+</section>
+
+<section id="s4">
+  <div class="sec-head" data-slide="17-19"><span class="sec-num">04</span><h2 lang="ko">어디에 쓰나</h2><h2 lang="en">Where it gets used</h2></div>
+
+  <p lang="ko">쓰임새 세 가지가 나온다. 셋 다 <strong>"두 쪽이 서로 안 맞는다" 인데 안 맞는 축이 다르다.</strong></p>
+  <p lang="en">Three use cases. All three are <strong>"two sides disagree", but they disagree along different axes.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">쓰임새</span><span lang="en">Use case</span></th>
+      <th><span lang="ko">무엇이 안 맞나</span><span lang="en">What disagrees</span></th>
+      <th><span lang="ko">슬라이드의 예</span><span lang="en">The slide's example</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">1. 생산자와 소비자 사이 임시 저장</span><span lang="en">1. Buffering producer and consumer</span></td>
+        <td><span lang="ko"><strong>시점.</strong> 클럭은 같아도 된다</span><span lang="en"><strong>Timing.</strong> The clock can be the same</span></td>
+        <td><span lang="ko">프로세서가 로그를 <strong>불규칙하게</strong> 쓰고 UART 가 <strong>일정하게</strong> 내보낸다</span><span lang="en">A processor writes logs <strong>irregularly</strong>; a UART sends them <strong>steadily</strong></span></td></tr>
+      <tr><td><span lang="ko">2. Clock domain crossing</span><span lang="en">2. Clock domain crossing</span></td>
+        <td><span lang="ko"><strong>클럭 그 자체</strong></span><span lang="en"><strong>The clock itself</strong></span></td>
+        <td><span lang="ko">FPGA 블록 100 MHz &rarr; 주변 장치 25 MHz</span><span lang="en">An FPGA block at 100 MHz feeding a 25 MHz peripheral</span></td></tr>
+      <tr><td><span lang="ko">3. Framed processing</span><span lang="en">3. Framed processing</span></td>
+        <td><span lang="ko"><strong>처리 단위.</strong> 낱개로 오는데 덩어리로 써야 한다</span><span lang="en"><strong>The unit of work.</strong> It arrives as items and is consumed as a block</span></td>
+        <td><span lang="ko">Ethernet frame 을 <strong>EOP 표시가 올 때까지</strong> 모았다가 처리한다</span><span lang="en">Collect an Ethernet frame <strong>until the EOP marker</strong>, then process</span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">세 번째가 나머지 둘과 성격이 다르다. 1번과 2번은 <strong>FIFO 가 알아서 흘려보내면 되는데</strong>, 3번은 <strong>읽는 쪽이 일부러 안 읽고 기다린다.</strong> 프레임이 다 들어올 때까지 <code>rd_ena</code> 를 안 올리는 것이다. 그러면 FIFO 는 <strong>버퍼가 아니라 조립대</strong>로 쓰이는 셈이다.</p>
+  <p lang="en">The third differs in kind. In the first two <strong>the FIFO just passes things through</strong>; in the third <strong>the reader deliberately waits</strong>, holding <code>rd_ena</code> low until the whole frame has arrived. The FIFO then serves <strong>as an assembly table rather than a buffer.</strong></p>
+
+  <div class="callout">
+    <p lang="ko"><strong>4 강이 여기서 일한다.</strong> <a href="L04-clock-and-reset.html#s7">4 강 07 절</a>이 CDC 기법 넷을 나열하면서 FIFO 를 <strong>"연속된 데이터 스트림용, Lab 1 이 만드는 것"</strong> 이라고 한 줄로 넘겼다. 위 표의 두 번째 줄이 그 한 줄이고, 이 강의 뒷부분 전체가 그 한 줄의 내용이다.</p>
+    <p lang="en"><strong>Lecture 4 shows up here.</strong> <a href="L04-clock-and-reset.html#s7">Lecture 4 &sect;07</a> listed four CDC schemes and dismissed the FIFO in a line as <strong>"for a continuous stream of data, the one you build in Lab 1".</strong> The second row above is that line, and the back half of this lecture is its content.</p>
+  </div>
+
+  <div class="ex">
+    <span class="tag" lang="ko">현장 감각</span><span class="tag" lang="en">On the job</span>
+    <p lang="ko">센서가 <strong>100 kHz 로 꾸준히</strong> 샘플을 내놓고, 프로세서는 그걸 읽어서 처리하는데 <strong>가끔 인터럽트 때문에 최대 200 마이크로초 동안 못 읽는다.</strong> 평균 처리 속도는 충분하다. FIFO 를 얼마나 깊게 잡아야 하나? 그리고 이 판단에서 <strong>진짜 위험한 가정</strong>은 무엇인가?</p>
+    <p lang="en">A sensor produces samples <strong>steadily at 100 kHz</strong>, and the processor reads and handles them but <strong>can be blocked by interrupts for up to 200 microseconds.</strong> Average throughput is more than enough. How deep should the FIFO be, and <strong>what is the genuinely dangerous assumption</strong> in this calculation?</p>
+    <details>
+      <summary><span lang="ko">생각해본 뒤 펼치기</span><span lang="en">Think first, then open</span></summary>
+      <div class="body">
+        <p lang="ko">막힌 동안 쌓이는 양은 <strong>100 kHz &times; 200 &micro;s = 20 샘플</strong>이다. 그러니 최소 20 칸이고, 주소를 2 의 거듭제곱으로 잡는 게 편하니 <strong>32 칸</strong>으로 간다. <a href="#s15">15 절</a>에서 보듯 <strong>gray code 가 2 의 거듭제곱 깊이를 전제</strong>하므로 이 반올림은 그냥 편의가 아니다.</p>
+        <p lang="ko">진짜 위험한 가정은 <strong>"최대 200 마이크로초" 라는 숫자를 어디서 얻었는가</strong>다. 측정해서 얻은 값이면 그건 <strong>관측한 최대치이지 실제 최대치가 아니다.</strong> 인터럽트가 겹치는 최악의 경우를 관측하지 못했을 수 있다. 그래서 실무에서는 <strong>계산값에 여유를 붙이고, 넘쳤을 때 조용히 지나가지 않게 만든다.</strong></p>
+        <p lang="ko">그 두 번째가 더 중요하다. <strong>overflow 를 감지해서 알리는 신호나 카운터를 둔다.</strong> 2 강에서 assertion 의 예시로 나왔던 문장이 정확히 이것이다. <strong>"FIFO 는 overflow 하면 안 된다."</strong> 깊이를 맞히는 것보다 <strong>틀렸을 때 알아채는 것</strong>이 설계다.</p>
+        <p lang="en">The backlog is <strong>100 kHz &times; 200 &micro;s = 20 samples</strong>, so at least 20 slots, rounded to <strong>32</strong> because a power-of-two address is convenient. And as <a href="#s15">&sect;15</a> shows, <strong>gray code assumes a power-of-two depth</strong>, so that rounding is more than convenience.</p>
+        <p lang="en">The dangerous assumption is <strong>where the "at most 200 microseconds" came from.</strong> If it was measured, it is <strong>the largest value observed, not the largest value possible</strong>; the worst overlap of interrupts may simply never have been seen. So real designs <strong>add margin to the number and make sure an overflow cannot pass silently.</strong></p>
+        <p lang="en">The second half matters more. <strong>Add a signal or a counter that reports the overflow.</strong> This is exactly the sentence Lecture 2 used as its assertion example: <strong>"a FIFO must not overflow."</strong> Getting the depth right is guesswork; <strong>noticing when you got it wrong</strong> is design.</p>
+      </div>
+    </details>
+  </div>
+
+</section>
+
+<section id="s5">
+  <div class="sec-head" data-slide="21"><span class="sec-num">05</span><h2 lang="ko">동기와 비동기</h2><h2 lang="en">Synchronous and asynchronous</h2></div>
+
+  <p lang="ko">슬라이드 21쪽이 둘을 세 줄로 비교한다. 표 자체는 짧은데 <strong>세 줄이 전부 같은 원인에서 나온다.</strong></p>
+  <p lang="en">Slide 21 compares the two in three rows. The table is short, and <strong>all three rows come from the same cause.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">항목</span><span lang="en">Feature</span></th>
+      <th>Synchronous</th>
+      <th>Asynchronous</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>Clock domains</td>
+        <td><span lang="ko">읽기와 쓰기가 <strong>한 클럭</strong></span><span lang="en"><strong>A single clock</strong> for read and write</span></td>
+        <td><span lang="ko">읽기와 쓰기가 <strong>각자 클럭</strong></span><span lang="en"><strong>Separate clocks</strong> for read and write</span></td></tr>
+      <tr><td>Complexity</td>
+        <td><span lang="ko">낮다. 제어 논리가 단순하다</span><span lang="en">Lower, simpler control logic</span></td>
+        <td><span lang="ko">높다. <strong>metastability 를 신경 써서 막아야 한다</strong></span><span lang="en">Higher, <strong>needs careful metastability mitigation</strong></span></td></tr>
+      <tr><td>Latency</td>
+        <td><span lang="ko">낮다</span><span lang="en">Lower</span></td>
+        <td><span lang="ko">조금 높다. <strong>synchronizer 지연 때문</strong></span><span lang="en">Slightly higher, <strong>due to synchroniser delays</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">둘째 줄과 셋째 줄은 <strong>첫째 줄의 결과</strong>다. 클럭이 갈리는 순간 포인터를 건네줘야 하고, 건네주려면 synchronizer 가 필요하고, synchronizer 는 <strong>복잡도도 늘리고 지연도 만든다.</strong> 원인이 하나라는 걸 알고 보면 표가 세 줄이 아니라 한 줄이다.</p>
+  <p lang="en">Rows two and three are <strong>consequences of row one.</strong> The moment the clocks split, pointers have to be handed across; handing them across needs a synchroniser; and a synchroniser <strong>adds both complexity and delay.</strong> Seen that way the table has one row, not three.</p>
+
+  <p lang="ko">슬라이드 오른쪽에 그림 세 개가 더 붙어 있다. <strong>Synchronous</strong>, <strong>Asynchronous - Fast to Slow</strong>, <strong>Asynchronous - Slow to Fast</strong>. 같은 FIFO 블록에 <strong>양쪽 클럭 파형만 바꿔 그린 것</strong>이다.</p>
+  <p lang="en">Three more pictures sit on the right of the slide: <strong>Synchronous</strong>, <strong>Asynchronous - Fast to Slow</strong>, and <strong>Asynchronous - Slow to Fast</strong>. The same FIFO block with <strong>only the two clock waveforms changed.</strong></p>
+
+  <div class="trap">
+    <p lang="ko"><strong>"Fast to Slow" 는 FIFO 가 속도를 바꿔준다는 뜻이 아니다.</strong> <a href="#s1">01 절</a>의 함정이 여기서 다시 나온다. 빠른 쪽이 <strong>평균적으로도</strong> 계속 빠르면 그 FIFO 는 결국 가득 차고, 그 다음부터는 쓰는 쪽이 <code>full</code> 때문에 기다린다. 즉 <strong>전체 시스템이 느린 쪽 속도로 떨어진다.</strong></p>
+    <p lang="ko">그림이 말하는 것은 <strong>"이런 조합도 FIFO 로 이을 수 있다"</strong> 이지 <strong>"속도 차이가 해결된다"</strong> 가 아니다. 이 구별을 놓치면 <strong>성능 예측이 통째로 틀린다.</strong></p>
+    <p lang="en"><strong>"Fast to slow" does not mean the FIFO converts rates.</strong> The trap from <a href="#s1">&sect;01</a> returns. If the fast side is faster <strong>on average as well</strong>, the FIFO eventually fills and from then on the writer stalls on <code>full</code>, which means <strong>the whole system runs at the slow side's rate.</strong></p>
+    <p lang="en">The picture says <strong>"a FIFO can join these two"</strong>, not <strong>"the rate mismatch is solved".</strong> Miss the distinction and <strong>your throughput estimate is wrong from the start.</strong></p>
+  </div>
+
+</section>
+
+<section id="s6">
+  <div class="sec-head" data-slide="23"><span class="sec-num">06</span><h2 lang="ko">원형 버퍼와 포인터 둘</h2><h2 lang="en">A circular buffer and two pointers</h2></div>
+
+  <div class="def">
+    <p lang="ko">슬라이드 23쪽이 구조를 한 문장으로 말한다. <strong>"At its core, a FIFO uses a circular buffer with dual-port memory, write_ptr, and read_ptr."</strong></p>
+    <p lang="ko">부품이 <strong>셋뿐</strong>이다. 메모리 하나, 포인터 둘. 나머지는 전부 이 셋에서 유도된다.</p>
+    <p lang="en">Slide 23 gives the structure in one sentence: <strong>"At its core, a FIFO uses a circular buffer with dual-port memory, write_ptr, and read_ptr."</strong></p>
+    <p lang="en"><strong>Three parts</strong>: one memory and two pointers. Everything else is derived from them.</p>
+  </div>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; dual-port memory</span><span lang="en">Unpacking the jargon &middot; dual-port memory</span></summary>
+      <table class="parts" lang="ko">
+        <tr><td>한 줄</td><td>읽기 주소와 쓰기 주소를 <strong>따로 받는</strong> 메모리. 한 사이클에 한 곳을 읽으면서 다른 곳에 쓸 수 있다</td></tr>
+        <tr><td>왜 필요한가</td><td>FIFO 는 <strong>읽기와 쓰기가 동시에 일어나는 게 정상</strong>이다. 포트가 하나면 둘 중 하나가 매번 기다려야 하고, 그러면 FIFO 를 둔 이유가 없어진다</td></tr>
+        <tr><td>누가</td><td>ASIC 에서는 <strong>메모리 컴파일러가 생성</strong>하고 FPGA 에서는 <strong>block RAM 이 원래 dual-port</strong>다. 설계자가 게이트로 만드는 물건이 아니다</td></tr>
+        <tr><td>코드에서</td><td>Lab 1 규모에서는 그냥 배열로 쓴다. <strong>쓰기는 <code>always @(posedge clk)</code> 안이고 읽기는 <code>assign</code> 이라 조합 논리다.</strong> 자세한 것은 <a href="#s10">10 절</a></td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>dual-port 와 two-port 와 true dual-port 가 다 다르다.</strong> 여기서 필요한 것은 <strong>읽기 전용 포트 하나 + 쓰기 전용 포트 하나</strong>이고, 이건 보통 simple dual-port 라고 부른다</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>In a line</td><td>Memory that takes <strong>separate</strong> read and write addresses, so one place can be read while another is written in the same cycle</td></tr>
+        <tr><td>Why needed</td><td>In a FIFO, <strong>reading and writing at the same time is the normal case.</strong> One port means one of them waits every cycle, which defeats the purpose</td></tr>
+        <tr><td>Who</td><td>In an ASIC a <strong>memory compiler generates it</strong>; on an FPGA <strong>block RAM is dual-port to begin with.</strong> It is not something a designer builds out of gates</td></tr>
+        <tr><td>In the code</td><td>At Lab 1 scale it is just an array. <strong>The write sits in <code>always @(posedge clk)</code> and the read is an <code>assign</code>, so it is combinational.</strong> See <a href="#s10">&sect;10</a></td></tr>
+        <tr><td>Easily confused</td><td><strong>Dual-port, two-port and true dual-port are all different things.</strong> What is needed here is <strong>one read-only port plus one write-only port</strong>, usually called simple dual-port</td></tr>
+      </table>
+    </details>
+  </div>
+
+  <p lang="ko"><strong>"circular" 는 공짜다.</strong> 주소가 끝에 닿으면 0 으로 되돌아와야 하는데 <strong>따로 처리할 게 없다.</strong> 깊이가 4 면 주소는 <code>00 01 10 11</code> 이고, 2 비트짜리 값에 1 을 계속 더하면 <code>11</code> 다음이 저절로 <code>00</code> 이다. <strong>비트 수를 주소 폭에 맞춰 잘라두면 덧셈이 알아서 돌아온다.</strong></p>
+  <p lang="en"><strong>"Circular" is free.</strong> The address has to wrap to zero at the end, and <strong>nothing special is needed to make it.</strong> With depth four the addresses are <code>00 01 10 11</code>, and adding one to a two-bit value takes <code>11</code> to <code>00</code> by itself. <strong>Truncate to the address width and the arithmetic wraps on its own.</strong></p>
+
+  <p lang="ko">슬라이드 23쪽 그림에서 <code>write_ptr</code> 은 왼쪽에서, <code>read_ptr</code> 은 오른쪽에서 같은 메모리를 가리킨다. <strong>둘 다 <code>000</code> 이고 <code>empty = 1</code>, <code>full = 0</code> 이다.</strong> 여기가 출발점이다.</p>
+  <p lang="en">In the slide 23 figure, <code>write_ptr</code> points at the memory from the left and <code>read_ptr</code> from the right. <strong>Both read <code>000</code>, with <code>empty = 1</code> and <code>full = 0</code>.</strong> That is the starting point.</p>
+
+</section>
+
+<section id="s7">
+  <div class="sec-head" data-slide="24-31"><span class="sec-num">07</span><h2 lang="ko">네 번 쓰고 네 번 읽기</h2><h2 lang="en">Four writes and four reads</h2></div>
+
+  <p lang="ko">슬라이드 24쪽부터 31쪽까지가 <strong>여덟 장에 걸친 한 애니메이션</strong>이다. 네 번 쓰고 네 번 읽으면서 <strong>포인터 값과 플래그만 바뀐다.</strong> 표로 펴면 이렇다.</p>
+  <p lang="en">Slides 24 through 31 are <strong>one animation across eight slides</strong>: four writes then four reads, with <strong>only the pointer values and flags changing.</strong> Laid out as a table:</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">쪽</span><span lang="en">Slide</span></th>
+      <th><span lang="ko">한 일</span><span lang="en">Action</span></th>
+      <th><code>write_ptr</code></th>
+      <th><code>read_ptr</code></th>
+      <th><code>full</code></th>
+      <th><code>empty</code></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>23</td><td><span lang="ko">리셋</span><span lang="en">reset</span></td><td><code>000</code></td><td><code>000</code></td><td>0</td><td><strong>1</strong></td></tr>
+      <tr><td>24</td><td><span lang="ko">1차 쓰기</span><span lang="en">1st write</span></td><td><code>001</code></td><td><code>000</code></td><td>0</td><td>0</td></tr>
+      <tr><td>25</td><td><span lang="ko">2차 쓰기</span><span lang="en">2nd write</span></td><td><code>010</code></td><td><code>000</code></td><td>0</td><td>0</td></tr>
+      <tr><td>26</td><td><span lang="ko">3차 쓰기</span><span lang="en">3rd write</span></td><td><code>011</code></td><td><code>000</code></td><td>0</td><td>0</td></tr>
+      <tr><td>27</td><td><span lang="ko">4차 쓰기</span><span lang="en">4th write</span></td><td><strong><code>100</code></strong></td><td><code>000</code></td><td><strong>1</strong></td><td>0</td></tr>
+      <tr><td>28</td><td><span lang="ko">1차 읽기</span><span lang="en">1st read</span></td><td><code>100</code></td><td><code>001</code></td><td>0</td><td>0</td></tr>
+      <tr><td>29&ndash;30</td><td><span lang="ko">2&middot;3차 읽기</span><span lang="en">2nd and 3rd read</span></td><td><code>100</code></td><td><code>010</code>, <code>011</code></td><td>0</td><td>0</td></tr>
+      <tr><td>31</td><td><span lang="ko">4차 읽기</span><span lang="en">4th read</span></td><td><code>100</code></td><td><strong><code>100</code></strong></td><td>0</td><td><strong>1</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">이 표에서 <strong>27쪽 줄과 31쪽 줄</strong>만 보면 된다. 두 줄 다 <strong>주소로 쓰이는 아래 2 비트가 <code>00</code> 으로 같다.</strong> 그런데 하나는 <code>full</code> 이고 하나는 <code>empty</code> 다. 세 컷으로 줄이면 이렇게 된다.</p>
+  <p lang="en">Only <strong>the row for slide 27 and the row for slide 31</strong> matter. In both, <strong>the lower two bits that serve as the address are <code>00</code>.</strong> Yet one is <code>full</code> and the other is <code>empty</code>. Compressed to three frames:</p>
+
+<figure>
+    <svg viewBox="0 0 700 274" role="img" aria-label="깊이 4짜리 FIFO 의 세 가지 상태. 리셋 직후, 네 번 쓴 뒤, 네 번 읽은 뒤의 포인터 값과 플래그">
+      <text class="svgtxt" x="112" y="26" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="ko">리셋 직후</text>
+      <text class="svgtxt" x="112" y="26" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="en">Just after reset</text>
+      <rect x="58" y="42" width="108" height="96" rx="4" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="54" y="58" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">00</text>
+      <line x1="58" y1="66" x2="166" y2="66" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="54" y="82" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">01</text>
+      <line x1="58" y1="90" x2="166" y2="90" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="54" y="106" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">10</text>
+      <line x1="58" y1="114" x2="166" y2="114" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="54" y="130" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">11</text>
+      <path d="M18 49 L30 54 L18 59 z" fill="var(--blue)"/>
+      <path d="M182 49 L170 54 L182 59 z" fill="var(--blue)" opacity=".55"/>
+      <text class="svglab" x="112" y="156" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">write_ptr</text>
+      <rect x="78" y="162" width="18" height="17" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="87.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--green)">0</text>
+      <rect x="98" y="162" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="107.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="118" y="162" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="127.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <text class="svglab" x="112" y="196" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">read_ptr</text>
+      <rect x="78" y="202" width="18" height="17" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="87.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--green)">0</text>
+      <rect x="98" y="202" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="107.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="118" y="202" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="127.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <text class="svglab" x="68" y="238" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">full = 0</text>
+      <text class="svglab" x="154" y="238" text-anchor="middle" style="font-size:9.5px;fill:var(--green);font-weight:700">empty = 1</text>
+      <text class="svgtxt" x="346" y="26" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="ko">네 번 쓴 뒤</text>
+      <text class="svgtxt" x="346" y="26" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="en">After four writes</text>
+      <rect x="292" y="42" width="108" height="96" rx="4" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="288" y="58" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">00</text>
+      <text class="svglab" x="346" y="58" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">D0</text>
+      <line x1="292" y1="66" x2="400" y2="66" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="288" y="82" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">01</text>
+      <text class="svglab" x="346" y="82" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">D1</text>
+      <line x1="292" y1="90" x2="400" y2="90" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="288" y="106" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">10</text>
+      <text class="svglab" x="346" y="106" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">D2</text>
+      <line x1="292" y1="114" x2="400" y2="114" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="288" y="130" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">11</text>
+      <text class="svglab" x="346" y="130" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">D3</text>
+      <path d="M252 49 L264 54 L252 59 z" fill="var(--blue)"/>
+      <path d="M416 49 L404 54 L416 59 z" fill="var(--blue)" opacity=".55"/>
+      <text class="svglab" x="346" y="156" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">write_ptr</text>
+      <rect x="312" y="162" width="18" height="17" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="321.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--green)">1</text>
+      <rect x="332" y="162" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="341.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="352" y="162" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="361.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <text class="svglab" x="346" y="196" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">read_ptr</text>
+      <rect x="312" y="202" width="18" height="17" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="321.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--green)">0</text>
+      <rect x="332" y="202" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="341.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="352" y="202" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="361.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <text class="svglab" x="302" y="238" text-anchor="middle" style="font-size:9.5px;fill:var(--green);font-weight:700">full = 1</text>
+      <text class="svglab" x="388" y="238" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">empty = 0</text>
+      <text class="svgtxt" x="580" y="26" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="ko">네 번 읽은 뒤</text>
+      <text class="svgtxt" x="580" y="26" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700" lang="en">After four reads</text>
+      <rect x="526" y="42" width="108" height="96" rx="4" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="522" y="58" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">00</text>
+      <text class="svglab" x="580" y="58" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">D0</text>
+      <line x1="526" y1="66" x2="634" y2="66" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="522" y="82" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">01</text>
+      <text class="svglab" x="580" y="82" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">D1</text>
+      <line x1="526" y1="90" x2="634" y2="90" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="522" y="106" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">10</text>
+      <text class="svglab" x="580" y="106" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">D2</text>
+      <line x1="526" y1="114" x2="634" y2="114" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="522" y="130" text-anchor="end" style="font-size:8.5px;fill:var(--ink3)">11</text>
+      <text class="svglab" x="580" y="130" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">D3</text>
+      <path d="M486 49 L498 54 L486 59 z" fill="var(--blue)"/>
+      <path d="M650 49 L638 54 L650 59 z" fill="var(--blue)" opacity=".55"/>
+      <text class="svglab" x="580" y="156" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">write_ptr</text>
+      <rect x="546" y="162" width="18" height="17" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="555.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--green)">1</text>
+      <rect x="566" y="162" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="575.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="586" y="162" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="595.0" y="174.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <text class="svglab" x="580" y="196" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">read_ptr</text>
+      <rect x="546" y="202" width="18" height="17" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="555.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--green)">1</text>
+      <rect x="566" y="202" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="575.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="586" y="202" width="18" height="17" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="595.0" y="214.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--blue)">0</text>
+      <text class="svglab" x="536" y="238" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">full = 0</text>
+      <text class="svglab" x="622" y="238" text-anchor="middle" style="font-size:9.5px;fill:var(--green);font-weight:700">empty = 1</text>
+      <text class="svgtxt" x="350" y="262" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)" lang="ko">맨 앞 한 비트가 wrap bit 이다. 주소로는 쓰이지 않는다.</text>
+      <text class="svgtxt" x="350" y="262" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)" lang="en">The leading bit is the wrap bit. It is never used as an address.</text>
+      
+    </svg>
+    <figcaption lang="ko">가운데와 오른쪽을 보라. <strong>메모리 내용도 같고 포인터가 가리키는 행도 같다.</strong> 하나는 가득 찼고 하나는 비었는데 말이다. 둘을 가르는 것은 <strong>read_ptr 맨 앞 한 비트</strong>뿐이다. 오른쪽 데이터가 흐린 것은 이미 읽힌 값이라는 뜻이고, <strong>읽어도 메모리에서 지워지지는 않는다.</strong></figcaption>
+    <figcaption lang="en">Look at the middle and right panels. <strong>Same memory contents, same row under both pointers.</strong> Yet one is full and the other is empty. The only thing separating them is <strong>the leading bit of read_ptr</strong>. The faded data on the right has already been read, and <strong>reading never erases it from memory.</strong></figcaption>
+  </figure>
+
+  <div class="trap">
+    <p lang="ko"><strong>슬라이드가 글로는 한 번도 말하지 않는 것.</strong> 이 FIFO 의 주소는 <code>00</code> 부터 <code>11</code> 까지 <strong>2 비트</strong>다. 그림에도 <code>Addr</code> 칸에 그렇게 적혀 있다. 그런데 같은 그림의 <code>write_ptr</code> 과 <code>read_ptr</code> 값은 <code>000</code>, <code>100</code> 처럼 <strong>3 비트</strong>다.</p>
+    <p lang="ko">이 한 비트가 <strong>이 강의 전체의 답</strong>인데, 슬라이드는 그걸 <strong>숫자로만 보여주고 이름도 안 붙이고 설명도 안 한다.</strong> 그림을 대충 넘기면 그냥 못 보고 지나간다. 이 노트에서는 <strong>wrap bit</strong> 라고 부르는데, <strong>이건 업계에서 통용되는 이름이고 슬라이드의 용어는 아니다.</strong></p>
+    <p lang="en"><strong>What the slides never say in words.</strong> The addresses here are <strong>two bits</strong>, <code>00</code> to <code>11</code>, and the <code>Addr</code> column says so. Yet in the same figure <code>write_ptr</code> and <code>read_ptr</code> read <code>000</code> and <code>100</code>: <strong>three bits.</strong></p>
+    <p lang="en">That bit is <strong>the answer to the whole lecture</strong>, and the slides <strong>only ever show it as a number, never naming or explaining it.</strong> Skim the figures and you walk past it. These notes call it the <strong>wrap bit</strong>, which is <strong>the common industry name rather than the slide's own term.</strong></p>
+  </div>
+
+</section>
+
+<section id="s8">
+  <div class="sec-head"><span class="sec-num">08</span><h2 lang="ko">full 과 empty 를 가르는 한 비트</h2><h2 lang="en">The one bit that separates them</h2></div>
+
+  <p lang="ko">문제를 정확히 놓자. 원형 버퍼에서 <strong>두 포인터가 같은 주소를 가리키는 상황은 두 번 온다.</strong></p>
+  <p lang="en">State the problem precisely. In a circular buffer, <strong>the pointers land on the same address twice.</strong></p>
+
+  <p lang="ko"><strong>하나는 아무것도 안 넣었을 때.</strong> 쓰는 쪽이 한 번도 안 움직였으니 둘이 출발점에 같이 있다.</p>
+  <p lang="ko"><strong>다른 하나는 쓰는 쪽이 한 바퀴 돌아서 읽는 쪽을 따라잡았을 때.</strong> 깊이만큼 썼는데 아무도 안 읽었으면 정확히 제자리로 돌아온다.</p>
+  <p lang="en"><strong>Once when nothing has been written</strong>, with both still at the start.</p>
+  <p lang="en"><strong>Once when the writer has gone all the way round and caught up</strong>, having written exactly depth items that nobody read.</p>
+
+  <p lang="ko"><strong>주소만 비교하면 이 둘이 완전히 똑같아 보인다.</strong> 그래서 주소만으로는 판정 자체가 불가능하다. 식을 잘못 세운 게 아니라 <strong>정보가 모자란 것</strong>이다.</p>
+  <p lang="en"><strong>Compare addresses alone and the two are indistinguishable.</strong> No formula can separate them, because <strong>the information is not there to begin with.</strong></p>
+
+  <div class="def">
+    <p lang="ko">해법은 <strong>포인터에 "한 바퀴를 돌았다" 는 기록을 남기는 것</strong>이다. 주소가 <code>ADDR_WIDTH</code> 비트면 포인터는 <code>ADDR_WIDTH+1</code> 비트로 두고, <strong>맨 위 한 비트는 주소로 쓰지 않는다.</strong> 주소부가 한 바퀴 돌아 올림이 발생할 때마다 이 비트가 저절로 뒤집힌다.</p>
+    <p lang="ko">깊이가 4 면 <code>ADDR_WIDTH</code> 가 2 이고 포인터는 3 비트다. 앞 절 표의 <code>000</code> 과 <code>100</code> 이 이것이다.</p>
+    <p lang="en">The fix is <strong>to let the pointer record that it has been round.</strong> If the address is <code>ADDR_WIDTH</code> bits, make the pointer <code>ADDR_WIDTH+1</code> bits and <strong>never use the top bit as an address.</strong> Every time the address part wraps and carries out, that bit flips by itself.</p>
+    <p lang="en">With depth four, <code>ADDR_WIDTH</code> is 2 and the pointer is 3 bits. That is the <code>000</code> and <code>100</code> in the previous table.</p>
+  </div>
+
+<figure>
+    <svg viewBox="0 0 700 186" role="img" aria-label="empty 와 full 의 판정 비교. 주소 2비트는 같고 wrap bit 만 다르다">
+      <defs>
+        <marker id="f2ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--green)"/>
+        </marker>
+      </defs>
+      <text class="svgtxt" x="176" y="26" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700" lang="ko">비었다</text>
+      <text class="svgtxt" x="176" y="26" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700" lang="en">Empty</text>
+      <text class="svglab" x="40" y="62" text-anchor="start" style="font-size:9px;fill:var(--blue)">write_ptr</text>
+      <rect x="102" y="48" width="22" height="20" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="113.0" y="63.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--green)">1</text>
+      <rect x="126" y="48" width="22" height="20" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="137.0" y="63.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="150" y="48" width="22" height="20" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="161.0" y="63.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">0</text>
+      <text class="svglab" x="40" y="98" text-anchor="start" style="font-size:9px;fill:var(--blue)">read_ptr</text>
+      <rect x="102" y="84" width="22" height="20" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="113.0" y="99.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--green)">1</text>
+      <rect x="126" y="84" width="22" height="20" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="137.0" y="99.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="150" y="84" width="22" height="20" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="161.0" y="99.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">0</text>
+      <line x1="102" y1="112" x2="124" y2="112" stroke="var(--green)" stroke-width="1.6"/>
+      <line x1="126" y1="112" x2="192" y2="112" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="113" y="126" text-anchor="middle" style="font-size:8.5px;fill:var(--green);font-weight:700">wrap</text>
+      <text class="svgtxt" x="159" y="126" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)" lang="ko">주소 2비트</text>
+      <text class="svgtxt" x="159" y="126" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)" lang="en">address bits</text>
+      <text class="svgtxt" x="113" y="140" text-anchor="middle" style="font-size:9px;fill:var(--ink2)" lang="ko">같다</text>
+      <text class="svgtxt" x="113" y="140" text-anchor="middle" style="font-size:9px;fill:var(--ink2)" lang="en">same</text>
+      <text class="svgtxt" x="159" y="140" text-anchor="middle" style="font-size:9px;fill:var(--ink2)" lang="ko">같다</text>
+      <text class="svgtxt" x="159" y="140" text-anchor="middle" style="font-size:9px;fill:var(--ink2)" lang="en">same</text>
+      <rect x="222" y="64" width="110" height="34" rx="6" fill="rgba(var(--green-rgb),.14)" stroke="var(--green)" stroke-width="1.6"/>
+      <text class="svglab" x="277" y="86" text-anchor="middle" style="font-size:12px;fill:var(--green);font-weight:700">empty = 1</text>
+      <path d="M198 81 L218 81" stroke="var(--green)" stroke-width="1.6" marker-end="url(#f2ar)"/>
+      <text class="svgtxt" x="520" y="26" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700" lang="ko">가득 찼다</text>
+      <text class="svgtxt" x="520" y="26" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700" lang="en">Full</text>
+      <text class="svglab" x="384" y="62" text-anchor="start" style="font-size:9px;fill:var(--blue)">write_ptr</text>
+      <rect x="446" y="48" width="22" height="20" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="457.0" y="63.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--green)">1</text>
+      <rect x="470" y="48" width="22" height="20" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="481.0" y="63.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="494" y="48" width="22" height="20" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="505.0" y="63.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">0</text>
+      <text class="svglab" x="384" y="98" text-anchor="start" style="font-size:9px;fill:var(--blue)">read_ptr</text>
+      <rect x="446" y="84" width="22" height="20" rx="3" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svgnum" x="457.0" y="99.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--green)">0</text>
+      <rect x="470" y="84" width="22" height="20" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="481.0" y="99.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">0</text>
+      <rect x="494" y="84" width="22" height="20" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgnum" x="505.0" y="99.5" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">0</text>
+      <line x1="446" y1="112" x2="468" y2="112" stroke="var(--green)" stroke-width="1.6"/>
+      <line x1="470" y1="112" x2="536" y2="112" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="457" y="126" text-anchor="middle" style="font-size:8.5px;fill:var(--green);font-weight:700">wrap</text>
+      <text class="svgtxt" x="503" y="126" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)" lang="ko">주소 2비트</text>
+      <text class="svgtxt" x="503" y="126" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)" lang="en">address bits</text>
+      <text class="svgtxt" x="457" y="140" text-anchor="middle" style="font-size:9px;fill:var(--ink2)" lang="ko">다르다</text>
+      <text class="svgtxt" x="457" y="140" text-anchor="middle" style="font-size:9px;fill:var(--ink2)" lang="en">differ</text>
+      <text class="svgtxt" x="503" y="140" text-anchor="middle" style="font-size:9px;fill:var(--ink2)" lang="ko">같다</text>
+      <text class="svgtxt" x="503" y="140" text-anchor="middle" style="font-size:9px;fill:var(--ink2)" lang="en">same</text>
+      <rect x="566" y="64" width="110" height="34" rx="6" fill="rgba(var(--green-rgb),.14)" stroke="var(--green)" stroke-width="1.6"/>
+      <text class="svglab" x="621" y="86" text-anchor="middle" style="font-size:12px;fill:var(--green);font-weight:700">full = 1</text>
+      <path d="M542 81 L562 81" stroke="var(--green)" stroke-width="1.6" marker-end="url(#f2ar)"/>
+      <text class="svgtxt" x="350" y="172" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)" lang="ko">주소 2비트는 두 경우가 똑같다. 판정을 뒤집는 것은 wrap bit 하나다.</text>
+      <text class="svgtxt" x="350" y="172" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)" lang="en">The address bits are identical in both cases. One wrap bit flips the verdict.</text>
+      
+    </svg>
+    <figcaption lang="ko">포인터를 <strong>주소부와 wrap bit 로 쪼개서 따로 비교</strong>하는 것이 전부다. 둘 다 같으면 비었고, 주소부만 같으면 한 바퀴 앞서 있다는 뜻이라 가득 찬 것이다.</figcaption>
+    <figcaption lang="en">The whole trick is to <strong>split each pointer into address bits and a wrap bit and compare them separately.</strong> Both equal means empty; only the address equal means the writer is one lap ahead, which means full.</figcaption>
+  </figure>
+
+  <div class="def">
+    <p lang="ko"><strong>empty</strong>: 두 포인터가 <strong>wrap bit 까지 완전히 같다.</strong> 같은 자리, 같은 바퀴.</p>
+    <p lang="ko"><strong>full</strong>: <strong>주소부는 같은데 wrap bit 가 다르다.</strong> 같은 자리인데 쓰는 쪽이 <strong>정확히 한 바퀴 앞서</strong> 있다.</p>
+    <p lang="en"><strong>empty</strong>: the pointers are <strong>identical including the wrap bit.</strong> Same slot, same lap.</p>
+    <p lang="en"><strong>full</strong>: <strong>the address bits match and the wrap bits differ.</strong> Same slot, and the writer is <strong>exactly one lap ahead.</strong></p>
+  </div>
+
+  <div class="ex">
+    <span class="tag" lang="ko">현장 감각</span><span class="tag" lang="en">On the job</span>
+    <p lang="ko">깊이 64, width 16 인 FIFO 를 만든다. <code>ADDR_WIDTH</code> 는 몇이고 포인터는 몇 비트인가? 그리고 어느 순간 파형을 떠 보니 <code>wr_ptr = 1000101</code>, <code>rd_ptr = 0000101</code> 이다. 이 FIFO 는 지금 어떤 상태이고, <strong>안에 몇 개가 들어 있나?</strong></p>
+    <p lang="en">You are building a FIFO of depth 64 and width 16. What is <code>ADDR_WIDTH</code>, and how wide is the pointer? Then a waveform shows <code>wr_ptr = 1000101</code> and <code>rd_ptr = 0000101</code>. What state is it in, and <strong>how many items does it hold?</strong></p>
+    <details>
+      <summary><span lang="ko">생각해본 뒤 펼치기</span><span lang="en">Think first, then open</span></summary>
+      <div class="body">
+        <p lang="ko">64 = 2<sup>6</sup> 이므로 <code>ADDR_WIDTH</code> 는 <strong>6</strong> 이고 포인터는 <strong>7 비트</strong>다. 슬라이드 33쪽 코드의 parameter 기본값이 정확히 이 조합이다.</p>
+        <p lang="ko">두 값을 쪼개보면 <strong>주소부가 <code>000101</code> 로 같고 wrap bit 가 <code>1</code> 과 <code>0</code> 으로 다르다.</strong> 판정식 그대로 <strong><code>full = 1</code></strong> 이다.</p>
+        <p lang="ko">그리고 <strong>들어 있는 개수는 64 개</strong>다. 가득 찼으니까. 여기가 재미있는 지점인데, <strong>개수를 세는 카운터가 없어도 개수를 알 수 있다.</strong> 두 포인터를 <strong>7 비트 뺄셈</strong>하면 <code>1000101 - 0000101 = 1000000</code> 즉 64 다. <strong>포인터 차이가 곧 점유량</strong>이고, wrap bit 를 포함해서 빼면 한 바퀴까지 제대로 세어진다.</p>
+        <p lang="ko">이게 wrap bit 방식의 숨은 이득이다. <strong>almost_full 이나 almost_empty 같은 신호가 필요할 때 카운터를 새로 안 만들어도 된다.</strong> 이 강의는 거기까지 안 가지만, Lab 1 에 그런 요구가 붙으면 여기를 쓴다.</p>
+        <p lang="en">64 = 2<sup>6</sup>, so <code>ADDR_WIDTH</code> is <strong>6</strong> and the pointer is <strong>7 bits</strong>. Exactly the parameter defaults in the slide 33 code.</p>
+        <p lang="en">Splitting the two values, <strong>the address parts are both <code>000101</code> and the wrap bits are <code>1</code> and <code>0</code>.</strong> By the rule, <strong><code>full = 1</code></strong>.</p>
+        <p lang="en">And it holds <strong>64 items</strong>, since it is full. Here is the interesting part: <strong>you can know the occupancy without a counter.</strong> Subtract the pointers as <strong>7-bit numbers</strong>: <code>1000101 - 0000101 = 1000000</code>, which is 64. <strong>The pointer difference is the occupancy</strong>, and including the wrap bit makes it count correctly all the way round.</p>
+        <p lang="en">That is the hidden benefit of the wrap-bit scheme: <strong>signals like almost_full or almost_empty need no new counter.</strong> This lecture does not go there, but if Lab 1 asks for one, this is where it comes from.</p>
+      </div>
+    </details>
+  </div>
+
+</section>
+
+<section id="s9">
+  <div class="sec-head" data-slide="32"><span class="sec-num">09</span><h2 lang="ko">동기 FIFO 아키텍처</h2><h2 lang="en">Synchronous FIFO architecture</h2></div>
+
+  <p lang="ko">슬라이드 32쪽이 전체 구조다. 블록이 <strong>다섯</strong> 개다. Memory, WP, RP, Full, Empty.</p>
+  <p lang="en">Slide 32 is the whole structure: <strong>five blocks</strong>, namely Memory, WP, RP, Full and Empty.</p>
+
+<figure>
+    <svg viewBox="0 0 700 246" role="img" aria-label="동기 FIFO 구조. 메모리와 두 포인터, 그리고 포인터를 비교해 full 과 empty 를 만드는 비교기">
+      <defs>
+        <marker id="f3b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+        <marker id="f3g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--green)"/>
+        </marker>
+        <marker id="f3n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--brown)"/>
+        </marker>
+      </defs>
+      <rect x="70" y="38" width="560" height="176" rx="10" fill="none" stroke="var(--ink3)" stroke-width="1.4" stroke-dasharray="5 4"/>
+      <text class="svglab" x="84" y="54" text-anchor="start" style="font-size:10px;fill:var(--ink3);font-weight:700">FIFO</text>
+      <rect x="310" y="66" width="80" height="88" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="350.0" y="113.66666666666667" text-anchor="middle" style="font-size:11px;fill:var(--blue)" lang="ko">Memory</text>
+      <text class="svgtxt" x="350.0" y="113.66666666666667" text-anchor="middle" style="font-size:11px;fill:var(--blue)" lang="en">Memory</text>
+      <rect x="150" y="92" width="76" height="34" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="188.0" y="112.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">write_ptr</text>
+      <text class="svgtxt" x="188.0" y="112.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">write_ptr</text>
+      <rect x="474" y="92" width="76" height="34" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="512.0" y="112.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">read_ptr</text>
+      <text class="svgtxt" x="512.0" y="112.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">read_ptr</text>
+      <rect x="280" y="166" width="140" height="32" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="350.0" y="185.33333333333334" text-anchor="middle" style="font-size:10px;fill:var(--blue)" lang="ko">비교기</text>
+      <text class="svgtxt" x="350.0" y="185.33333333333334" text-anchor="middle" style="font-size:10px;fill:var(--blue)" lang="en">comparator</text>
+      <path d="M16 82 L304 82" stroke="var(--blue)" stroke-width="1.8" marker-end="url(#f3b)"/>
+      <text class="svglab" x="20" y="74" text-anchor="start" style="font-size:9.5px;fill:var(--blue)">din</text>
+      <path d="M392 82 L684 82" stroke="var(--blue)" stroke-width="1.8" marker-end="url(#f3b)"/>
+      <text class="svglab" x="684" y="74" text-anchor="end" style="font-size:9.5px;fill:var(--blue)">dout</text>
+      <path d="M226 110 L304 110" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f3b)"/>
+      <text class="svglab" x="266" y="104" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">w_addr</text>
+      <path d="M474 110 L392 110" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f3b)"/>
+      <text class="svglab" x="434" y="104" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">r_addr</text>
+      <path d="M188 126 L188 160 L320 160 L320 164" stroke="var(--blue)" stroke-width="1.5" fill="none" marker-end="url(#f3b)"/>
+      <path d="M512 126 L512 160 L380 160 L380 164" stroke="var(--blue)" stroke-width="1.5" fill="none" marker-end="url(#f3b)"/>
+      <path d="M280 182 L18 182" stroke="var(--green)" stroke-width="1.6" marker-end="url(#f3g)"/>
+      <text class="svglab" x="20" y="174" text-anchor="start" style="font-size:9.5px;fill:var(--green)">full</text>
+      <path d="M420 182 L682 182" stroke="var(--green)" stroke-width="1.6" marker-end="url(#f3g)"/>
+      <text class="svglab" x="682" y="174" text-anchor="end" style="font-size:9.5px;fill:var(--green)">empty</text>
+      <path d="M16 54 L64 54" stroke="var(--brown)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#f3n)"/>
+      <text class="svglab" x="20" y="46" text-anchor="start" style="font-size:9.5px;fill:var(--brown)">clk</text>
+      <text class="svgtxt" x="350" y="234" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)" lang="ko">같은 포인터 한 쌍이 주소도 만들고 플래그도 만든다</text>
+      <text class="svgtxt" x="350" y="234" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)" lang="en">one pair of pointers makes both the addresses and the flags</text>
+      
+    </svg>
+    <figcaption lang="ko">클럭이 하나라서 <strong>비교기가 두 포인터를 그냥 직접 읽어도 된다.</strong> 이 그림에서 유일하게 위험할 것 없는 부분이 그 비교기이고, 다음 절에서 클럭이 둘이 되는 순간 <strong>바로 그 비교기가 문제가 된다.</strong></figcaption>
+    <figcaption lang="en">With a single clock, <strong>the comparator can simply read both pointers directly.</strong> That comparator is the one harmless thing in this picture, and the moment a second clock appears in the next section, <strong>it becomes the problem.</strong></figcaption>
+  </figure>
+
+  <p lang="ko">여기서 봐야 할 것은 <strong>배선이 어디서 어디로 가는가</strong>다. 슬라이드 그림을 따라가면 이렇다.</p>
+  <p lang="en">What to look at is <strong>where the wires go.</strong> Following the slide figure:</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">신호</span><span lang="en">Signal</span></th>
+      <th><span lang="ko">어디로 가나</span><span lang="en">Where it goes</span></th>
+      <th><span lang="ko">왜</span><span lang="en">Why</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>WP</code></td>
+        <td><span lang="ko">Memory 와 Full 과 Empty</span><span lang="en">Memory, Full and Empty</span></td>
+        <td><span lang="ko">주소로도 쓰이고 <strong>판정의 피연산자로도 쓰인다</strong></span><span lang="en">It is the address <strong>and an operand of the comparison</strong></span></td></tr>
+      <tr><td><code>RP</code></td>
+        <td><span lang="ko">마찬가지로 셋 다</span><span lang="en">The same three</span></td>
+        <td><span lang="ko">대칭이다</span><span lang="en">Symmetric</span></td></tr>
+      <tr><td><code>Write Enable</code></td>
+        <td><span lang="ko">Memory 와 WP</span><span lang="en">Memory and WP</span></td>
+        <td><span lang="ko">데이터를 쓰라는 신호이자 <strong>포인터를 올리라는 신호</strong>다</span><span lang="en">It says write the data <strong>and advance the pointer</strong></span></td></tr>
+      <tr><td><code>Reset</code></td>
+        <td><span lang="ko">WP, RP, Full, Empty. <strong>Memory 로는 안 간다</strong></span><span lang="en">WP, RP, Full and Empty. <strong>Not the memory</strong></span></td>
+        <td><span lang="ko">슬라이드가 직접 적어놨다. <strong>"The reset goes to WP, RP, full and empty blocks."</strong></span><span lang="en">The slide states it: <strong>"The reset goes to WP, RP, full and empty blocks."</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="trap">
+    <p lang="ko"><strong>reset 이 메모리로 안 간다는 것이 요점이다.</strong> 리셋해도 <strong>메모리 내용은 그대로 남는다.</strong> 그런데도 FIFO 는 정상적으로 "비어 있다" 가 된다. 포인터가 둘 다 0 이 되어서 <strong>그 데이터에 도달할 방법이 없어졌기 때문</strong>이다.</p>
+    <p lang="ko"><a href="#s7">07 절</a> 도해에서 오른쪽 패널의 데이터를 흐리게 그린 것도 같은 이야기다. <strong>읽어도 안 지워진다.</strong> FIFO 에서 "뺀다" 는 것은 <strong>포인터를 옮기는 것</strong>이지 메모리를 건드리는 게 아니다.</p>
+    <p lang="ko">실무에서 이게 물릴 때가 있다. <strong>민감한 데이터를 다루는 FIFO 라면</strong> 리셋만으로는 내용이 안 지워진다. 지워야 하면 <strong>지우는 로직을 따로 넣어야 한다.</strong> 이 강의는 거기까지 안 가지만 알아둘 값어치가 있다.</p>
+    <p lang="en"><strong>The point is that reset does not reach the memory.</strong> After a reset <strong>the contents are still there</strong>, and yet the FIFO is correctly empty, because both pointers went to zero and <strong>there is no longer any way to reach that data.</strong></p>
+    <p lang="en">The faded data in the right panel of the <a href="#s7">&sect;07</a> figure says the same thing. <strong>Reading does not erase.</strong> In a FIFO, "removing" an item means <strong>moving a pointer</strong>, not touching memory.</p>
+    <p lang="en">This bites in practice. <strong>For a FIFO carrying sensitive data</strong>, a reset does not clear it; clearing requires <strong>logic written for that purpose.</strong> The lecture does not go there, but it is worth knowing.</p>
+  </div>
+
+</section>
+
+<section id="s10">
+  <div class="sec-head" data-slide="33"><span class="sec-num">10</span><h2 lang="ko">메모리 모듈</h2><h2 lang="en">The memory module</h2></div>
+
+  <p lang="ko">슬라이드 33쪽. Lab 1 에서 가장 먼저 쓸 파일이다.</p>
+  <p lang="en">Slide 33. The first file you will write in Lab 1.</p>
+
+  <pre class="code"><span class="k">module</span> fifo_mem #(
+    <span class="k">parameter</span> FIFO_WIDTH = <span class="n">16</span>,
+    <span class="k">parameter</span> FIFO_DEPTH = <span class="n">64</span>,
+    <span class="k">parameter</span> ADDR_WIDTH = <span class="n">6</span>
+)(
+    <span class="k">input</span>  <span class="k">wire</span>                   clk,
+    <span class="k">input</span>  <span class="k">wire</span>                   w_ena,
+    <span class="k">input</span>  <span class="k">wire</span> [FIFO_WIDTH<span class="n">-1</span>:<span class="n">0</span>] w_data,
+    <span class="k">input</span>  <span class="k">wire</span> [ADDR_WIDTH<span class="n">-1</span>:<span class="n">0</span>] w_addr,
+    <span class="k">input</span>  <span class="k">wire</span> [ADDR_WIDTH<span class="n">-1</span>:<span class="n">0</span>] r_addr,
+    <span class="k">output</span> <span class="k">wire</span> [FIFO_WIDTH<span class="n">-1</span>:<span class="n">0</span>] r_data
+);
+
+    <span class="k">reg</span> [FIFO_WIDTH<span class="n">-1</span>:<span class="n">0</span>] mem [<span class="n">0</span>:FIFO_DEPTH<span class="n">-1</span>];
+
+    <span class="k">assign</span> r_data = mem[r_addr];
+
+    <span class="k">always</span> @(<span class="k">posedge</span> clk) <span class="k">begin</span>
+        <span class="k">if</span> (w_ena) <span class="k">begin</span>
+            mem[w_addr] &lt;= w_data;
+        <span class="k">end</span>
+    <span class="k">end</span>
+
+<span class="k">endmodule</span></pre>
+
+  <p lang="ko">먼저 눈에 띄는 것. <strong>파라미터 셋이 서로 독립이 아니다.</strong> <code>ADDR_WIDTH</code> 는 <code>FIFO_DEPTH</code> 에서 나오는 값이라 <strong>둘을 따로 주면 어긋날 수 있다.</strong> 슬라이드는 기본값을 맞춰놨을 뿐 검사는 안 한다. 실무 코드라면 <code>ADDR_WIDTH = $clog2(FIFO_DEPTH)</code> 로 유도하거나 <strong>assertion 으로 묶는다.</strong></p>
+  <p lang="en">The first thing to notice: <strong>the three parameters are not independent.</strong> <code>ADDR_WIDTH</code> follows from <code>FIFO_DEPTH</code>, so <strong>passing them separately lets them disagree.</strong> The slide simply picks consistent defaults and checks nothing. Production code would derive it, <code>ADDR_WIDTH = $clog2(FIFO_DEPTH)</code>, or <strong>tie them together with an assertion.</strong></p>
+
+  <div class="trap">
+    <p lang="ko"><strong>읽기가 조합 논리다.</strong> <code>assign r_data = mem[r_addr];</code> 에는 클럭이 없다. <code>r_addr</code> 이 바뀌면 <strong>같은 사이클에 <code>r_data</code> 가 따라 바뀐다.</strong></p>
+    <p lang="ko">이걸 놓치면 타이밍 계산이 틀린다. <strong>메모리를 읽고 나서 뒤에 조합 논리가 더 붙으면 그게 전부 한 클럭 안에 들어가야 한다.</strong> 깊은 메모리에서 이 경로가 critical path 가 되는 일이 흔하다.</p>
+    <p lang="ko">그래서 실제 설계에는 <strong>읽기를 register 로 한 단 끊는 선택지</strong>가 있다. 대신 <strong>읽기 요청과 데이터 사이에 한 클럭 지연이 생기고 바깥 프로토콜이 바뀐다.</strong> 이 강의의 FIFO 는 지연 없는 쪽을 골랐다. <strong>어느 쪽이 맞다가 아니라 무엇을 주고 무엇을 받느냐의 문제</strong>다.</p>
+    <p lang="en"><strong>The read is combinational.</strong> There is no clock in <code>assign r_data = mem[r_addr];</code>. Change <code>r_addr</code> and <strong><code>r_data</code> follows in the same cycle.</strong></p>
+    <p lang="en">Miss this and your timing is wrong. <strong>Any combinational logic after the memory read has to fit in the same clock period</strong>, and on a deep memory this path is a common critical path.</p>
+    <p lang="en">Real designs therefore have the option of <strong>registering the read output</strong>, at the cost of <strong>a one-cycle gap between request and data, which changes the external protocol.</strong> This FIFO chose the no-latency side. <strong>Not a matter of right and wrong but of what you trade for what.</strong></p>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>3 강이 여기서 일한다.</strong> <a href="L03-system-verilog-for-design.html#s16">3 강 16 절</a>의 결정표를 그대로 적용하면 이 파일이 나온다. <strong>단순 조합 논리는 <code>assign</code></strong> 이라 읽기가 <code>assign</code> 이고, <strong>클럭 엣지에서 값을 잡는 것은 <code>always_ff</code> 와 <code>&lt;=</code></strong> 라 쓰기가 그 모양이다. 슬라이드가 <code>always_ff</code> 대신 <code>always</code> 를 쓴 것은 <strong>Verilog 스타일을 유지한 것</strong>이고, 3 강 기준으로는 <code>always_ff</code> 가 낫다.</p>
+    <p lang="en"><strong>Lecture 3 shows up here.</strong> Apply <a href="L03-system-verilog-for-design.html#s16">Lecture 3 &sect;16</a>'s decision table and this file falls out. <strong>Simple combinational takes <code>assign</code></strong>, hence the read; <strong>capturing on a clock edge takes <code>always_ff</code> with <code>&lt;=</code></strong>, hence the write. The slide's plain <code>always</code> instead of <code>always_ff</code> <strong>keeps to Verilog style</strong>; by Lecture 3's rule <code>always_ff</code> is better.</p>
+  </div>
+
+</section>
+
+<section id="s11">
+  <div class="sec-head" data-slide="34"><span class="sec-num">11</span><h2 lang="ko">포인터와 플래그 로직</h2><h2 lang="en">Pointer and flag logic</h2></div>
+
+  <p lang="ko">슬라이드 34쪽. <strong>이 강의에서 가장 중요한 한 장</strong>이다. 네 덩어리로 나뉜다.</p>
+  <p lang="en">Slide 34, <strong>the single most important slide in the lecture.</strong> It has four parts.</p>
+
+  <pre class="code"><span class="c"><span lang="ko">// 1. 주소는 포인터에서 wrap bit 를 뺀 나머지다</span><span lang="en">// 1. the address is the pointer minus its wrap bit</span></span>
+<span class="k">assign</span> wr_addr = wr_ptr[ADDR_WIDTH<span class="n">-1</span>:<span class="n">0</span>];
+<span class="k">assign</span> rd_addr = rd_ptr[ADDR_WIDTH<span class="n">-1</span>:<span class="n">0</span>];
+
+<span class="c"><span lang="ko">// 2. 요청은 FIFO 상태가 허락할 때만 받아들인다</span><span lang="en">// 2. a request is accepted only if the current FIFO state allows it</span></span>
+<span class="k">assign</span> wr_do = wr_ena &amp;&amp; !full;
+<span class="k">assign</span> rd_do = rd_ena &amp;&amp; !empty;
+
+<span class="c"><span lang="ko">// 3. 포인터는 wrap bit 까지 통째로 올린다</span><span lang="en">// 3. increment the COMPLETE pointer, wrap bit included</span></span>
+<span class="k">assign</span> wr_ptr_next = wr_ptr + (wr_do ? <span class="n">1'b1</span> : <span class="n">1'b0</span>);
+<span class="k">assign</span> rd_ptr_next = rd_ptr + (rd_do ? <span class="n">1'b1</span> : <span class="n">1'b0</span>);
+
+<span class="c"><span lang="ko">// 4. EMPTY 는 전체 일치, FULL 은 주소부 일치에 wrap bit 불일치</span><span lang="en">// 4. EMPTY when identical; FULL when addresses match but wrap bits differ</span></span>
+<span class="k">assign</span> empty_next = (wr_ptr_next == rd_ptr_next);
+
+<span class="k">assign</span> full_next =
+    (wr_ptr_next[ADDR_WIDTH<span class="n">-1</span>:<span class="n">0</span>] == rd_ptr_next[ADDR_WIDTH<span class="n">-1</span>:<span class="n">0</span>]) &amp;&amp;
+    (wr_ptr_next[ADDR_WIDTH]      != rd_ptr_next[ADDR_WIDTH]);</pre>
+
+  <p lang="ko">두 번째 덩어리가 <strong>이 설계에서 가장 값싸고 가장 중요한 방어</strong>다. 슬라이드 주석이 <strong>"A request is accepted only if the current FIFO state allows it"</strong> 이라고 적어놨다.</p>
+  <p lang="en">The second part is <strong>the cheapest and most important defence in the design.</strong> The slide comments it as <strong>"A request is accepted only if the current FIFO state allows it."</strong></p>
+
+  <p lang="ko"><code>full</code> 인데 <code>wr_ena</code> 가 들어오면 <code>wr_do</code> 가 <code>0</code> 이 되어 <strong>포인터가 안 움직인다.</strong> 쓰기 요청이 조용히 버려진다. 이게 없으면 <strong>아직 안 읽은 데이터를 덮어쓰고, 게다가 포인터가 한 칸 앞서 나가서 FIFO 가 "비었다" 고 착각한다.</strong> 한 번의 실수가 데이터 손실과 상태 붕괴 둘 다를 일으킨다.</p>
+  <p lang="en">If <code>full</code> is high when <code>wr_ena</code> arrives, <code>wr_do</code> is <code>0</code> and <strong>the pointer does not move.</strong> The request is silently dropped. Without it, <strong>you overwrite unread data and the pointer runs one slot ahead, so the FIFO then believes it is empty.</strong> One mistake causing both data loss and a corrupted state.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>슬라이드는 증가량을 더 길게 쓴다.</strong> <code>wr_ptr + (wr_do ? {{ADDR_WIDTH{1'b0}}, 1'b1} : {(ADDR_WIDTH+1){1'b0}})</code> 형태다. 폭을 명시적으로 맞춘 <strong>방어적 스타일</strong>이고 결과는 위의 <code>1'b1</code> 과 같다. 이 노트에서는 읽기 쉬운 쪽을 썼다.</p>
+    <p lang="ko">슬라이드가 굳이 저렇게 쓴 이유는 짐작이 간다. <strong>삼항 연산자의 두 갈래 폭이 다르면 헷갈리기 쉽고</strong>, 폭을 손으로 적어두면 <strong>나중에 <code>ADDR_WIDTH</code> 를 바꿔도 의도가 코드에 남는다.</strong> 다만 이 강의가 그 이유를 설명하지는 않는다.</p>
+    <p lang="en"><strong>The slide writes the increment the long way</strong>, as <code>wr_ptr + (wr_do ? {{ADDR_WIDTH{1'b0}}, 1'b1} : {(ADDR_WIDTH+1){1'b0}})</code>. That is <strong>defensive style</strong> making the widths explicit, and it evaluates the same as the <code>1'b1</code> above. These notes use the readable form.</p>
+    <p lang="en">You can guess why the slide does it: <strong>mismatched widths in the two arms of a ternary are easy to get wrong</strong>, and spelling them out means <strong>the intent survives in the code when <code>ADDR_WIDTH</code> later changes.</strong> The lecture itself never explains the choice.</p>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>비교 대상이 <code>ptr</code> 이 아니라 <code>ptr_next</code> 다.</strong> 그냥 스타일이 아니라 필수다.</p>
+    <p lang="ko">플래그도 <a href="#s12">다음 절</a>에서 보듯 register 다. 즉 <strong>지금 계산한 값이 다음 클럭에 출력으로 나간다.</strong> 현재 포인터로 판정하면 플래그가 <strong>한 사이클 늦고</strong>, 그 한 사이클 사이에 <strong>가득 찬 FIFO 에 한 번 더 쓰게 된다.</strong></p>
+    <p lang="ko">이 버그가 고약한 이유는 <strong>경계에서만 나타나기 때문</strong>이다. 절반쯤 찬 상태로 오래 돌리는 테스트에서는 절대 안 걸린다. <strong>가득 채웠다가 비우는 테스트를 일부러 써야 잡힌다.</strong> Lab 1 testbench 를 쓸 때 이걸 염두에 둘 것.</p>
+    <p lang="en"><strong>The comparison uses <code>ptr_next</code>, not <code>ptr</code>.</strong> Not a style choice but a requirement.</p>
+    <p lang="en">The flags are registers too, as <a href="#s12">the next section</a> shows, so <strong>what you compute now appears on the output at the next clock.</strong> Judge on the current pointers and the flag is <strong>a cycle late</strong>, and in that cycle <strong>you write once more into a full FIFO.</strong></p>
+    <p lang="en">The bug is nasty because <strong>it only appears at the boundaries.</strong> A long test that stays half full will never hit it. <strong>You have to deliberately write a test that fills it and drains it.</strong> Worth remembering when you write the Lab 1 testbench.</p>
+  </div>
+
+</section>
+
+<section id="s12">
+  <div class="sec-head" data-slide="35"><span class="sec-num">12</span><h2 lang="ko">포인터와 플래그 register</h2><h2 lang="en">Pointer and flag registers</h2></div>
+
+  <p lang="ko">슬라이드 35쪽. 앞 절의 <code>_next</code> 값들을 클럭 엣지에 잡아서 실제 register 로 만든다.</p>
+  <p lang="en">Slide 35. It captures the previous section's <code>_next</code> values on the clock edge and turns them into actual registers.</p>
+
+  <pre class="code"><span class="k">always</span> @(<span class="k">posedge</span> clk) <span class="k">begin</span>
+    <span class="k">if</span> (!rst_n) <span class="k">begin</span>
+        wr_ptr &lt;= {(ADDR_WIDTH<span class="n">+1</span>){<span class="n">1'b0</span>}};
+        rd_ptr &lt;= {(ADDR_WIDTH<span class="n">+1</span>){<span class="n">1'b0</span>}};
+        full   &lt;= <span class="n">1'b0</span>;
+        empty  &lt;= <span class="n">1'b1</span>;   <span class="c"><span lang="ko">// 여기만 1 이다</span><span lang="en">// the only one that resets high</span></span>
+    <span class="k">end</span> <span class="k">else</span> <span class="k">begin</span>
+        wr_ptr &lt;= wr_ptr_next;
+        rd_ptr &lt;= rd_ptr_next;
+        full   &lt;= full_next;
+        empty  &lt;= empty_next;
+    <span class="k">end</span>
+<span class="k">end</span></pre>
+
+  <p lang="ko">구조는 <a href="L04-clock-and-reset.html#s9">4 강 09 절</a>에서 본 <strong>동기 reset</strong> 그대로다. <code>rst_n</code> 이 sensitivity list 에 <strong>없으므로</strong> 이건 동기 reset 이다. 4 강이 준 구별 기준이 여기서 바로 쓰인다.</p>
+  <p lang="en">The shape is the <strong>synchronous reset</strong> from <a href="L04-clock-and-reset.html#s9">Lecture 4 &sect;09</a>. <code>rst_n</code> is <strong>not</strong> in the sensitivity list, so this is a synchronous reset. Lecture 4's test applies directly.</p>
+
+  <div class="trap">
+    <p lang="ko"><strong><code>empty</code> 만 <code>1</code> 로 리셋된다.</strong> 나머지 셋은 전부 <code>0</code> 이다. 당연해 보이는데 <strong>어기면 증상이 아주 고약하다.</strong></p>
+    <p lang="ko"><code>empty</code> 를 <code>0</code> 으로 리셋하면 리셋 직후에 읽는 쪽이 <strong>"데이터가 있다" 고 믿고 초기화 안 된 메모리를 읽어간다.</strong> 그 값은 <a href="#s3">03 절</a>에서 본 <code>X</code> 이고, 시뮬레이션에서는 <code>x</code> 로 보이지만 <strong>실물에서는 그냥 아무 값이나 나온다.</strong> 그래서 시뮬레이션에서 못 잡고 넘어가면 실리콘에서야 드러난다.</p>
+    <p lang="ko">4 강의 규칙이 <strong>"flip-flop 은 항상 reset 으로 초기화하라"</strong> 였는데, 여기서 한 칸 더 나아간다. <strong>"올바른 값으로 초기화하라."</strong> 넷 다 초기화는 했지만 하나라도 값이 틀리면 소용이 없다.</p>
+    <p lang="en"><strong>Only <code>empty</code> resets to <code>1</code>;</strong> the other three reset to <code>0</code>. It looks obvious, and <strong>getting it wrong fails badly.</strong></p>
+    <p lang="en">Reset <code>empty</code> to <code>0</code> and, right after reset, the reader <strong>believes there is data and reads uninitialised memory.</strong> That value is the <code>X</code> from <a href="#s3">&sect;03</a>: visible as <code>x</code> in simulation, but <strong>in silicon it is simply whatever was there.</strong> Miss it in simulation and it surfaces in the chip.</p>
+    <p lang="en">Lecture 4's rule was <strong>"always reset your flip-flops."</strong> This goes one step further: <strong>"reset them to the right value."</strong> All four are reset here, and one wrong value is enough to ruin it.</p>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>여기까지가 동기 FIFO 전부다.</strong> 파일 두 개, 코드 40 줄 남짓. 4 강에서 CDC 기법 중 하나로 한 줄 언급됐던 물건의 내부가 이게 전부다. <strong>남은 절반은 클럭이 둘이 되면서 붙는 것</strong>이고, 그 절반이 <a href="#s13">13 절</a>부터다.</p>
+    <p lang="en"><strong>That is the entire synchronous FIFO</strong>: two files, forty-odd lines. The whole inside of the thing Lecture 4 mentioned in a single line. <strong>The remaining half is what gets bolted on when the clocks split</strong>, starting at <a href="#s13">&sect;13</a>.</p>
+  </div>
+
+</section>
+
+<section id="s13">
+  <div class="sec-head" data-slide="37"><span class="sec-num">13</span><h2 lang="ko">비동기 FIFO 아키텍처</h2><h2 lang="en">Asynchronous FIFO architecture</h2></div>
+
+  <p lang="ko">슬라이드 37쪽이 비동기 FIFO 구조다. <strong>32쪽 그림과 나란히 놓고 보면 무엇이 바뀌었는지가 전부 보인다.</strong></p>
+  <p lang="en">Slide 37 is the asynchronous architecture, and <strong>putting it beside the slide 32 figure shows everything that changed.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">동기 FIFO (32쪽)</span><span lang="en">Synchronous (slide 32)</span></th>
+      <th><span lang="ko">비동기 FIFO (37쪽)</span><span lang="en">Asynchronous (slide 37)</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>Clock</code> <span lang="ko">하나</span><span lang="en">, one</span></td>
+        <td><code>Write Clock</code><span lang="ko">과 </span><span lang="en"> and </span><code>Read Clock</code></td></tr>
+      <tr><td><code>Reset</code> <span lang="ko">하나</span><span lang="en">, one</span></td>
+        <td><code>Write Reset</code><span lang="ko">과 </span><span lang="en"> and </span><code>Read Reset</code></td></tr>
+      <tr><td><span lang="ko">블록 다섯 개</span><span lang="en">Five blocks</span></td>
+        <td><span lang="ko"><strong>그대로 다섯 개</strong></span><span lang="en"><strong>Still five</strong></span></td></tr>
+      <tr><td><span lang="ko">판정식</span><span lang="en">The flag conditions</span></td>
+        <td><span lang="ko"><strong>그대로</strong></span><span lang="en"><strong>Unchanged</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko"><strong>블록도 안 늘고 판정식도 안 바뀐다.</strong> 바뀌는 것은 <strong>누가 무엇을 소유하는가</strong> 하나다. 슬라이드가 그림 밑에 적어놨다. <strong>"The write reset goes to WP and full blocks, and read reset goes to RP and empty blocks."</strong></p>
+  <p lang="en"><strong>No new blocks and no new conditions.</strong> The only change is <strong>who owns what</strong>, as the slide notes below the figure: <strong>"The write reset goes to WP and full blocks, and read reset goes to RP and empty blocks."</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">무엇</span><span lang="en">What</span></th>
+      <th><span lang="ko">어느 도메인 소유인가</span><span lang="en">Which domain owns it</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>WP</code><span lang="ko">, </span><span lang="en">, </span><code>full</code></td>
+        <td><span lang="ko">write clock 과 write reset</span><span lang="en">The write clock and the write reset</span></td></tr>
+      <tr><td><code>RP</code><span lang="ko">, </span><span lang="en">, </span><code>empty</code></td>
+        <td><span lang="ko">read clock 과 read reset</span><span lang="en">The read clock and the read reset</span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">소유가 이렇게 갈리는 이유는 <strong>플래그를 봐야 하는 쪽이 정해져 있기 때문</strong>이다. <code>full</code> 은 쓰는 쪽이 보고, 쓰는 쪽은 write clock 으로 돈다. 그러니 <code>full</code> 도 write clock 으로 만들어야 <strong>쓰는 쪽이 CDC 없이 바로 읽을 수 있다.</strong> <code>empty</code> 는 반대다.</p>
+  <p lang="en">The split follows from <strong>which side has to look at each flag.</strong> <code>full</code> is watched by the writer, and the writer runs on the write clock, so <code>full</code> must be generated on the write clock for <strong>the writer to read it without a crossing of its own.</strong> And the reverse for <code>empty</code>.</p>
+
+  <div class="trap">
+    <p lang="ko"><strong>그런데 판정식은 두 포인터를 다 필요로 한다.</strong> 여기서 모순이 생긴다.</p>
+    <p lang="ko"><code>empty</code> 는 read 도메인 소유인데, 계산하려면 <strong>write 도메인의 <code>WP</code> 가 필요하다.</strong> <code>full</code> 은 write 도메인 소유인데 <strong>read 도메인의 <code>RP</code> 가 필요하다.</strong> 즉 <strong>어느 쪽으로 정하든 포인터 하나는 반드시 경계를 건넌다.</strong></p>
+    <p lang="ko"><a href="#s9">09 절</a> 도해에서 <strong>유일하게 위험할 것 없어 보이던 비교기가 바로 여기서 문제가 된다.</strong> 클럭이 하나일 때는 그냥 두 값을 읽으면 됐는데, 이제는 그 읽는 행위가 CDC 다.</p>
+    <p lang="en"><strong>But the conditions need both pointers</strong>, and that is the contradiction.</p>
+    <p lang="en"><code>empty</code> belongs to the read domain yet needs <strong><code>WP</code> from the write domain</strong>; <code>full</code> belongs to the write domain yet needs <strong><code>RP</code> from the read domain.</strong> Whichever way you assign ownership, <strong>one pointer must cross.</strong></p>
+    <p lang="en">The comparator that looked <strong>like the one harmless thing</strong> in the <a href="#s9">&sect;09</a> figure is exactly what breaks. With one clock you simply read both values; now that reading is a CDC.</p>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>4 강의 RDC 도 여기 있다.</strong> <a href="L04-clock-and-reset.html#s11">4 강 11 절</a>이 <strong>reset 이 두 개면 RDC 가 생긴다</strong>고 했다. 이 FIFO 는 정확히 그 조건을 만족한다. <code>Write Reset</code> 과 <code>Read Reset</code> 이 서로 다른 register 그룹을 통제하고, 데이터는 그 사이를 흐른다.</p>
+    <p lang="ko"><strong>이 강의는 RDC 를 다루지 않는다.</strong> CDC 만 푼다. 그러니 "왜 reset 쪽은 아무 말이 없지" 싶으면, 그건 <strong>이 강의가 생략한 것이지 문제가 없는 게 아니다.</strong> 실제 SoC 의 비동기 FIFO 에는 reset 쪽 처리도 들어간다.</p>
+    <p lang="en"><strong>Lecture 4's RDC is here too.</strong> <a href="L04-clock-and-reset.html#s11">Lecture 4 &sect;11</a> said <strong>two resets create an RDC</strong>, and this FIFO meets that condition exactly: <code>Write Reset</code> and <code>Read Reset</code> control different register groups with data flowing between them.</p>
+    <p lang="en"><strong>This lecture does not address RDC</strong>, only CDC. So if you wonder why nothing is said about the resets, that is <strong>an omission in the lecture rather than an absence of the problem.</strong> A real SoC's asynchronous FIFO handles the reset side as well.</p>
+  </div>
+
+</section>
+
+<section id="s14">
+  <div class="sec-head" data-slide="38-40"><span class="sec-num">14</span><h2 lang="ko">무엇이 깨지는가</h2><h2 lang="en">What breaks</h2></div>
+
+  <p lang="ko">슬라이드 38쪽이 문제를 두 줄로 적는다.</p>
+  <p lang="en">Slide 38 states the problem in two lines.</p>
+
+  <div class="def">
+    <p lang="ko"><strong>"Glitches may occur due different skew (wrong sampling)"</strong></p>
+    <p lang="ko"><strong>"Clock domain crossing (metastability)"</strong></p>
+    <p lang="ko">둘은 <strong>다른 문제</strong>이고 <strong>해법도 다르다.</strong> 한 덩어리로 묶어 외우면 gray code 가 왜 필요한지를 영영 이해 못 한다.</p>
+    <p lang="en"><strong>"Glitches may occur due different skew (wrong sampling)"</strong></p>
+    <p lang="en"><strong>"Clock domain crossing (metastability)"</strong></p>
+    <p lang="en">They are <strong>two different problems with two different fixes.</strong> Memorise them as one and you will never see why gray code is needed.</p>
+  </div>
+
+  <p lang="ko"><strong>문제 1: metastability.</strong> 슬라이드 39쪽이 그림과 파형으로 보여준다. <code>CLK-A</code> 도메인의 flop 출력이 <code>CLK-B</code> 도메인 flop 의 <code>D</code> 로 바로 들어간다. 하필 <code>D</code> 가 setup/hold 창 안에서 움직이면 <code>Q</code> 가 <strong>0 도 1 도 아닌 상태로 한동안 머문다.</strong></p>
+  <p lang="en"><strong>Problem 1: metastability.</strong> Slide 39 shows it as a circuit and a waveform. A flop output in the <code>CLK-A</code> domain feeds the <code>D</code> of a flop in the <code>CLK-B</code> domain, and if <code>D</code> happens to move inside the setup/hold window, <code>Q</code> <strong>sits between 0 and 1 for a while.</strong></p>
+
+  <div class="jargon">
+    <details open>
+      <summary><span lang="ko">용어 뜯어보기 &middot; Metastability</span><span lang="en">Unpacking the jargon &middot; Metastability</span></summary>
+      <table class="parts" lang="ko">
+        <tr><td>풀네임</td><td>약어가 아니다. 단어 그대로</td></tr>
+        <tr><td>한 줄</td><td>flip-flop 의 <code>D</code> 가 setup/hold 윈도우 안에서 바뀌어 <code>Q</code> 가 불확정 상태로 한동안 머무는 현상. <strong><a href="L04-clock-and-reset.html#s6">4 강 06 절</a>에서 이미 풀었다</strong></td></tr>
+        <tr><td>여기서는</td><td>포인터가 경계를 건널 때. <strong>FIFO 에서 CDC 를 건너는 것은 데이터가 아니라 포인터라는 점이 핵심</strong>이다. 데이터는 메모리에 있고 경계를 안 넘는다</td></tr>
+        <tr><td>왜 없앨 수 없나</td><td>두 클럭이 비동기면 <strong>위상이 계속 미끄러지므로 충분히 오래 돌리면 반드시 그 순간이 온다.</strong> 확률을 낮추는 것이 전부다</td></tr>
+        <tr><td>헷갈리는 것</td><td>같은 슬라이드의 <strong>glitch 와 다른 문제다.</strong> metastability 는 <strong>flop 하나의 아날로그 현상</strong>이고 glitch 는 <strong>여러 비트의 도착 시각이 어긋나는 디지털 현상</strong>이다</td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Full name</td><td>Not an abbreviation, just the word</td></tr>
+        <tr><td>In a line</td><td>A flop's <code>D</code> changes inside the setup/hold window and <code>Q</code> lingers in an undetermined state. <strong>Already unpacked in <a href="L04-clock-and-reset.html#s6">Lecture 4 &sect;06</a></strong></td></tr>
+        <tr><td>Here</td><td>When a pointer crosses the boundary. <strong>The key point is that in a FIFO it is the pointer, not the data, that crosses</strong>; the data sits in memory and never leaves its domain</td></tr>
+        <tr><td>Why it cannot be removed</td><td>Asynchronous clocks <strong>keep sliding in phase, so run long enough and the moment is guaranteed.</strong> Lowering the probability is all you can do</td></tr>
+        <tr><td>Easily confused</td><td><strong>Not the same as the glitch on the same slide.</strong> Metastability is <strong>an analogue effect in one flop</strong>; a glitch is <strong>a digital effect from several bits arriving at different times</strong></td></tr>
+      </table>
+    </details>
+  </div>
+
+  <p lang="ko">슬라이드 40쪽이 해법을 그린다. <strong>flip-flop 을 한 단 더 붙인다.</strong> 파형에 <code>Ds</code> 라는 중간 신호가 생기고, 그게 흔들리는 동안 한 클럭이 지나간 뒤 <code>Dout</code> 이 깨끗하게 나온다. 슬라이드가 그 두 구간에 <strong>"Metastable phase"</strong> 와 <strong>"Stable Output"</strong> 이라고 이름을 붙여놨다.</p>
+  <p lang="en">Slide 40 draws the fix: <strong>add a second flop.</strong> An intermediate signal <code>Ds</code> appears in the waveform, wobbles for one clock, and then <code>Dout</code> comes out clean. The slide labels the two stretches <strong>"Metastable phase"</strong> and <strong>"Stable Output."</strong></p>
+
+<figure>
+    <svg viewBox="0 0 700 288" role="img" aria-label="flip-flop 한 단만 쓸 때와 두 단을 쓸 때 비동기 입력의 출력 파형 비교">
+      <defs>
+        <marker id="fmb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+        <marker id="fma" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--amber)"/>
+        </marker>
+        <marker id="fmg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--green)"/>
+        </marker>
+        <marker id="fmn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--brown)"/>
+        </marker>
+      </defs>
+      <text class="svgtxt" x="20" y="32" text-anchor="start" style="font-size:10.5px;fill:var(--amber);font-weight:700" lang="ko">flip-flop 한 단</text>
+      <text class="svgtxt" x="20" y="32" text-anchor="start" style="font-size:10.5px;fill:var(--amber);font-weight:700" lang="en">One flop</text>
+      <rect x="112" y="44" width="60" height="48" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="142.0" y="71.33333333333333" text-anchor="middle" style="font-size:10px;fill:var(--blue)" lang="ko">D  Q</text>
+      <text class="svgtxt" x="142.0" y="71.33333333333333" text-anchor="middle" style="font-size:10px;fill:var(--blue)" lang="en">D  Q</text>
+      <path d="M64 68 L108 68" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#fmb)"/>
+      <text class="svglab" x="60" y="64" text-anchor="end" style="font-size:9px;fill:var(--blue)">Din</text>
+      <path d="M172 68 L212 68" stroke="var(--amber)" stroke-width="1.6" marker-end="url(#fma)"/>
+      <text class="svglab" x="216" y="72" text-anchor="start" style="font-size:9px;fill:var(--amber)">Dout</text>
+      <path d="M112 118 L112 96" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#fmn)"/>
+      <text class="svglab" x="104" y="132" text-anchor="end" style="font-size:9px;fill:var(--brown)">CLK-B</text>
+      <line x1="380" y1="88" x2="640" y2="88" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="372" y="78" text-anchor="end" style="font-size:9px;fill:var(--amber)">Dout</text>
+      <path d="M380 88 L440 88 C452 74 464 78 476 72 C488 66 500 74 512 58 L640 58" fill="none" stroke="var(--amber)" stroke-width="2"/>
+      <text class="svgtxt" x="510" y="114" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)" lang="ko">0 도 1 도 아닌 구간이 그대로 나간다</text>
+      <text class="svgtxt" x="510" y="114" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)" lang="en">an undecided stretch reaches the logic</text>
+      <text class="svgtxt" x="20" y="150" text-anchor="start" style="font-size:10.5px;fill:var(--green);font-weight:700" lang="ko">flip-flop 두 단</text>
+      <text class="svgtxt" x="20" y="150" text-anchor="start" style="font-size:10.5px;fill:var(--green);font-weight:700" lang="en">Two flops</text>
+      <rect x="112" y="162" width="60" height="48" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="142.0" y="189.33333333333334" text-anchor="middle" style="font-size:10px;fill:var(--blue)" lang="ko">D  Q</text>
+      <text class="svgtxt" x="142.0" y="189.33333333333334" text-anchor="middle" style="font-size:10px;fill:var(--blue)" lang="en">D  Q</text>
+      <rect x="200" y="162" width="60" height="48" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="230.0" y="189.33333333333334" text-anchor="middle" style="font-size:10px;fill:var(--blue)" lang="ko">D  Q</text>
+      <text class="svgtxt" x="230.0" y="189.33333333333334" text-anchor="middle" style="font-size:10px;fill:var(--blue)" lang="en">D  Q</text>
+      <path d="M172 186 L196 186" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#fmb)"/>
+      <text class="svglab" x="184" y="180" text-anchor="middle" style="font-size:8.5px;fill:var(--blue)">Ds</text>
+      <path d="M64 186 L108 186" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#fmb)"/>
+      <text class="svglab" x="60" y="182" text-anchor="end" style="font-size:9px;fill:var(--blue)">Din</text>
+      <path d="M260 186 L300 186" stroke="var(--green)" stroke-width="1.6" marker-end="url(#fmg)"/>
+      <text class="svglab" x="304" y="190" text-anchor="start" style="font-size:9px;fill:var(--green)">Dout</text>
+      <path d="M112 236 L112 214" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#fmn)"/>
+      <path d="M112 236 L230 236 L230 214" fill="none" stroke="var(--brown)" stroke-width="1.4" marker-end="url(#fmn)"/>
+      <text class="svglab" x="104" y="250" text-anchor="end" style="font-size:9px;fill:var(--brown)">CLK-B</text>
+      <line x1="380" y1="206" x2="640" y2="206" stroke="var(--ink3)" stroke-width=".8"/>
+      <text class="svglab" x="372" y="196" text-anchor="end" style="font-size:9px;fill:var(--green)">Dout</text>
+      <path d="M380 206 L500 206 L504 176 L640 176" fill="none" stroke="var(--green)" stroke-width="2"/>
+      <text class="svgtxt" x="510" y="232" text-anchor="middle" style="font-size:9.5px;fill:var(--green)" lang="ko">두 번째 단이 잡을 때쯤 정착해 있다</text>
+      <text class="svgtxt" x="510" y="232" text-anchor="middle" style="font-size:9.5px;fill:var(--green)" lang="en">settled by the time the second flop samples</text>
+      
+    </svg>
+    <figcaption lang="ko">두 단이 <strong>metastability 를 없애는 것이 아니다.</strong> 첫 단은 여전히 흔들린다. 두 번째 단이 하는 일은 <strong>흔들림이 가라앉을 시간을 한 클럭 벌어주는 것</strong>뿐이다. 그래서 이건 확률을 낮추는 장치이지 보장이 아니고, 클럭이 빨라질수록 벌어주는 시간이 줄어든다.</figcaption>
+    <figcaption lang="en">The second flop <strong>does not remove metastability.</strong> The first one still wobbles. All the second one does is <strong>buy one clock period for that wobble to settle.</strong> So this lowers the probability rather than guaranteeing anything, and the faster the clock, the less time it buys.</figcaption>
+  </figure>
+
+  <div class="trap">
+    <p lang="ko"><strong>2 단 flip-flop 은 metastability 를 없애지 않는다.</strong> 첫 단은 여전히 흔들린다. 두 번째 단이 하는 일은 <strong>흔들림이 가라앉을 시간을 한 클럭 벌어주는 것</strong>뿐이다.</p>
+    <p lang="ko">그래서 이건 <strong>확률을 낮추는 장치이지 보장이 아니다.</strong> 그리고 <strong>클럭이 빨라질수록 벌어주는 시간이 줄어든다.</strong> 고속 설계에서 3 단, 4 단을 쓰는 이유가 이것이다. 이 강의는 2 단만 다룬다.</p>
+    <p lang="ko"><strong>더 중요한 것:</strong> 2 단 flip-flop 은 <strong>한 비트짜리 장치다.</strong> 여러 비트에 붙이면 <strong>비트마다 독립적으로 동작하므로 비트끼리 어긋나는 것은 전혀 안 막아준다.</strong> 그게 다음에 나오는 두 번째 문제다.</p>
+    <p lang="en"><strong>A two-flop synchroniser does not remove metastability.</strong> The first flop still wobbles. All the second one does is <strong>buy one clock period for that wobble to settle.</strong></p>
+    <p lang="en">So it <strong>lowers a probability rather than guaranteeing anything</strong>, and <strong>the faster the clock, the less time it buys.</strong> That is why high-speed designs use three or four stages. This lecture covers two.</p>
+    <p lang="en"><strong>More importantly:</strong> a two-flop synchroniser is <strong>a one-bit device.</strong> Put it on many bits and <strong>each bit works independently, so it does nothing about bits disagreeing with each other.</strong> Which is the second problem.</p>
+  </div>
+
+  <p lang="ko"><strong>문제 2: 비트마다 도착 시각이 달라서 생기는 잘못된 샘플링.</strong> 슬라이드 38쪽 오른쪽 파형이 이걸 그린다. <code>WP[0]</code>, <code>WP[1]</code>, <code>WP[2]</code> 가 <strong>거의 동시에 바뀌는데 완전히 동시는 아니다.</strong> 배선 길이와 skew 가 비트마다 다르기 때문이다. 하필 <code>rd_clock</code> 의 엣지가 그 틈에 오면 <strong>일부는 새 값, 일부는 옛 값으로 읽힌다.</strong></p>
+  <p lang="en"><strong>Problem 2: wrong sampling because bits arrive at different times.</strong> The waveform on the right of slide 38 draws it: <code>WP[0]</code>, <code>WP[1]</code> and <code>WP[2]</code> change <strong>almost but not exactly together</strong>, because wire length and skew differ per bit. If the <code>rd_clock</code> edge lands in that gap, <strong>some bits read new and some read old.</strong></p>
+
+  <p lang="ko">그 결과 <strong>원본에 존재한 적이 없는 포인터 값</strong>이 읽힌다. <a href="L04-clock-and-reset.html#s6">4 강</a>이 <strong>data coherency</strong> 라고 부른 것이다. 포인터가 그런 값이 되면 <strong>비었는데 안 비었다고 하거나 가득 찼는데 안 찼다고 한다.</strong> 후자가 특히 위험하다.</p>
+  <p lang="en">The result is <strong>a pointer value that never existed at the source</strong>, which <a href="L04-clock-and-reset.html#s6">Lecture 4</a> called <strong>data coherency.</strong> A pointer like that makes the FIFO <strong>claim it is not empty when it is, or not full when it is.</strong> The second case is the dangerous one.</p>
+
+</section>
+
+<section id="s15">
+  <div class="sec-head" data-slide="41"><span class="sec-num">15</span><h2 lang="ko">Gray code</h2><h2 lang="en">Gray code</h2></div>
+
+  <p lang="ko">슬라이드 41쪽 제목이 답을 그대로 적어놨다. <strong>"Avoiding glitches in pointers CDC using gray code."</strong></p>
+  <p lang="en">The title of slide 41 is the answer: <strong>"Avoiding glitches in pointers CDC using gray code."</strong></p>
+
+  <div class="def">
+    <p lang="ko"><strong>Gray code 는 이웃한 두 값이 정확히 한 비트만 다르게 만든 부호</strong>다. 슬라이드가 <code>N=3</code> 일 때의 표를 준다.</p>
+    <p lang="en"><strong>Gray code is an encoding where consecutive values differ in exactly one bit.</strong> The slide gives the table for <code>N=3</code>.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Decimal</th><th>Binary</th><th>Gray</th>
+      <th><span lang="ko">이전 값에서 바뀐 비트 수</span><span lang="en">Bits changed from the previous row</span></th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td><code>000</code></td><td><code>000</code></td><td>&ndash;</td></tr>
+      <tr><td>1</td><td><code>001</code></td><td><code>001</code></td><td>1</td></tr>
+      <tr><td>2</td><td><code>010</code></td><td><code>011</code></td><td>1</td></tr>
+      <tr><td>3</td><td><code>011</code></td><td><code>010</code></td><td>1</td></tr>
+      <tr><td>4</td><td><code>100</code></td><td><code>110</code></td><td>1</td></tr>
+      <tr><td>5</td><td><code>101</code></td><td><code>111</code></td><td>1</td></tr>
+      <tr><td>6</td><td><code>110</code></td><td><code>101</code></td><td>1</td></tr>
+      <tr><td>7</td><td><code>111</code></td><td><code>100</code></td><td>1</td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">표에서 binary 열을 보면 <strong>3 에서 4 로 갈 때 세 비트가 한꺼번에 바뀐다.</strong> gray 열에서는 같은 자리가 <code>010</code> 에서 <code>110</code> 으로 <strong>한 비트만 바뀐다.</strong></p>
+  <p lang="en">In the binary column, <strong>going from 3 to 4 changes all three bits at once.</strong> In the gray column the same step goes <code>010</code> to <code>110</code>: <strong>one bit.</strong></p>
+
+<figure>
+    <svg viewBox="0 0 700 182" role="img" aria-label="이진수와 gray code 에서 3에서 4로 셀 때 동시에 바뀌는 비트 수 비교">
+      <defs>
+        <marker id="f4a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--amber)"/>
+        </marker>
+        <marker id="f4b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--green)"/>
+        </marker>
+      </defs>
+      <text class="svgtxt" x="178" y="26" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700" lang="ko">이진수로 셀 때</text>
+      <text class="svgtxt" x="178" y="26" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700" lang="en">Counting in binary</text>
+      <rect x="40" y="48" width="22" height="24" rx="3" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="51" y="65" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">0</text>
+      <rect x="64" y="48" width="22" height="24" rx="3" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="75" y="65" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">1</text>
+      <rect x="88" y="48" width="22" height="24" rx="3" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="99" y="65" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">1</text>
+      <rect x="208" y="48" width="22" height="24" rx="3" fill="rgba(var(--amber-rgb),.18)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svglab" x="219" y="65" text-anchor="middle" style="font-size:11px;fill:var(--amber);font-weight:700">1</text>
+      <rect x="232" y="48" width="22" height="24" rx="3" fill="rgba(var(--amber-rgb),.18)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svglab" x="243" y="65" text-anchor="middle" style="font-size:11px;fill:var(--amber);font-weight:700">0</text>
+      <rect x="256" y="48" width="22" height="24" rx="3" fill="rgba(var(--amber-rgb),.18)" stroke="var(--amber)" stroke-width="1.4"/>
+      <text class="svglab" x="267" y="65" text-anchor="middle" style="font-size:11px;fill:var(--amber);font-weight:700">0</text>
+      <path d="M122 60 L198 60" stroke="var(--amber)" stroke-width="1.6" marker-end="url(#f4a)"/>
+      <text class="svgtxt" x="160" y="52" text-anchor="middle" style="font-size:8.5px;fill:var(--amber)" lang="ko">다음 값</text>
+      <text class="svgtxt" x="160" y="52" text-anchor="middle" style="font-size:8.5px;fill:var(--amber)" lang="en">next</text>
+      <text class="svgtxt" x="178" y="96" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700" lang="ko">세 비트가 동시에 바뀐다</text>
+      <text class="svgtxt" x="178" y="96" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700" lang="en">three bits change at once</text>
+      <text class="svgtxt" x="178" y="122" text-anchor="middle" style="font-size:9px;fill:var(--ink3)" lang="ko">건너는 도중 보일 수 있는 값</text>
+      <text class="svgtxt" x="178" y="122" text-anchor="middle" style="font-size:9px;fill:var(--ink3)" lang="en">what can be seen mid-flight</text>
+      <text class="svglab" x="178" y="144" text-anchor="middle" style="font-size:12px;fill:var(--amber);font-weight:700">111 · 001 · 101 …</text>
+      <text class="svgtxt" x="178" y="166" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">없던 값이 잠깐 보인다</text>
+      <text class="svgtxt" x="178" y="166" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">values that never existed appear</text>
+      <text class="svgtxt" x="522" y="26" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700" lang="ko">gray code 로 셀 때</text>
+      <text class="svgtxt" x="522" y="26" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700" lang="en">Counting in gray code</text>
+      <rect x="384" y="48" width="22" height="24" rx="3" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="395" y="65" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">0</text>
+      <rect x="408" y="48" width="22" height="24" rx="3" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="419" y="65" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">1</text>
+      <rect x="432" y="48" width="22" height="24" rx="3" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="443" y="65" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">0</text>
+      <rect x="552" y="48" width="22" height="24" rx="3" fill="rgba(var(--green-rgb),.18)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svglab" x="563" y="65" text-anchor="middle" style="font-size:11px;fill:var(--green);font-weight:700">1</text>
+      <rect x="576" y="48" width="22" height="24" rx="3" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="587" y="65" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">1</text>
+      <rect x="600" y="48" width="22" height="24" rx="3" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+      <text class="svglab" x="611" y="65" text-anchor="middle" style="font-size:11px;fill:var(--ink3);font-weight:700">0</text>
+      <path d="M466 60 L542 60" stroke="var(--green)" stroke-width="1.6" marker-end="url(#f4b)"/>
+      <text class="svgtxt" x="504" y="52" text-anchor="middle" style="font-size:8.5px;fill:var(--green)" lang="ko">다음 값</text>
+      <text class="svgtxt" x="504" y="52" text-anchor="middle" style="font-size:8.5px;fill:var(--green)" lang="en">next</text>
+      <text class="svgtxt" x="522" y="96" text-anchor="middle" style="font-size:10px;fill:var(--green);font-weight:700" lang="ko">한 비트만 바뀐다</text>
+      <text class="svgtxt" x="522" y="96" text-anchor="middle" style="font-size:10px;fill:var(--green);font-weight:700" lang="en">only one bit changes</text>
+      <text class="svgtxt" x="522" y="122" text-anchor="middle" style="font-size:9px;fill:var(--ink3)" lang="ko">건너는 도중 보일 수 있는 값</text>
+      <text class="svgtxt" x="522" y="122" text-anchor="middle" style="font-size:9px;fill:var(--ink3)" lang="en">what can be seen mid-flight</text>
+      <text class="svglab" x="522" y="144" text-anchor="middle" style="font-size:12px;fill:var(--green);font-weight:700">010 / 110</text>
+      <text class="svgtxt" x="522" y="166" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">이전 값 아니면 다음 값</text>
+      <text class="svgtxt" x="522" y="166" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">either the old value or the new one</text>
+      
+    </svg>
+    <figcaption lang="ko">둘 다 3에서 4로 세는 것인데 <strong>동시에 움직이는 비트 수가 다르다.</strong> 받는 쪽 클럭이 하필 그 순간에 샘플하면, 왼쪽은 <strong>원본에 존재한 적 없는 값</strong>을 읽고 오른쪽은 최악이어도 <strong>한 칸 늦은 값</strong>을 읽는다. 한 칸 늦은 empty 판정은 안전한 쪽으로 틀리는 것이라 문제가 되지 않는다.</figcaption>
+    <figcaption lang="en">Both count from 3 to 4, but <strong>a different number of bits move together.</strong> If the receiving clock samples at exactly that moment, the left one reads <strong>a value that never existed</strong> while the right one at worst reads <strong>a value one step stale</strong>. An empty flag that is one step stale errs on the safe side, so it does no harm.</figcaption>
+  </figure>
+
+  <p lang="ko">그러면 어긋나서 읽혀도 <strong>최악이 이전 값 아니면 다음 값</strong>이다. 없던 값이 안 나온다. 그리고 이게 <strong>안전한 쪽으로만 틀린다.</strong> 포인터가 한 칸 옛날 값으로 보이면 <strong>실제보다 덜 찬 것으로, 또는 덜 비워진 것으로</strong> 보이기 때문이다.</p>
+  <p lang="en">So even a torn sample reads <strong>either the old value or the new one</strong>, never an invented one. And it <strong>errs only on the safe side</strong>: a pointer that looks one step stale makes the FIFO appear <strong>less full, or less drained,</strong> than it really is.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>슬라이드에 없는 것: 변환 공식.</strong> 슬라이드는 표만 주고 <code>Binary to Gray converter</code> 라는 블록 이름만 보여준다. 실제 공식은 한 줄이다.</p>
+    <p lang="ko" style="margin-top:8px"><code>gray = binary ^ (binary &gt;&gt; 1)</code></p>
+    <p lang="ko">거꾸로 돌리는 것은 한 줄로 안 되고 <strong>위 비트부터 누적 XOR</strong> 를 해야 한다. <code>bin[N-1] = gray[N-1]</code> 이고 그 아래는 <code>bin[i] = bin[i+1] ^ gray[i]</code> 다. <strong>이 두 줄은 이 강의 밖에서 가져온 것</strong>이고, Lab 1 에서 실제로 필요할 것이라 적어둔다.</p>
+    <p lang="en"><strong>Not in the slides: the conversion itself.</strong> The slide gives the table and a block labelled <code>Binary to Gray converter</code>, nothing more. The forward direction is one line.</p>
+    <p lang="en" style="margin-top:8px"><code>gray = binary ^ (binary &gt;&gt; 1)</code></p>
+    <p lang="en">The reverse is not one line; it needs <strong>a running XOR from the top bit down</strong>: <code>bin[N-1] = gray[N-1]</code>, then <code>bin[i] = bin[i+1] ^ gray[i]</code>. <strong>Both lines come from outside this lecture</strong>, noted here because Lab 1 will actually need them.</p>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>gray code 의 "한 비트" 성질은 마지막에서 처음으로 돌아올 때도 유지된다.</strong> 표의 <code>100</code> 에서 <code>000</code> 으로 가는 것이 그것이고, 한 비트만 바뀐다. <strong>단, 이건 값의 개수가 2 의 거듭제곱일 때만 성립한다.</strong></p>
+    <p lang="ko">그래서 <strong>비동기 FIFO 의 깊이는 2 의 거듭제곱이어야 한다.</strong> 깊이 100 짜리 비동기 FIFO 를 순진하게 만들면 <strong>wrap 하는 순간 여러 비트가 동시에 바뀌어서 gray code 를 쓴 의미가 사라진다.</strong></p>
+    <p lang="ko"><strong>이 제약은 슬라이드에 없다.</strong> 슬라이드는 표만 보여주고 넘어간다. 그런데 <a href="#s4">04 절</a> 현장 감각에서 깊이를 32 로 반올림했던 것이 사실 이 이유였다. 동기 FIFO 에는 없는 제약이라 더 놓치기 쉽다.</p>
+    <p lang="en"><strong>The one-bit property holds across the wrap as well</strong>, from <code>100</code> back to <code>000</code> in the table. <strong>But only when the number of values is a power of two.</strong></p>
+    <p lang="en">Which means <strong>an asynchronous FIFO's depth has to be a power of two.</strong> Build a naive depth-100 asynchronous FIFO and <strong>several bits change at the wrap, and the gray code has bought you nothing.</strong></p>
+    <p lang="en"><strong>This constraint is not in the slides</strong>, which show the table and move on. It is, however, the real reason the depth was rounded to 32 back in the <a href="#s4">&sect;04</a> exercise. The synchronous FIFO has no such constraint, which makes it easier to forget.</p>
+  </div>
+
+</section>
+
+<section id="s16">
+  <div class="sec-head" data-slide="42-43"><span class="sec-num">16</span><h2 lang="ko">동기화 해법</h2><h2 lang="en">The synchronisation solution</h2></div>
+
+  <p lang="ko">슬라이드 42쪽이 최종 파이프라인이다. <strong>네 단계</strong>이고, 가운데 점선이 도메인 경계다.</p>
+  <p lang="en">Slide 42 is the final pipeline: <strong>four stages</strong>, with a dashed line marking the domain boundary.</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">단계</span><span lang="en">Stage</span></th>
+      <th><span lang="ko">어느 도메인</span><span lang="en">Domain</span></th>
+      <th><span lang="ko">하는 일</span><span lang="en">What it does</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>Binary to Gray converter</td><td><span lang="ko">write</span><span lang="en">write</span></td>
+        <td><span lang="ko">건너기 직전에 <strong>gray 로 갈아입힌다</strong></span><span lang="en">Changes into gray <strong>just before crossing</strong></span></td></tr>
+      <tr><td>Synchronizer</td><td><span lang="ko"><strong>경계를 걸친다</strong></span><span lang="en"><strong>Straddles the boundary</strong></span></td>
+        <td><span lang="ko">2 단 flip-flop. metastability 를 가라앉힌다</span><span lang="en">Two flops, letting metastability settle</span></td></tr>
+      <tr><td>Gray to binary converter</td><td>read</td>
+        <td><span lang="ko">건너온 뒤 <strong>다시 이진수로</strong></span><span lang="en">Back to binary <strong>once across</strong></span></td></tr>
+      <tr><td>Empty flag generator</td><td>read</td>
+        <td><span lang="ko">건너온 <code>write_ptr</code> 과 <strong>자기 도메인의 <code>read_ptr</code></strong> 을 비교한다</span><span lang="en">Compares the arrived <code>write_ptr</code> with <strong>its own domain's <code>read_ptr</code></strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">마지막 단계에 주목할 것. <code>Read Pointer</code> 가 <strong>아래에서 곧바로 들어온다.</strong> 동기화를 안 거친다. <strong>자기 도메인 신호라 거칠 이유가 없기 때문</strong>이다. 이 비대칭이 슬라이드 그림에 그대로 그려져 있고, <strong>CDC 설계의 기본 감각</strong>이다. 필요한 것만 건너게 하고 나머지는 건드리지 않는다.</p>
+  <p lang="en">Note the last stage: <code>Read Pointer</code> <strong>arrives straight from below</strong>, with no synchroniser, <strong>because it is already in this domain and has no reason to be synchronised.</strong> That asymmetry is drawn into the slide, and it is <strong>the basic instinct of CDC design</strong>: cross only what must cross and leave the rest alone.</p>
+
+<figure>
+    <svg viewBox="0 0 700 270" role="img" aria-label="비동기 FIFO 에서 두 포인터가 서로 반대 방향으로 클럭 경계를 건너는 경로">
+      <defs>
+        <marker id="f5b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+        <marker id="f5p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)" opacity=".6"/>
+        </marker>
+        <marker id="f5g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--green)"/>
+        </marker>
+      </defs>
+      <line x1="352" y1="44" x2="352" y2="240" stroke="var(--amber)" stroke-width="2" stroke-dasharray="6 5"/>
+      <text class="svgtxt" x="180" y="32" text-anchor="middle" style="font-size:10px;fill:var(--brown);font-weight:700" lang="ko">write clock 도메인</text>
+      <text class="svgtxt" x="180" y="32" text-anchor="middle" style="font-size:10px;fill:var(--brown);font-weight:700" lang="en">write clock domain</text>
+      <text class="svgtxt" x="528" y="32" text-anchor="middle" style="font-size:10px;fill:var(--brown);font-weight:700" lang="ko">read clock 도메인</text>
+      <text class="svgtxt" x="528" y="32" text-anchor="middle" style="font-size:10px;fill:var(--brown);font-weight:700" lang="en">read clock domain</text>
+      <rect x="40" y="64" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="82.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">write_ptr</text>
+      <text class="svgtxt" x="82.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">write_ptr</text>
+      <rect x="134" y="64" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="176.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">bin→gray</text>
+      <text class="svgtxt" x="176.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">bin→gray</text>
+      <rect x="392" y="64" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="434.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">2단 FF</text>
+      <text class="svgtxt" x="434.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">two-FF sync</text>
+      <rect x="486" y="64" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="528.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">gray→bin</text>
+      <text class="svgtxt" x="528.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">gray→bin</text>
+      <rect x="580" y="64" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.22)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="622.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">empty 생성</text>
+      <text class="svgtxt" x="622.0" y="85.16666666666667" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">empty logic</text>
+      <path d="M124 82 L130 82" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f5b)"/>
+      <path d="M218 82 L388 82" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f5b)"/>
+      <path d="M476 82 L482 82" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f5b)"/>
+      <path d="M570 82 L576 82" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f5b)"/>
+      <path d="M664 82 L688 82" stroke="var(--green)" stroke-width="1.6" marker-end="url(#f5g)"/>
+      <rect x="580" y="176" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="622.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">read_ptr</text>
+      <text class="svgtxt" x="622.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">read_ptr</text>
+      <rect x="486" y="176" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="528.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">bin→gray</text>
+      <text class="svgtxt" x="528.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">bin→gray</text>
+      <rect x="228" y="176" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="270.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">2단 FF</text>
+      <text class="svgtxt" x="270.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">two-FF sync</text>
+      <rect x="134" y="176" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="176.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">gray→bin</text>
+      <text class="svgtxt" x="176.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">gray→bin</text>
+      <rect x="40" y="176" width="84" height="36" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="82.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">full 생성</text>
+      <text class="svgtxt" x="82.0" y="197.16666666666666" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">full logic</text>
+      <path d="M580 194 L574 194" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f5p)"/>
+      <path d="M486 194 L316 194" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f5p)"/>
+      <path d="M228 194 L222 194" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f5p)"/>
+      <path d="M134 194 L128 194" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#f5p)"/>
+      <path d="M40 194 L14 194" stroke="var(--green)" stroke-width="1.6" marker-end="url(#f5g)"/>
+      <text class="svglab" x="688" y="56" text-anchor="end" style="font-size:9.5px;fill:var(--green)">empty</text>
+      <text class="svglab" x="12" y="168" text-anchor="start" style="font-size:9.5px;fill:var(--green)">full</text>
+      <text class="svgtxt" x="285" y="76" text-anchor="middle" style="font-size:9px;fill:var(--amber)" lang="ko">wr_ptr 이 gray 로 건넌다</text>
+      <text class="svgtxt" x="285" y="76" text-anchor="middle" style="font-size:9px;fill:var(--amber)" lang="en">wr_ptr crosses as gray</text>
+      <text class="svgtxt" x="420" y="188" text-anchor="middle" style="font-size:9px;fill:var(--amber)" lang="ko">rd_ptr 이 gray 로 건넌다</text>
+      <text class="svgtxt" x="420" y="188" text-anchor="middle" style="font-size:9px;fill:var(--amber)" lang="en">rd_ptr crosses as gray</text>
+      <text class="svgtxt" x="352" y="258" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700" lang="ko">비동기 경계</text>
+      <text class="svgtxt" x="352" y="258" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700" lang="en">asynchronous boundary</text>
+      
+    </svg>
+    <figcaption lang="ko">경계를 건너는 것은 <strong>데이터가 아니라 포인터다.</strong> 그리고 <strong>양방향으로 하나씩</strong> 건넌다. empty 는 읽는 쪽에서 판정해야 하니 write_ptr 이 건너오고, full 은 쓰는 쪽에서 판정해야 하니 read_ptr 이 건너간다. 슬라이드는 위쪽 경로만 자세히 그렸고, 아래쪽은 구조도에서 붉게 표시만 해뒀다.</figcaption>
+    <figcaption lang="en">What crosses the boundary is <strong>not the data but the pointers</strong>, and <strong>one crosses each way.</strong> Empty has to be decided on the read side, so write_ptr comes over; full has to be decided on the write side, so read_ptr goes back. The slides draw the upper path in detail and only mark the lower one in red on the block diagram.</figcaption>
+  </figure>
+
+  <p lang="ko">슬라이드 43쪽이 마지막 그림인데, <strong>37쪽 구조도에 붉은 표시 두 개를 얹어놨다.</strong> 그 두 군데가 <strong>synchronizer 를 넣어야 하는 지점</strong>이다. 42쪽이 자세히 그린 것은 그중 위쪽 하나, 즉 <code>empty</code> 를 위한 경로뿐이다. <strong>아래쪽, <code>full</code> 을 위한 경로는 대칭이라고 보고 생략했다.</strong></p>
+  <p lang="en">Slide 43 is the last figure: <strong>the slide 37 block diagram with two red marks added</strong>, and those two are <strong>where the synchronisers go.</strong> Slide 42 draws only the upper one in detail, the path for <code>empty</code>. <strong>The lower path, for <code>full</code>, is left implicit as the mirror image.</strong></p>
+
+  <div class="def">
+    <p lang="ko"><strong>그래서 대가가 무엇인가.</strong> 2 단 flip-flop 은 최소 두 클럭을 먹는다. 그래서 받는 쪽이 보는 상대 포인터는 <strong>항상 조금 옛날 값</strong>이다. 21 쪽 비교표가 <strong>"slightly higher due to synchronizer delays"</strong> 라고 적은 것이 이것이다.</p>
+    <p lang="en"><strong>And the price.</strong> A two-flop synchroniser costs at least two clocks, so the pointer each side sees from the other is <strong>always slightly stale.</strong> That is what the slide 21 table means by <strong>"slightly higher due to synchronizer delays."</strong></p>
+  </div>
+
+  <p lang="ko"><strong>늦은 게 왜 괜찮은지</strong>를 한 번 더 짚고 가자. 늦은 정보는 <strong>항상 보수적인 쪽으로만 틀린다.</strong></p>
+  <p lang="en">Worth stating once more <strong>why stale is acceptable</strong>: stale information <strong>only ever errs conservatively.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">플래그</span><span lang="en">Flag</span></th>
+      <th><span lang="ko">늦으면 어떻게 보이나</span><span lang="en">What staleness looks like</span></th>
+      <th><span lang="ko">결과</span><span lang="en">Consequence</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>empty</code></td>
+        <td><span lang="ko">실제로는 데이터가 있는데 <strong>없다고 본다</strong></span><span lang="en">There is data but it <strong>looks empty</strong></span></td>
+        <td><span lang="ko">잠깐 덜 읽는다. <strong>없는 데이터를 읽지는 않는다</strong></span><span lang="en">You read a little less. <strong>You never read data that is not there</strong></span></td></tr>
+      <tr><td><code>full</code></td>
+        <td><span lang="ko">실제로는 자리가 있는데 <strong>가득 찼다고 본다</strong></span><span lang="en">There is room but it <strong>looks full</strong></span></td>
+        <td><span lang="ko">잠깐 덜 쓴다. <strong>넘치지는 않는다</strong></span><span lang="en">You write a little less. <strong>You never overflow</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">둘 다 <strong>성능을 조금 잃고 정확성을 지킨다.</strong> CDC 설계가 대개 이 모양이고, <strong>반대 방향으로 틀리는 설계는 그냥 틀린 설계다.</strong></p>
+  <p lang="en">Both <strong>give up a little throughput to keep correctness.</strong> Most CDC design has this shape, and <strong>a design that errs in the other direction is simply wrong.</strong></p>
+
+</section>
+
+<section id="s17">
+  <div class="sec-head"><span class="sec-num">17</span><h2 lang="ko">직접 돌려보기</h2><h2 lang="en">Drive it yourself</h2></div>
+
+  <p lang="ko">깊이 4 짜리 FIFO 다. <strong><code>write</code> 를 네 번 누르면 <code>full</code> 이 서고, 이어서 <code>read</code> 를 네 번 누르면 <code>empty</code> 가 선다.</strong> 그 두 순간에 <strong>포인터의 아래 2 비트가 똑같다</strong>는 것을 직접 확인하는 것이 목적이다.</p>
+  <p lang="en">A depth-four FIFO. <strong>Press <code>write</code> four times and <code>full</code> goes high; press <code>read</code> four times and <code>empty</code> goes high.</strong> The point is to see for yourself that <strong>the lower two pointer bits are identical at both of those moments.</strong></p>
+
+  <div class="play">
+    <div class="plab" lang="ko">동작</div>
+    <div class="plab" lang="en">Operation</div>
+    <div class="presets" id="fq-ops"></div>
+
+    <svg id="fq-svg" viewBox="0 0 700 210" role="img" aria-label="깊이 4 짜리 FIFO 의 현재 메모리 내용, 두 포인터 값, full 과 empty 플래그" style="margin-top:14px"></svg>
+
+    <div class="verdict" id="fq-v"></div>
+  </div>
+
+  <p lang="ko">해볼 것 몇 가지.</p>
+  <p lang="en">A few things to try.</p>
+
+  <ul>
+    <li lang="ko"><strong>가득 찬 상태에서 <code>write</code> 를 한 번 더 눌러본다.</strong> 아무 일도 안 일어난다. 그게 <code>wr_do = wr_ena &amp;&amp; !full</code> 이 하는 일이다</li>
+    <li lang="en"><strong>Press <code>write</code> once more when it is full.</strong> Nothing happens. That is <code>wr_do = wr_ena &amp;&amp; !full</code> doing its job</li>
+    <li lang="ko"><strong>네 번 쓰고 네 번 읽은 뒤 두 포인터를 본다.</strong> 둘 다 <code>100</code> 이다. 처음의 <code>000</code> 과 <strong>주소부는 같은데 wrap bit 만 뒤집혀 있다</strong></li>
+    <li lang="en"><strong>Write four, read four, then look at the pointers.</strong> Both read <code>100</code>: <strong>same address bits as the initial <code>000</code>, with only the wrap bit flipped</strong></li>
+    <li lang="ko"><strong>쓰기와 읽기를 번갈아 눌러본다.</strong> 두 포인터가 나란히 따라가면서 <strong>한 칸 차이를 유지</strong>한다. 가득 차지도 비지도 않는다</li>
+    <li lang="en"><strong>Alternate write and read.</strong> The pointers chase each other <strong>one slot apart</strong>, never full and never empty</li>
+    <li lang="ko"><strong><code>reset</code> 을 눌러본다.</strong> 포인터는 <code>000</code> 으로 돌아가는데 <strong>메모리 내용은 그대로 남아 있다.</strong> <a href="#s9">09 절</a>의 함정 그대로다</li>
+    <li lang="en"><strong>Press <code>reset</code>.</strong> The pointers return to <code>000</code> while <strong>the memory contents stay.</strong> Exactly the trap in <a href="#s9">&sect;09</a></li>
+  </ul>
+
+</section>
+
+<section id="s18">
+  <div class="sec-head"><span class="sec-num">18</span><h2 lang="ko">정리 &amp; 다음 강의</h2><h2 lang="en">Recap &amp; next lecture</h2></div>
+
+  <p lang="ko"><strong>한 장 요약.</strong></p>
+  <p lang="en"><strong>The whole lecture on one page.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">절</span><span lang="en">&sect;</span></th>
+      <th><span lang="ko">한 줄로 줄이면</span><span lang="en">In one line</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>01</td><td><span lang="ko">FIFO 는 <strong>평균이 아니라 burst 를 흡수한다.</strong> 속도를 바꾸지 않는다</span><span lang="en">A FIFO absorbs <strong>burstiness, not a difference in averages.</strong> It does not convert rates</span></td></tr>
+      <tr><td>02</td><td><span lang="ko">포트가 <strong>쓰는 쪽과 읽는 쪽으로 대칭</strong>이고 <code>full</code>, <code>empty</code> 는 <strong>출력</strong>이다</span><span lang="en">The ports are <strong>symmetric</strong>, and <code>full</code> and <code>empty</code> are <strong>outputs</strong></span></td></tr>
+      <tr><td>03</td><td><span lang="ko">들어간 순서로 나온다. 읽기 전 <code>dout</code> 은 <code>X</code> 다</span><span lang="en">Order is preserved, and <code>dout</code> is <code>X</code> before any read</span></td></tr>
+      <tr><td>04</td><td><span lang="ko">쓰임새 셋. 그중 두 번째가 <strong>4 강의 CDC 기법 FIFO</strong></span><span lang="en">Three uses, the second being <strong>Lecture 4's FIFO CDC scheme</strong></span></td></tr>
+      <tr><td>05</td><td><span lang="ko">비교표 세 줄은 <strong>첫 줄의 결과</strong>다. 클럭이 갈리면 나머지가 따라온다</span><span lang="en">Three rows of comparison, all <strong>consequences of the first</strong></span></td></tr>
+      <tr><td>06</td><td><span lang="ko">부품은 <strong>셋뿐</strong>이다. dual-port memory, write_ptr, read_ptr</span><span lang="en">Only <strong>three parts</strong>: dual-port memory, write_ptr, read_ptr</span></td></tr>
+      <tr><td>07</td><td><span lang="ko">가득 찼을 때와 비었을 때 <strong>주소가 같다.</strong> 그래서 주소만으로는 못 가른다</span><span lang="en">Full and empty <strong>share the same address</strong>, so addresses alone cannot separate them</span></td></tr>
+      <tr><td>08</td><td><span lang="ko"><strong>wrap bit</strong> 한 비트가 가른다. empty 는 전체 일치, full 은 주소부 일치에 wrap 불일치</span><span lang="en">One <strong>wrap bit</strong> separates them: empty is all equal, full is address equal with wrap differing</span></td></tr>
+      <tr><td>09</td><td><span lang="ko">reset 이 <strong>메모리로는 안 간다.</strong> 포인터만 되돌린다</span><span lang="en">Reset <strong>never reaches the memory</strong>; only the pointers go back</span></td></tr>
+      <tr><td>10</td><td><span lang="ko">쓰기는 클럭에 걸리고 <strong>읽기는 조합 논리</strong>다</span><span lang="en">The write is clocked; <strong>the read is combinational</strong></span></td></tr>
+      <tr><td>11</td><td><span lang="ko"><code>wr_do = wr_ena &amp;&amp; !full</code> 이 <strong>가장 값싼 방어</strong>다. 판정은 <code>ptr_next</code> 로</span><span lang="en"><code>wr_do = wr_ena &amp;&amp; !full</code> is <strong>the cheapest defence</strong>, and the flags are judged on <code>ptr_next</code></span></td></tr>
+      <tr><td>12</td><td><span lang="ko"><strong><code>empty</code> 만 <code>1</code> 로 리셋</strong>된다</span><span lang="en"><strong>Only <code>empty</code> resets high</strong></span></td></tr>
+      <tr><td>13</td><td><span lang="ko">블록도 판정식도 그대로다. <strong>소유만 갈린다.</strong> 그래서 포인터가 경계를 넘는다</span><span lang="en">Same blocks, same conditions; <strong>only ownership splits</strong>, and so a pointer must cross</span></td></tr>
+      <tr><td>14</td><td><span lang="ko">문제가 <strong>둘</strong>이다. metastability 는 2 단 FF 로, 비트 어긋남은 <strong>안 잡힌다</strong></span><span lang="en"><strong>Two</strong> problems. Two flops fix metastability and <strong>do nothing</strong> for bit skew</span></td></tr>
+      <tr><td>15</td><td><span lang="ko">gray code 는 <strong>한 번에 한 비트</strong>만 바꾼다. 깊이가 2 의 거듭제곱이어야 한다</span><span lang="en">Gray code changes <strong>one bit at a time</strong>, and needs a power-of-two depth</span></td></tr>
+      <tr><td>16</td><td><span lang="ko">건너는 것은 <strong>포인터이고 양방향으로 하나씩</strong>이다. 늦은 값은 <strong>안전한 쪽으로 틀린다</strong></span><span lang="en">What crosses is <strong>a pointer, one each way</strong>, and staleness <strong>errs on the safe side</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko"><strong>이전 강의가 여기서 어떻게 일하나.</strong></p>
+  <p lang="en"><strong>How the earlier lectures show up here.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">이전 강의</span><span lang="en">Earlier lecture</span></th>
+      <th><span lang="ko">이 강의에서</span><span lang="en">In this lecture</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><a href="L02-design-and-verification-overview.html">L2</a></td>
+        <td><span lang="ko">assertion 예시로 나왔던 <strong>"FIFO 는 overflow 하면 안 된다"</strong> 가 <a href="#s11">11 절</a>의 <code>!full</code> 한 줄로 실현된다</span><span lang="en">The assertion example <strong>"a FIFO must not overflow"</strong> becomes the single <code>!full</code> term in <a href="#s11">&sect;11</a></span></td></tr>
+      <tr><td><a href="L03-system-verilog-for-design.html#s16">L3 &sect;16</a></td>
+        <td><span lang="ko">결정표 다섯 줄이 <a href="#s10">10 절</a>과 <a href="#s12">12 절</a> 코드의 모양을 그대로 정한다</span><span lang="en">The five-row decision table dictates the shape of the code in <a href="#s10">&sect;10</a> and <a href="#s12">&sect;12</a></span></td></tr>
+      <tr><td><a href="L04-clock-and-reset.html#s6">L4 &sect;06</a></td>
+        <td><span lang="ko">metastability 와 data coherency 가 <a href="#s14">14 절</a>에서 <strong>구체적인 신호 이름을 달고</strong> 다시 나온다</span><span lang="en">Metastability and data coherency return in <a href="#s14">&sect;14</a> <strong>attached to specific signal names</strong></span></td></tr>
+      <tr><td><a href="L04-clock-and-reset.html#s7">L4 &sect;07</a></td>
+        <td><span lang="ko">CDC 기법 넷 중 <strong>FIFO 한 줄이 이 강의 전체</strong>가 된다</span><span lang="en">One line of the four CDC schemes, <strong>the FIFO, expands into this whole lecture</strong></span></td></tr>
+      <tr><td><a href="L04-clock-and-reset.html#s9">L4 &sect;09</a></td>
+        <td><span lang="ko">동기 reset 의 구별 기준(sensitivity list)이 <a href="#s12">12 절</a> 코드를 읽는 데 바로 쓰인다</span><span lang="en">The sensitivity-list test for a synchronous reset reads the <a href="#s12">&sect;12</a> code directly</span></td></tr>
+      <tr><td><a href="L04-clock-and-reset.html#s11">L4 &sect;11</a></td>
+        <td><span lang="ko">reset 이 둘이라 <strong>RDC 조건이 성립하는데 이 강의는 다루지 않는다</strong></span><span lang="en">Two resets meet <strong>the RDC condition, which this lecture does not address</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>Quiz 로 나올 만한 것.</strong> 포인터가 주소보다 한 비트 넓은 이유, empty 와 full 의 판정식, gray code 가 필요한 이유, 경계를 건너는 것이 데이터가 아니라 포인터라는 것, 동기와 비동기의 비교표 세 줄, 그리고 <strong>2 단 flip-flop 이 무엇을 못 막는가.</strong> 마지막 것이 제일 잘 틀린다.</p>
+    <p lang="en"><strong>Likely quiz material.</strong> Why the pointer is a bit wider than the address; the empty and full conditions; why gray code is needed; that a pointer crosses rather than the data; the three comparison rows; and <strong>what a two-flop synchroniser fails to prevent.</strong> The last one is the most commonly missed.</p>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>Lab 1 에서 손이 미끄러질 곳.</strong> 넷 다 <strong>문법 오류가 아니라서 컴파일은 통과한다.</strong></p>
+    <p lang="ko">1. 포인터 폭을 <code>ADDR_WIDTH</code> 로 잡는다. &rarr; full 과 empty 가 영영 구별이 안 된다<br>
+    2. 플래그를 <code>ptr</code> 로 판정한다. &rarr; 경계에서 한 사이클 늦는다<br>
+    3. <code>empty</code> 를 <code>0</code> 으로 리셋한다. &rarr; 리셋 직후 쓰레기를 읽는다<br>
+    4. <code>full</code> 일 때 쓰기를 안 막는다. &rarr; 데이터 손실과 상태 붕괴가 동시에 온다</p>
+    <p lang="en"><strong>Where your hands will slip in Lab 1.</strong> None of the four is a syntax error, so <strong>all four compile.</strong></p>
+    <p lang="en">1. Sizing the pointer to <code>ADDR_WIDTH</code>, which makes full and empty permanently indistinguishable.<br>
+    2. Judging the flags on <code>ptr</code>, which is a cycle late at the boundaries.<br>
+    3. Resetting <code>empty</code> to <code>0</code>, which reads garbage right after reset.<br>
+    4. Not blocking writes on <code>full</code>, which loses data and corrupts the state at once.</p>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>다음 강의(6 강)</strong> 는 Pipelined CPU design 이다. FIFO 가 <strong>블록 사이를 잇는 물건</strong>이었다면, 다음은 <strong>블록 하나를 여러 단으로 쪼개는</strong> 이야기다. 방향이 반대인데 <strong>다루는 문제는 비슷하다.</strong> 앞 단과 뒤 단의 속도가 안 맞을 때 무엇을 하는가.</p>
+    <p lang="en"><strong>Lecture 6</strong> is pipelined CPU design. Where a FIFO <strong>joins two blocks</strong>, the next lecture <strong>splits one block into stages.</strong> Opposite directions, <strong>similar problem</strong>: what to do when one stage cannot keep up with another.</p>
+  </div>
+
+</section>
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 5 개인 학습 노트<br>
+  강의: Aman Arora, Arizona State University · Fall 2026 · 이 강의의 발표자: Igor D. S. Miranda (Federal University of Rec&ocirc;ncavo da Bahia) · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 5 personal study notes<br>
+  Course: Aman Arora, Arizona State University · Fall 2026 · guest speaker for this lecture: Igor D. S. Miranda (Federal University of Rec&ocirc;ncavo da Bahia) · <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+
+<script>
+// 깊이 4 짜리 FIFO 시뮬레이터. 버튼을 눌러 포인터와 플래그가 어떻게 움직이는지 본다.
+// 목적은 결과를 나열하는 게 아니라, 가득 찼을 때와 비었을 때 주소부가 똑같다는 것을
+// 직접 눌러보다가 발견하게 하는 것이다. 상태는 JS 변수로만 들고 저장소는 안 쓴다.
+(function () {
+  var svg = document.getElementById('fq-svg');
+  if (!svg) return;
+  var verdict = document.getElementById('fq-v');
+  var ops = document.getElementById('fq-ops');
+
+  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
+
+  var DEPTH = 4, AW = 2, PW = 3;
+  var st, last;
+
+  function reset() {
+    st = { mem: ['', '', '', ''], wr: 0, rd: 0, n: 0 };
+    last = 'reset';
+  }
+  reset();
+
+  function addr(p) { return p & (DEPTH - 1); }
+  function wrap(p) { return (p >> AW) & 1; }
+  function isEmpty() { return st.wr === st.rd; }
+  function isFull() { return addr(st.wr) === addr(st.rd) && wrap(st.wr) !== wrap(st.rd); }
+  function bin(p) {
+    var s = '';
+    for (var i = PW - 1; i >= 0; i--) s += (p >> i) & 1;
+    return s;
+  }
+
+  var BTNS = [
+    { id: 'w', ko: 'write', en: 'write' },
+    { id: 'r', ko: 'read', en: 'read' },
+    { id: 'x', ko: 'reset', en: 'reset' }
+  ];
+  var btns = [];
+  BTNS.forEach(function (b) {
+    var el = document.createElement('button');
+    el.type = 'button';
+    el.addEventListener('click', function () { act(b.id); });
+    ops.appendChild(el);
+    btns.push({ el: el, ko: b.ko, en: b.en });
+  });
+
+  function act(id) {
+    if (id === 'x') { reset(); render(); return; }
+    if (id === 'w') {
+      if (isFull()) { last = 'wblocked'; render(); return; }
+      st.mem[addr(st.wr)] = 'D' + st.n;
+      st.n += 1;
+      st.wr = (st.wr + 1) & ((1 << PW) - 1);
+      last = 'w';
+    } else {
+      if (isEmpty()) { last = 'rblocked'; render(); return; }
+      last = 'r';
+      st.rdData = st.mem[addr(st.rd)];
+      st.rd = (st.rd + 1) & ((1 << PW) - 1);
+    }
+    render();
+  }
+
+  function el(tag, attrs, txt) {
+    var n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (txt !== undefined) n.textContent = txt;
+    return n;
+  }
+
+  function bitRow(x, y, s, live) {
+    var g = el('g', {});
+    for (var i = 0; i < s.length; i++) {
+      var isWrap = i === 0;
+      var col = isWrap ? '--green' : '--blue';
+      var bx = x + i * 22;
+      g.appendChild(el('rect', {
+        x: bx, y: y, width: 20, height: 20, rx: 3,
+        fill: 'rgba(var(' + col + '-rgb),' + (live ? '.2' : '.1') + ')',
+        stroke: 'var(' + col + ')', 'stroke-width': '1.4'
+      }));
+      g.appendChild(el('text', {
+        x: bx + 10, y: y + 15, 'text-anchor': 'middle', class: 'svgnum',
+        style: 'font-size:11px;font-weight:700;fill:var(' + col + ')'
+      }, s[i]));
+    }
+    return g;
+  }
+
+  function render() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    // 메모리 네 칸
+    svg.appendChild(el('text', {
+      x: 150, y: 22, 'text-anchor': 'middle', class: 'svgtxt',
+      style: 'font-size:10.5px;font-weight:700;fill:var(--ink)'
+    }, L('메모리', 'memory')));
+    for (var i = 0; i < DEPTH; i++) {
+      var ry = 34 + i * 30;
+      var hot = (st.mem[i] !== '') && !(isEmpty() && !isFull());
+      svg.appendChild(el('rect', {
+        x: 96, y: ry, width: 108, height: 28, rx: 4,
+        fill: 'var(--card)', stroke: 'var(--ink3)', 'stroke-width': '1.3'
+      }));
+      svg.appendChild(el('text', {
+        x: 90, y: ry + 19, 'text-anchor': 'end', class: 'svglab',
+        style: 'font-size:9px;fill:var(--ink3)'
+      }, (i >> 1) + '' + (i & 1)));
+      if (st.mem[i]) {
+        svg.appendChild(el('text', {
+          x: 150, y: ry + 19, 'text-anchor': 'middle', class: 'svglab',
+          style: 'font-size:11px;font-weight:700;fill:var(' + (hot ? '--blue' : '--ink3') + ')'
+        }, st.mem[i]));
+      }
+      if (addr(st.wr) === i) {
+        svg.appendChild(el('path', {
+          d: 'M64 ' + (ry + 9) + ' L78 ' + (ry + 14) + ' L64 ' + (ry + 19) + ' z',
+          fill: 'var(--blue)'
+        }));
+      }
+      if (addr(st.rd) === i) {
+        svg.appendChild(el('path', {
+          d: 'M236 ' + (ry + 9) + ' L222 ' + (ry + 14) + ' L236 ' + (ry + 19) + ' z',
+          fill: 'var(--blue)', opacity: '.55'
+        }));
+      }
+    }
+
+    // 포인터와 플래그
+    svg.appendChild(el('text', {
+      x: 300, y: 52, class: 'svglab', style: 'font-size:9.5px;fill:var(--blue)'
+    }, 'write_ptr'));
+    svg.appendChild(bitRow(392, 36, bin(st.wr), true));
+    svg.appendChild(el('text', {
+      x: 300, y: 96, class: 'svglab', style: 'font-size:9.5px;fill:var(--blue)'
+    }, 'read_ptr'));
+    svg.appendChild(bitRow(392, 80, bin(st.rd), true));
+
+    svg.appendChild(el('text', {
+      x: 392, y: 128, class: 'svglab', style: 'font-size:9px;fill:var(--ink3)'
+    }, L('맨 앞이 wrap bit', 'leading bit is the wrap bit')));
+
+    var f = isFull(), e = isEmpty();
+    [['full', f, 300], ['empty', e, 430]].forEach(function (p) {
+      var col = p[1] ? '--green' : '--ink3';
+      svg.appendChild(el('rect', {
+        x: p[2], y: 150, width: 108, height: 32, rx: 6,
+        fill: 'rgba(var(' + (p[1] ? '--green' : '--ink') + '-rgb),' + (p[1] ? '.16' : '.05') + ')',
+        stroke: 'var(' + col + ')', 'stroke-width': '1.5'
+      }));
+      svg.appendChild(el('text', {
+        x: p[2] + 54, y: 171, 'text-anchor': 'middle', class: 'svglab',
+        style: 'font-size:11px;font-weight:700;fill:var(' + col + ')'
+      }, p[0] + ' = ' + (p[1] ? 1 : 0)));
+    });
+
+    svg.appendChild(el('text', {
+      x: 560, y: 52, class: 'svglab', style: 'font-size:9.5px;fill:var(--ink3)'
+    }, L('주소부', 'address')));
+    svg.appendChild(el('text', {
+      x: 560, y: 70, class: 'svglab',
+      style: 'font-size:11px;font-weight:700;fill:var(--blue)'
+    }, bin(st.wr).slice(1) + '  /  ' + bin(st.rd).slice(1)));
+
+    btns.forEach(function (b) { b.el.textContent = L(b.ko, b.en); });
+
+    var msg;
+    if (last === 'reset') {
+      msg = L('리셋 상태다. 포인터가 둘 다 000 이고 empty 가 서 있다.',
+              'Just reset. Both pointers read 000 and empty is high.');
+    } else if (last === 'wblocked') {
+      msg = L('가득 차서 쓰기가 거절됐다. 포인터가 안 움직인 것을 보라. wr_do = wr_ena && !full 이 한 일이다.',
+              'Full, so the write was refused. Note that the pointer did not move: that is wr_do = wr_ena && !full.');
+    } else if (last === 'rblocked') {
+      msg = L('비어 있어서 읽기가 거절됐다. rd_do = rd_ena && !empty 가 막았다.',
+              'Empty, so the read was refused. Blocked by rd_do = rd_ena && !empty.');
+    } else if (last === 'w') {
+      msg = f ? L('네 번 채웠다. 주소부는 00 인데 wrap bit 가 달라서 full 이다.',
+                  'Filled. The address bits are 00 and the wrap bits differ, so it is full.')
+              : L('썼다. write_ptr 이 한 칸 올라갔다.', 'Written. write_ptr advanced by one.');
+    } else {
+      msg = e ? L('다 읽었다. 이번에는 wrap bit 까지 같아져서 empty 다. 메모리 내용은 그대로 남아 있다.',
+                  'Drained. This time the wrap bits match too, so it is empty. The memory contents are still there.')
+              : L('읽었다. ' + st.rdData + ' 가 나왔다.', 'Read. ' + st.rdData + ' came out.');
+    }
+    verdict.textContent = msg;
+  }
+
+  window.addEventListener('langchange', render);
+  render();
+})();
+</script>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<script src="../reader.js" type="module"></script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

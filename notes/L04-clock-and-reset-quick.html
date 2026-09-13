@@ -936,7 +936,6 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   </div>
 </section>
 
-</main>
 <footer>
   <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Lecture 4 개인 학습 노트<br>
   강의: Aman Arora, Arizona State University · Fall 2026 · 이 강의의 발표자: Chetan Sudarshan (Marvell Technology) · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
@@ -950,131 +949,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </main>
 </div>
 
-<script>
-// CDC / RDC 분류기. 상황을 주고 셋 중 하나를 고르게 하고 즉시 채점한다.
-// 정답을 나열하는 게 아니라, 고르고 나서 "왜"를 읽게 하는 것이 목적이다.
-// 상태는 JS 변수로만 들고 있고 브라우저 저장소는 쓰지 않는다.
-(function () {
-  var list = document.getElementById('cq-list');
-  if (!list) return;
-  var scoreBox = document.getElementById('cq-score');
-  var hintBox = document.getElementById('cq-hint');
 
-  function L(ko, en) { return document.documentElement.dataset.lang === 'en' ? en : ko; }
-
-  var OPTS = [
-    { v: 'cdc', ko: 'CDC', en: 'CDC' },
-    { v: 'rdc', ko: 'RDC', en: 'RDC' },
-    { v: 'ok',  ko: '문제 없음', en: 'no issue' }
-  ];
-
-  var QS = [
-    { ans: 'cdc',
-      ko: '100 MHz 도메인의 flop 출력이 80 MHz 도메인의 flop에 <strong>바로</strong> 들어간다. 두 클럭은 서로 다른 PLL에서 나왔다.',
-      en: 'A flop output in the 100 MHz domain feeds a flop in the 80 MHz domain <strong>directly</strong>. The two clocks come from different PLLs.',
-      wko: '서로 다른 소스라 타이밍 관계를 정할 수 없다. 100과 80은 4:5라 위상이 계속 미끄러지고, 언젠가 엣지가 겹친다. <strong>동기화 없이 넘기고 있으므로 CDC 위반이다.</strong>',
-      wen: 'Different sources, so no timing relationship can be established. 100 to 80 is 4:5, the phase keeps sliding, and eventually the edges coincide. <strong>Crossing with no synchroniser makes this a CDC violation.</strong>' },
-    { ans: 'ok',
-      ko: '100 MHz 클럭과, 그것을 2분주해서 만든 50 MHz 클럭 사이에서 데이터를 넘긴다.',
-      en: 'Data is passed between a 100 MHz clock and the 50 MHz clock made by dividing it by two.',
-      wko: '주파수는 다르지만 <strong>같은 소스에서 나왔고 매 두 번째 엣지가 정렬</strong>된다. 타이밍 관계를 적어줄 수 있으므로 둘은 <strong>같은 clock domain</strong>이고, STA가 정상적으로 검사한다. CDC가 아니다.',
-      wen: 'The frequencies differ but they <strong>share a source and every second edge lines up.</strong> The relationship can be written down, so they are <strong>the same clock domain</strong> and STA checks them normally. Not a CDC.' },
-    { ans: 'rdc',
-      ko: 'FF1과 FF2가 <strong>둘 다 clk1</strong>으로 돈다. FF1은 RST_1로, FF2는 RST_2로 비동기 리셋된다. FF1의 출력이 FF2로 들어간다.',
-      en: 'FF1 and FF2 are <strong>both clocked by clk1</strong>. FF1 is asynchronously reset by RST_1, FF2 by RST_2. FF1 drives FF2.',
-      wko: '클럭이 하나이므로 CDC는 없다. 그런데 <strong>RST_1이 걸리면 FF1의 출력이 클럭과 무관하게 바뀌고</strong>, 그 순간 FF2는 리셋 중이 아니므로 그 변화를 엣지 근처에서 잡는다. <strong>슬라이드 32쪽 metastability 패널 그대로다.</strong>',
-      wen: 'One clock, so no CDC. But <strong>when RST_1 asserts, FF1’s output changes with no regard for the clock</strong>, and FF2, not being in reset, samples that change near an edge. <strong>This is the metastability panel on slide 32, exactly.</strong>' },
-    { ans: 'cdc',
-      ko: '8비트 <strong>binary</strong> 카운터 값을 double-FF synchronizer 하나로 비동기 도메인에 넘긴다.',
-      en: 'An 8-bit <strong>binary</strong> counter value is passed into an asynchronous domain through a single double-FF synchroniser.',
-      wko: 'double-FF가 metastability는 막아준다. 그런데 카운터가 예를 들어 <code>01111111</code>에서 <code>10000000</code>으로 갈 때 <strong>여덟 비트가 한꺼번에 바뀌고 각 비트가 독립적으로 정착</strong>한다. 원본에 없던 값이 나타난다. <strong>gray code로 바꿔서 넘겨야 한다.</strong>',
-      wen: 'The double-FF does stop metastability. But when the counter goes from <code>01111111</code> to <code>10000000</code>, <strong>all eight bits change at once and each settles independently.</strong> Values the source never held appear. <strong>It has to be gray-coded before crossing.</strong>' },
-    { ans: 'rdc',
-      ko: '비동기 reset 신호가 <strong>다른 클럭 도메인 flop의 reset 핀에 바로</strong> 붙어 있다. 중간에 아무것도 없다.',
-      en: 'An asynchronous reset is wired <strong>straight onto the reset pin of a flop in another clock domain</strong>, with nothing in between.',
-      wko: '슬라이드 34쪽이 ✗ 표시를 붙여둔 바로 그 모양, <strong>Missing Reset Synchronizer</strong>다. 걸릴 때는 괜찮지만 <strong>풀릴 때 목적지 클럭 엣지와 겹치면 recovery time을 위반</strong>하고, 그 도메인 전체가 어긋난 시점에 깨어난다.',
-      wen: 'This is the shape slide 34 marks with an ✗: <strong>Missing Reset Synchronizer.</strong> Asserting is fine, but <strong>releasing on top of a destination clock edge violates recovery time</strong>, and the whole domain wakes up at inconsistent times.' },
-    { ans: 'ok',
-      ko: '같은 도메인 안에서 flop → 조합 논리 → flop으로 데이터가 간다. STA가 setup과 hold를 전부 통과시켰다.',
-      en: 'Inside one domain, data goes flop, combinational logic, flop. STA passed both setup and hold.',
-      wko: '같은 도메인이므로 CDC가 아니고, reset도 하나이므로 RDC가 아니다. <strong>그리고 STA가 통과시켰다는 것은 데이터가 setup/hold 윈도우 밖에서만 바뀐다는 뜻</strong>이라 metastability도 안 생긴다. <strong>이게 "클럭이 하나인 세계"의 안심이고, 이 강의는 그 안심이 언제 깨지는지를 다뤘다.</strong>',
-      wen: 'Same domain, so not a CDC; one reset, so not an RDC. <strong>And STA passing means the data only ever changes outside the setup and hold window</strong>, so metastability cannot occur either. <strong>This is the comfort of the single-clock world, and this lecture was about when that comfort ends.</strong>' }
-  ];
-
-  var picked = QS.map(function () { return null; });
-
-  function render() {
-    list.innerHTML = '';
-    QS.forEach(function (q, i) {
-      var row = document.createElement('div');
-      row.className = 'qrow';
-      if (picked[i]) {
-        row.classList.add('done');
-        row.classList.add(picked[i] === q.ans ? 'ok' : 'no');
-      }
-
-      var qd = document.createElement('div');
-      qd.className = 'q';
-      qd.innerHTML = '<strong>' + (i + 1) + '.</strong> ' + L(q.ko, q.en);
-      row.appendChild(qd);
-
-      var opts = document.createElement('div');
-      opts.className = 'opts';
-      OPTS.forEach(function (o) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.textContent = L(o.ko, o.en);
-        if (picked[i]) {
-          b.disabled = true;
-          if (o.v === q.ans) b.classList.add('right');
-          else if (o.v === picked[i]) b.classList.add('wrong');
-        } else {
-          b.addEventListener('click', function () { picked[i] = o.v; render(); });
-        }
-        opts.appendChild(b);
-      });
-      row.appendChild(opts);
-
-      var why = document.createElement('div');
-      why.className = 'why';
-      why.innerHTML = L(q.wko, q.wen);
-      row.appendChild(why);
-
-      list.appendChild(row);
-    });
-    paintScore();
-  }
-
-  function paintScore() {
-    var done = picked.filter(function (p) { return p !== null; }).length;
-    var right = picked.filter(function (p, i) { return p === QS[i].ans; }).length;
-    scoreBox.innerHTML = '';
-    var s = document.createElement('span');
-    s.textContent = L('푼 문제 ' + done + ' / ' + QS.length + '  ·  맞힌 것 ' + right,
-                      'answered ' + done + ' of ' + QS.length + '  ·  correct ' + right);
-    scoreBox.appendChild(s);
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.textContent = L('다시 풀기', 'start over');
-    b.addEventListener('click', function () {
-      picked = QS.map(function () { return null; });
-      render();
-    });
-    scoreBox.appendChild(b);
-
-    if (done < QS.length) {
-      hintBox.innerHTML = L('판정 순서를 이렇게 잡으면 헷갈리지 않는다. <strong>1. 클럭이 둘인가</strong> → 아니면 CDC는 빼도 된다. <strong>2. reset이 둘인가</strong> → 아니면 RDC도 빼도 된다. <strong>3. 남았다면, 중간에 동기화 장치가 있는가.</strong>',
-                           'Work through it in this order and it stays clear. <strong>1. Are there two clocks?</strong> If not, CDC is off the table. <strong>2. Are there two resets?</strong> If not, RDC is off the table too. <strong>3. If something is left, is there a synchroniser in between?</strong>');
-    } else {
-      hintBox.innerHTML = L('여섯 문제가 각각 이 강의의 한 절에 대응한다. 틀린 것이 있으면 그 절로 돌아가면 된다. 1번은 <a href="#s6">06절</a>, 2번은 <a href="#s5">05절</a>, 3번과 5번은 <a href="#s11">11절</a>, 4번은 <a href="#s7">07절</a>, 6번은 <a href="#s1">01절</a>이다.',
-                           'Each of the six maps to one section. If you missed one, go back to it: 1 is <a href="#s6">§06</a>, 2 is <a href="#s5">§05</a>, 3 and 5 are <a href="#s11">§11</a>, 4 is <a href="#s7">§07</a>, and 6 is <a href="#s1">§01</a>.');
-    }
-  }
-
-  window.addEventListener('langchange', render);
-  render();
-})();
-</script>
 <script>
 // 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
 (function () {
