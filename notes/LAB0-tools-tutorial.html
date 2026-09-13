@@ -1240,82 +1240,236 @@ dc_shell-topo&gt; <span class="k">report_constraint</span> -all_violators
 
   <h3 lang="ko">따라치기 압축판</h3>
   <h3 lang="en">The condensed walkthrough</h3>
-  <p lang="ko">위까지가 <strong>왜</strong>이고 여기부터는 <strong>그냥 이대로 치면 됨</strong>이다. 실제로 끝까지 돌려본 순서 그대로다.</p>
-  <p lang="en">Everything above is the <strong>why</strong>. From here it is <strong>just type this</strong>, in the exact order that actually worked end to end.</p>
 
+  <p lang="ko">위까지가 <strong>왜</strong>였고, 여기부터는 <strong>그래서 뭘 어떻게 치면 되냐</strong>다. 실제로 끝까지 돌려본 순서 그대로 적는다. 중간중간 "이건 왜 이러냐" 싶은 것도 같이 풀어둘 테니, 따라치면서 읽으면 된다.</p>
+  <p lang="en">Everything above was the <strong>why</strong>. From here it is <strong>what to actually type</strong>, in the exact order that worked end to end. I will stop and explain the bits that make you go "wait, why is it doing that", so read as you type.</p>
+
+  <h4 lang="ko">이 과제, 대체 뭘 시키는 거냐</h4>
+  <h4 lang="en">So what is this lab actually asking</h4>
+  <p lang="ko">과제가 시키는 건 딱 세 개다. <strong>VCS로 시뮬레이션 돌리고, Verdi로 파형 보고, DC로 합성해라.</strong></p>
+  <p lang="en">The lab asks for exactly three things. <strong>Run a simulation in VCS, look at the waveform in Verdi, synthesise with DC.</strong></p>
+  <p lang="ko">왜 하필 이 셋이냐. 이게 <strong>RTL 설계자가 매일 도는 루프</strong>라서다. 코드를 쓴다 &rarr; 돌려본다(VCS) &rarr; 이상하면 파형을 열어서 어디서 틀어졌는지 본다(Verdi) &rarr; 맞으면 게이트로 바꿔서 면적과 전력과 타이밍을 확인한다(DC). Lab 0은 그 루프를 <strong>한 바퀴만</strong> 돌아보는 거다. 실무에서는 이걸 하루에 수십 번 돈다.</p>
+  <p lang="en">Why those three? Because that is <strong>the loop an RTL designer runs every day</strong>. Write code &rarr; run it (VCS) &rarr; when it misbehaves, open the waveform and find where it went wrong (Verdi) &rarr; when it is right, turn it into gates and check area, power and timing (DC). Lab 0 walks that loop <strong>exactly once</strong>. On a real project you go round it dozens of times a day.</p>
+  <p lang="ko">그래서 설계도 testbench도 이미 다 줬다. <strong>너는 코드를 한 줄도 안 쓴다.</strong> 도구를 손에 익히는 게 전부고, 제출도 코드가 아니라 리포트 하나다. 뭘 내야 하냐면:</p>
+  <p lang="en">That is why the design and the testbench are both handed to you. <strong>You write no code at all.</strong> The whole point is getting the tools under your fingers, and you submit a report rather than code. Here is what goes in it:</p>
+  <ul>
+    <li lang="ko">Task마다 <strong>성공했다는 걸 보여주는 스크린샷</strong></li>
+    <li lang="en">A <strong>screenshot showing success</strong> for each task</li>
+    <li lang="ko">Task 1은 여기에 더해 <strong>생성된 파일과 폴더 목록을 글로도</strong> 적어야 한다. 이거 놓치는 사람 꽤 있다</li>
+    <li lang="en">For Task 1, on top of that, a <strong>written list of the files and folders</strong> that got created. Plenty of people miss this one</li>
+    <li lang="ko">Task 2는 <strong>design hierarchy</strong> 화면과 <strong>파형</strong> 화면 두 장</li>
+    <li lang="en">For Task 2, two shots: the <strong>design hierarchy</strong> and the <strong>waveform</strong></li>
+    <li lang="ko">Task 3은 <strong>power, area, timing</strong> 세 개를 따로</li>
+    <li lang="en">For Task 3, <strong>power, area and timing</strong> as three separate shots</li>
+    <li lang="ko">그리고 질문 5개 답</li>
+    <li lang="en">Plus answers to the five questions</li>
+  </ul>
+  <p lang="ko">자 그럼 시작하자.</p>
+  <p lang="en">Right, let us go.</p>
+
+  <h4 lang="ko">0. 일단 들어가야 한다</h4>
+  <h4 lang="en">0. Getting in</h4>
+  <p lang="ko">도구가 다 남의 서버에 있으니 거기부터 들어가야 한다. Canvas 왼쪽 메뉴에서 <em>Apporto - ECEE Cad Lab</em>을 누르면 브라우저 안에 리눅스 데스크톱이 통째로 뜬다.</p>
+  <p lang="en">The tools all live on someone else's machine, so that is where you have to go. Click <em>Apporto - ECEE Cad Lab</em> in the Canvas sidebar and a whole Linux desktop opens up inside your browser.</p>
   <div class="callout">
-    <p lang="ko"><strong>0단계.</strong> Canvas 왼쪽 <em>Apporto - ECEE Cad Lab</em> 클릭 &rarr; 리눅스 데스크톱이 뜬다 &rarr; <strong>keyring 비밀번호 창은 Cancel</strong> (터미널만 쓸 거면 필요 없다) &rarr; 좌상단 <em>Activities</em> &rarr; dock에서 터미널 아이콘.</p>
-    <p lang="en"><strong>Step 0.</strong> Click <em>Apporto - ECEE Cad Lab</em> in Canvas &rarr; a Linux desktop opens &rarr; <strong>hit Cancel on the keyring password box</strong> (you do not need it for terminal work) &rarr; <em>Activities</em> top left &rarr; terminal icon in the dock.</p>
+    <p lang="ko">들어가자마자 <strong>keyring 비밀번호를 묻는 창</strong>이 뜰 거다. <strong>그냥 Cancel 눌러라.</strong> 이건 GNOME이 브라우저 비밀번호 같은 걸 저장하려고 여는 건데, 우리는 터미널만 쓸 거라 아무 상관 없다. 괜히 비밀번호 치지 마라.</p>
+    <p lang="en">The moment you are in, a box will ask for a <strong>keyring password</strong>. <strong>Just hit Cancel.</strong> That is GNOME wanting to unlock saved browser passwords and such. We are only using a terminal, so it is irrelevant. Do not bother typing anything.</p>
   </div>
+  <p lang="ko">그 다음 좌상단 <em>Activities</em>를 누르면 왼쪽에 dock이 나온다. 거기서 터미널 아이콘을 누른다. 이제 준비 끝.</p>
+  <p lang="en">Then click <em>Activities</em> at the top left, a dock slides out on the left, and you click the terminal icon. That is you set up.</p>
 
-  <p lang="ko"><strong>1. 파일 복사.</strong> 원본은 읽기 전용이라 거기서 작업하면 안 된다.</p>
-  <p lang="en"><strong>1. Copy the files.</strong> The originals are read-only, so you cannot work in place.</p>
+  <h4 lang="ko">1. 실습 파일 챙기기</h4>
+  <h4 lang="en">1. Grabbing the lab files</h4>
+  <p lang="ko">파일은 <code>/usr/local2/COURSES/ADDV/LAB0</code>에 있다. 근데 <strong>거기서 바로 작업하면 안 된다.</strong> 읽기 전용이고 소유자가 조교라서 애초에 쓰기도 안 된다. 내 홈으로 복사해서 쓴다.</p>
+  <p lang="en">The files sit in <code>/usr/local2/COURSES/ADDV/LAB0</code>. But <strong>you do not work there.</strong> It is read-only and owned by the TA, so you could not write to it anyway. Copy it into your own home directory.</p>
 <pre class="code" lang="ko">mkdir -p ~/lab0/work
 cp -r /usr/local2/COURSES/ADDV/LAB0/* ~/lab0/work/
 cd ~/lab0/work
-grep -nE "^[a-zA-Z_][a-zA-Z0-9_]*:" sim/Makefile   <span class="c">// 타겟 이름만 뽑아본다</span></pre>
+ls -R</pre>
 <pre class="code" lang="en">mkdir -p ~/lab0/work
 cp -r /usr/local2/COURSES/ADDV/LAB0/* ~/lab0/work/
 cd ~/lab0/work
-grep -nE "^[a-zA-Z_][a-zA-Z0-9_]*:" sim/Makefile   <span class="c">// pull out just the target names</span></pre>
+ls -R</pre>
+  <p lang="ko">파일이 여섯 개 나올 거다. 설계(<code>18_19_Slice.v</code>), testbench(<code>18_19_Slice_tb.v</code>), 환경 스크립트(<code>env.cshrc</code>), 그리고 <code>sim/</code>과 <code>synth/</code> 안에 Makefile들. <strong>여섯 개 중 셋이 빌드 스크립트</strong>라는 게 이 Lab의 성격을 말해준다. 새로 짤 코드는 없고 이미 있는 걸 돌리는 게 전부다.</p>
+  <p lang="en">Six files show up: the design (<code>18_19_Slice.v</code>), the testbench (<code>18_19_Slice_tb.v</code>), an environment script (<code>env.cshrc</code>), and Makefiles inside <code>sim/</code> and <code>synth/</code>. <strong>Three of the six are build scripts</strong>, which tells you what this lab is. Nothing to write, everything to run.</p>
+  <p lang="ko">그리고 과제가 <strong>"Makefile 타겟을 열어보라"</strong>고 굳이 시킨다. 시키는 데는 이유가 있는데, <strong>리포트 질문 답이 거기 들어 있다.</strong> 일단 타겟 이름만 훑어보자.</p>
+  <p lang="en">The lab also specifically tells you to <strong>open the Makefiles and look at the targets</strong>. There is a reason for that: <strong>some of the report answers are sitting in there.</strong> Let us list the target names first.</p>
+<pre class="code" lang="ko">grep -nE "^[a-zA-Z_][a-zA-Z0-9_]*:" sim/Makefile</pre>
+<pre class="code" lang="en">grep -nE "^[a-zA-Z_][a-zA-Z0-9_]*:" sim/Makefile</pre>
+  <p lang="ko">줄 맨 앞에서 시작해서 <code>:</code>로 끝나는 게 타겟이다. 레시피는 탭으로 들여써 있어서 이 정규식에 안 걸린다. <code>compile</code>, <code>compile_verdi</code>, <code>sim</code>, <code>verdi</code>, <code>clean</code> 같은 게 쭉 나올 거다.</p>
+  <p lang="en">Anything starting at column one and ending in <code>:</code> is a target. Recipes are tab-indented so they do not match. You will get <code>compile</code>, <code>compile_verdi</code>, <code>sim</code>, <code>verdi</code>, <code>clean</code> and friends.</p>
+  <p lang="ko">여기서 <strong>눈여겨볼 게 하나 있다.</strong> <code>compile</code>과 <code>compile_verdi</code>가 따로 있다. 같은 <code>vcs</code>를 부르는데 왜 타겟이 두 개겠나. <strong>옵션이 다르다는 뜻이다.</strong> 이게 나중에 Task 2에서 걸리는 지점이니 지금 기억해둬라.</p>
+  <p lang="en">One thing worth noticing right now: there is a <code>compile</code> <em>and</em> a <code>compile_verdi</code>. Both call <code>vcs</code>, so why two targets? <strong>Because the options differ.</strong> That difference is exactly what bites people in Task 2, so file it away.</p>
 
-  <p lang="ko"><strong>2. 환경.</strong> <strong>여기서 제일 많이 죽는다.</strong> bash에서 하면 <code>setenv: command not found</code>가 줄줄이 뜨는데 <strong>멈추지를 않아서</strong> 성공한 줄 안다. 그 상태로 make를 돌리면 엉뚱한 데서 터진다.</p>
-  <p lang="en"><strong>2. Environment.</strong> <strong>This is where most people die.</strong> Do it in bash and you get a wall of <code>setenv: command not found</code>, and because it <strong>does not stop</strong>, you think it worked. Run make from there and it blows up somewhere unrelated.</p>
-<pre class="code" lang="ko">tcsh                        <span class="c">// 먼저 tcsh로 들어간다. 이게 핵심</span>
+  <h4 lang="ko">2. 환경 잡기 (여기서 제일 많이 죽는다)</h4>
+  <h4 lang="en">2. Setting up the environment (this is where people die)</h4>
+  <p lang="ko">도구를 돌리려면 <code>VCS_HOME</code>이니 라이선스 서버 주소니 하는 환경 변수가 잡혀 있어야 한다. 그걸 해주는 게 <code>env.cshrc</code>다. 그냥 습관대로 이렇게 치면:</p>
+  <p lang="en">Before any tool will run, environment variables like <code>VCS_HOME</code> and the licence server address have to be set. That is what <code>env.cshrc</code> does. Type it the way you normally would:</p>
+<pre class="code" lang="ko">source ~/lab0/work/env.cshrc</pre>
+<pre class="code" lang="en">source ~/lab0/work/env.cshrc</pre>
+  <p lang="ko">이런 게 화면을 가득 채운다.</p>
+  <p lang="en">and this fills your screen:</p>
+<pre class="code">bash: setenv: command not found
+bash: setenv: command not found
+bash: setenv: command not found
+...</pre>
+  <p lang="ko"><code>setenv</code>는 <strong>tcsh 문법</strong>이라 bash가 못 알아듣는 거다. 근데 진짜 문제는 그게 아니다. <strong>에러만 뱉고 멈추질 않는다.</strong> 프롬프트가 그냥 돌아오니까 "됐나 보다" 하고 넘어가게 된다. 그 상태로 <code>make</code>를 돌리면 <code>VCS_HOME</code>이 빈 문자열이라 <code>/bin/vcs: No such file</code> 같은 엉뚱한 에러가 뜨고, 원인을 한참 못 찾는다.</p>
+  <p lang="en"><code>setenv</code> is <strong>tcsh syntax</strong>, so bash has no idea what it is. But that is not the real problem. <strong>It errors and keeps going.</strong> You get your prompt back, shrug, and move on. Then you run <code>make</code>, <code>VCS_HOME</code> is empty, and you get something unrelated like <code>/bin/vcs: No such file</code> and spend ages hunting the wrong thing.</p>
+  <p lang="ko">그래서 <strong>tcsh로 먼저 들어가야 한다.</strong></p>
+  <p lang="en">So <strong>get into tcsh first.</strong></p>
+<pre class="code" lang="ko">tcsh
 source ~/lab0/work/env.cshrc
-which vcs verdi dc_shell    <span class="c">// 셋 다 경로가 나와야 정상</span></pre>
-<pre class="code" lang="en">tcsh                        <span class="c">// get into tcsh first. this is the whole trick</span>
+which vcs verdi dc_shell</pre>
+<pre class="code" lang="en">tcsh
 source ~/lab0/work/env.cshrc
-which vcs verdi dc_shell    <span class="c">// all three must print a path</span></pre>
-  <p lang="ko">터미널을 새로 열면 <strong>매번 다시</strong> 해야 한다. 환경은 셸마다 따로다.</p>
-  <p lang="en">You must redo this <strong>every time</strong> you open a new terminal. The environment is per-shell.</p>
-
-  <p lang="ko"><strong>3. Task 1 &middot; VCS.</strong></p>
-  <p lang="en"><strong>3. Task 1 &middot; VCS.</strong></p>
-<pre class="code" lang="ko">cd ~/lab0/work/sim
-ls -A                       <span class="c">// 찍어둔다. 나중에 "뭐가 생겼나"의 기준선</span>
-make compile                <span class="c">// simv, simv.daidir/, csrc/, compile.log</span>
-make sim                    <span class="c">// novas.fsdb, novas_dump.log, ucli.key</span></pre>
-<pre class="code" lang="en">cd ~/lab0/work/sim
-ls -A                       <span class="c">// note this down. it is your before/after baseline</span>
-make compile                <span class="c">// simv, simv.daidir/, csrc/, compile.log</span>
-make sim                    <span class="c">// novas.fsdb, novas_dump.log, ucli.key</span></pre>
-  <p lang="ko"><strong>스크린샷만 찍고 끝내면 감점이다.</strong> 제출물에 <em>compile 단계</em>와 <em>simulation 단계</em>에서 생긴 파일과 폴더를 <strong>글로 나눠 적으라</strong>고 따로 요구한다. 그래서 <code>ls -A</code>를 단계마다 찍어 before/after로 대조해두면 그대로 근거가 된다.</p>
-  <p lang="en"><strong>Screenshots alone lose points here.</strong> The deliverable separately asks you to <strong>list in writing</strong> the files and folders created by the <em>compilation step</em> and by the <em>simulation step</em>. Run <code>ls -A</code> at each step and the before/after diff writes that list for you.</p>
-
-  <p lang="ko"><strong>4. Task 2 &middot; Verdi.</strong> <code>make compile</code> 결과로는 <strong>안 된다.</strong> Verdi가 읽는 DB는 <code>-kdb</code>로 만들어지고 그건 <code>compile_verdi</code>에만 붙어 있다.</p>
-  <p lang="en"><strong>4. Task 2 &middot; Verdi.</strong> The output of <code>make compile</code> <strong>will not do.</strong> The database Verdi reads comes from <code>-kdb</code>, and that switch only appears in <code>compile_verdi</code>.</p>
-<pre class="code" lang="ko">make clean
-make compile_verdi          <span class="c">// "Verdi KDB elaboration done" 줄이 떠야 성공</span>
-make sim
-make waves_verdi            <span class="c">// Verdi + 파형 같이 뜬다</span></pre>
-<pre class="code" lang="en">make clean
-make compile_verdi          <span class="c">// look for the "Verdi KDB elaboration done" line</span>
-make sim
-make waves_verdi            <span class="c">// opens Verdi with the waveform loaded</span></pre>
-  <p lang="ko">창이 뜨면 <strong>왼쪽 Hierarchy에서 스코프를 우클릭 &rarr; Add to Waveform &rarr; Add to Wave2.</strong> 신호를 하나씩 고를 필요 없이 스코프 통째로 들어간다. <strong>testbench 스코프와 DUT 스코프를 각각 한 번씩</strong> 해라. 제출물이 "설계 신호와 testbench 신호가 <em>둘 다</em>"를 요구한다. 한쪽만 있으면 미달이다. 다 넣었으면 <strong><code>F</code>(Zoom All)</strong>로 전체 구간을 맞추고, 이름이 잘리면 이름 칸 경계를 오른쪽으로 끈다.</p>
-  <p lang="en">Once it opens, <strong>right-click a scope in the Hierarchy pane &rarr; Add to Waveform &rarr; Add to Wave2.</strong> That pulls the whole scope in, no picking signals one by one. <strong>Do it once for the testbench scope and once for the DUT scope.</strong> The deliverable asks for signals from the design <em>and</em> from the testbench; one side only is a miss. Then press <strong><code>F</code> (Zoom All)</strong> to fit the whole run, and drag the name column wider if names are clipped.</p>
-
-  <p lang="ko"><strong>5. Task 3 &middot; Design Compiler.</strong></p>
-  <p lang="en"><strong>5. Task 3 &middot; Design Compiler.</strong></p>
-<pre class="code" lang="ko">cd ~/lab0/work/synth
-cat -n compile_dc.tcl       <span class="c">// target_library / link_library 줄을 찾는다. 리포트 질문 답</span>
-make synth                  <span class="c">// 10초쯤. timing.rep cell.rep power.rep area.rep</span>
-tail -20 timing.rep         <span class="c">// 맨 아래 slack (MET) 인지 (VIOLATED) 인지</span></pre>
-<pre class="code" lang="en">cd ~/lab0/work/synth
-cat -n compile_dc.tcl       <span class="c">// find the target_library / link_library lines. that is a report answer</span>
-make synth                  <span class="c">// about 10 seconds. timing.rep cell.rep power.rep area.rep</span>
-tail -20 timing.rep         <span class="c">// the slack (MET) or (VIOLATED) line at the bottom</span></pre>
-  <p lang="ko">로그에 <code>Error: unknown command &apos;set_ultra_optimization&apos;</code>이 두 번 뜨는데 <strong>무시해도 된다.</strong> DC Ultra 라이선스가 없어서 그 명령을 모르는 것뿐이고, 합성은 그대로 끝까지 간다. <strong>"에러가 있다"와 "실패했다"는 다르다.</strong> 리포트 네 개가 다 생겼는지로 판단해라.</p>
-  <p lang="en">The log prints <code>Error: unknown command &apos;set_ultra_optimization&apos;</code> twice. <strong>Ignore it.</strong> It just means there is no DC Ultra licence, so the command is unknown; synthesis runs to completion anyway. <strong>"There are errors" and "it failed" are not the same thing.</strong> Judge by whether all four reports appeared.</p>
-
+which vcs verdi dc_shell</pre>
+  <p lang="ko">마지막 줄에서 <strong>세 도구의 경로가 다 나오면</strong> 성공이다. 하나라도 안 나오면 source가 안 먹은 거니까 다시 해라. 참고로 프롬프트 모양도 <code>[user@host dir]$</code>처럼 바뀌는데, 그게 tcsh에 들어왔다는 표시다.</p>
+  <p lang="en">If that last line <strong>prints a path for all three</strong>, you are good. If any is missing, the source did not take, so do it again. Your prompt also changes shape to something like <code>[user@host dir]$</code>, which is your cue that you are in tcsh.</p>
   <div class="trap">
-    <p lang="ko"><strong>tcsh에서는 <code>2&gt;&amp;1</code>이 안 먹는다.</strong> <code>Ambiguous output redirect.</code>가 뜬다. tcsh는 <code>&gt;&amp;</code>를 쓴다. 로그를 파일로 남기려다 여기서 한 번 넘어진다.</p>
-    <p lang="en"><strong><code>2&gt;&amp;1</code> does not work in tcsh.</strong> You get <code>Ambiguous output redirect.</code> tcsh uses <code>&gt;&amp;</code> instead. This trips you the first time you try to tee a log.</p>
+    <p lang="ko"><strong>터미널을 새로 열면 매번 다시 해야 한다.</strong> 환경 변수는 셸마다 따로 산다. 창을 하나 더 열었는데 갑자기 <code>vcs</code>를 못 찾는다면 십중팔구 이거다.</p>
+    <p lang="en"><strong>You redo this in every new terminal.</strong> Environment variables live per shell. If you open a second window and suddenly <code>vcs</code> is not found, this is almost always why.</p>
   </div>
 
-  <p lang="ko">여기까지가 Part II 전부다. 남는 건 리포트 질문 다섯 개인데, <strong>1번과 2번은 <code>compile_dc.tcl</code>, 3번은 <code>sim/Makefile</code>, 4번은 testbench 안에 답이 그냥 적혀 있다.</strong> 5번만 설계 파일을 읽고 <strong>그림을 그려야</strong> 한다.</p>
-  <p lang="en">That is all of Part II. What is left is the five report questions, and <strong>the answers to 1 and 2 sit in <code>compile_dc.tcl</code>, 3 in <code>sim/Makefile</code>, and 4 inside the testbench.</strong> Only question 5 needs you to read the design and <strong>draw diagrams</strong>.</p>
+  <h4 lang="ko">3. Task 1 &middot; VCS로 돌려보기</h4>
+  <h4 lang="en">3. Task 1 &middot; Running it in VCS</h4>
+  <p lang="ko">이제 진짜 시작이다. 우리가 원하는 건 <strong>설계와 testbench를 합쳐서 실행 파일을 만들고, 그걸 돌려서 끝까지 가는지 보는 것</strong>이다.</p>
+  <p lang="en">Now the real thing. What we want is to <strong>build the design and testbench into an executable, then run it and see it reach the end</strong>.</p>
+  <p lang="ko">근데 그 전에 한 가지. 제출물에 <strong>"각 단계에서 생성된 파일과 폴더를 나열하라"</strong>가 있다. 그러니까 <strong>돌리기 전에 지금 상태를 찍어두면</strong> 나중에 비교만 하면 된다. 이거 은근 편하다.</p>
+  <p lang="en">One thing first, though. The deliverable asks you to <strong>list the files and folders created at each step</strong>. So if you <strong>snapshot the directory before you run anything</strong>, you just diff it later. Saves a lot of squinting.</p>
+<pre class="code" lang="ko">cd ~/lab0/work/sim
+ls -A
+make compile</pre>
+<pre class="code" lang="en">cd ~/lab0/work/sim
+ls -A
+make compile</pre>
+  <p lang="ko">VCS가 뭐라뭐라 한참 뱉는다. 여기서 <strong>우리가 봐야 할 건 이 두 군데</strong>다.</p>
+  <p lang="en">VCS spews a lot. <strong>Two bits matter</strong>:</p>
+<pre class="code">Top Level Modules:
+       tb_dsp_slice
+...
+CPU time: .226 seconds to compile + .143 seconds to elab + .218 seconds to link</pre>
+  <p lang="ko">top module 이름이 <code>tb_dsp_slice</code>라는 것, 그리고 <strong>compile / elab / link 세 단계가 다 시간을 찍고 끝났다</strong>는 것. 에러 없이 여기까지 오면 컴파일 성공이다.</p>
+  <p lang="en">The top module is <code>tb_dsp_slice</code>, and <strong>all three stages (compile, elab, link) reported a time</strong>. Get here with no errors and the compile is done.</p>
+  <p lang="ko">이제 <code>ls -A</code>를 다시 쳐보면 아까 없던 게 네 개 생겨 있다.</p>
+  <p lang="en">Run <code>ls -A</code> again and four things have appeared that were not there before.</p>
+  <ul>
+    <li lang="ko"><code>simv</code> &mdash; <strong>이게 목표물이다.</strong> 시뮬레이터 실행 파일. 설계와 testbench가 여기 다 들어가 있다</li>
+    <li lang="en"><code>simv</code> &mdash; <strong>this is the prize.</strong> The simulator executable, with design and testbench baked in</li>
+    <li lang="ko"><code>simv.daidir/</code> &mdash; 설계 정보 DB. <strong>Verdi가 나중에 이걸 읽는다</strong></li>
+    <li lang="en"><code>simv.daidir/</code> &mdash; the design database. <strong>Verdi reads this later</strong></li>
+    <li lang="ko"><code>csrc/</code> &mdash; VCS가 중간에 만든 C 소스랑 오브젝트. 신경 안 써도 된다</li>
+    <li lang="en"><code>csrc/</code> &mdash; intermediate C sources and objects VCS made along the way. Ignore it</li>
+    <li lang="ko"><code>compile.log</code> &mdash; 방금 화면에 지나간 거 전부</li>
+    <li lang="en"><code>compile.log</code> &mdash; everything that just scrolled past</li>
+  </ul>
+  <p lang="ko">궁금할 수도 있는데, VCS가 <strong>Verilog를 C로 바꿔서 컴파일하기 때문에</strong> <code>csrc/</code> 같은 게 나온다. 시뮬레이터가 결국 네이티브 실행 파일인 이유가 이거다. 느린 인터프리터가 아니라 진짜 컴파일된 프로그램이라 빠르다.</p>
+  <p lang="en">In case you are wondering: <code>csrc/</code> exists because <strong>VCS translates your Verilog into C and compiles that</strong>. It is why the simulator ends up as a native executable. Not a slow interpreter, an actual compiled program, which is why it is quick.</p>
+  <p lang="ko">그럼 돌려보자.</p>
+  <p lang="en">Now run it.</p>
+<pre class="code" lang="ko">make sim</pre>
+<pre class="code" lang="en">make sim</pre>
+  <p lang="ko">여기서 <strong>우리가 원하는 건 이 줄들</strong>이다.</p>
+  <p lang="en">and <strong>these are the lines we want</strong>:</p>
+<pre class="code">*Verdi* : Create FSDB file 'novas.fsdb'
+$finish called from file "../18_19_Slice_tb.v", line 61.
+$finish at simulation time                 610
+         V C S   S i m u l a t i o n   R e p o r t
+Time: 610 ns</pre>
+  <p lang="ko"><code>$finish</code>가 불렸다는 건 <strong>testbench가 중간에 죽은 게 아니라 자기가 끝났다고 선언했다</strong>는 뜻이다. 시뮬레이션이 끝까지 갔다는 증거가 이거다. 에러로 죽었으면 <code>$finish</code> 없이 다른 메시지가 뜬다.</p>
+  <p lang="en"><code>$finish</code> being called means <strong>the testbench declared itself done rather than dying partway</strong>. That is your proof the simulation ran to completion. If it had crashed you would see something else and no <code>$finish</code>.</p>
+  <p lang="ko">그리고 <code>novas.fsdb</code>가 생겼다. <strong>이게 파형 파일이다.</strong> Task 2에서 이걸 열 거다. <code>ls -A</code> 다시 쳐보면 <code>novas.fsdb</code>, <code>novas_dump.log</code>, <code>ucli.key</code> 세 개가 더 늘어 있을 거다. <strong>compile 단계 네 개 / sim 단계 세 개, 이렇게 나눠서 리포트에 적으면 된다.</strong></p>
+  <p lang="en">And <code>novas.fsdb</code> showed up. <strong>That is the waveform file</strong>, and Task 2 opens it. Run <code>ls -A</code> once more and you have three new entries: <code>novas.fsdb</code>, <code>novas_dump.log</code> and <code>ucli.key</code>. <strong>Four from the compile step, three from the sim step. That is your written list.</strong></p>
+
+  <h4 lang="ko">4. Task 2 &middot; Verdi로 파형 보기</h4>
+  <h4 lang="en">4. Task 2 &middot; Waveforms in Verdi</h4>
+  <p lang="ko">자, 아까 <code>compile</code>이랑 <code>compile_verdi</code>가 따로 있다고 했던 거 기억나나. <strong>여기서 그게 걸린다.</strong></p>
+  <p lang="en">Remember how there was both a <code>compile</code> and a <code>compile_verdi</code>? <strong>Here is where that matters.</strong></p>
+  <p lang="ko">방금 만든 걸로 Verdi를 열면 파형은 보이는데 <strong>설계 계층이 안 보인다.</strong> Verdi가 설계 구조를 읽으려면 <code>-kdb</code>라는 옵션으로 만든 knowledge database가 필요한데, 그게 <code>compile_verdi</code>에만 붙어 있기 때문이다. <strong>그냥 다시 컴파일해야 한다.</strong></p>
+  <p lang="en">Open Verdi against what you just built and the waveform shows up but <strong>the design hierarchy does not</strong>. For Verdi to read the structure it needs a knowledge database, built by the <code>-kdb</code> switch, and that switch only lives in <code>compile_verdi</code>. <strong>So you recompile.</strong></p>
+<pre class="code" lang="ko">make clean
+make compile_verdi
+make sim
+make waves_verdi</pre>
+<pre class="code" lang="en">make clean
+make compile_verdi
+make sim
+make waves_verdi</pre>
+  <p lang="ko"><code>compile_verdi</code> 로그 끝에 <strong>이 줄이 뜨면</strong> 제대로 된 거다. 일반 <code>compile</code>에는 안 나오는 줄이다.</p>
+  <p lang="en">If the tail of the <code>compile_verdi</code> log shows <strong>this line</strong>, it worked. A plain <code>compile</code> never prints it.</p>
+<pre class="code">Verdi KDB elaboration done and the database successfully generated</pre>
+  <p lang="ko">그리고 <code>make waves_verdi</code>를 치면 Verdi 창이 뜬다. 좀 걸리니까 기다려라.</p>
+  <p lang="en">Then <code>make waves_verdi</code> opens Verdi. Give it a moment.</p>
+  <p lang="ko">창이 뜨면 <strong>왼쪽에 Hierarchy 패널</strong>이 있다. 거기 <code>tb_dsp_slice</code> 밑에 <code>slice_me</code>가 있고, 그 밑에 <code>pre_adder</code>, <code>multiplier</code>, <code>adder_subtractor</code> 같은 게 주르륵 나온다. <strong>이게 첫 번째 제출용 스크린샷이다.</strong> 삼각형 눌러서 다 펼쳐놓고 찍어라.</p>
+  <p lang="en">When it opens there is a <strong>Hierarchy pane on the left</strong>. Under <code>tb_dsp_slice</code> you will find <code>slice_me</code>, and under that a row of things like <code>pre_adder</code>, <code>multiplier</code>, <code>adder_subtractor</code>. <strong>That is your first screenshot.</strong> Expand the triangles so it is all visible, then capture it.</p>
+  <p lang="ko">그 다음이 파형인데, 여기가 요령이 좀 필요하다. 제출물이 <strong>"설계 신호와 testbench 신호가 둘 다"</strong> 있어야 한다고 못박아놨다. 한쪽만 찍으면 미달이다.</p>
+  <p lang="en">The waveform is next, and this one has a knack to it. The deliverable explicitly wants <strong>signals from the design and from the testbench</strong>. One side only does not count.</p>
+  <div class="callout">
+    <p lang="ko">신호를 하나씩 골라 넣을 필요 없다. <strong>Hierarchy에서 스코프를 우클릭 &rarr; Add to Waveform &rarr; Add to Wave2</strong> 하면 그 스코프 신호가 통째로 들어간다. <strong>testbench 쪽(<code>tb_dsp_slice</code>)에 한 번, DUT 쪽(<code>slice_me</code>)에 한 번</strong> 해라. 그러면 요구사항이 자동으로 충족된다.</p>
+    <p lang="en">You do not pick signals one at a time. <strong>Right-click a scope in the Hierarchy pane &rarr; Add to Waveform &rarr; Add to Wave2</strong> and the whole scope goes in. <strong>Do it once on the testbench (<code>tb_dsp_slice</code>) and once on the DUT (<code>slice_me</code>)</strong> and the requirement takes care of itself.</p>
+  </div>
+  <p lang="ko">다 넣고 나면 화면이 좀 답답할 거다. 두 가지만 손보면 된다.</p>
+  <p lang="en">It will look cramped once everything is in. Two fixes.</p>
+  <ul>
+    <li lang="ko"><strong><code>F</code>를 눌러라.</strong> Zoom All이다. 처음엔 앞쪽 100ns 정도만 확대돼 있어서 신호가 거의 안 변하는 것처럼 보이는데, 전체를 맞춰놓으면 값이 계속 바뀌는 게 보인다. <strong>채점자 입장에서도 "제대로 돌았구나"가 훨씬 잘 보인다.</strong></li>
+    <li lang="en"><strong>Press <code>F</code></strong> for Zoom All. By default you are zoomed into the first 100 ns or so, where the signals look nearly static. Fit the whole run and you can see values changing throughout. <strong>It reads much more convincingly as "this actually ran".</strong></li>
+    <li lang="ko"><strong>이름 칸 경계를 오른쪽으로 끌어라.</strong> 기본값이 좁아서 <code>chainout[63:0]</code> 같은 긴 이름이 잘린다. 잘린 채로 내면 무슨 신호인지 알아보기 힘들다</li>
+    <li lang="en"><strong>Drag the name column wider.</strong> The default is narrow and clips longer names like <code>chainout[63:0]</code>. Submit it clipped and nobody can tell which signal is which</li>
+  </ul>
+
+  <h4 lang="ko">5. Task 3 &middot; DC로 합성</h4>
+  <h4 lang="en">5. Task 3 &middot; Synthesis in DC</h4>
+  <p lang="ko">마지막이다. 여태까지는 <strong>설계가 맞게 도는지</strong>를 봤다면, 합성은 <strong>그걸 진짜 게이트로 바꿨을 때 얼마나 크고, 얼마나 먹고, 얼마나 빠른지</strong>를 본다.</p>
+  <p lang="en">Last one. Up to now we checked <strong>whether the design behaves</strong>. Synthesis asks <strong>how big, how hungry and how fast it gets once it is turned into real gates</strong>.</p>
+  <p lang="ko">돌리기 전에 <code>compile_dc.tcl</code>을 한 번 열어봐라. <strong>리포트 질문 1번과 2번 답이 그냥 적혀 있다.</strong></p>
+  <p lang="en">Before running it, open <code>compile_dc.tcl</code>. <strong>The answers to report questions 1 and 2 are literally written in there.</strong></p>
+<pre class="code" lang="ko">cd ~/lab0/work/synth
+cat -n compile_dc.tcl</pre>
+<pre class="code" lang="en">cd ~/lab0/work/synth
+cat -n compile_dc.tcl</pre>
+  <p lang="ko"><code>target_library</code>랑 <code>link_library</code>가 나오는 줄을 찾아봐라. 어떤 <strong>std cell library</strong>를 쓰는지, 그걸 <strong>어떤 명령으로 넘기는지</strong>가 거기 있다. 참고로 이 둘은 역할이 다르다. <code>target_library</code>는 "이 셀들로 만들어라"는 거고 <code>link_library</code>는 "참조를 풀 때 여기서 찾아라"는 거다. 같은 값을 넣는 경우가 많아서 헷갈리는데 <strong>의미는 다르다.</strong></p>
+  <p lang="en">Find the lines with <code>target_library</code> and <code>link_library</code>. Which <strong>std cell library</strong> is used and <strong>what command hands it over</strong> are both right there. Worth knowing that the two differ: <code>target_library</code> says "build out of these cells", <code>link_library</code> says "resolve references against these". They are often set to the same thing, which is why people conflate them, but <strong>they mean different things.</strong></p>
+  <p lang="ko">그리고 돌린다.</p>
+  <p lang="en">Then run it.</p>
+<pre class="code" lang="ko">make synth</pre>
+<pre class="code" lang="en">make synth</pre>
+  <p lang="ko">10초쯤 걸리고, 끝나면 <code>Thank you...</code>라고 인사하고 나간다. 리포트 파일 네 개가 생긴다: <code>timing.rep</code>, <code>cell.rep</code>, <code>power.rep</code>, <code>area.rep</code>.</p>
+  <p lang="en">Takes about ten seconds, then it says <code>Thank you...</code> and exits. Four report files appear: <code>timing.rep</code>, <code>cell.rep</code>, <code>power.rep</code> and <code>area.rep</code>.</p>
+  <div class="trap">
+    <p lang="ko">로그에 <code>Error: unknown command &apos;set_ultra_optimization&apos;</code>이 <strong>두 번</strong> 뜰 거다. 놀라지 마라. <strong>무시해도 된다.</strong> 이건 DC Ultra 라이선스가 있어야 쓰는 명령인데 우리 라이선스엔 없어서 "그런 명령 모른다"고 한 것뿐이다. 스크립트는 그냥 다음 줄로 넘어갔고 합성은 끝까지 갔다. <strong>"에러가 있다"와 "실패했다"는 다르다.</strong> 리포트 네 개가 다 생겼으면 성공한 거다.</p>
+    <p lang="en">The log will print <code>Error: unknown command &apos;set_ultra_optimization&apos;</code> <strong>twice</strong>. Do not panic. <strong>Ignore it.</strong> That command needs a DC Ultra licence, which this install does not have, so DC simply does not recognise it. The script carried on to the next line and synthesis finished. <strong>"There are errors" and "it failed" are not the same thing.</strong> If all four reports exist, you are fine.</p>
+  </div>
+  <p lang="ko">이제 리포트를 열어서 필요한 숫자를 뽑는다. <strong>제출물이 power, area, timing 세 개를 따로 요구한다.</strong></p>
+  <p lang="en">Now open the reports and pull the numbers. <strong>The deliverable wants power, area and timing as three separate things.</strong></p>
+<pre class="code" lang="ko">tail -20 area.rep
+tail -25 power.rep
+tail -20 timing.rep</pre>
+<pre class="code" lang="en">tail -20 area.rep
+tail -25 power.rep
+tail -20 timing.rep</pre>
+  <p lang="ko">timing이 제일 중요한데, <strong>맨 아래 <code>slack</code> 줄</strong>만 보면 된다.</p>
+  <p lang="en">Timing is the one that matters most, and you only really need <strong>the <code>slack</code> line at the very bottom</strong>.</p>
+<pre class="code">slack (MET)                                   0.11</pre>
+  <p lang="ko"><code>(MET)</code>이면 <strong>요구한 클럭에서 이 설계가 돈다</strong>는 뜻이고 <code>(VIOLATED)</code>면 못 돈다는 뜻이다. 위에 있는 복잡한 표들은 전부 <strong>그 한 줄이 왜 그 값인지를 설명하는 재료</strong>다. 처음엔 아래부터 보는 게 맞다.</p>
+  <p lang="en"><code>(MET)</code> means <strong>the design runs at the clock you asked for</strong>; <code>(VIOLATED)</code> means it does not. All the dense tables above it are just <strong>the workings behind that one number</strong>. Reading bottom-up is the right instinct here.</p>
+  <p lang="ko">power 쪽도 하나 짚고 가자. 보면 <strong>clock network가 전력의 대부분을 먹는다.</strong> 이상해 보이는데 당연한 거다. 클럭은 <strong>모든 플립플롭에 매 사이클 토글하면서 들어가니까</strong> 설계에서 제일 바쁜 신호다. 실무에서 clock gating을 그렇게 열심히 하는 이유가 이거다. <strong>이걸 알아두면 나중에 "전력이 왜 이렇게 높지?" 할 때 클럭부터 의심하게 된다.</strong></p>
+  <p lang="en">One note on power: <strong>the clock network eats most of it.</strong> Looks odd, makes sense. The clock is <strong>the busiest net in the design</strong>, toggling into every single flip-flop every cycle. This is exactly why clock gating gets so much attention in industry. <strong>Worth remembering, so that next time power looks high you look at the clock first.</strong></p>
+
+  <h4 lang="ko">6. 남은 건 질문 다섯 개</h4>
+  <h4 lang="en">6. That leaves the five questions</h4>
+  <p lang="ko">여기까지가 Part II 전부다. 질문은 <strong>거의 다 이미 지나온 파일 안에 답이 있다.</strong></p>
+  <p lang="en">That is all of Part II. As for the questions, <strong>most of the answers are in files you have already opened.</strong></p>
+  <ul>
+    <li lang="ko"><strong>1번, 2번</strong> &mdash; <code>compile_dc.tcl</code>. 아까 본 그 줄</li>
+    <li lang="en"><strong>1 and 2</strong> &mdash; <code>compile_dc.tcl</code>, the lines you just read</li>
+    <li lang="ko"><strong>3번</strong> &mdash; <code>sim/Makefile</code>의 <code>compile_verdi</code>. Task 2에서 걸렸던 그 옵션</li>
+    <li lang="en"><strong>3</strong> &mdash; <code>compile_verdi</code> in <code>sim/Makefile</code>, the switch that tripped you in Task 2</li>
+    <li lang="ko"><strong>4번</strong> &mdash; testbench 안. <code>grep -n fsdb</code> 한 방이면 몇 번째 줄인지 나온다</li>
+    <li lang="en"><strong>4</strong> &mdash; inside the testbench. A single <code>grep -n fsdb</code> gives you the line number</li>
+    <li lang="ko"><strong>5번</strong> &mdash; 이것만 좀 해야 한다. 설계 파일의 해당 줄을 읽고 <strong>그림을 그리라</strong>고 명시돼 있다. 글로만 쓰면 미달이다</li>
+    <li lang="en"><strong>5</strong> &mdash; this one takes work. You read the given lines of the design and it explicitly says <strong>draw diagrams</strong>. Prose alone does not satisfy it</li>
+  </ul>
+  <p lang="ko">5번 힌트를 하나 주면, <strong>조합 논리인지 순차 논리인지부터 갈라라.</strong> <code>assign</code>이면 클럭이 없으니 게이트만 나오고, <code>always @(posedge clk)</code>면 플립플롭이 나온다. 그리고 <code>if (clr)</code>가 <strong>always 블록 안</strong>에 있는지 <strong>sensitivity list</strong>에 있는지가 동기 리셋이냐 비동기 리셋이냐를 가른다. 이거 <a href="#s11">11절</a>에서 다룬 내용이다.</p>
+  <p lang="en">A hint for 5: <strong>start by splitting combinational from sequential.</strong> An <code>assign</code> has no clock, so you get gates only; an <code>always @(posedge clk)</code> gives you flip-flops. And whether <code>if (clr)</code> sits <strong>inside the always block</strong> or in the <strong>sensitivity list</strong> is what makes the reset synchronous or asynchronous. That is the <a href="#s11">section 11</a> material.</p>
 </section>
 
 <!-- ══════════════════════════════════════════════════════ 14 -->
