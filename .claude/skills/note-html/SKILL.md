@@ -321,6 +321,8 @@ notes/                                            노트는 전부 여기 모은
   P03-before-lecture-3.html                       실습 입문 (아래 참조)
   P{NN}-{kebab}.html                              n 강을 읽기 전에 손에 익힐 동작.
                                                   data-slide 없음, reader.js 없음, sim.js 사용
+  PLAB{N}-{kebab}.html                            Lab N 을 풀기 전에 손에 익힐 동작.
+                                                  같은 장르이고 번호만 Lab 을 따른다
 
 slides/L01-course-intro.pdf                       Lecture 1 슬라이드 (노트와 같은 stem)
 slides/L02-design-and-verification-overview.pdf
@@ -368,6 +370,14 @@ vendor/pdf.js/                                    pdf.js 런타임
 `docs/superpowers/specs/2026-09-13-hands-on-primer-design.md`.
 **트레이스는 손으로 쓰므로 `node scripts/simcheck.mjs <페이지>` 를 반드시 돌린다.**
 `verify.mjs` 는 `.sim` 카드도 도해처럼 찍는다.
+
+**번호는 그 페이지가 준비시키는 대상을 따른다.** 강의면 `P{NN}`, Lab 이면 `PLAB{N}`.
+읽는 순서가 번호순이 아닐 수 있으므로 **전제하는 페이지를 00 단원에서 링크한다.**
+`PLAB0` 은 `P03` · `P04` 를 전제하므로 03 · 04 다음이다.
+
+**노드 종류를 새로 쓰려면 `sim.js` 의 `GEOM` 과 `simcheck.mjs` 의 `switch` 를 같이 고친다.**
+한쪽만 고치면 검사기가 `모르는 노드 종류` 로 죽거나, 더 나쁘게는 그림은 나오는데
+값을 아무도 안 본다. `simcheck.mjs --selftest` 에 사례를 하나 보탠다.
 
 ### scripts/
 

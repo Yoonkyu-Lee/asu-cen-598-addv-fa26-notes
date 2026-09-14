@@ -74,6 +74,7 @@ function checkNode(n, F, bits, errs, id) {
       case 'buf': case 'delay': expect(i, OUT.y, v(i, IN.a)); break;
       case 'mux': { const s = v(i, IN.sel); if (!isXM(s)) expect(i, OUT.y, v(i, s ? IN.b : IN.a)); break; }
       case 'add': expect(i, OUT.y, gate(v(i, IN.a), v(i, IN.b), (a, b) => (a + b) & mask(bits(OUT.y)))); break;
+      case 'mul': expect(i, OUT.y, gate(v(i, IN.a), v(i, IN.b), (a, b) => (a * b) & mask(bits(OUT.y)))); break;
       case 'const': expect(i, OUT.y, n.val); break;
       default: errs.push(`${id}: 모르는 노드 종류 ${n.kind}`); return;
     }
@@ -122,20 +123,21 @@ const GOOD2 = {
       { id: 'a1', kind: 'and', x: 340, y: 140, in: { a: 'q2', b: 'ql' }, out: { y: 'an' } },
       { id: 'c1', kind: 'const', x: 160, y: 250, val: 1, out: { y: 'one' } },
       { id: 's1', kind: 'add', x: 340, y: 250, in: { a: 'x', b: 'one' }, out: { y: 'sum' } },
+      { id: 'm1', kind: 'mul', x: 460, y: 250, in: { a: 'x', b: 'one' }, out: { y: 'pm' } },
     ],
     ports: [], wires: [{ sig: 'd', pts: [[20, 50], [160, 50]] }, { sig: 'ql', pts: [[240, 190], [340, 190]] }] },
   signals: [
     { n: 'clk', kind: 'clk' }, { n: 'rst_n' }, { n: 'd' }, { n: 'q1' }, { n: 'e' }, { n: 'q2' },
     { n: 'en' }, { n: 'dl' }, { n: 'ql' }, { n: 'xy' }, { n: 'an' },
-    { n: 'x', bits: 2 }, { n: 'one', bits: 2 }, { n: 'sum', bits: 2 },
+    { n: 'x', bits: 2 }, { n: 'one', bits: 2 }, { n: 'sum', bits: 2 }, { n: 'pm', bits: 4 },
   ],
   frames: [
-    { v: { clk: 1, rst_n: 0, d: 1, q1: 0, e: 1, q2: 1, en: 0, dl: 1, ql: 0, xy: 0, an: 0, x: 0, one: 1, sum: 1 } },
-    { v: { clk: 0, rst_n: 0, d: 1, q1: 0, e: 0, q2: 1, en: 0, dl: 0, ql: 0, xy: 0, an: 0, x: 1, one: 1, sum: 2 } },
-    { v: { clk: 1, rst_n: 1, d: 1, q1: 0, e: 1, q2: 1, en: 1, dl: 1, ql: 1, xy: 1, an: 1, x: 2, one: 1, sum: 3 } },
-    { v: { clk: 0, rst_n: 1, d: 1, q1: 0, e: 1, q2: 1, en: 1, dl: 0, ql: 0, xy: 0, an: 0, x: 3, one: 1, sum: 0 } },
-    { v: { clk: 1, rst_n: 1, d: 0, q1: 1, e: 0, q2: 0, en: 0, dl: 1, ql: 0, xy: 1, an: 0, x: 3, one: 1, sum: 0 } },
-    { v: { clk: 0, rst_n: 1, d: 0, q1: 1, e: 1, q2: 0, en: 0, dl: 0, ql: 0, xy: 1, an: 0, x: 0, one: 1, sum: 1 } },
+    { v: { clk: 1, rst_n: 0, d: 1, q1: 0, e: 1, q2: 1, en: 0, dl: 1, ql: 0, xy: 0, an: 0, x: 0, one: 1, sum: 1, pm: 0 } },
+    { v: { clk: 0, rst_n: 0, d: 1, q1: 0, e: 0, q2: 1, en: 0, dl: 0, ql: 0, xy: 0, an: 0, x: 1, one: 1, sum: 2, pm: 1 } },
+    { v: { clk: 1, rst_n: 1, d: 1, q1: 0, e: 1, q2: 1, en: 1, dl: 1, ql: 1, xy: 1, an: 1, x: 2, one: 1, sum: 3, pm: 2 } },
+    { v: { clk: 0, rst_n: 1, d: 1, q1: 0, e: 1, q2: 1, en: 1, dl: 0, ql: 0, xy: 0, an: 0, x: 3, one: 1, sum: 0, pm: 3 } },
+    { v: { clk: 1, rst_n: 1, d: 0, q1: 1, e: 0, q2: 0, en: 0, dl: 1, ql: 0, xy: 1, an: 0, x: 3, one: 1, sum: 0, pm: 3 } },
+    { v: { clk: 0, rst_n: 1, d: 0, q1: 1, e: 1, q2: 0, en: 0, dl: 0, ql: 0, xy: 1, an: 0, x: 0, one: 1, sum: 1, pm: 0 } },
   ],
 };
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -146,6 +148,7 @@ const CASES = [
   ['프레임 수 홀수', (() => { const s = clone(GOOD); s.frames.pop(); return s; })(), 1],
   ['clk 가 엣지 프레임에서 0', (() => { const s = clone(GOOD); s.frames[2].v.clk = 0; return s; })(), 1],
   ['drives 에 없는 신호', (() => { const s = clone(GOOD); s.code[1].drives = ['zz']; return s; })(), 1],
+  ['mul 곱이 틀림', (() => { const s = clone(GOOD2); s.frames[2].v.pm = 9; return s; })(), 1],
   ['X 는 건너뜀', (() => { const s = clone(GOOD); s.frames[2].v.q = 'X'; s.frames[3].v.q = 'X'; return s; })(), 0],
   ['노드 핀 이름에 오타', (() => { const s = clone(GOOD); s.circuit.nodes[0].in.d = 'dd'; return s; })(), 1],
   ['정상 (여러 노드)', GOOD2, 0],

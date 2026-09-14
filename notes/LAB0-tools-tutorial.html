@@ -987,6 +987,11 @@ TIMEBASE : ns</pre>
   <p lang="ko">합성은 <strong>RTL을 gate-level netlist로 번역하는 일</strong>이다. 번역이라고 부르는 이유는 의미를 보존하기 때문이고, 컴파일과 다른 이유는 <strong>목표 하드웨어의 부품 목록을 보고 고른다</strong>는 점이다. 그 부품 목록이 technology library다. 같은 RTL이라도 어느 library를 주느냐에 따라 전혀 다른 netlist가 나온다.</p>
   <p lang="en">Synthesis is <strong>translating RTL into a gate-level netlist.</strong> It is a translation because meaning is preserved; it differs from compilation because <strong>it picks parts from a catalogue of what the target process actually offers.</strong> That catalogue is the technology library. The same RTL against a different library produces a completely different netlist.</p>
 
+  <div class="callout">
+    <p lang="ko"><strong>리포트 질문 5 번이 이걸 손으로 시킨다.</strong> 코드 두 곳을 주고 무슨 하드웨어가 나오는지 그려 보라고 한다. 세는 절차와 Lab 0 의 두 줄을 밟아보는 페이지를 따로 만들어 뒀다. <a href="PLAB0-rtl-to-gates.html">코드 한 줄이 무슨 회로가 되나</a>.</p>
+    <p lang="en"><strong>Report question 5 asks you to do this by hand.</strong> It hands you two places in the code and asks you to draw the hardware. The counting procedure, and both lines of Lab 0 stepped through, are on a page of their own: <a href="PLAB0-rtl-to-gates.html">what circuit does this line become?</a></p>
+  </div>
+
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · technology library</span><span lang="en">Unpacking the jargon · technology library</span></summary>
     <div class="body">

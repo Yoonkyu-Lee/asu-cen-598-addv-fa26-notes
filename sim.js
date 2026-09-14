@@ -181,6 +181,7 @@ const GEOM = {
   xor:   { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], y: [48, 20] }, label: 'XOR' },
   add:   { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], y: [48, 20] }, label: '+' },
   mux:   { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], sel: [24, 40], y: [48, 20] }, label: 'MUX' },
+  mul:   { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], y: [48, 20] }, label: '×' },
   not:   { w: 40, h: 28, pins: { a: [0, 14], y: [40, 14] }, label: 'NOT' },
   buf:   { w: 40, h: 28, pins: { a: [0, 14], y: [40, 14] }, label: '' },
   delay: { w: 40, h: 28, pins: { a: [0, 14], y: [40, 14] }, label: 'delay' },
