@@ -36,6 +36,27 @@ const CSS = `
 .sim .lab.clk{fill:var(--brown)}
 .sim .cyc{font-family:var(--mono);font-size:9.5px;fill:var(--ink3)}
 .sim .grid{stroke:var(--rule);stroke-width:1}
+.sim .wire{fill:none;stroke-linejoin:round;transition:stroke-width .15s}
+.sim .wire.w0{stroke:var(--blue);stroke-width:1.4;opacity:.45}
+.sim .wire.w1{stroke:var(--blue);stroke-width:2.6}
+.sim .wire.wx{stroke:var(--amber);stroke-width:2.4;stroke-dasharray:4 3}
+.sim .wire.wc0{stroke:var(--brown);stroke-width:1.3;opacity:.5}
+.sim .wire.wc1{stroke:var(--brown);stroke-width:2.2}
+.sim .wire.chg{filter:drop-shadow(0 0 3px rgba(var(--blue-rgb),.7))}
+.sim .wire.wx.chg{filter:drop-shadow(0 0 3px rgba(var(--amber-rgb),.8))}
+.sim .node rect{fill:rgba(var(--blue-rgb),.12);stroke:var(--blue);stroke-width:1.6}
+.sim .node.edge rect{fill:rgba(var(--green-rgb),.3);stroke:var(--green)}
+.sim .node.open rect{fill:rgba(var(--amber-rgb),.22);stroke:var(--amber)}
+.sim .node.bad rect{stroke:var(--amber);stroke-dasharray:4 3}
+.sim .node text{font-family:var(--mono);font-size:10.5px;font-weight:700;fill:var(--ink)}
+.sim .node text.small{font-size:8px;font-weight:400;fill:var(--ink2)}
+.sim .node .clkmark{fill:none;stroke:var(--brown);stroke-width:1.6}
+.sim .node .bufmark{fill:none;stroke:var(--blue);stroke-width:1.4}
+.sim .port{font-family:var(--mono);font-size:10.5px;fill:var(--blue)}
+.sim .port.clk{fill:var(--brown)}
+.sim .badge rect{fill:var(--card);stroke:var(--rule);stroke-width:1}
+.sim .badge text{font-family:var(--mono);font-size:9.5px;font-weight:700;fill:var(--ink)}
+.sim .badge.bad text{fill:var(--amber)}
 `;
 
 function injectCSS() {
@@ -142,6 +163,106 @@ function xmCell(svg, x, y0, v) {
   g.appendChild(svgEl('rect', { x: x + 1, y: y0 + 4, width: CW - 2, height: RH - 10, rx: 2 }));
   g.appendChild(svgEl('text', { x: x + CW / 2, y: y0 + RH / 2 + 3, 'text-anchor': 'middle' }, v));
   svg.appendChild(g);
+}
+
+// ── 회로 ─────────────────────────────────────────────────────────
+// 초보자용이라 IEEE 기호 대신 이름 붙은 상자를 쓴다. 배선은 값에 따라
+// 굵기가 달라지고, 이번 프레임에 바뀐 배선은 빛난다.
+const GEOM = {
+  ff:    { w: 56, h: 44, pins: { d: [0, 16], clk: [0, 34], rst_n: [28, 44], arst_n: [28, 44], q: [56, 16] } },
+  latch: { w: 56, h: 44, pins: { d: [0, 16], en: [0, 34], q: [56, 16] } },
+  and:   { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], y: [48, 20] }, label: 'AND' },
+  or:    { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], y: [48, 20] }, label: 'OR' },
+  xor:   { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], y: [48, 20] }, label: 'XOR' },
+  add:   { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], y: [48, 20] }, label: '+' },
+  mux:   { w: 48, h: 40, pins: { a: [0, 12], b: [0, 28], sel: [24, 40], y: [48, 20] }, label: 'MUX' },
+  not:   { w: 40, h: 28, pins: { a: [0, 14], y: [40, 14] }, label: 'NOT' },
+  buf:   { w: 40, h: 28, pins: { a: [0, 14], y: [40, 14] }, label: '' },
+  delay: { w: 40, h: 28, pins: { a: [0, 14], y: [40, 14] }, label: 'delay' },
+  const: { w: 32, h: 24, pins: { y: [32, 12] } },
+};
+
+function renderCircuit(sc, host) {
+  const C = sc.circuit;
+  // 회로 없는 시나리오도 있다. 파형만으로 충분한 카드까지 예외로 죽이지 않는다.
+  if (!C) { host.replaceChildren(); return () => {}; }
+  const svg = svgEl('svg', { viewBox: `0 0 ${C.w} ${C.h}`, role: 'img',
+    'aria-label': L('회로도. 프레임에 따라 배선 값이 바뀐다', 'circuit diagram; wire values follow the frame') });
+  host.replaceChildren(svg);
+  const clkSigs = new Set(sc.signals.filter(s => s.kind === 'clk').map(s => s.n));
+
+  // 배선을 먼저 깔고 상자를 그 위에 올린다
+  const wires = (C.wires || []).map(w => {
+    const p = svgEl('path', { class: 'wire', 'data-sig': w.sig, d: w.pts.map((q, k) => (k ? 'L' : 'M') + q[0] + ' ' + q[1]).join(' ') });
+    svg.appendChild(p);
+    return { el: p, sig: w.sig };
+  });
+
+  const nodes = (C.nodes || []).map(n => {
+    const g = GEOM[n.kind];
+    const grp = svgEl('g', { class: 'node ' + n.kind, 'data-id': n.id, transform: `translate(${n.x} ${n.y})` });
+    grp.appendChild(svgEl('rect', { width: g.w, height: g.h, rx: 6 }));
+    if (n.kind === 'ff' || n.kind === 'latch') {
+      grp.appendChild(svgEl('text', { x: 7, y: 20 }, 'D'));
+      grp.appendChild(svgEl('text', { x: g.w - 7, y: 20, 'text-anchor': 'end' }, 'Q'));
+      if (n.kind === 'ff') grp.appendChild(svgEl('path', { d: 'M0 28 L8 34 L0 40', class: 'clkmark' }));
+      else grp.appendChild(svgEl('text', { x: 7, y: 38, class: 'small' }, 'EN'));
+      if (n.in && (n.in.rst_n || n.in.arst_n)) grp.appendChild(svgEl('text', { x: g.w / 2, y: g.h - 4, 'text-anchor': 'middle', class: 'small' }, n.in.arst_n ? 'ARST' : 'RST'));
+    } else if (n.kind === 'const') {
+      grp.appendChild(svgEl('text', { x: g.w / 2, y: g.h / 2 + 4, 'text-anchor': 'middle' }, String(n.val)));
+    } else if (g.label) {
+      grp.appendChild(svgEl('text', { x: g.w / 2, y: g.h / 2 + 4, 'text-anchor': 'middle' }, g.label));
+    }
+    if (n.kind === 'buf') grp.appendChild(svgEl('path', { d: `M4 4 L${g.w - 4} ${g.h / 2} L4 ${g.h - 4} Z`, class: 'bufmark' }));
+    svg.appendChild(grp);
+    return { el: grp, n };
+  });
+
+  // 포트 이름
+  (C.ports || []).forEach(p => {
+    const x = p.side === 'in' ? 8 : C.w - 8;
+    svg.appendChild(svgEl('text', { x, y: p.y + 4, 'text-anchor': p.side === 'in' ? 'start' : 'end',
+      class: 'port' + (clkSigs.has(p.sig) ? ' clk' : '') }, p.sig));
+  });
+
+  // 값 배지: 신호마다 첫 배선의 시작점 위
+  const badges = {};
+  wires.forEach(w => {
+    if (badges[w.sig]) return;
+    const pts = (C.wires.find(x => x.sig === w.sig) || {}).pts;
+    const [x, y] = pts[0];
+    const g = svgEl('g', { class: 'badge', 'data-sig': w.sig, transform: `translate(${x + 4} ${y - 14})` });
+    g.appendChild(svgEl('rect', { width: 18, height: 12, rx: 3 }));
+    g.appendChild(svgEl('text', { x: 9, y: 9, 'text-anchor': 'middle' }));
+    svg.appendChild(g);
+    badges[w.sig] = g;
+  });
+
+  return i => {
+    const v = sc.frames[i].v;
+    wires.forEach(w => {
+      const val = v[w.sig], clk = clkSigs.has(w.sig);
+      let cls = 'wire';
+      if (isXM(val)) cls += ' wx';
+      else if (clk) cls += val ? ' wc1' : ' wc0';
+      else cls += val ? ' w1' : ' w0';
+      if (changed(sc, i, w.sig)) cls += ' chg';
+      w.el.setAttribute('class', cls);
+    });
+    for (const sig in badges) {
+      const val = v[sig];
+      badges[sig].querySelector('text').textContent = String(val);
+      badges[sig].setAttribute('class', 'badge' + (isXM(val) ? ' bad' : ''));
+    }
+    nodes.forEach(({ el, n }) => {
+      let cls = 'node ' + n.kind;
+      const out = n.out && (n.out.q || n.out.y);
+      if (n.kind === 'ff' && i > 0 && i % 2 === 0) cls += ' edge';
+      if (n.kind === 'latch' && n.in && v[n.in.en] === 1) cls += ' open';
+      if (out && isXM(v[out])) cls += ' bad';
+      el.setAttribute('class', cls);
+    });
+  };
 }
 
 // ── 카드 ─────────────────────────────────────────────────────────
