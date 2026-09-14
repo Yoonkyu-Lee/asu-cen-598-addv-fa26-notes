@@ -66,18 +66,21 @@ function svgEl(tag, attrs = {}, txt) {
 // ── 파형 ─────────────────────────────────────────────────────────
 // 프레임 하나가 한 칸이다. 값이 바뀐 칸은 행 아래 얇은 바로 표시하고
 // 커서는 테두리만 그린다. 칠한 사각형이 글자 위에 오면 verify 가 잡는다.
+// LG 는 신호 이름을 적는 왼쪽 여백의 하한이다. 긴 이름은 여백을 넘겨 음수 x 로 나가고
+// verify 의 SVG 넘침 검사에 걸리므로, 시나리오마다 제일 긴 이름에 맞춰 늘린다.
 const CW = 30, RH = 28, LG = 68, TOP = 10;
 
 function renderWave(sc, host) {
   const N = sc.frames.length, S = sc.signals;
-  const W = LG + N * CW + 10, H = TOP + S.length * RH + 20;
+  const lg = Math.max(LG, 16 + 7 * Math.max(0, ...S.map(s => String(s.n).length)));
+  const W = lg + N * CW + 10, H = TOP + S.length * RH + 20;
   const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img',
     'aria-label': L('프레임별 신호 파형', 'signal waveform per frame') });
   host.replaceChildren(svg);
 
   // 사이클 눈금. 엣지 프레임마다 세로선과 번호.
   for (let i = 0; i < N; i += 2) {
-    const x = LG + i * CW;
+    const x = lg + i * CW;
     svg.appendChild(svgEl('line', { x1: x, y1: TOP, x2: x, y2: TOP + S.length * RH, class: 'grid' }));
     svg.appendChild(svgEl('text', { x: x + CW, y: H - 6, 'text-anchor': 'middle', class: 'cyc' }, String(i / 2)));
   }
@@ -85,14 +88,14 @@ function renderWave(sc, host) {
   S.forEach((s, r) => {
     const y0 = TOP + r * RH, hi = y0 + 5, lo = y0 + RH - 7;
     const bits = s.bits || 1;
-    svg.appendChild(svgEl('text', { x: LG - 8, y: y0 + RH / 2 + 4, 'text-anchor': 'end',
+    svg.appendChild(svgEl('text', { x: lg - 8, y: y0 + RH / 2 + 4, 'text-anchor': 'end',
       class: 'lab' + (s.kind === 'clk' ? ' clk' : '') }, s.n));
     const val = i => sc.frames[i].v[s.n];
 
     if (bits === 1) {
       let d = '', pen = false;
       for (let i = 0; i < N; i++) {
-        const x = LG + i * CW, v = val(i);
+        const x = lg + i * CW, v = val(i);
         if (isXM(v)) { pen = false; xmCell(svg, x, y0, v); continue; }
         const y = v ? hi : lo;
         if (!pen) { d += `M${x} ${y}`; pen = true; }
@@ -105,8 +108,8 @@ function renderWave(sc, host) {
       let i = 0;
       while (i < N) {
         let j = i; while (j + 1 < N && val(j + 1) === val(i)) j++;
-        const x0 = LG + i * CW, x1 = LG + (j + 1) * CW, v = val(i);
-        if (isXM(v)) { for (let k = i; k <= j; k++) xmCell(svg, LG + k * CW, y0, v); i = j + 1; continue; }
+        const x0 = lg + i * CW, x1 = lg + (j + 1) * CW, v = val(i);
+        if (isXM(v)) { for (let k = i; k <= j; k++) xmCell(svg, lg + k * CW, y0, v); i = j + 1; continue; }
         const g = svgEl('g');
         g.appendChild(svgEl('path', { class: 'wv bus',
           d: `M${x0} ${(hi + lo) / 2} L${x0 + 4} ${hi} L${x1 - 4} ${hi} L${x1} ${(hi + lo) / 2} L${x1 - 4} ${lo} L${x0 + 4} ${lo} Z` }));
@@ -117,19 +120,20 @@ function renderWave(sc, host) {
     }
     // 값이 바뀐 칸 표시 (프레임에 따라 다시 그린다)
     for (let i = 1; i < N; i++) if (changed(sc, i, s.n))
-      svg.appendChild(svgEl('rect', { x: LG + i * CW + 2, y: y0 + RH - 4, width: CW - 4, height: 3, class: 'chgbar', 'data-sig': s.n, 'data-i': i }));
+      svg.appendChild(svgEl('rect', { x: lg + i * CW + 2, y: y0 + RH - 4, width: CW - 4, height: 3, class: 'chgbar', 'data-sig': s.n, 'data-i': i }));
   });
 
-  const cur = svgEl('rect', { x: LG, y: TOP - 2, width: CW, height: S.length * RH + 4, class: 'cur', 'data-i': 0 });
+  const cur = svgEl('rect', { x: lg, y: TOP - 2, width: CW, height: S.length * RH + 4, class: 'cur', 'data-i': 0 });
   svg.appendChild(cur);
   return i => {
-    cur.setAttribute('x', LG + i * CW);
+    cur.setAttribute('x', lg + i * CW);
     cur.setAttribute('data-i', i);
     // 현재 칸까지의 변화만 진하게. 앞으로 올 변화는 흐리게 남겨 예고한다.
-    svg.querySelectorAll('.chgbar').forEach(b => b.setAttribute('opacity', Number(b.dataset.i) <= i ? '.55' : '.15'));
+    // presentation attribute 로는 안 된다. 위 .chgbar 규칙이 이기기 때문에 인라인 스타일로 쓴다.
+    svg.querySelectorAll('.chgbar').forEach(b => { b.style.opacity = Number(b.dataset.i) <= i ? '0.55' : '0.15'; });
     const box = host.getBoundingClientRect();
-    const cx = LG + i * CW;
-    if (cx < host.scrollLeft + LG || cx + CW > host.scrollLeft + box.width) host.scrollLeft = Math.max(0, cx - box.width / 2);
+    const cx = lg + i * CW;
+    if (cx < host.scrollLeft + lg || cx + CW > host.scrollLeft + box.width) host.scrollLeft = Math.max(0, cx - box.width / 2);
   };
 }
 
@@ -205,9 +209,11 @@ function mount(card, sc) {
     else if (e.key === 'End') { e.preventDefault(); stop(); go(N - 1); }
     else if (e.key === ' ') { e.preventDefault(); play(); }
   });
-  window.addEventListener('langchange', () => { paintText(); renderers.forEach(r => r(i)); });
   card.simGo = go;
   go(0);
+  // 첫 그리기가 끝난 뒤에 붙인다. 망가진 시나리오가 go(0) 에서 던지고도 리스너를 남기면
+  // 언어를 바꿀 때마다 그 카드가 다시 던져서 페이지 전체에 에러가 뜬다.
+  window.addEventListener('langchange', () => { paintText(); renderers.forEach(r => r(i)); });
 }
 
 // ── 시작 ─────────────────────────────────────────────────────────
@@ -216,5 +222,14 @@ function mount(card, sc) {
   let data = [];
   try { data = JSON.parse(document.getElementById('sim-data').textContent); } catch { data = []; }
   const byId = Object.fromEntries(data.map(s => [s.id, s]));
-  document.querySelectorAll('.sim[data-sim]').forEach(card => mount(card, byId[card.dataset.sim]));
+  // 시나리오 하나가 망가져도 거기서 멈추지 않는다. 안 잡으면 예외가 forEach 를 끊어서
+  // 뒤에 오는 멀쩡한 카드까지 전부 빈 상자로 남는다. 망가진 카드만 대체 문구로 끝낸다.
+  document.querySelectorAll('.sim[data-sim]').forEach(card => {
+    try { mount(card, byId[card.dataset.sim]); }
+    catch (e) {
+      console.error(`sim.js: "${card.dataset.sim}" 시나리오를 그리지 못했다`, e);
+      card.replaceChildren();
+      card.appendChild(el('p', { class: 'sim-fail' }, L('시뮬레이션을 못 불러왔다', 'simulation failed to load')));
+    }
+  });
 })();
