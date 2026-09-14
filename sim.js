@@ -280,6 +280,8 @@ function hl(t) {
 }
 
 function renderCode(sc, host) {
+  // 코드 없는 시나리오도 있다. 빈 pre 를 남기면 옆 회로 칸 높이만큼 늘어난 빈 색 덩어리가 된다.
+  if (!sc.code || !sc.code.length) { host.replaceChildren(); return () => {}; }
   const pre = el('pre', { class: 'code' });
   host.replaceChildren(pre);
   const lines = (sc.code || []).map(l => {
