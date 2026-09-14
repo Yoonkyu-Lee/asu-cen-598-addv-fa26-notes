@@ -345,15 +345,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 .notice li strong{color:var(--amber)}
 
 /* 사전으로 가는 카드 */
-a.gloss-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:12px;padding:16px 20px;
+a.gloss-card,div.gloss-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:12px;padding:16px 20px;
   background:var(--card);border:1px solid var(--rule);border-radius:10px;text-decoration:none;color:inherit;transition:.15s}
 a.gloss-card:hover{border-color:var(--blue);box-shadow:0 3px 14px var(--shadow)}
+/* 카드 안에 링크가 둘 이상이면 카드 전체를 <a> 로 감쌀 수 없다. 겉모습은 같게, 커서만 기본으로 */
+div.gloss-card{cursor:default}
+div.gloss-card a{color:var(--blue);text-decoration:none;border-bottom:1px solid var(--rule)}
+div.gloss-card a:hover{border-bottom-color:var(--blue)}
+div.gloss-card .go a{border-bottom:none}
 /* 카드가 둘 이상 쌓이므로 아이콘 칸을 고정폭으로 둔다. 안 그러면 글자 시작선이 카드마다 어긋난다 */
-a.gloss-card .gi{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--blue);letter-spacing:-.03em;line-height:1;
+.gloss-card .gi{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--blue);letter-spacing:-.03em;line-height:1;
   min-width:32px}
-a.gloss-card .gt{flex:1;min-width:200px;font-size:14.5px;color:var(--ink2);line-height:1.55}
-a.gloss-card .gt b{color:var(--ink)}
-a.gloss-card .go{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--blue);white-space:nowrap;font-weight:600}
+.gloss-card .gt{flex:1;min-width:200px;font-size:14.5px;color:var(--ink2);line-height:1.55}
+.gloss-card .gt b{color:var(--ink)}
+.gloss-card .go{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--blue);white-space:nowrap;font-weight:600}
 
 h2.grp{font-size:13px;font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);
   font-weight:500;margin:56px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
@@ -463,13 +468,13 @@ a.mod:hover .num{color:var(--blue)}
     <span class="go" lang="en">Look it up →</span>
   </a>
 
-  <a class="gloss-card" href="notes/P03-before-lecture-3.html">
+  <div class="gloss-card">
     <span class="gi">▶|</span>
-    <span class="gt" lang="ko"><b>실습 입문</b> · Verilog 를 한 번도 안 봤으면 여기부터. 클럭 · flip-flop · comb / ff / latch 를 코드 · 회로 · 파형 나란히 놓고 반 클럭씩 밟아본다. 3 강 전 · 4 강 전 두 편.</span>
-    <span class="gt" lang="en"><b>Hands-on primer</b> · Never seen Verilog? Start here. Clock, flip-flop, comb / ff / latch with code, circuit and waveform side by side, stepped half a clock at a time. Before L3 · Before L4.</span>
-    <span class="go" lang="ko">밟아보기 →</span>
-    <span class="go" lang="en">Step through →</span>
-  </a>
+    <span class="gt" lang="ko"><b>실습 입문</b> · Verilog 를 한 번도 안 봤으면 여기부터. 클럭 · flip-flop · comb / ff / latch 를 코드 · 회로 · 파형 나란히 놓고 반 클럭씩 밟아본다. <a href="notes/P03-before-lecture-3.html">3 강 전</a> · <a href="notes/P04-before-lecture-4.html">4 강 전</a> 두 편.</span>
+    <span class="gt" lang="en"><b>Hands-on primer</b> · Never seen Verilog? Start here. Clock, flip-flop, comb / ff / latch with code, circuit and waveform side by side, stepped half a clock at a time. <a href="notes/P03-before-lecture-3.html">Before L3</a> · <a href="notes/P04-before-lecture-4.html">Before L4</a>.</span>
+    <span class="go" lang="ko"><a href="notes/P03-before-lecture-3.html">밟아보기 →</a></span>
+    <span class="go" lang="en"><a href="notes/P03-before-lecture-3.html">Step through →</a></span>
+  </div>
 </header>
 
 <h2 class="grp" lang="ko">1부 · 설계</h2>

@@ -32,7 +32,7 @@ const CSS = `
 .sim .wv.bus{stroke:var(--blue);stroke-width:1.6}
 .sim .xm{fill:rgba(var(--amber-rgb),.22);stroke:var(--amber);stroke-width:1.2}
 .sim .xm text,.sim .bust{font-family:var(--mono);font-size:10px;fill:var(--ink)}
-.sim .xm text{fill:var(--amber)}
+.sim .xm text{fill:var(--amber);stroke:none}
 .sim .chgbar{fill:var(--blue);opacity:.55}
 .sim .cur{fill:none;stroke:var(--blue);stroke-width:2;rx:3}
 .sim .lab{font-family:var(--mono);font-size:10.5px;fill:var(--ink2)}
@@ -144,7 +144,8 @@ function renderWave(sc, host) {
       }
     }
     // 값이 바뀐 칸 표시 (프레임에 따라 다시 그린다)
-    for (let i = 1; i < N; i++) if (changed(sc, i, s.n))
+    // clk 은 매 프레임 토글하니 표시가 늘 켜져 있어서 알려주는 것이 없다. 건너뛴다.
+    if (s.kind !== 'clk') for (let i = 1; i < N; i++) if (changed(sc, i, s.n))
       svg.appendChild(svgEl('rect', { x: lg + i * CW + 2, y: y0 + RH - 4, width: CW - 4, height: 3, class: 'chgbar', 'data-sig': s.n, 'data-i': i }));
   });
 
