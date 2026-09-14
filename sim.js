@@ -44,6 +44,7 @@ const CSS = `
 .sim .wire.wc1{stroke:var(--brown);stroke-width:2.2}
 .sim .wire.chg{filter:drop-shadow(0 0 3px rgba(var(--blue-rgb),.7))}
 .sim .wire.wx.chg{filter:drop-shadow(0 0 3px rgba(var(--amber-rgb),.8))}
+.sim .wire.wc0.chg,.sim .wire.wc1.chg{filter:none}
 .sim .node rect{fill:rgba(var(--blue-rgb),.12);stroke:var(--blue);stroke-width:1.6}
 .sim .node.edge rect{fill:rgba(var(--green-rgb),.3);stroke:var(--green)}
 .sim .node.open rect{fill:rgba(var(--amber-rgb),.22);stroke:var(--amber)}
