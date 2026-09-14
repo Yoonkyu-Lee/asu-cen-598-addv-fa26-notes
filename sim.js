@@ -9,6 +9,9 @@ const CSS = `
 .sim-title{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px}
 .sim-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
 @media(max-width:900px){.sim-grid{grid-template-columns:minmax(0,1fr)}}
+/* 카드 두 장이 grid2 로 나란히 서면 한 장이 절반이다. 그 안에서 또 둘로 가르면
+   코드 칸이 190px 남짓이 되어 줄이 잘린다. 나란한 카드 안에서는 세로로 쌓는다. */
+.grid2 .sim .sim-grid{grid-template-columns:minmax(0,1fr)}
 .sim-code pre.code{margin:0;min-height:100%;box-sizing:border-box}
 .sim-code .ln{display:block;padding-left:8px;margin-left:-8px;border-left:3px solid transparent;transition:background .15s}
 .sim-code .ln.hot{border-left-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
