@@ -266,6 +266,34 @@ function renderCircuit(sc, host) {
   };
 }
 
+// ── 코드 ─────────────────────────────────────────────────────────
+// 하이라이팅은 손으로 하는 게 규칙이지만 여기는 줄이 데이터로 오므로
+// 키워드 · 주석 · 숫자 세 가지만 정규식으로 칠한다. 색은 pre.code 의 .k .c .n 이 맡는다.
+const KW = /\b(always_ff|always_comb|always_latch|always|posedge|negedge|if|else|begin|end|module|endmodule|input|output|logic|assign|case|endcase|default)\b/g;
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function hl(t) {
+  const c = t.indexOf('//');
+  let code = c >= 0 ? t.slice(0, c) : t, cm = c >= 0 ? t.slice(c) : '';
+  code = esc(code).replace(KW, '<span class="k">$1</span>').replace(/\b(\d+'[bdh][0-9a-fA-F_]+|\d+)\b/g, '<span class="n">$1</span>');
+  return code + (cm ? '<span class="c">' + esc(cm) + '</span>' : '');
+}
+
+function renderCode(sc, host) {
+  const pre = el('pre', { class: 'code' });
+  host.replaceChildren(pre);
+  const lines = (sc.code || []).map(l => {
+    const s = el('span', { class: 'ln', 'data-drives': (l.drives || []).join(',') });
+    s.innerHTML = hl(l.t) || ' ';
+    pre.appendChild(s);
+    return { el: s, drives: l.drives || [] };
+  });
+  return i => lines.forEach(l => {
+    const hot = l.drives.some(sig => changed(sc, i, sig));
+    l.el.setAttribute('class', 'ln' + (hot ? ' hot' : ''));
+  });
+}
+
 // ── 카드 ─────────────────────────────────────────────────────────
 function mount(card, sc) {
   card.tabIndex = 0;
