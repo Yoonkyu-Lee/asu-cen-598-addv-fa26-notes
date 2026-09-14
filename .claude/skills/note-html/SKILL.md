@@ -20,9 +20,10 @@ description: 이 저장소의 노트 HTML 을 만들거나 고칠 때 쓴다. �
 노트 본문의 CSS, SVG, JS는 전부 그 HTML 파일 하나에 인라인한다.
 오프라인에서 열어도 노트는 완전히 동작해야 한다.
 
-예외는 PDF 리더 하나뿐이다. `vendor/pdf.js/`와 `slides/*.pdf`는 repo 안에 있는
-로컬 파일이므로 "외부 의존성 없음"은 유지된다. 다만 **리더는 없어도 되는 부가 기능이다.**
-`vendor/`나 `slides/`가 없거나 로드에 실패해도 노트 본문은 그대로 읽혀야 한다.
+예외는 둘이다. PDF 리더(`reader.js`)와 **실습 입문 페이지의 시뮬레이션 뷰어(`sim.js`)**.
+둘 다 repo 안 로컬 파일이므로 "외부 의존성 없음" 은 유지된다. 둘 다 없어도 노트 본문은
+그대로 읽혀야 한다. `vendor/pdf.js/`, `slides/*.pdf`, `sim.js` 가 없거나 로드에 실패해도
+본문은 막히지 않는다. **리더도 뷰어도 없어도 되는 부가 기능이다.**
 
 ### 코드 표기
 
@@ -317,6 +318,9 @@ notes/                                            노트는 전부 여기 모은
   L04-clock-and-reset.html                        Lecture 4
   L{NN}-{kebab-case-영문주제}.html
   LAB{N}-{kebab-case-과제제목}.html               Lab 공략 (아래 참조)
+  P03-before-lecture-3.html                       실습 입문 (아래 참조)
+  P{NN}-{kebab}.html                              n 강을 읽기 전에 손에 익힐 동작.
+                                                  data-slide 없음, reader.js 없음, sim.js 사용
 
 slides/L01-course-intro.pdf                       Lecture 1 슬라이드 (노트와 같은 stem)
 slides/L02-design-and-verification-overview.pdf
@@ -326,6 +330,7 @@ lab/lab0/report.md                                제출 리포트
 lab/lab0/materials/                               공개 금지. gitignore 된다 (아래 참조)
 
 reader.js  reader.css                             슬라이드 리더 (모든 노트가 공유)
+sim.js                                            반 클럭 프레임 시뮬레이션 뷰어 (P 페이지가 공유)
 vendor/pdf.js/                                    pdf.js 런타임
 ```
 
@@ -353,6 +358,16 @@ vendor/pdf.js/                                    pdf.js 런타임
 **슬라이드 사본은 노트와 stem을 맞춰서 이름을 바꾼다.** `02_Design and Verification Overview.pptx`
 → `slides/L02-design-and-verification-overview.pdf`. 그러면 `reader.js`가 노트 파일명에서
 슬라이드 경로를 바로 유도하므로 하드코딩된 매핑 표가 필요 없다.
+
+### 실습 입문 페이지 (`P{NN}-*.html`)
+
+강의 요약이 아니라 **"이 코드는 이 회로이고 이렇게 돈다"** 를 보여주는 장르다.
+단원은 **코드 → 회로 → 밟아본다 → 한 줄 정리** 네 단.
+시나리오는 페이지 안 `<script type="application/json" id="sim-data">` 에 두고
+`.sim[data-sim="id"]` 카드가 부른다. 형식과 노드 의미는
+`docs/superpowers/specs/2026-09-13-hands-on-primer-design.md`.
+**트레이스는 손으로 쓰므로 `node scripts/simcheck.mjs <페이지>` 를 반드시 돌린다.**
+`verify.mjs` 는 `.sim` 카드도 도해처럼 찍는다.
 
 ### scripts/
 

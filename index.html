@@ -348,7 +348,9 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 a.gloss-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:12px;padding:16px 20px;
   background:var(--card);border:1px solid var(--rule);border-radius:10px;text-decoration:none;color:inherit;transition:.15s}
 a.gloss-card:hover{border-color:var(--blue);box-shadow:0 3px 14px var(--shadow)}
-a.gloss-card .gi{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--blue);letter-spacing:-.03em;line-height:1}
+/* 카드가 둘 이상 쌓이므로 아이콘 칸을 고정폭으로 둔다. 안 그러면 글자 시작선이 카드마다 어긋난다 */
+a.gloss-card .gi{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--blue);letter-spacing:-.03em;line-height:1;
+  min-width:32px}
 a.gloss-card .gt{flex:1;min-width:200px;font-size:14.5px;color:var(--ink2);line-height:1.55}
 a.gloss-card .gt b{color:var(--ink)}
 a.gloss-card .go{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--blue);white-space:nowrap;font-weight:600}
@@ -459,6 +461,14 @@ a.mod:hover .num{color:var(--blue)}
     <span class="gt" lang="en"><b>Glossary</b> · RTL, ECO, slack, DUT, BFM, VIP, DFT and the rest. The page you open with a document in front of you. Alphabetical and searchable.</span>
     <span class="go" lang="ko">찾아보기 →</span>
     <span class="go" lang="en">Look it up →</span>
+  </a>
+
+  <a class="gloss-card" href="notes/P03-before-lecture-3.html">
+    <span class="gi">▶|</span>
+    <span class="gt" lang="ko"><b>실습 입문</b> · Verilog 를 한 번도 안 봤으면 여기부터. 클럭 · flip-flop · comb / ff / latch 를 코드 · 회로 · 파형 나란히 놓고 반 클럭씩 밟아본다. 3 강 전 · 4 강 전 두 편.</span>
+    <span class="gt" lang="en"><b>Hands-on primer</b> · Never seen Verilog? Start here. Clock, flip-flop, comb / ff / latch with code, circuit and waveform side by side, stepped half a clock at a time. Before L3 · Before L4.</span>
+    <span class="go" lang="ko">밟아보기 →</span>
+    <span class="go" lang="en">Step through →</span>
   </a>
 </header>
 
