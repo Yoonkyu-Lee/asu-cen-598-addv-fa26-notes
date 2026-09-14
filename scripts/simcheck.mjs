@@ -32,6 +32,11 @@ export function checkScenario(sc) {
     if (!sigs[d]) errs.push(`${sc.id}: code drives 에 없는 신호 ${d}`);
   for (const w of (sc.circuit && sc.circuit.wires) || [])
     if (!sigs[w.sig]) errs.push(`${sc.id}: wire 에 없는 신호 ${w.sig}`);
+  // 핀 이름에 오타가 나면 그 노드의 값이 undefined 가 되고, expect 가 조용히 넘어간다.
+  // 검사가 통째로 사라지는 셈이라 여기서 잡는다.
+  for (const n of (sc.circuit && sc.circuit.nodes) || [])
+    for (const [pin, name] of [...Object.entries(n.in || {}), ...Object.entries(n.out || {})])
+      if (!sigs[name]) errs.push(`${sc.id}: 노드 ${n.id} 의 ${pin} 이 없는 신호 ${name}`);
 
   if (errs.length) return errs;                    // 구조가 깨졌으면 의미 검사는 무의미하다
   for (const n of (sc.circuit && sc.circuit.nodes) || []) checkNode(n, F, bits, errs, sc.id);
@@ -96,6 +101,43 @@ const GOOD = {
     { v: { clk: 1, d: 0, q: 0 } }, { v: { clk: 0, d: 0, q: 0 } },
   ],
 };
+// ff 하나로는 게이트 · latch · add 의 mask 가 한 번도 안 돌아간다. 노드를 섞은 두 번째 시나리오.
+// rst_n 이 걸린 ff, late ff, latch, xor, and, const, 그리고 2 bit 로 자리올림이 잘리는 add.
+const GOOD2 = {
+  id: 'self-mix',
+  code: [
+    { t: 'always_ff @(posedge clk) q1 <= !rst_n ? 0 : d;', drives: ['q1'] },
+    { t: 'always_ff @(posedge clk) q2 <= e;', drives: ['q2'] },
+    { t: 'always_latch if (en) ql = dl;', drives: ['ql'] },
+    { t: 'assign xy = q1 ^ ql;', drives: ['xy'] },
+    { t: 'assign an = q2 & ql;', drives: ['an'] },
+    { t: 'assign sum = x + one;', drives: ['sum'] },
+  ],
+  circuit: { w: 560, h: 320,
+    nodes: [
+      { id: 'f1', kind: 'ff', x: 160, y: 30, in: { d: 'd', clk: 'clk', rst_n: 'rst_n' }, out: { q: 'q1' } },
+      { id: 'f2', kind: 'ff', x: 160, y: 100, late: true, in: { d: 'e', clk: 'clk' }, out: { q: 'q2' } },
+      { id: 'l1', kind: 'latch', x: 160, y: 170, in: { d: 'dl', en: 'en' }, out: { q: 'ql' } },
+      { id: 'x1', kind: 'xor', x: 340, y: 60, in: { a: 'q1', b: 'ql' }, out: { y: 'xy' } },
+      { id: 'a1', kind: 'and', x: 340, y: 140, in: { a: 'q2', b: 'ql' }, out: { y: 'an' } },
+      { id: 'c1', kind: 'const', x: 160, y: 250, val: 1, out: { y: 'one' } },
+      { id: 's1', kind: 'add', x: 340, y: 250, in: { a: 'x', b: 'one' }, out: { y: 'sum' } },
+    ],
+    ports: [], wires: [{ sig: 'd', pts: [[20, 50], [160, 50]] }, { sig: 'ql', pts: [[240, 190], [340, 190]] }] },
+  signals: [
+    { n: 'clk', kind: 'clk' }, { n: 'rst_n' }, { n: 'd' }, { n: 'q1' }, { n: 'e' }, { n: 'q2' },
+    { n: 'en' }, { n: 'dl' }, { n: 'ql' }, { n: 'xy' }, { n: 'an' },
+    { n: 'x', bits: 2 }, { n: 'one', bits: 2 }, { n: 'sum', bits: 2 },
+  ],
+  frames: [
+    { v: { clk: 1, rst_n: 0, d: 1, q1: 0, e: 1, q2: 1, en: 0, dl: 1, ql: 0, xy: 0, an: 0, x: 0, one: 1, sum: 1 } },
+    { v: { clk: 0, rst_n: 0, d: 1, q1: 0, e: 0, q2: 1, en: 0, dl: 0, ql: 0, xy: 0, an: 0, x: 1, one: 1, sum: 2 } },
+    { v: { clk: 1, rst_n: 1, d: 1, q1: 0, e: 1, q2: 1, en: 1, dl: 1, ql: 1, xy: 1, an: 1, x: 2, one: 1, sum: 3 } },
+    { v: { clk: 0, rst_n: 1, d: 1, q1: 0, e: 1, q2: 1, en: 1, dl: 0, ql: 0, xy: 0, an: 0, x: 3, one: 1, sum: 0 } },
+    { v: { clk: 1, rst_n: 1, d: 0, q1: 1, e: 0, q2: 0, en: 0, dl: 1, ql: 0, xy: 1, an: 0, x: 3, one: 1, sum: 0 } },
+    { v: { clk: 0, rst_n: 1, d: 0, q1: 1, e: 1, q2: 0, en: 0, dl: 0, ql: 0, xy: 1, an: 0, x: 0, one: 1, sum: 1 } },
+  ],
+};
 const clone = o => JSON.parse(JSON.stringify(o));
 const CASES = [
   ['정상', GOOD, 0],
@@ -105,6 +147,11 @@ const CASES = [
   ['clk 가 엣지 프레임에서 0', (() => { const s = clone(GOOD); s.frames[2].v.clk = 0; return s; })(), 1],
   ['drives 에 없는 신호', (() => { const s = clone(GOOD); s.code[1].drives = ['zz']; return s; })(), 1],
   ['X 는 건너뜀', (() => { const s = clone(GOOD); s.frames[2].v.q = 'X'; s.frames[3].v.q = 'X'; return s; })(), 0],
+  ['노드 핀 이름에 오타', (() => { const s = clone(GOOD); s.circuit.nodes[0].in.d = 'dd'; return s; })(), 1],
+  ['정상 (여러 노드)', GOOD2, 0],
+  ['latch 가 en=1 인데 앞 값을 붙듦', (() => { const s = clone(GOOD2); s.frames[3].v.ql = 1; return s; })(), 1],
+  ['late 플롭이 d[i-1] 을 읽음', (() => { const s = clone(GOOD2); s.frames[2].v.q2 = 0; return s; })(), 1],
+  ['엣지에서 rst_n 을 무시함', (() => { const s = clone(GOOD2); s.frames[2].v.q1 = 1; return s; })(), 1],
 ];
 
 function selftest() {
