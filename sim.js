@@ -289,7 +289,11 @@ function renderCode(sc, host) {
   host.replaceChildren(pre);
   const lines = (sc.code || []).map(l => {
     const s = el('span', { class: 'ln', 'data-drives': (l.drives || []).join(',') });
-    s.innerHTML = hl(l.t) || ' ';
+    // t 가 문자열이면 한 덩어리, {ko, en} 이면 언어별 span 두 개.
+    // 숨김은 페이지 전역의 [lang] CSS 가 맡으므로 langchange 때 다시 그릴 필요가 없다.
+    s.innerHTML = typeof l.t === 'string'
+      ? (hl(l.t) || ' ')
+      : '<span lang="ko">' + (hl(l.t.ko) || ' ') + '</span><span lang="en">' + (hl(l.t.en) || ' ') + '</span>';
     pre.appendChild(s);
     return { el: s, drives: l.drives || [] };
   });
