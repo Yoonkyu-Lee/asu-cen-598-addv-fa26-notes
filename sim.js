@@ -222,10 +222,17 @@ function renderCircuit(sc, host) {
     return { el: grp, n };
   });
 
-  // 포트 이름
+  // 포트 이름. 배선은 x=36 에서 시작하므로 여섯 글자쯤 되는 이름(arst_n)은 배선 위로 올라탄다.
+  // 그런 이름만 배선 위로 들어올리고, 오른쪽 끝을 기억해 뒀다가 배지를 그 너머로 민다.
+  // 짧은 이름은 지금까지와 똑같은 자리에 남는다.
+  const labelRight = {};
   (C.ports || []).forEach(p => {
-    const x = p.side === 'in' ? 8 : C.w - 8;
-    svg.appendChild(svgEl('text', { x, y: p.y + 4, 'text-anchor': p.side === 'in' ? 'start' : 'end',
+    const inSide = p.side === 'in';
+    const w = 6.6 * p.sig.length;                 // 10.5px mono 의 글자 폭 어림
+    const x = inSide ? 8 : C.w - 8;
+    const lift = inSide ? (8 + w > 34) : (C.w - 8 - w < C.w - 34);
+    if (inSide && lift) labelRight[p.sig] = 8 + w;
+    svg.appendChild(svgEl('text', { x, y: lift ? p.y - 5 : p.y + 4, 'text-anchor': inSide ? 'start' : 'end',
       class: 'port' + (clkSigs.has(p.sig) ? ' clk' : '') }, p.sig));
   });
 
@@ -235,7 +242,9 @@ function renderCircuit(sc, host) {
     if (badges[w.sig]) return;
     const pts = (C.wires.find(x => x.sig === w.sig) || {}).pts;
     const [x, y] = pts[0];
-    const g = svgEl('g', { class: 'badge', 'data-sig': w.sig, transform: `translate(${x + 4} ${y - 14})` });
+    // 들어올린 이름 바로 위에 배지를 놓으면 둘이 겹친다. 이름 오른쪽으로 비켜 세운다.
+    const bx = (x <= 36 && labelRight[w.sig] !== undefined) ? Math.max(x + 4, labelRight[w.sig] + 6) : x + 4;
+    const g = svgEl('g', { class: 'badge', 'data-sig': w.sig, transform: `translate(${bx} ${y - 14})` });
     g.appendChild(svgEl('rect', { width: 18, height: 12, rx: 3 }));
     g.appendChild(svgEl('text', { x: 9, y: 9, 'text-anchor': 'middle' }));
     svg.appendChild(g);
