@@ -28,3 +28,4 @@ lab/**/slides.jsonl
 
 # 제출 리포트는 공개하지 않는다. 증거 스크린샷을 임베드하므로 materials/ 와 운명을 같이한다.
 lab/**/report.md
+.superpowers/
