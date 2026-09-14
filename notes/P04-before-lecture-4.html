@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before Lecture 4 · 엣지에는 폭이 있다 · CEN 598 ADDV</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow" lang="ko">CEN 598 &middot; Advanced Digital Design and Verification &middot; 실습 입문</div>
+  <div class="eyebrow" lang="en">CEN 598 &middot; Advanced Digital Design and Verification &middot; hands-on primer</div>
+  <h1 class="title">Before Lecture 4<br><span lang="ko">엣지에는 폭이 있다</span><span lang="en">The edge has width</span></h1>
+  <p class="subtitle" lang="ko">3 강 전 페이지에서 '엣지 순간' 이라고 넘어간 것에 사실은 폭이 있고, 클럭이 둘이 되면 그 폭이 사고가 된다. 4 강을 읽기 전에 손에 익혀둘 동작 다섯 개.</p>
+  <p class="subtitle" lang="en">The 'edge instant' the P03 page took for granted has width, and with two clocks that width becomes an accident. Five behaviours to have in your hands before Lecture 4.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">실습 입문</span>
+    <span class="chip">시뮬레이션 6 개</span>
+    <span class="chip dim">P03 의 3 · 4 단원을 전제</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">hands-on primer</span>
+    <span class="chip">6 simulations</span>
+    <span class="chip dim">assumes P03 units 3 and 4</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Before Lecture 4</div>
+    <div class="name"><span lang="ko">엣지에는 폭이 있다</span><span lang="en">The edge has width</span></div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#u0"><span class="n">01</span><span lang="ko">먼저 3 강 전 페이지</span><span lang="en">The P03 page first</span></a>
+  <a href="#u1"><span class="n">02</span><span lang="ko">엣지는 순간이 아니라 창이다</span><span lang="en">The edge is a window, not an instant</span></a>
+  <a href="#u2"><span class="n">03</span><span lang="ko">같은 clk 도 같은 순간에 오지 않는다</span><span lang="en">Even the same clk does not arrive at once</span></a>
+  <a href="#u3"><span class="n">04</span><span lang="ko">다른 클럭에서 온 신호</span><span lang="en">A signal from another clock</span></a>
+  <a href="#u4"><span class="n">05</span><span lang="ko">reset 을 걸 때: 동기와 비동기</span><span lang="en">Asserting reset: sync and async</span></a>
+  <a href="#u5"><span class="n">06</span><span lang="ko">reset 을 풀 때</span><span lang="en">Releasing reset</span></a>
+  <a href="#u6"><span class="n">07</span><span lang="ko">4 강 어느 절로 가면 되나</span><span lang="en">Where to go in Lecture 4</span></a>
+</nav>
+
+<main>
+<section id="u0">
+  <div class="sec-head"><span class="sec-num">01</span><h2 lang="ko">먼저 3 강 전 페이지</h2><h2 lang="en">The P03 page first</h2></div>
+
+</section>
+
+<section id="u1">
+  <div class="sec-head"><span class="sec-num">02</span><h2 lang="ko">엣지는 순간이 아니라 창이다</h2><h2 lang="en">The edge is a window, not an instant</h2></div>
+<div class="sim" data-sim="p04-setup"></div>
+</section>
+
+<section id="u2">
+  <div class="sec-head"><span class="sec-num">03</span><h2 lang="ko">같은 clk 도 같은 순간에 오지 않는다</h2><h2 lang="en">Even the same clk does not arrive at once</h2></div>
+<div class="sim" data-sim="p04-skew"></div>
+</section>
+
+<section id="u3">
+  <div class="sec-head"><span class="sec-num">04</span><h2 lang="ko">다른 클럭에서 온 신호</h2><h2 lang="en">A signal from another clock</h2></div>
+<div class="sim" data-sim="p04-cdc"></div>
+</section>
+
+<section id="u4">
+  <div class="sec-head"><span class="sec-num">05</span><h2 lang="ko">reset 을 걸 때: 동기와 비동기</h2><h2 lang="en">Asserting reset: sync and async</h2></div>
+<div class="grid2"><div class="sim" data-sim="p04-rst-sync"></div><div class="sim" data-sim="p04-rst-async"></div></div>
+</section>
+
+<section id="u5">
+  <div class="sec-head"><span class="sec-num">06</span><h2 lang="ko">reset 을 풀 때</h2><h2 lang="en">Releasing reset</h2></div>
+<div class="sim" data-sim="p04-recovery"></div>
+</section>
+
+<section id="u6">
+  <div class="sec-head"><span class="sec-num">07</span><h2 lang="ko">4 강 어느 절로 가면 되나</h2><h2 lang="en">Where to go in Lecture 4</h2></div>
+
+</section>
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Before Lecture 4 개인 학습 노트<br>
+  강의: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 페이지는 수강생이 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  이 과목 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification · Before Lecture 4 personal study notes<br>
+  Course: Aman Arora, Arizona State University · Fall 2026 · <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  This page is personal study material written by a student. It is not official course material.<br>
+  Copyright in the course's lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<script type="application/json" id="sim-data">[{"id": "p04-setup", "title": {"ko": "엣지 '순간' 에 d 가 바뀌면", "en": "When d changes 'at' the edge"}, "code": [{"t": "always_ff @(posedge clk)"}, {"t": "  q <= d;", "drives": ["q"]}], "circuit": {"w": 320, "h": 120, "nodes": [{"id": "f1", "kind": "ff", "x": 140, "y": 40, "in": {"d": "d", "clk": "clk"}, "out": {"q": "q"}}], "ports": [{"sig": "d", "side": "in", "y": 56}, {"sig": "q", "side": "out", "y": 56}, {"sig": "clk", "side": "in", "y": 96}], "wires": [{"sig": "d", "pts": [[36, 56], [140, 56]]}, {"sig": "q", "pts": [[196, 56], [284, 56]]}, {"sig": "clk", "pts": [[36, 96], [120, 96], [120, 74], [140, 74]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "d"}, {"n": "q"}], "frames": [{"v": {"clk": 1, "d": 0, "q": 0}, "note": {"ko": "3 강 전 페이지에서 본 flop 그대로다. 다만 이번에는 d 를 바꾸는 시점을 고른다.", "en": "The same flop as the P03 page. This time we choose when d changes."}}, {"v": {"clk": 0, "d": 0, "q": 0}, "note": {"ko": "정착. d 는 아직 0.", "en": "Settled. d is still 0."}}, {"v": {"clk": 1, "d": 1, "q": "X"}, "note": {"ko": "d 가 엣지와 같은 순간에 1 로 올라갔다. flop 이 0 을 본 건지 1 을 본 건지 정해지지 않았다. q 는 X. '모른다' 는 뜻이다.", "en": "d rose to 1 in the same instant as the edge. Whether the flop saw 0 or 1 is undecided. q is X, meaning unknown."}}, {"v": {"clk": 0, "d": 1, "q": "X"}, "note": {"ko": "한 사이클 내내 X 다. 실물에서는 0 아니면 1 중 하나가 나오지만, 어느 쪽인지 설계자는 모른다. 그걸 받아 쓰는 논리도 모른다.", "en": "X for the whole cycle. In silicon it is a 0 or a 1, but the designer does not know which, and neither does the logic downstream."}}, {"v": {"clk": 1, "d": 1, "q": 1}, "note": {"ko": "다음 엣지. 이번엔 d 가 한참 전부터 1 이었다. q 는 깨끗하게 1.", "en": "Next edge. This time d has been 1 for ages. q is a clean 1."}}, {"v": {"clk": 0, "d": 0, "q": 1}, "note": {"ko": "d 가 정착 프레임에서 내려갔다. 엣지와 멀다. 안전하다.", "en": "d falls in a settled frame, far from the edge. Safe."}}, {"v": {"clk": 1, "d": 0, "q": 0}, "note": {"ko": "엣지. q 는 0. 문제없다.", "en": "Edge. q is 0. No problem."}}, {"v": {"clk": 0, "d": 0, "q": 0}, "note": {"ko": "엣지 앞뒤로 d 가 가만히 있어야 하는 폭이 있다. 앞이 setup time, 뒤가 hold time 이다. 4 강 01 절이 그 숫자를 잰다.", "en": "There is a width on either side of the edge where d must sit still: setup time before, hold time after. Lecture 4 §01 measures those numbers."}}]}, {"id": "p04-skew", "title": {"ko": "같은 clk 인데 둘째 flop 에 늦게 도착하면", "en": "Same clk, but it reaches the second flop late"}, "code": [{"t": "always_ff @(posedge clk) begin"}, {"t": "  q1 <= din;", "drives": ["q1"]}, {"t": {"ko": "  q2 <= q1;    // 한 칸 뒤따라야 한다", "en": "  q2 <= q1;    // must trail by one step"}, "drives": ["q2"]}, {"t": "end"}], "circuit": {"w": 380, "h": 150, "nodes": [{"id": "f1", "kind": "ff", "x": 110, "y": 30, "in": {"d": "din", "clk": "clk"}, "out": {"q": "q1"}}, {"id": "d1", "kind": "delay", "x": 150, "y": 100, "in": {"a": "clk"}, "out": {"y": "clk_late"}}, {"id": "f2", "kind": "ff", "x": 250, "y": 30, "late": true, "in": {"d": "q1", "clk": "clk_late"}, "out": {"q": "q2"}}], "ports": [{"sig": "din", "side": "in", "y": 46}, {"sig": "clk", "side": "in", "y": 114}, {"sig": "q2", "side": "out", "y": 46}], "wires": [{"sig": "din", "pts": [[36, 46], [110, 46]]}, {"sig": "q1", "pts": [[166, 46], [250, 46]]}, {"sig": "q2", "pts": [[306, 46], [344, 46]]}, {"sig": "clk", "pts": [[36, 114], [150, 114]]}, {"sig": "clk", "pts": [[70, 114], [70, 64], [110, 64]]}, {"sig": "clk_late", "pts": [[190, 114], [230, 114], [230, 64], [250, 64]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "clk_late"}, {"n": "din"}, {"n": "q1"}, {"n": "q2"}], "frames": [{"v": {"clk": 1, "clk_late": 1, "din": 0, "q1": 0, "q2": 0}, "note": {"ko": "flop 두 개를 이어 놓았다. 제대로면 q2 는 q1 을 한 칸 뒤따라야 한다. 그런데 둘째 flop 의 clk 앞에 '지연' 상자가 있다. 배선이 길어서 늦게 도착한다는 뜻이다.", "en": "Two flops in a chain. Done right, q2 should trail q1 by one step. But there is a 'delay' box in front of the second flop's clk: its wire is longer, so the clock arrives late."}}, {"v": {"clk": 0, "clk_late": 0, "din": 1, "q1": 0, "q2": 0}, "note": {"ko": "din 이 1.", "en": "din is 1."}}, {"v": {"clk": 1, "clk_late": 1, "din": 1, "q1": 1, "q2": 1}, "note": {"ko": "엣지. q1 이 1 을 잡았다. 그리고 q2 도 1 이다. 늦게 온 엣지가 '방금 바뀐' q1 을 봐버렸다. 한 칸 늦어야 하는데 같은 칸에 와 있다.", "en": "Edge. q1 captures 1. And q2 is 1 too. The late edge saw the q1 that had just changed. It should be one step behind and it is not."}}, {"v": {"clk": 0, "clk_late": 0, "din": 0, "q1": 1, "q2": 1}, "note": {"ko": "이게 hold 위반이다. 엣지 직후에 D 가 가만히 있어야 하는데, 앞 flop 이 바꿔버린 새 값이 이미 와 있었다.", "en": "This is a hold violation. D must sit still just after the edge, but the new value from the flop in front had already arrived."}}, {"v": {"clk": 1, "clk_late": 1, "din": 0, "q1": 0, "q2": 0}, "note": {"ko": "엣지. 또 같이 바뀐다. 두 단짜리 shift register 가 한 단처럼 동작한다.", "en": "Edge. They change together again. A two-stage shift register behaving like one stage."}}, {"v": {"clk": 0, "clk_late": 0, "din": 1, "q1": 0, "q2": 0}, "note": {"ko": "코드는 틀린 데가 없다. 틀린 것은 clk 이 두 flop 에 도착하는 시각의 차이, 즉 skew 다.", "en": "Nothing in the code is wrong. What is wrong is the difference in when clk reaches the two flops: skew."}}, {"v": {"clk": 1, "clk_late": 1, "din": 1, "q1": 1, "q2": 1}, "note": {"ko": "엣지.", "en": "Edge."}}, {"v": {"clk": 0, "clk_late": 0, "din": 1, "q1": 1, "q2": 1}, "note": {"ko": "이 문제는 RTL 만 보고는 알 수 없다. 배선이 깔린 뒤에야 skew 가 정해진다. 4 강 03 절이 그 이야기다.", "en": "You cannot see this from the RTL. Skew is decided only after the wires are laid out. Lecture 4 §03 is about that."}}]}, {"id": "p04-cdc", "title": {"ko": "다른 클럭에서 온 신호를 잡으면", "en": "Capturing a signal from another clock"}, "code": [{"t": {"ko": "// a 는 clkA 도메인에서 온다", "en": "// a comes from the clkA domain"}}, {"t": "always_ff @(posedge clkB) begin"}, {"t": "  q1 <= a;", "drives": ["q1"]}, {"t": {"ko": "  q2 <= q1;   // 두 번째 단", "en": "  q2 <= q1;   // second stage"}, "drives": ["q2"]}, {"t": "end"}], "circuit": {"w": 380, "h": 150, "nodes": [{"id": "f1", "kind": "ff", "x": 110, "y": 30, "in": {"d": "a", "clk": "clkB"}, "out": {"q": "q1"}}, {"id": "f2", "kind": "ff", "x": 230, "y": 30, "in": {"d": "q1", "clk": "clkB"}, "out": {"q": "q2"}}], "ports": [{"sig": "a", "side": "in", "y": 46}, {"sig": "clkB", "side": "in", "y": 114}, {"sig": "q2", "side": "out", "y": 46}], "wires": [{"sig": "a", "pts": [[36, 46], [110, 46]]}, {"sig": "q1", "pts": [[166, 46], [230, 46]]}, {"sig": "q2", "pts": [[286, 46], [344, 46]]}, {"sig": "clkB", "pts": [[36, 114], [70, 114], [70, 64], [110, 64]]}, {"sig": "clkB", "pts": [[70, 114], [190, 114], [190, 64], [230, 64]]}]}, "signals": [{"n": "clkB", "kind": "clk"}, {"n": "clkA"}, {"n": "a"}, {"n": "q1"}, {"n": "q2"}], "frames": [{"v": {"clkB": 1, "clkA": 1, "a": 0, "q1": 0, "q2": 0}, "note": {"ko": "clkA 줄을 보라. clkB 와 박자가 다르다. a 는 clkA 에 맞춰 바뀌므로 clkB 입장에서는 아무 때나 바뀌는 신호다.", "en": "Look at the clkA row. It beats differently from clkB. a changes to clkA's rhythm, so from clkB's point of view it changes at random."}}, {"v": {"clkB": 0, "clkA": 1, "a": 0, "q1": 0, "q2": 0}, "note": {"ko": "정착.", "en": "Settled."}}, {"v": {"clkB": 1, "clkA": 0, "a": 1, "q1": "M", "q2": 0}, "note": {"ko": "a 가 하필 clkB 의 엣지에 바뀌었다. 첫 flop 이 metastable 로 빠졌다. M. 0 도 1 도 아닌 중간 전압이다.", "en": "a changed right on clkB's edge. The first flop went metastable: M, a voltage between 0 and 1."}}, {"v": {"clkB": 0, "clkA": 0, "a": 1, "q1": 1, "q2": 0}, "note": {"ko": "반 클럭이 지나는 동안 가라앉았다. 1 이 됐다. 0 이 됐을 수도 있다. 중요한 것은 둘째 flop 이 볼 때쯤엔 정해져 있다는 것이다.", "en": "Over the half clock it settled, to 1 here; it could have been 0. What matters is that by the time the second flop looks, it has decided."}}, {"v": {"clkB": 1, "clkA": 1, "a": 1, "q1": 1, "q2": 1}, "note": {"ko": "엣지. q2 가 1 을 잡았다. q2 는 M 을 본 적이 없다.", "en": "Edge. q2 captures 1. q2 never saw the M."}}, {"v": {"clkB": 0, "clkA": 1, "a": 0, "q1": 1, "q2": 1}, "note": {"ko": "a 가 내려갔다. 이번엔 엣지와 멀다.", "en": "a drops, this time far from the edge."}}, {"v": {"clkB": 1, "clkA": 0, "a": 0, "q1": 0, "q2": 1}, "note": {"ko": "엣지. q1 은 깨끗하게 0.", "en": "Edge. q1 is a clean 0."}}, {"v": {"clkB": 0, "clkA": 0, "a": 0, "q1": 0, "q2": 1}, "note": {"ko": "만약 둘째 flop 이 없었다면 프레임 2 의 M 이 뒤의 논리로 그대로 나갔다. 둘째 flop 은 M 을 없애는 게 아니라 가라앉을 시간을 한 클럭 벌어준다.", "en": "Without the second flop, frame 2's M would have gone straight into the logic behind. The second flop does not remove the M; it buys one clock for it to settle."}}, {"v": {"clkB": 1, "clkA": 1, "a": 0, "q1": 0, "q2": 0}, "note": {"ko": "엣지. q2 가 0.", "en": "Edge. q2 is 0."}}, {"v": {"clkB": 0, "clkA": 1, "a": 0, "q1": 0, "q2": 0}, "note": {"ko": "이 두 단을 synchronizer 라고 부른다. 4 강 06 · 07 절, 그리고 5 강 FIFO 의 포인터가 건널 때 다시 만난다.", "en": "These two stages are called a synchronizer. You meet them again in Lecture 4 §06 and §07, and when the FIFO pointers cross in Lecture 5."}}]}, {"id": "p04-rst-sync", "title": {"ko": "동기 reset", "en": "Synchronous reset"}, "code": [{"t": "always_ff @(posedge clk)"}, {"t": "  if (!rst_n) q <= 1'b0;", "drives": ["q"]}, {"t": "  else        q <= 1'b1;", "drives": ["q"]}], "circuit": {"w": 320, "h": 130, "nodes": [{"id": "c1", "kind": "const", "x": 60, "y": 40, "val": 1, "out": {"y": "one"}}, {"id": "f1", "kind": "ff", "x": 140, "y": 36, "in": {"d": "one", "clk": "clk", "rst_n": "rst_n"}, "out": {"q": "q"}}], "ports": [{"sig": "clk", "side": "in", "y": 70}, {"sig": "rst_n", "side": "in", "y": 110}, {"sig": "q", "side": "out", "y": 52}], "wires": [{"sig": "one", "pts": [[92, 52], [140, 52]]}, {"sig": "q", "pts": [[196, 52], [284, 52]]}, {"sig": "clk", "pts": [[36, 70], [140, 70]]}, {"sig": "rst_n", "pts": [[36, 110], [168, 110], [168, 80]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "rst_n"}, {"n": "one"}, {"n": "q"}], "frames": [{"v": {"clk": 1, "rst_n": 1, "one": 1, "q": 1}, "note": {"ko": "flop 이 계속 1 을 잡고 있다. rst_n 이 sensitivity list 에 없다. 그래서 이 reset 은 엣지에서만 들린다.", "en": "The flop keeps capturing 1. rst_n is not in the sensitivity list, so this reset is heard only at the edge."}}, {"v": {"clk": 0, "rst_n": 1, "one": 1, "q": 1}, "note": {"ko": "정착.", "en": "Settled."}}, {"v": {"clk": 1, "rst_n": 1, "one": 1, "q": 1}, "note": {"ko": "엣지. 여전히 1.", "en": "Edge. Still 1."}}, {"v": {"clk": 0, "rst_n": 0, "one": 1, "q": 1}, "note": {"ko": "rst_n 을 걸었다. 그런데 q 는 아직 1 이다. 엣지가 안 왔으니까.", "en": "rst_n asserted, and q is still 1, because no edge has come."}}, {"v": {"clk": 1, "rst_n": 0, "one": 1, "q": 0}, "note": {"ko": "엣지. 이제야 0. 걸고 나서 반 클럭이 지났다.", "en": "Edge. Only now 0, half a clock after asserting."}}, {"v": {"clk": 0, "rst_n": 1, "one": 1, "q": 0}, "note": {"ko": "rst_n 을 풀었다. q 는 0 그대로. 다음 엣지까지.", "en": "rst_n released. q stays 0 until the next edge."}}, {"v": {"clk": 1, "rst_n": 1, "one": 1, "q": 1}, "note": {"ko": "엣지. 다시 1.", "en": "Edge. Back to 1."}}, {"v": {"clk": 0, "rst_n": 1, "one": 1, "q": 1}, "note": {"ko": "reset 이 클럭에 묶여 있다. 클럭이 없으면 reset 도 없다. 4 강이 왜 그게 문제인지 말한다.", "en": "The reset is tied to the clock. No clock, no reset. Lecture 4 says why that is a problem."}}]}, {"id": "p04-rst-async", "title": {"ko": "비동기 reset", "en": "Asynchronous reset"}, "code": [{"t": "always_ff @(posedge clk or negedge arst_n)"}, {"t": "  if (!arst_n) q <= 1'b0;", "drives": ["q"]}, {"t": "  else         q <= 1'b1;", "drives": ["q"]}], "circuit": {"w": 320, "h": 130, "nodes": [{"id": "c1", "kind": "const", "x": 60, "y": 40, "val": 1, "out": {"y": "one"}}, {"id": "f1", "kind": "ff", "x": 140, "y": 36, "in": {"d": "one", "clk": "clk", "arst_n": "arst_n"}, "out": {"q": "q"}}], "ports": [{"sig": "clk", "side": "in", "y": 70}, {"sig": "arst_n", "side": "in", "y": 110}, {"sig": "q", "side": "out", "y": 52}], "wires": [{"sig": "one", "pts": [[92, 52], [140, 52]]}, {"sig": "q", "pts": [[196, 52], [284, 52]]}, {"sig": "clk", "pts": [[36, 70], [140, 70]]}, {"sig": "arst_n", "pts": [[36, 110], [168, 110], [168, 80]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "arst_n"}, {"n": "one"}, {"n": "q"}], "frames": [{"v": {"clk": 1, "arst_n": 1, "one": 1, "q": 1}, "note": {"ko": "같은 flop. 다른 점은 arst_n 이 sensitivity list 에 들어 있다는 것 하나다.", "en": "The same flop. The one difference: arst_n is in the sensitivity list."}}, {"v": {"clk": 0, "arst_n": 1, "one": 1, "q": 1}, "note": {"ko": "정착.", "en": "Settled."}}, {"v": {"clk": 1, "arst_n": 1, "one": 1, "q": 1}, "note": {"ko": "엣지. 1.", "en": "Edge. 1."}}, {"v": {"clk": 0, "arst_n": 0, "one": 1, "q": 0}, "note": {"ko": "arst_n 을 걸었다. q 가 즉시 0. 엣지를 기다리지 않는다. 왼쪽과 이 프레임을 비교하라.", "en": "arst_n asserted. q is 0 immediately, without waiting for an edge. Compare this frame with the left."}}, {"v": {"clk": 1, "arst_n": 0, "one": 1, "q": 0}, "note": {"ko": "엣지가 와도 reset 이 이긴다. 0.", "en": "The edge comes and reset still wins. 0."}}, {"v": {"clk": 0, "arst_n": 1, "one": 1, "q": 0}, "note": {"ko": "풀었다. 이쪽은 푸는 것도 즉시 반영되지만, 새 값을 잡는 건 엣지의 몫이라 q 는 아직 0.", "en": "Released. Release takes effect at once too, but capturing a new value is the edge's job, so q is still 0."}}, {"v": {"clk": 1, "arst_n": 1, "one": 1, "q": 1}, "note": {"ko": "엣지. 1.", "en": "Edge. 1."}}, {"v": {"clk": 0, "arst_n": 1, "one": 1, "q": 1}, "note": {"ko": "걸 때는 즉시, 풀고 나서 새 값은 엣지에서. 이 비대칭이 4 강 09 · 10 절의 결론으로 이어진다.", "en": "Assert takes effect at once; a new value after release waits for the edge. That asymmetry leads to the conclusion of Lecture 4 §09 and §10."}}]}, {"id": "p04-recovery", "title": {"ko": "비동기 reset 을 엣지 근처에서 풀면", "en": "Releasing an async reset near the edge"}, "code": [{"t": "always_ff @(posedge clk or negedge arst_n)"}, {"t": "  if (!arst_n) q <= 1'b0;", "drives": ["q"]}, {"t": "  else         q <= 1'b1;", "drives": ["q"]}], "circuit": {"w": 320, "h": 130, "nodes": [{"id": "c1", "kind": "const", "x": 60, "y": 40, "val": 1, "out": {"y": "one"}}, {"id": "f1", "kind": "ff", "x": 140, "y": 36, "in": {"d": "one", "clk": "clk", "arst_n": "arst_n"}, "out": {"q": "q"}}], "ports": [{"sig": "clk", "side": "in", "y": 70}, {"sig": "arst_n", "side": "in", "y": 110}, {"sig": "q", "side": "out", "y": 52}], "wires": [{"sig": "one", "pts": [[92, 52], [140, 52]]}, {"sig": "q", "pts": [[196, 52], [284, 52]]}, {"sig": "clk", "pts": [[36, 70], [140, 70]]}, {"sig": "arst_n", "pts": [[36, 110], [168, 110], [168, 80]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "arst_n"}, {"n": "one"}, {"n": "q"}], "frames": [{"v": {"clk": 1, "arst_n": 1, "one": 1, "q": 1}, "note": {"ko": "앞 단원과 같은 flop 이다. 이번엔 reset 을 푸는 시점을 엣지에 겹쳐본다.", "en": "The same flop as the previous unit. This time the release is made to coincide with the edge."}}, {"v": {"clk": 0, "arst_n": 0, "one": 1, "q": 0}, "note": {"ko": "걸었다. 즉시 0.", "en": "Asserted. 0 at once."}}, {"v": {"clk": 1, "arst_n": 0, "one": 1, "q": 0}, "note": {"ko": "엣지. 아직 걸려 있으니 0.", "en": "Edge. Still asserted, so 0."}}, {"v": {"clk": 0, "arst_n": 0, "one": 1, "q": 0}, "note": {"ko": "정착.", "en": "Settled."}}, {"v": {"clk": 1, "arst_n": 1, "one": 1, "q": "X"}, "note": {"ko": "엣지와 같은 순간에 풀었다. flop 은 '아직 reset 중' 인지 '이제 1 을 잡아야' 하는지 정하지 못했다. X.", "en": "Released in the same instant as the edge. The flop could not decide between 'still in reset' and 'capture the 1 now'. X."}}, {"v": {"clk": 0, "arst_n": 1, "one": 1, "q": "X"}, "note": {"ko": "1 단원의 setup/hold 와 같은 종류의 사고다. 대상이 d 가 아니라 reset 을 푸는 시점일 뿐이다.", "en": "The same kind of accident as unit 1's setup/hold, except the subject is the reset release rather than d."}}, {"v": {"clk": 1, "arst_n": 1, "one": 1, "q": 1}, "note": {"ko": "다음 엣지. 이제는 깨끗하게 1.", "en": "Next edge. Now a clean 1."}}, {"v": {"clk": 0, "arst_n": 1, "one": 1, "q": 1}, "note": {"ko": "그래서 reset 은 걸 때는 아무 때나 걸어도 되지만 풀 때는 엣지에 맞춰 풀어야 한다. 4 강 10 절이 이걸 recovery time 이라고 부른다.", "en": "So a reset may be asserted any time but must be released in step with the edge. Lecture 4 §10 calls this recovery time."}}]}]</script>
+<script src="../sim.js" type="module"></script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
