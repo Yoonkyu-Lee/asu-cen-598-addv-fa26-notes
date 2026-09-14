@@ -284,7 +284,7 @@ await page.goto(url, { waitUntil: 'networkidle' });
 await page.evaluate(() => document.querySelectorAll('details').forEach(d => d.open = true));
 await page.waitForTimeout(300);
 await page.waitForTimeout(250);
-const figs = await page.$$('figure, .play');
+const figs = await page.$$('figure, .play, .sim');
 let shotCount = 0;
 for (const el of figs) {
   const id = String(shotCount + 1).padStart(2, '0');
@@ -390,7 +390,7 @@ const svgHits = await page.evaluate(() => {
   const vis = e => getComputedStyle(e).display !== 'none';
   const grp = e => { let n = e.parentElement; while (n && n.tagName !== 'svg') { if (n.tagName === 'g') return n; n = n.parentElement; } return null; };
   const ov = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
-  document.querySelectorAll('figure svg, .play svg, .nota svg').forEach(svg => {
+  document.querySelectorAll('figure svg, .play svg, .nota svg, .sim svg').forEach(svg => {
     const name = (svg.getAttribute('aria-label') || '?').slice(0, 30);
     const texts = [...svg.querySelectorAll('text')].filter(vis)
       .map(t => ({ bb: t.getBoundingClientRect(), g: grp(t), txt: (t.textContent || '').trim().slice(0, 16) }))
@@ -576,7 +576,7 @@ if (shotCount > 0) {
   line('도해 스크린샷은 반드시 한 장씩 열어서 눈으로 확인할 것.');
   line('도형 겹침(테두리가 글자를 관통하는 것)과 색 대비는 자동 검사가 못 잡는다.\n');
 } else {
-  line('도해 스크린샷: 없음 (figure / .play 요소가 없는 파일)\n');
+  line('도해 스크린샷: 없음 (figure / .play / .sim 요소가 없는 파일)\n');
 }
 
 
