@@ -125,6 +125,24 @@ node scripts/render-slides.mjs slides/<stem>.pdf 12-18   # 도해는 반드시 �
 **텍스트만 보고 도해를 옮기면 반드시 틀린다.** 화살표가 어디를 가리키는지, 표의 열 순서가
 어떤지는 렌더해서 봐야 안다. 실제로 이걸로 틀린 적이 있다.
 
+### 애니메이션 구간을 먼저 찾는다
+
+**용어를 뽑기 전에 한 번 더 할 일이 있다.** 이 과목 덱은 같은 그림을 여러 장에 걸쳐
+움직이는 구간이 많고, **PDF 로 보면 그냥 비슷한 그림 여러 장이라 그냥 지나가기 쉽다.**
+L05 의 슬라이드 7&ndash;15 쪽과 23&ndash;31 쪽이 각각 아홉 장짜리 애니메이션 하나다.
+
+```bash
+node scripts/pdftext.mjs slides/<stem>.pdf        # 제목이 같은 연속 쪽을 찾는다
+node scripts/render-slides.mjs slides/<stem>.pdf 23-31   # 진짜 움직이는지 눈으로 본다
+```
+
+찾았으면 **`.anim` 슬라이더로 만든다.** 표로 펴거나 "세 컷 요약" 으로 줄이지 않는다.
+만드는 법과 판별 기준은 `note-html` 스킬의 "애니메이션 슬라이더" 절이 단일 출처다.
+**불릿만 하나씩 나타나는 쪽은 애니메이션이 아니다.** 그림이 실제로 움직여야 한다.
+
+**`.anim` 과 `.play` 를 헷갈리지 않는다.** `.anim` 은 슬라이드가 보여준 것을 되살리고,
+`.play` 는 슬라이드가 안 보여준 상황을 독자가 만들어보는 것이다. 한 강의에 둘 다 있어도 된다.
+
 **그 다음 오늘 나오는 새 용어부터 뽑는다.** 각각에 대해 풀네임 / 한 줄 / 언제 / 누가 /
 헷갈리는 것을 채울 수 있는지 확인한다. **못 채우면 아직 이해 못 한 것이다.**
 
@@ -156,6 +174,8 @@ const a=s.indexOf('<style>'),b=s.indexOf('</style>')+8;fs.writeFileSync('.build-
 3. **비주얼** — **흐름과 경계를 그린다.** 수식이 없는 과목이라 그림의 역할이 다르다.
    무엇이 무엇으로 변환되는지, 누가 누구에게 무엇을 넘기는지, 어디가 front-end이고
    어디가 back-end인지. **이게 이 프로젝트의 존재 이유다.**
+   **덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간은 표로 펴지 말고 슬라이더로 되살린다.**
+   아래 [애니메이션 구간](#애니메이션-구간을-먼저-찾는다) 참조.
 4. **현장 감각** — 시험과 실무 양쪽 대비. `<details>`로 답을 접어둔다.
    "이 상황에서 어떤 판단을 내리나" 형태. 계산 문제가 아니라 **분류와 판단** 문제다.
 5. **함정과 혼동** — 헷갈리는 이웃 용어, 회사마다 다른 이름, 흔한 오해. `.trap` 블록.
@@ -310,7 +330,7 @@ SVG (`note-html` 스킬 "SVG 규칙")
 - **라벨을 화살표 선 위에 놓지 마라.** 자동 검사가 못 잡고 렌더해야 보인다
 - 원문자(①②③)는 mono 폰트에 없어서 깨진다. `1.` `2.` 로 쓴다
 
-쓸 수 있는 클래스: `.def` `.jargon` `.trap` `.ex` `.callout` `pre.code` `figure` `.mini`
+쓸 수 있는 클래스: `.def` `.jargon` `.trap` `.ex` `.callout` `pre.code` `figure` `figure.anim` `.mini`
 `.grid2` `.grid3` `.play` `.chip.hot` `.chip.dim` `.cD/.cV/.cT/.cP`
 **`.grid4` 와 `.chip.warn` 은 없다.**
 
@@ -352,17 +372,21 @@ SVG (`note-html` 스킬 "SVG 규칙")
    **어긋난 앵커는 있으나 마나가 아니라 적극적으로 해롭다.** 근거를 잘못 가리킨다.
    **포트를 바꿔가며 확인한다.** 한 번 잘못된 MIME 으로 받은 `.mjs` 는 브라우저 캐시에
    남아서, 서버를 고쳐도 같은 주소로는 계속 실패한다. 실제로 이걸로 한 번 헤맸다.
-6. **`node scripts/langcheck.mjs L{NN}-{topic}.html` 실행.** 영어 모드에 한글이 남으면 실패한다.
+6. **`.anim` 이 있으면 `node scripts/animshot.mjs notes/L{NN}-{topic}.html` 실행.**
+   `verify.mjs` 는 **첫 프레임만 본다.** 나머지 프레임의 글자 겹침과 viewBox 이탈은
+   이것만 잡는다. `shots/` 에 프레임별 그림이 생기므로 **전부 눈으로 연다.**
+   영어·다크·모바일은 `--en --dark --w=390` 으로 따로 본다.
+7. **`node scripts/langcheck.mjs L{NN}-{topic}.html` 실행.** 영어 모드에 한글이 남으면 실패한다.
    **코드 블록 주석에서 제일 많이 걸린다.** 자세한 검사 원리는 `note-html` 스킬의
    "이중 언어 > 검사" 절 참조.
-7. 문제가 있으면 고치고 4번 반복.
-8. **`index.html`을 갱신한다:**
+8. 문제가 있으면 고치고 4번 반복.
+9. **`index.html`을 갱신한다:**
    - 해당 강의 카드의 `<div class="mod soon">` → `<a class="mod" href="...">`
    - `<span class="status wait">준비 중</span>` → `<span class="status done">읽기</span>`
    - 닫는 `</div>` → `</a>`
    - 태그 목록을 실제 내용에 맞게 갱신
    - 헤더의 "N / 30강" chip 갱신
-9. 커밋하고 푸시한다. 커밋 메시지는 한 줄, 영어: `Add Lecture 3: SystemVerilog for design`
+10. 커밋하고 푸시한다. 커밋 메시지는 한 줄, 영어: `Add Lecture 3: SystemVerilog for design`
    **슬라이드 PDF가 노트보다 늦게 들어가면 안 된다.** 노트만 먼저 올라가면 리더가 404를 받는다.
 
 ## 7. 검증 루프
@@ -371,6 +395,7 @@ SVG (`note-html` 스킬 "SVG 규칙")
 node scripts/verify.mjs notes/L{NN}-{topic}.html      # exit 0 이어야 통과
 node scripts/langcheck.mjs notes/L{NN}-{topic}.html   # 영어 모드 한글 잔류
 node scripts/readercheck.mjs notes/L{NN}-{topic}.html s1,s3,s9   # 앵커 동기화
+node scripts/animshot.mjs notes/L{NN}-{topic}.html      # .anim 의 프레임 전부
 ```
 
 | 스크립트 | 하는 일 |
@@ -378,6 +403,7 @@ node scripts/readercheck.mjs notes/L{NN}-{topic}.html s1,s3,s9   # 앵커 동기
 | `verify.mjs` | 노트 검증. exit 0 이어야 통과 |
 | `readercheck.mjs` | 섹션으로 스크롤하며 리더가 실제로 그 쪽으로 따라오는지 대조 |
 | `langcheck.mjs` | 영어 모드에 남은 한글 찾기. 번역 누락은 눈으로 못 잡는다 |
+| `animshot.mjs` | `.anim` 을 프레임마다 찍고 겹침·이탈을 다시 잰다. `verify.mjs` 는 첫 프레임만 본다 |
 
 `verify.mjs`는 저장소 루트를 **임시 http 서버로 띄우고** 그 주소로 연다.
 `file://`에서는 브라우저가 PDF와 모듈 로드를 막아 리더를 검증할 수 없기 때문이고,
@@ -419,5 +445,6 @@ GitHub Pages와 같은 조건으로 맞추기 위해서다.
 - [ ] `index.html` 카드를 `soon` 에서 링크로 바꾸고 태그와 `N / 30강` chip 을 갱신했다
 - [ ] 이전 강의와의 연결을 `.callout` 으로 최소 한 번 짚었다
 - [ ] `verify.mjs` · `langcheck.mjs` 둘 다 exit 0
-- [ ] 도해 스크린샷을 전부 눈으로 봤다
+- [ ] 도해 스크린샷을 전부 눈으로 봤다. `.anim` 이 있으면 `animshot.mjs` 가 남긴 프레임도 전부 봤다
+- [ ] 덱에 애니메이션 구간이 있었는데 표로 펴놓고 넘어간 곳이 없다
 - [ ] 커밋 메시지는 영어. 슬라이드 PDF 가 노트보다 늦게 들어가지 않게 같이 커밋한다

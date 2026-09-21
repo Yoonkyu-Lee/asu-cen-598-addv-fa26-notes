@@ -285,6 +285,24 @@ figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;bor
 #tbsvg [data-part]{transition:opacity .22s ease}
 @media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
 .hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+/* 애니메이션 슬라이더. 덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간을 한 자리에서 밟아본다. */
+/* 마크업 규약과 동작은 anim.js 가 단일 출처다. 스크립트가 없으면 첫 프레임만 보이고 막대가 안 생긴다. */
+.anim [data-f]{display:none}
+.anim [data-f~="0"]{display:revert}
+.anim.js-anim [data-f]{display:none}
+.anim.js-anim [data-f].on{display:revert}
+.anim:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.animbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--rule)}
+.animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.animbar button:disabled{opacity:.35;cursor:default}
+.animbar .animplay{min-width:86px}
+.animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;min-width:46px;text-align:right}
+.animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
+.animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
+@media(prefers-reduced-motion:reduce){.animbar button{transition:none}}
 
 table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
 @media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
@@ -570,22 +588,120 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <section id="s3">
   <div class="sec-head" data-slide="7-15"><span class="sec-num">03</span><h2 lang="ko">기본 동작</h2><h2 lang="en">Basic behaviour</h2></div>
 
-  <p lang="ko">슬라이드 7쪽부터 15쪽까지 <strong>아홉 장이 한 애니메이션</strong>이다. 같은 그림에 내용물만 바뀐다. 네 번 밀어넣고 네 번 뺀다.</p>
-  <p lang="en">Slides 7 through 15 are <strong>nine slides of one animation</strong>: the same picture with different contents. Four pushes, then four pops.</p>
+  <p lang="ko">슬라이드 7쪽부터 15쪽까지 <strong>아홉 장이 한 애니메이션</strong>이다. 같은 그림에 내용물만 바뀐다. 네 번 밀어넣고 네 번 뺀다. <strong>아래 막대로 직접 밟아볼 수 있다.</strong></p>
+  <p lang="en">Slides 7 through 15 are <strong>nine slides of one animation</strong>: the same picture with different contents. Four pushes, then four pops. <strong>Step through it with the bar below.</strong></p>
 
-  <table>
-    <thead><tr>
-      <th><span lang="ko">쪽</span><span lang="en">Slide</span></th>
-      <th><span lang="ko">한 일</span><span lang="en">Action</span></th>
-      <th><span lang="ko">안에 남은 것</span><span lang="en">Contents</span></th>
-      <th><span lang="ko"><code>dout</code></span><span lang="en"><code>dout</code></span></th>
-    </tr></thead>
-    <tbody>
-      <tr><td>7</td><td><span lang="ko">리셋 직후</span><span lang="en">after reset</span></td><td><span lang="ko">비어 있다</span><span lang="en">empty</span></td><td><code>X</code></td></tr>
-      <tr><td>8&ndash;11</td><td><span lang="ko"><code>D0</code>, <code>D1</code>, <code>D2</code>, <code>D3</code> 을 차례로 쓴다</span><span lang="en">write <code>D0</code>, <code>D1</code>, <code>D2</code>, <code>D3</code></span></td><td><code>D0 D1 D2 D3</code></td><td><code>X</code></td></tr>
-      <tr><td>12&ndash;15</td><td><span lang="ko">네 번 읽는다</span><span lang="en">read four times</span></td><td><span lang="ko">하나씩 줄어든다</span><span lang="en">drains one at a time</span></td><td><code>D0 &rarr; D1 &rarr; D2 &rarr; D3</code></td></tr>
-    </tbody>
-  </table>
+  <figure class="anim">
+    <svg viewBox="0 0 700 250" role="img" aria-label="FIFO 기본 동작. 네 번 쓰고 네 번 읽는 동안 안에 남은 것과 din, dout 이 어떻게 바뀌는지">
+      <defs>
+        <marker id="a1arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+        <marker id="a1arrhot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+      </defs>
+      <g>
+        <rect x="186" y="58" width="328" height="150" rx="9" fill="var(--chip)" stroke="var(--ink3)" stroke-width="1.5"/>
+        <text class="svglab" x="350" y="98" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--ink2)">FIFO</text>
+      </g>
+      <g>
+        <rect x="204" y="130" width="64" height="46" rx="5" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.3"/>
+        <rect data-f="1 2 3 4 5 6 7" x="204" y="130" width="64" height="46" rx="5" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+        <text data-f="1 2 3 4" class="svglab" x="236" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D0</text>
+        <text data-f="5" class="svglab" x="236" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D1</text>
+        <text data-f="6" class="svglab" x="236" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D2</text>
+        <text data-f="7" class="svglab" x="236" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D3</text>
+      </g>
+      <g>
+        <rect x="280" y="130" width="64" height="46" rx="5" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.3"/>
+        <rect data-f="2 3 4 5 6" x="280" y="130" width="64" height="46" rx="5" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+        <text data-f="2 3 4" class="svglab" x="312" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D1</text>
+        <text data-f="5" class="svglab" x="312" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D2</text>
+        <text data-f="6" class="svglab" x="312" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D3</text>
+      </g>
+      <g>
+        <rect x="356" y="130" width="64" height="46" rx="5" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.3"/>
+        <rect data-f="3 4 5" x="356" y="130" width="64" height="46" rx="5" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+        <text data-f="3 4" class="svglab" x="388" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D2</text>
+        <text data-f="5" class="svglab" x="388" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D3</text>
+      </g>
+      <g>
+        <rect x="432" y="130" width="64" height="46" rx="5" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.3"/>
+        <rect data-f="4" x="432" y="130" width="64" height="46" rx="5" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+        <text data-f="4" class="svglab" x="464" y="159" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D3</text>
+      </g>
+      <g>
+        <path d="M350 32 L350 54" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+        <text class="svglab" x="350" y="26" text-anchor="middle" style="font-size:10.5px;fill:var(--ink3)">reset_n</text>
+      </g>
+      <g>
+        <path d="M132 84 L184 84" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+        <text class="svglab" x="126" y="88" text-anchor="end" style="font-size:10.5px;fill:var(--ink3)">wr_clk</text>
+      </g>
+      <g data-f="0 5 6 7 8">
+        <path d="M132 110 L184 110" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+        <text class="svglab" x="126" y="114" text-anchor="end" style="font-size:10.5px;fill:var(--ink3)">wr_ena</text>
+      </g>
+      <g>
+        <path d="M188 190 L132 190" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+        <text class="svglab" x="126" y="194" text-anchor="end" style="font-size:10.5px;fill:var(--ink3)">full</text>
+      </g>
+      <g>
+        <path d="M568 84 L516 84" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+        <text class="svglab" x="574" y="88" text-anchor="start" style="font-size:10.5px;fill:var(--ink3)">rd_clk</text>
+      </g>
+      <g data-f="0 1 2 3 4">
+        <path d="M568 110 L516 110" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+        <text class="svglab" x="574" y="114" text-anchor="start" style="font-size:10.5px;fill:var(--ink3)">rd_ena</text>
+      </g>
+      <g>
+        <path d="M512 190 L568 190" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+        <text class="svglab" x="574" y="194" text-anchor="start" style="font-size:10.5px;fill:var(--ink3)">empty</text>
+      </g>
+      <g data-f="1 2 3 4">
+        <path d="M132 110 L184 110" stroke="var(--blue)" stroke-width="2.2" fill="none" marker-end="url(#a1arrhot)"/>
+        <text class="svglab" x="126" y="114" text-anchor="end" style="font-size:10.5px;font-weight:700;fill:var(--blue)">wr_ena</text>
+      </g>
+      <g data-f="5 6 7 8">
+        <path d="M568 110 L516 110" stroke="var(--blue)" stroke-width="2.2" fill="none" marker-end="url(#a1arrhot)"/>
+        <text class="svglab" x="574" y="114" text-anchor="start" style="font-size:10.5px;font-weight:700;fill:var(--blue)">rd_ena</text>
+      </g>
+      <g>
+        <text class="svglab" x="68" y="128" text-anchor="middle" style="font-size:10.5px;fill:var(--ink3)">din</text>
+        <rect x="40" y="136" width="56" height="30" rx="5" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.3"/>
+        <text data-f="0 5 6 7 8" class="svglab" x="68" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--ink3)">X</text>
+        <text data-f="1" class="svglab" x="68" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--blue)">D0</text>
+        <text data-f="2" class="svglab" x="68" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--blue)">D1</text>
+        <text data-f="3" class="svglab" x="68" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--blue)">D2</text>
+        <text data-f="4" class="svglab" x="68" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--blue)">D3</text>
+      </g>
+      <g>
+        <text class="svglab" x="632" y="128" text-anchor="middle" style="font-size:10.5px;fill:var(--ink3)">dout</text>
+        <rect x="604" y="136" width="56" height="30" rx="5" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.3"/>
+        <text data-f="0 1 2 3 4" class="svglab" x="632" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--ink3)">X</text>
+        <text data-f="5" class="svglab" x="632" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--blue)">D0</text>
+        <text data-f="6" class="svglab" x="632" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--blue)">D1</text>
+        <text data-f="7" class="svglab" x="632" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--blue)">D2</text>
+        <text data-f="8" class="svglab" x="632" y="156" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--blue)">D3</text>
+      </g>
+      <g>
+        <path d="M100 151 L184 151" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+        <path d="M516 151 L600 151" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#a1arr)"/>
+      </g>
+    </svg>
+    <div class="animcap" data-f="0" data-src="7"><span lang="ko">리셋 직후다. 안이 비어 있고 <code>din</code> 과 <code>dout</code> 둘 다 <code>X</code> 다. 아무 의미 없는 값이라는 뜻이다.</span><span lang="en">Straight after reset. Nothing inside, and both <code>din</code> and <code>dout</code> read <code>X</code>: values that carry no meaning.</span></div>
+    <div class="animcap" data-f="1" data-src="8"><span lang="ko"><code>wr_ena</code> 가 한 클럭 뜨면서 <code>din</code> 에 놓인 <code>D0</code> 이 들어갔다. <code>dout</code> 은 여전히 <code>X</code> 다. 읽으라고 시킨 적이 없으니까.</span><span lang="en"><code>wr_ena</code> goes high for one clock and the <code>D0</code> sitting on <code>din</code> goes in. <code>dout</code> is still <code>X</code>, because nothing has asked for a read yet.</span></div>
+    <div class="animcap" data-f="2" data-src="9"><span lang="ko"><code>D1</code> 이 들어갔다. <code>D0</code> 뒤에 줄을 선다. 앞지르지 않는다.</span><span lang="en"><code>D1</code> goes in and queues up behind <code>D0</code>. Nothing overtakes.</span></div>
+    <div class="animcap" data-f="3" data-src="10"><span lang="ko"><code>D2</code> 까지 세 칸이 찼다. 여기까지 <code>dout</code> 은 계속 <code>X</code> 다.</span><span lang="en">Three slots hold data now, and <code>dout</code> has stayed <code>X</code> the whole time.</span></div>
+    <div class="animcap" data-f="4" data-src="11"><span lang="ko"><code>D3</code> 까지 네 칸이 다 찼다. 여기가 이 애니메이션의 꼭대기다. 쓰는 쪽은 여기서 멈춘다.</span><span lang="en">All four slots are taken. This is the top of the animation, and the write side stops here.</span></div>
+    <div class="animcap" data-f="5" data-src="12"><span lang="ko">이제 읽는 쪽이다. <code>rd_ena</code> 가 뜨자 <strong>가장 먼저 들어간 <code>D0</code> 이 먼저 나온다.</strong> <code>dout</code> 이 처음으로 의미를 갖는 순간이다.</span><span lang="en">Now the read side. <code>rd_ena</code> goes high and <strong>the first thing in is the first thing out.</strong> This is the first moment <code>dout</code> means anything.</span></div>
+    <div class="animcap" data-f="6" data-src="13"><span lang="ko"><code>D1</code> 이 나온다. 안에 남은 것이 하나씩 줄어든다.</span><span lang="en"><code>D1</code> comes out. The contents drain one at a time.</span></div>
+    <div class="animcap" data-f="7" data-src="14"><span lang="ko"><code>D2</code> 가 나온다. 한 칸 남았다.</span><span lang="en"><code>D2</code> comes out. One left.</span></div>
+    <div class="animcap" data-f="8" data-src="15"><span lang="ko"><code>D3</code> 이 나오면서 다시 비었다. <strong>네 번 넣은 순서 그대로 네 번 나왔다.</strong></span><span lang="en"><code>D3</code> comes out and it is empty again. <strong>Four went in, and the same four came back out in the same order.</strong></span></div>
+    <figcaption lang="ko">슬라이드 7&ndash;15 쪽을 한 자리에 모은 것이다. 막대를 끌거나 <strong>재생</strong>을 눌러 아홉 장을 그대로 돌려볼 수 있다. 그림에 <code>full</code> 과 <code>empty</code> 가 <strong>포트 이름으로만 있고 값이 없는 것은 슬라이드가 그렇기 때문이다.</strong> 이 애니메이션은 두 플래그를 한 번도 움직이지 않는다.</figcaption>
+    <figcaption lang="en">Slides 7 to 15, gathered into one place. Drag the bar or hit <strong>play</strong> to run the nine frames. <code>full</code> and <code>empty</code> appear here <strong>as port names with no value because that is how the slides draw them:</strong> this animation never moves either flag.</figcaption>
+  </figure>
 
   <p lang="ko">그림에서 가져갈 것은 셋이다.</p>
   <p lang="en">Three things to take from it.</p>
@@ -752,32 +868,116 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <section id="s7">
   <div class="sec-head" data-slide="24-31"><span class="sec-num">07</span><h2 lang="ko">네 번 쓰고 네 번 읽기</h2><h2 lang="en">Four writes and four reads</h2></div>
 
-  <p lang="ko">슬라이드 24쪽부터 31쪽까지가 <strong>여덟 장에 걸친 한 애니메이션</strong>이다. 네 번 쓰고 네 번 읽으면서 <strong>포인터 값과 플래그만 바뀐다.</strong> 표로 펴면 이렇다.</p>
-  <p lang="en">Slides 24 through 31 are <strong>one animation across eight slides</strong>: four writes then four reads, with <strong>only the pointer values and flags changing.</strong> Laid out as a table:</p>
+  <p lang="ko">슬라이드 24쪽부터 31쪽까지가 <strong>여덟 장에 걸친 한 애니메이션</strong>이다. 리셋 상태인 23쪽까지 앞에 붙이면 아홉 컷이 된다. 네 번 쓰고 네 번 읽으면서 <strong>포인터 값과 플래그만 바뀐다.</strong> <strong>아래 막대로 직접 밟아보라.</strong></p>
+  <p lang="en">Slides 24 through 31 are <strong>one animation across eight slides</strong>, nine frames once you put the reset state on slide 23 in front. Four writes then four reads, with <strong>only the pointer values and flags changing.</strong> <strong>Step through it with the bar below.</strong></p>
 
-  <table>
-    <thead><tr>
-      <th><span lang="ko">쪽</span><span lang="en">Slide</span></th>
-      <th><span lang="ko">한 일</span><span lang="en">Action</span></th>
-      <th><code>write_ptr</code></th>
-      <th><code>read_ptr</code></th>
-      <th><code>full</code></th>
-      <th><code>empty</code></th>
-    </tr></thead>
-    <tbody>
-      <tr><td>23</td><td><span lang="ko">리셋</span><span lang="en">reset</span></td><td><code>000</code></td><td><code>000</code></td><td>0</td><td><strong>1</strong></td></tr>
-      <tr><td>24</td><td><span lang="ko">1차 쓰기</span><span lang="en">1st write</span></td><td><code>001</code></td><td><code>000</code></td><td>0</td><td>0</td></tr>
-      <tr><td>25</td><td><span lang="ko">2차 쓰기</span><span lang="en">2nd write</span></td><td><code>010</code></td><td><code>000</code></td><td>0</td><td>0</td></tr>
-      <tr><td>26</td><td><span lang="ko">3차 쓰기</span><span lang="en">3rd write</span></td><td><code>011</code></td><td><code>000</code></td><td>0</td><td>0</td></tr>
-      <tr><td>27</td><td><span lang="ko">4차 쓰기</span><span lang="en">4th write</span></td><td><strong><code>100</code></strong></td><td><code>000</code></td><td><strong>1</strong></td><td>0</td></tr>
-      <tr><td>28</td><td><span lang="ko">1차 읽기</span><span lang="en">1st read</span></td><td><code>100</code></td><td><code>001</code></td><td>0</td><td>0</td></tr>
-      <tr><td>29&ndash;30</td><td><span lang="ko">2&middot;3차 읽기</span><span lang="en">2nd and 3rd read</span></td><td><code>100</code></td><td><code>010</code>, <code>011</code></td><td>0</td><td>0</td></tr>
-      <tr><td>31</td><td><span lang="ko">4차 읽기</span><span lang="en">4th read</span></td><td><code>100</code></td><td><strong><code>100</code></strong></td><td>0</td><td><strong>1</strong></td></tr>
-    </tbody>
-  </table>
+  <figure class="anim">
+    <svg viewBox="0 0 700 300" role="img" aria-label="깊이 4 짜리 동기 FIFO 의 원형 버퍼. 네 번 쓰고 네 번 읽는 동안 write_ptr, read_ptr, full, empty 가 어떻게 바뀌는지">
+      <defs>
+        <marker id="a2arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+      </defs>
+      <g>
+        <text class="svglab" x="282" y="48" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">Addr</text>
+        <text class="svglab" x="382" y="48" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">Content</text>
+      </g>
+      <g>
+        <rect x="250" y="58" width="64" height="48" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.2"/>
+        <rect x="314" y="58" width="136" height="48" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.2"/>
+        <text class="svglab" x="282" y="88" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">00</text>
+        <text data-f="1 2 3 4" class="svglab" x="382" y="88" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D0</text>
+        <text data-f="5 6 7 8" class="svglab" x="382" y="88" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--ink3)">D0</text>
+        <path data-f="5 6 7 8" d="M368 83 L396 83" stroke="var(--ink3)" stroke-width="1.4"/>
+      </g>
+      <g>
+        <rect x="250" y="106" width="64" height="48" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.2"/>
+        <rect x="314" y="106" width="136" height="48" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.2"/>
+        <text class="svglab" x="282" y="136" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">01</text>
+        <text data-f="2 3 4 5" class="svglab" x="382" y="136" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D1</text>
+        <text data-f="6 7 8" class="svglab" x="382" y="136" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--ink3)">D1</text>
+        <path data-f="6 7 8" d="M368 131 L396 131" stroke="var(--ink3)" stroke-width="1.4"/>
+      </g>
+      <g>
+        <rect x="250" y="154" width="64" height="48" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.2"/>
+        <rect x="314" y="154" width="136" height="48" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.2"/>
+        <text class="svglab" x="282" y="184" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">10</text>
+        <text data-f="3 4 5 6" class="svglab" x="382" y="184" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D2</text>
+        <text data-f="7 8" class="svglab" x="382" y="184" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--ink3)">D2</text>
+        <path data-f="7 8" d="M368 179 L396 179" stroke="var(--ink3)" stroke-width="1.4"/>
+      </g>
+      <g>
+        <rect x="250" y="202" width="64" height="48" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.2"/>
+        <rect x="314" y="202" width="136" height="48" fill="var(--card)" stroke="var(--ink3)" stroke-width="1.2"/>
+        <text class="svglab" x="282" y="232" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">11</text>
+        <text data-f="4 5 6 7" class="svglab" x="382" y="232" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--blue)">D3</text>
+        <text data-f="8" class="svglab" x="382" y="232" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--ink3)">D3</text>
+        <path data-f="8" d="M368 227 L396 227" stroke="var(--ink3)" stroke-width="1.4"/>
+      </g>
+      <g>
+        <text class="svglab" x="114" y="92" text-anchor="middle" style="font-size:10.5px;fill:var(--blue)">write_ptr</text>
+        <rect x="79" y="102" width="22" height="22" rx="4" fill="rgba(var(--green-rgb),.14)" stroke="var(--green)" stroke-width="1.5"/>
+        <text data-f="0 1 2 3" class="svgnum" x="90" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--green)">0</text>
+        <text data-f="4 5 6 7 8" class="svgnum" x="90" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--green)">1</text>
+        <rect x="103" y="102" width="22" height="22" rx="4" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.5"/>
+        <text data-f="0 1 4 5 6 7 8" class="svgnum" x="114" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--blue)">0</text>
+        <text data-f="2 3" class="svgnum" x="114" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--blue)">1</text>
+        <rect x="127" y="102" width="22" height="22" rx="4" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.5"/>
+        <text data-f="0 2 4 5 6 7 8" class="svgnum" x="138" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--blue)">0</text>
+        <text data-f="1 3" class="svgnum" x="138" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--blue)">1</text>
+      </g>
+      <path data-f="0 4 5 6 7 8" d="M162 113 L244 82" stroke="var(--blue)" stroke-width="1.6" fill="none" marker-end="url(#a2arr)"/>
+      <path data-f="1" d="M162 113 L244 130" stroke="var(--blue)" stroke-width="1.6" fill="none" marker-end="url(#a2arr)"/>
+      <path data-f="2" d="M162 113 L244 178" stroke="var(--blue)" stroke-width="1.6" fill="none" marker-end="url(#a2arr)"/>
+      <path data-f="3" d="M162 113 L244 226" stroke="var(--blue)" stroke-width="1.6" fill="none" marker-end="url(#a2arr)"/>
+      <g>
+        <text class="svglab" x="586" y="92" text-anchor="middle" style="font-size:10.5px;fill:var(--blue)">read_ptr</text>
+        <rect x="551" y="102" width="22" height="22" rx="4" fill="rgba(var(--green-rgb),.14)" stroke="var(--green)" stroke-width="1.5"/>
+        <text data-f="0 1 2 3 4 5 6 7" class="svgnum" x="562" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--green)">0</text>
+        <text data-f="8" class="svgnum" x="562" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--green)">1</text>
+        <rect x="575" y="102" width="22" height="22" rx="4" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.5"/>
+        <text data-f="0 1 2 3 4 5 8" class="svgnum" x="586" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--blue)">0</text>
+        <text data-f="6 7" class="svgnum" x="586" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--blue)">1</text>
+        <rect x="599" y="102" width="22" height="22" rx="4" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.5"/>
+        <text data-f="0 1 2 3 4 6 8" class="svgnum" x="610" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--blue)">0</text>
+        <text data-f="5 7" class="svgnum" x="610" y="118" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--blue)">1</text>
+      </g>
+      <path data-f="0 1 2 3 4 8" d="M538 113 L456 82" stroke="var(--blue)" stroke-width="1.6" fill="none" marker-end="url(#a2arr)"/>
+      <path data-f="5" d="M538 113 L456 130" stroke="var(--blue)" stroke-width="1.6" fill="none" marker-end="url(#a2arr)"/>
+      <path data-f="6" d="M538 113 L456 178" stroke="var(--blue)" stroke-width="1.6" fill="none" marker-end="url(#a2arr)"/>
+      <path data-f="7" d="M538 113 L456 226" stroke="var(--blue)" stroke-width="1.6" fill="none" marker-end="url(#a2arr)"/>
+      <g data-f="0 1 2 3 5 6 7 8">
+        <rect x="96" y="256" width="112" height="30" rx="7" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+        <text class="svglab" x="152" y="276" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--ink3)">full = 0</text>
+      </g>
+      <g data-f="4">
+        <rect x="96" y="256" width="112" height="30" rx="7" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.6"/>
+        <text class="svglab" x="152" y="276" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--green)">full = 1</text>
+      </g>
+      <g data-f="1 2 3 4 5 6 7">
+        <rect x="492" y="256" width="112" height="30" rx="7" fill="rgba(var(--ink-rgb),.05)" stroke="var(--ink3)" stroke-width="1.4"/>
+        <text class="svglab" x="548" y="276" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--ink3)">empty = 0</text>
+      </g>
+      <g data-f="0 8">
+        <rect x="492" y="256" width="112" height="30" rx="7" fill="rgba(var(--green-rgb),.16)" stroke="var(--green)" stroke-width="1.6"/>
+        <text class="svglab" x="548" y="276" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--green)">empty = 1</text>
+      </g>
+    </svg>
+    <div class="animcap" data-f="0" data-src="23"><span lang="ko">리셋 직후다. 두 포인터가 <code>000</code> 으로 <strong>완전히 같다.</strong> 그래서 <code>empty</code> 가 서 있다.</span><span lang="en">Straight after reset. Both pointers read <code>000</code>, <strong>identical in every bit</strong>, so <code>empty</code> is high.</span></div>
+    <div class="animcap" data-f="1" data-src="24"><span lang="ko">1 차 쓰기. <code>D0</code> 이 주소 <code>00</code> 에 앉고 <code>write_ptr</code> 이 <code>001</code> 로 간다. 둘이 갈라졌으니 <code>empty</code> 가 내려간다.</span><span lang="en">First write. <code>D0</code> lands at address <code>00</code> and <code>write_ptr</code> moves to <code>001</code>. The two no longer match, so <code>empty</code> drops.</span></div>
+    <div class="animcap" data-f="2" data-src="25"><span lang="ko">2 차 쓰기. <code>write_ptr</code> 이 <code>010</code>. <code>read_ptr</code> 은 한 번도 안 움직였다.</span><span lang="en">Second write, <code>write_ptr</code> at <code>010</code>. <code>read_ptr</code> has not moved at all.</span></div>
+    <div class="animcap" data-f="3" data-src="26"><span lang="ko">3 차 쓰기. <code>011</code>. 여기까지는 아래 2 비트만 세고 있는 것처럼 보인다.</span><span lang="en">Third write, <code>011</code>. So far it looks like nothing but a two-bit counter.</span></div>
+    <div class="animcap" data-f="4" data-src="27"><span lang="ko">4 차 쓰기. <code>write_ptr</code> 이 <code>100</code> 이 됐다. <strong>주소로 쓰이는 아래 2 비트는 <code>00</code> 이라 <code>read_ptr</code> 과 같은데 맨 앞 비트가 다르다.</strong> 그래서 <code>full</code> 이 선다.</span><span lang="en">Fourth write, and <code>write_ptr</code> reads <code>100</code>. <strong>The lower two bits used as the address are <code>00</code>, the same as <code>read_ptr</code>, but the leading bit differs.</strong> That is what raises <code>full</code>.</span></div>
+    <div class="animcap" data-f="5" data-src="28"><span lang="ko">1 차 읽기. <code>read_ptr</code> 이 <code>001</code> 로 가고 <code>full</code> 이 내려간다. <strong><code>D0</code> 은 흐려질 뿐 메모리에서 지워지지 않는다.</strong> 읽기는 포인터만 옮긴다.</span><span lang="en">First read. <code>read_ptr</code> moves to <code>001</code> and <code>full</code> drops. <strong><code>D0</code> only fades; it is never erased from memory.</strong> A read just moves a pointer.</span></div>
+    <div class="animcap" data-f="6" data-src="29"><span lang="ko">2 차 읽기. <code>010</code>.</span><span lang="en">Second read, <code>010</code>.</span></div>
+    <div class="animcap" data-f="7" data-src="30"><span lang="ko">3 차 읽기. <code>011</code>. 한 칸 남았다.</span><span lang="en">Third read, <code>011</code>. One left.</span></div>
+    <div class="animcap" data-f="8" data-src="31"><span lang="ko">4 차 읽기. <code>read_ptr</code> 이 <code>100</code> 이 되어 <code>write_ptr</code> 과 <strong>맨 앞 비트까지 같아졌다.</strong> 그래서 이번에는 <code>empty</code> 다. <strong>주소부만 보면 4 차 쓰기 때와 똑같은데 결과가 정반대다.</strong></span><span lang="en">Fourth read. <code>read_ptr</code> reaches <code>100</code> and now matches <code>write_ptr</code> <strong>down to the leading bit</strong>, so this time it is <code>empty</code>. <strong>Look only at the address bits and this is the same picture as the fourth write, with the opposite answer.</strong></span></div>
+    <figcaption lang="ko">슬라이드 23&ndash;31 쪽이다. <strong>4 번 프레임과 8 번 프레임을 번갈아 보라.</strong> 메모리 내용도 같고 두 포인터가 가리키는 행도 같은데, 하나는 <code>full</code> 이고 하나는 <code>empty</code> 다. 둘을 가르는 것은 <strong>초록색으로 칠한 맨 앞 한 비트</strong>뿐이다. 슬라이드는 이 비트에 이름을 붙이지 않는다.</figcaption>
+    <figcaption lang="en">Slides 23 to 31. <strong>Flip between frame 4 and frame 8.</strong> Same memory contents, same row under both pointers, yet one is <code>full</code> and the other is <code>empty</code>. The only difference is <strong>the leading bit drawn in green</strong>, which the slides never name.</figcaption>
+  </figure>
 
-  <p lang="ko">이 표에서 <strong>27쪽 줄과 31쪽 줄</strong>만 보면 된다. 두 줄 다 <strong>주소로 쓰이는 아래 2 비트가 <code>00</code> 으로 같다.</strong> 그런데 하나는 <code>full</code> 이고 하나는 <code>empty</code> 다. 세 컷으로 줄이면 이렇게 된다.</p>
-  <p lang="en">Only <strong>the row for slide 27 and the row for slide 31</strong> matter. In both, <strong>the lower two bits that serve as the address are <code>00</code>.</strong> Yet one is <code>full</code> and the other is <code>empty</code>. Compressed to three frames:</p>
+  <p lang="ko">아홉 컷 중에 <strong>27쪽(4 번 프레임)과 31쪽(8 번 프레임)</strong>만 보면 된다. 둘 다 <strong>주소로 쓰이는 아래 2 비트가 <code>00</code> 으로 같다.</strong> 그런데 하나는 <code>full</code> 이고 하나는 <code>empty</code> 다. 둘을 리셋 상태와 나란히 놓으면 이렇게 된다.</p>
+  <p lang="en">Of the nine frames, only <strong>slide 27 (frame 4) and slide 31 (frame 8)</strong> matter. In both, <strong>the lower two bits that serve as the address are <code>00</code>.</strong> Yet one is <code>full</code> and the other is <code>empty</code>. Put the two beside the reset state and it looks like this:</p>
 
 <figure>
     <svg viewBox="0 0 700 274" role="img" aria-label="깊이 4짜리 FIFO 의 세 가지 상태. 리셋 직후, 네 번 쓴 뒤, 네 번 읽은 뒤의 포인터 값과 플래그">
@@ -1995,6 +2195,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   }, { threshold: 0 }).observe(title);
 })();
 </script>
+<script src="../anim.js"></script>
 <script src="../reader.js" type="module"></script>
 <button class="lang-btn" type="button">English</button>
 <button class="theme-btn" type="button">☾ 다크</button>
