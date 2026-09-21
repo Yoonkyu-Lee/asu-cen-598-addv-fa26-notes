@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 6 빠른 읽기 &middot; Pipelined CPU Design &middot; CEN 598 ADDV</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 6<br>Pipelined CPU Design</h1>
+  <p class="subtitle" lang="ko">명령어를 다섯 토막으로 자르는 데는 한 장이면 되고, 잘린 토막들이 서로 발을 밟는 걸 수습하는 데 스무 장이 든다.</p>
+  <p class="subtitle" lang="en">Cutting an instruction into five pieces takes one slide. Cleaning up after the pieces step on each other takes twenty.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L06-pipelined-cpu-design.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L06-pipelined-cpu-design.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 6</div>
+    <div class="name">Pipelined CPU Design</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">왜 쪼개나</span><span lang="en">Why split it up</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">공짜가 아니다</span><span lang="en">What it costs</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">Hazard 세 종류</span><span lang="en">Three kinds of hazard</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">Forwarding 과 stall</span><span lang="en">Forwarding and stalling</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">분기가 제일 비싸다</span><span lang="en">Branches are the expensive ones</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+
+  <p lang="ko">Pipelining 은 <strong>명령어를 다섯 단계로 쪼개고 서로 다른 명령어를 동시에 올리는 것</strong>이다. 강의 표현으로 <strong>temporal parallelism</strong>. 개념은 슬라이드 한 장이면 끝난다. <strong>그런데 이 강의는 50 쪽이다.</strong> 나머지가 전부 <strong>쪼갠 대가</strong>를 치르는 이야기다.</p>
+  <p lang="en">Pipelining means <strong>cutting an instruction into five stages and letting different instructions occupy them at once.</strong> The lecture calls it <strong>temporal parallelism</strong>. The idea fits on one slide. <strong>The deck is 50.</strong> All the rest is <strong>paying for the cut.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">한 줄로</span><span lang="en">In one line</span></th>
+      <th><span lang="ko">내용</span><span lang="en">What it says</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">무엇이 좋아지나</span><span lang="en">What improves</span></td><td><span lang="ko"><strong>throughput 만.</strong> latency 는 오히려 나빠진다</span><span lang="en"><strong>throughput only.</strong> latency gets worse</span></td></tr>
+      <tr><td><span lang="ko">클럭은 뭐가 정하나</span><span lang="en">What sets the clock</span></td><td><span lang="ko"><strong>가장 느린 단계.</strong> 평균도 합도 아니다</span><span lang="en"><strong>the slowest stage.</strong> not the average, not the sum</span></td></tr>
+      <tr><td><span lang="ko">새로 생기는 문제</span><span lang="en">The new problem</span></td><td><span lang="ko"><strong>hazard.</strong> structural, data, control 셋</span><span lang="en"><strong>hazards</strong>, three of them: structural, data, control</span></td></tr>
+      <tr><td><span lang="ko">주된 해법</span><span lang="en">The main fixes</span></td><td><span lang="ko">forwarding, stall, flush, 그리고 branch prediction</span><span lang="en">forwarding, stalling, flushing, and branch prediction</span></td></tr>
+      <tr><td><span lang="ko">forwarding 의 한계</span><span lang="en">Where forwarding stops</span></td><td><span lang="ko"><code>lw</code> 바로 뒤. <strong>반드시 한 사이클 버려야 한다</strong></span><span lang="en">right after an <code>lw</code>. <strong>one cycle must be thrown away</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p lang="ko">슬라이드 27쪽의 한 문장이 이 강의 전체의 태도다. <strong>There is always a work-around but it always has a trade-off that you need to assess.</strong> 해법마다 무엇을 내주는지가 이 강의의 진짜 내용이다.</p>
+    <p lang="en">One sentence on slide 27 sets the tone for everything: <strong>There is always a work-around but it always has a trade-off that you need to assess.</strong> What each fix gives up is the real content of the lecture.</p>
+  </div>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">왜 쪼개나</h2><h2 lang="en">Why split it up</h2></div>
+
+  <p lang="ko">Single cycle CPU 는 명령어 하나를 한 클럭에 끝낸다. 읽기는 전부 조합 회로라 (instruction memory, register file, data memory 모두 <strong>읽기는 clock 과 무관</strong>하다) 정말로 한 사이클 안에 다 들어간다. 문제는 셋이다.</p>
+  <p lang="en">A single cycle CPU finishes one instruction per clock. Every read is combinational (instruction memory, register file and data memory are all <strong>unclocked on reads</strong>), so it genuinely fits. Three things are wrong with it.</p>
+
+  <div class="grid3">
+    <div class="mini">
+      <h4 lang="ko">성능</h4>
+      <h4 lang="en">Performance</h4>
+      <p lang="ko">클럭이 <strong>가장 긴 명령어</strong>에 맞춰진다. <code>add</code> 가 <code>lw</code> 를 기다린다</p>
+      <p lang="en">The clock follows <strong>the longest instruction.</strong> <code>add</code> waits for <code>lw</code></p>
+    </div>
+    <div class="mini">
+      <h4 lang="ko">전력</h4>
+      <h4 lang="en">Power</h4>
+      <p lang="ko">모든 요소가 항상 켜져 있다. <strong>clock gating 이 불가능</strong>하다</p>
+      <p lang="en">Everything is always on. <strong>No clock gating possible</strong></p>
+    </div>
+    <div class="mini">
+      <h4 lang="ko">면적</h4>
+      <h4 lang="en">Area</h4>
+      <p lang="ko">ALU 가 주기의 일부만 일하고 논다. <strong>활용률이 낮다</strong></p>
+      <p lang="en">The ALU works for part of the period and idles. <strong>Poor utilisation</strong></p>
+    </div>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="위는 한 덩어리로 실행되는 single cycle, 아래는 다섯 단계로 쪼개고 사이마다 pipeline register 를 넣은 모습">
+      <defs>
+        <marker id="qp-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+        <marker id="qp-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+      <rect x="16" y="24" width="76" height="50" rx="4" fill="rgba(var(--green-rgb),.14)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svglab" x="54" y="46" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">arch state</text>
+      <text class="svglab" x="54" y="59" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">n</text>
+      <rect x="608" y="24" width="76" height="50" rx="4" fill="rgba(var(--green-rgb),.14)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svglab" x="646" y="46" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">arch state</text>
+      <text class="svglab" x="646" y="59" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">n+1</text>
+      <rect x="150" y="26" width="400" height="46" rx="22" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svglab" x="350" y="46" text-anchor="middle" style="font-size:10px;fill:var(--blue)">IF + ID + EX + MEM + WB</text>
+      <text class="svgtxt" x="350" y="62" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">한 덩어리로 실행</text>
+      <text class="svgtxt" x="350" y="62" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">executed as one block</text>
+      <path d="M96 49 L146 49" stroke="var(--blue)" stroke-width="1.4" marker-end="url(#qp-a)"/>
+      <path d="M554 49 L604 49" stroke="var(--blue)" stroke-width="1.4" marker-end="url(#qp-a)"/>
+      <path d="M150 86 L550 86" stroke="var(--ink3)" stroke-width="1" marker-start="url(#qp-m)" marker-end="url(#qp-m)"/>
+      <text class="svglab" x="350" y="100" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">T</text>
+
+      <path d="M16 118 L684 118" stroke="var(--rule)" stroke-width="1"/>
+
+      <rect x="16" y="160" width="76" height="50" rx="4" fill="rgba(var(--green-rgb),.14)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svglab" x="54" y="182" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">arch state</text>
+      <text class="svglab" x="54" y="195" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">n</text>
+      <rect x="608" y="160" width="76" height="50" rx="4" fill="rgba(var(--green-rgb),.14)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svglab" x="646" y="182" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">arch state</text>
+      <text class="svglab" x="646" y="195" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">n+1</text>
+      <path d="M96 185 L118 185" stroke="var(--blue)" stroke-width="1.4" marker-end="url(#qp-a)"/>
+      <rect x="122" y="162" width="58" height="46" rx="4" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svglab" x="151" y="189" text-anchor="middle" style="font-size:10px;fill:var(--blue)">IF</text>
+      <rect x="184" y="154" width="10" height="62" rx="2" fill="var(--violet)"/>
+      <rect x="198" y="162" width="58" height="46" rx="4" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svglab" x="227" y="189" text-anchor="middle" style="font-size:10px;fill:var(--blue)">ID</text>
+      <rect x="260" y="154" width="10" height="62" rx="2" fill="var(--violet)"/>
+      <rect x="274" y="162" width="58" height="46" rx="4" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svglab" x="303" y="189" text-anchor="middle" style="font-size:10px;fill:var(--blue)">EX</text>
+      <rect x="336" y="154" width="10" height="62" rx="2" fill="var(--violet)"/>
+      <rect x="350" y="162" width="58" height="46" rx="4" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svglab" x="379" y="189" text-anchor="middle" style="font-size:10px;fill:var(--blue)">MEM</text>
+      <rect x="412" y="154" width="10" height="62" rx="2" fill="var(--violet)"/>
+      <rect x="426" y="162" width="58" height="46" rx="4" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.3"/>
+      <text class="svglab" x="455" y="189" text-anchor="middle" style="font-size:10px;fill:var(--blue)">WB</text>
+      <rect x="488" y="154" width="10" height="62" rx="2" fill="var(--violet)"/>
+      <path d="M502 185 L604 185" stroke="var(--blue)" stroke-width="1.4" marker-end="url(#qp-a)"/>
+      <path d="M122 140 L184 140" stroke="var(--ink3)" stroke-width="1" marker-start="url(#qp-m)" marker-end="url(#qp-m)"/>
+      <text class="svglab" x="153" y="134" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">T / 5</text>
+      <text class="svgtxt" x="310" y="238" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="ko">세로 막대가 pipeline register 다. 양 끝의 architectural state 는 그대로다</text>
+      <text class="svgtxt" x="310" y="238" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="en">the violet bars are pipeline registers. the architectural state at both ends is unchanged</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 14쪽. <strong>프로그램이 보는 결과는 안 바뀐다.</strong> 바뀌는 것은 그 사이를 지나는 방식이다.</figcaption>
+    <figcaption lang="en">Slide 14. <strong>What the program sees does not change.</strong> Only the road between the two ends does.</figcaption>
+  </figure>
+
+  <p lang="ko">슬라이드 16쪽의 숫자. 단계 지연이 <code>100, 50, 100, 100, 50 ns</code> 면 파이프라인 없이는 <code>400 ns</code>, 파이프라인은 <strong>가장 느린 단계</strong>인 <code>100 ns</code>. speedup 은 <code>4</code> 배다. <strong>단계가 다섯인데 5 배가 아닌 이유</strong>는 50 짜리 두 단계가 100 을 배정받고 절반을 놀기 때문이다.</p>
+  <p lang="en">The numbers from slide 16. With stage delays of <code>100, 50, 100, 100, 50 ns</code>, unpipelined is <code>400 ns</code> and pipelined is <code>100 ns</code>, <strong>the slowest stage.</strong> Speedup <code>4</code>. <strong>Five stages, not five times</strong>, because the two 50 ns stages sit in a 100 ns slot and idle through half of it.</p>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">공짜가 아니다</h2><h2 lang="en">What it costs</h2></div>
+
+  <p lang="ko">슬라이드 17쪽이 묻는다. <strong>단수를 계속 늘리면 클럭을 계속 올릴 수 있나?</strong> 답은 두 식의 비대칭에 있다. <code>G</code> 는 게이트 수, <code>T</code> 는 조합 지연, <code>R</code> 은 register 비용, <code>S</code> 는 register 지연이다.</p>
+  <p lang="en">Slide 17 asks: <strong>can you keep adding stages to keep raising the clock?</strong> The answer is in the asymmetry between two formulas. <code>G</code> is gate count, <code>T</code> combinational delay, <code>R</code> register cost, <code>S</code> register delay.</p>
+
+  <table>
+    <thead><tr>
+      <th></th>
+      <th><span lang="ko">파이프라인 없음</span><span lang="en">unpipelined</span></th>
+      <th><span lang="ko">k 단</span><span lang="en">k stages</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>cost</td><td><code>G + R</code></td><td><code>G + R &times; k</code></td></tr>
+      <tr><td>throughput</td><td><code>1 / (T + S)</code></td><td><code>1 / (T/k + S)</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="trap">
+    <p lang="ko"><strong>비용은 k 에 정직하게 비례해 늘고, throughput 은 상한에 막힌다.</strong> <code>T/k</code> 는 0 으로 가지만 <code>S</code> 는 안 줄어들고, 조합 논리는 <strong>게이트 하나 밑으로 못 쪼갠다.</strong> 그래서 상한이 <code>1 / (1 게이트 지연 + S)</code> 다. <strong>돈은 계속 내는데 성능은 안 오르는 구간이 생긴다.</strong></p>
+    <p lang="en"><strong>Cost grows honestly with k while throughput hits a ceiling.</strong> <code>T/k</code> goes to zero but <code>S</code> does not shrink, and combinational logic <strong>cannot be split below one gate.</strong> Hence the cap at <code>1 / (1 gate delay + S)</code>. <strong>You reach a region where you keep paying and stop gaining.</strong></p>
+  </div>
+
+  <p lang="ko">슬라이드가 든 나머지 대가. <strong>명령어 latency 증가</strong> (특히 단계가 불균형할 때), <strong>hazard 를 해결하는 하드웨어 복잡도</strong>, 면적 증가, 전력 증가. 이 중 세 번째가 이 강의의 나머지 스무 장이다.</p>
+  <p lang="en">The other costs the slide lists: <strong>instruction latency goes up</strong> (especially with unbalanced stages), <strong>hardware complexity to resolve hazards</strong>, more area, more power. The third of those is the remaining twenty slides.</p>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">Hazard 세 종류</h2><h2 lang="en">Three kinds of hazard</h2></div>
+
+  <div class="def">
+    <p lang="ko"><strong>Hazard 는 앞선 명령어에 대한 의존 때문에 어떤 명령어가 진행하지 못하는 상황이다.</strong> 파이프라인이면 반드시 생긴다. <strong>버그가 아니라 구조적 성질이고, 버그는 hazard 를 안 막은 쪽이다.</strong></p>
+    <p lang="en"><strong>A hazard is when an instruction cannot make progress because it depends on an earlier one.</strong> Pipelines have them by construction. <strong>The hazard is not the bug. Failing to handle it is.</strong></p>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">종류</span><span lang="en">Kind</span></th>
+      <th><span lang="ko">무엇이 부족한가</span><span lang="en">What is missing</span></th>
+      <th><span lang="ko">해법</span><span lang="en">Fix</span></th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Structural</strong></td>
+        <td><span lang="ko"><strong>자원.</strong> 포트가 모자라거나 유닛이 파이프라인이 안 돼 있다</span><span lang="en"><strong>a resource.</strong> too few ports, or a unit that is not pipelined</span></td>
+        <td><span lang="ko">하드웨어 복제, 포트 증설, 아니면 한쪽 stall</span><span lang="en">duplicate hardware, add ports, or stall one side</span></td>
+      </tr>
+      <tr>
+        <td><strong>Data</strong></td>
+        <td><span lang="ko"><strong>값.</strong> 앞 명령어의 결과가 아직 register file 에 없다</span><span lang="en"><strong>a value.</strong> the earlier result is not in the register file yet</span></td>
+        <td><span lang="ko">forwarding, stall, 또는 컴파일 타임 재배치</span><span lang="en">forwarding, stalling, or reordering at compile time</span></td>
+      </tr>
+      <tr>
+        <td><strong>Control</strong></td>
+        <td><span lang="ko"><strong>방향.</strong> 다음에 어느 명령어를 가져올지 모른다</span><span lang="en"><strong>a direction.</strong> you do not know which instruction comes next</span></td>
+        <td><span lang="ko">flush, 판정 앞당기기, branch prediction</span><span lang="en">flush, resolve earlier, branch prediction</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="trap">
+    <p lang="ko"><strong>Stall 과 flush 는 다르다.</strong> 둘 다 파이프라인에 구멍을 내지만 이유가 반대다.</p>
+    <p lang="en"><strong>Stall and flush are different.</strong> Both put bubbles in, for opposite reasons.</p>
+    <ul>
+      <li lang="ko"><strong>Stall</strong> 은 명령어를 제자리에 붙들어 둔다. <strong>기다리면 쓸 수 있는 값이 오기 때문</strong>이다. data, structural</li>
+      <li lang="en"><strong>Stall</strong> holds an instruction in place, <strong>because waiting makes the value available.</strong> Data and structural</li>
+      <li lang="ko"><strong>Flush</strong> 는 이미 들어온 명령어를 지운다. <strong>애초에 실행되면 안 되는 것</strong>이었기 때문이다. control</li>
+      <li lang="en"><strong>Flush</strong> discards an instruction already inside, <strong>because it should never have run.</strong> Control</li>
+    </ul>
+    <p lang="ko">둘이 같이 가기도 한다. <code>StallF = StallD = FlushE</code>. 앞을 멈추면 EX 에 직전 명령어가 남아 <strong>두 번 실행</strong>되므로 그 자리를 지워야 한다.</p>
+    <p lang="en">They also travel together: <code>StallF = StallD = FlushE</code>. Holding the front leaves the previous instruction sitting in EX, where it would <strong>execute twice</strong>, so that slot gets erased.</p>
+  </div>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">Forwarding 과 stall</h2><h2 lang="en">Forwarding and stalling</h2></div>
+
+  <p lang="ko">핵심 관찰 한 줄. <strong><code>add</code> 의 결과는 EX 끝에 이미 존재한다.</strong> register file 에 적히는 것이 5 사이클째일 뿐이다. 그러면 <strong>보관소를 거치지 말고 바로 건네주면 된다.</strong> 그게 forwarding 이고, 회사에 따라 <strong>bypassing</strong> 이라 부른다.</p>
+  <p lang="en">One observation. <strong>The result of <code>add</code> already exists at the end of EX.</strong> Cycle 5 is only when it gets filed. So <strong>hand it over directly and skip the filing.</strong> That is forwarding, also called <strong>bypassing</strong> depending on where you work.</p>
+
+  <p lang="ko">슬라이드 35쪽의 조건식. EX 로 받아오는 곳은 <strong>Memory 단계</strong>와 <strong>Writeback 단계</strong> 둘이다.</p>
+  <p lang="en">The condition on slide 35. Into EX, the value can come from <strong>the Memory stage</strong> or <strong>the Writeback stage.</strong></p>
+
+  <pre class="code" lang="ko"><span class="k">if</span>      ((rsE != <span class="n">0</span>) <span class="k">AND</span> (rsE == WriteRegM) <span class="k">AND</span> RegWriteM)  ForwardAE = <span class="n">10</span>   <span class="c">// Memory 에서</span>
+<span class="k">else if</span> ((rsE != <span class="n">0</span>) <span class="k">AND</span> (rsE == WriteRegW) <span class="k">AND</span> RegWriteW)  ForwardAE = <span class="n">01</span>   <span class="c">// Writeback 에서</span>
+<span class="k">else</span>                                                     ForwardAE = <span class="n">00</span>   <span class="c">// register file 에서</span></pre>
+  <pre class="code" lang="en"><span class="k">if</span>      ((rsE != <span class="n">0</span>) <span class="k">AND</span> (rsE == WriteRegM) <span class="k">AND</span> RegWriteM)  ForwardAE = <span class="n">10</span>   <span class="c">// from Memory</span>
+<span class="k">else if</span> ((rsE != <span class="n">0</span>) <span class="k">AND</span> (rsE == WriteRegW) <span class="k">AND</span> RegWriteW)  ForwardAE = <span class="n">01</span>   <span class="c">// from Writeback</span>
+<span class="k">else</span>                                                     ForwardAE = <span class="n">00</span>   <span class="c">// from the register file</span></pre>
+
+  <p lang="ko">짧은 식에 세 가지가 들어 있다.</p>
+  <p lang="en">Three things hide in that short expression.</p>
+
+  <ul>
+    <li lang="ko"><code>rsE != 0</code> &middot; MIPS 의 <code>$0</code> 는 <strong>항상 0 으로 고정</strong>이라 forwarding 하면 0 이어야 할 값이 0 이 아니게 된다</li>
+    <li lang="en"><code>rsE != 0</code> &middot; <code>$0</code> is <strong>hardwired to zero</strong> in MIPS, so forwarding into it would make a value that must be zero not zero</li>
+    <li lang="ko"><code>RegWriteM</code> &middot; 그 명령어가 <strong>실제로 register 를 쓰는지</strong> 확인한다. <code>sw</code> 의 destination 필드는 쓰레기다</li>
+    <li lang="en"><code>RegWriteM</code> &middot; checks the instruction <strong>actually writes a register.</strong> The destination field of an <code>sw</code> is garbage</li>
+    <li lang="ko"><strong>M 을 W 보다 먼저 본다</strong> &middot; <code>else if</code> 라 Memory 가 이긴다. <strong>더 최근 명령어</strong>의 값이 맞기 때문이다. 순서를 뒤집으면 조용히 틀린다</li>
+    <li lang="en"><strong>M is tested before W</strong> &middot; the <code>else if</code> makes Memory win, because <strong>the more recent instruction</strong> is the right one. Flip it and you silently use a stale value</li>
+  </ul>
+
+  <div class="trap">
+    <p lang="ko"><strong><code>lw</code> 바로 뒤는 forwarding 으로 안 된다.</strong> 이 강의에서 제일 중요한 함정이다.</p>
+    <p lang="en"><strong>A use right after an <code>lw</code> cannot be forwarded.</strong> The most important trap here.</p>
+    <pre class="code">lw  $s0, 40($0)
+and $t0, $s0, $s1</pre>
+    <p lang="ko">이유는 타이밍이 아니라 <strong>물리</strong>다. <code>lw</code> 의 값은 메모리를 읽어야 나오므로 <strong>MEM 끝에야 존재</strong>하는데 <code>and</code> 는 같은 사이클의 <strong>EX</strong> 에서 원한다. <strong>없는 값은 못 당겨온다.</strong> 한 사이클 stall 하고 그 다음에 forwarding 한다. 조건식은 <code>lwstall = ((rsD == rtE) OR (rtD == rtE)) AND MemtoRegE</code> 다.</p>
+    <p lang="en">The reason is <strong>physics</strong>, not bookkeeping. The load value <strong>only exists at the end of MEM</strong> because memory must be read, and <code>and</code> wants it in <strong>EX</strong> in that same cycle. <strong>You cannot forward what does not exist.</strong> Stall one cycle, then forward. The condition is <code>lwstall = ((rsD == rtE) OR (rtD == rtE)) AND MemtoRegE</code>.</p>
+    <p lang="ko">이 패턴을 <strong>load-use hazard</strong> 라고 부른다. 슬라이드에는 그 이름이 없지만 표준 표현이다.</p>
+    <p lang="en">The pattern is called a <strong>load-use hazard</strong>. The slide does not name it, but that is the standard term.</p>
+  </div>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">분기가 제일 비싸다</h2><h2 lang="en">Branches are the expensive ones</h2></div>
+
+  <p lang="ko">Data hazard 는 <strong>값</strong>이 없는 문제였다. Control hazard 는 <strong>어느 명령어를 가져와야 하는지 자체를</strong> 모르는 문제라 더 나쁘다.</p>
+  <p lang="en">A data hazard is a missing <strong>value.</strong> A control hazard is not knowing <strong>which instruction to fetch at all</strong>, which is worse.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 176" role="img" aria-label="분기가 MEM 단계에서 판정되면 세 개를 버리고, Decode 에서 판정하면 하나만 버린다">
+      <rect x="20" y="30" width="316" height="118" rx="6" fill="rgba(var(--amber-rgb),.10)" stroke="var(--amber)" stroke-width="1.3"/>
+      <text class="svgtxt" x="178" y="50" text-anchor="middle" style="font-size:11px;fill:var(--amber);font-weight:700" lang="ko">MEM 에서 판정</text>
+      <text class="svgtxt" x="178" y="50" text-anchor="middle" style="font-size:11px;fill:var(--amber);font-weight:700" lang="en">resolved in MEM</text>
+      <rect x="40" y="62" width="52" height="22" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1"/>
+      <text class="svglab" x="66" y="77" text-anchor="middle" style="font-size:9px;fill:var(--blue)">beq IF</text>
+      <rect x="98" y="62" width="52" height="22" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1"/>
+      <text class="svglab" x="124" y="77" text-anchor="middle" style="font-size:9px;fill:var(--blue)">ID</text>
+      <rect x="156" y="62" width="52" height="22" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1"/>
+      <text class="svglab" x="182" y="77" text-anchor="middle" style="font-size:9px;fill:var(--blue)">EX</text>
+      <rect x="214" y="62" width="52" height="22" rx="3" fill="rgba(var(--green-rgb),.2)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svglab" x="240" y="77" text-anchor="middle" style="font-size:9px;fill:var(--green)">MEM</text>
+      <text class="svglab" x="240" y="98" text-anchor="middle" style="font-size:9px;fill:var(--green)">decided</text>
+      <rect x="98" y="110" width="168" height="22" rx="3" fill="rgba(var(--amber-rgb),.2)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svgtxt" x="182" y="125" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)" lang="ko">세 개를 flush</text>
+      <text class="svgtxt" x="182" y="125" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)" lang="en">flush three</text>
+
+      <rect x="364" y="30" width="316" height="118" rx="6" fill="rgba(var(--green-rgb),.08)" stroke="var(--green)" stroke-width="1.3"/>
+      <text class="svgtxt" x="522" y="50" text-anchor="middle" style="font-size:11px;fill:var(--green);font-weight:700" lang="ko">Decode 에서 판정</text>
+      <text class="svgtxt" x="522" y="50" text-anchor="middle" style="font-size:11px;fill:var(--green);font-weight:700" lang="en">resolved in Decode</text>
+      <rect x="384" y="62" width="52" height="22" rx="3" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1"/>
+      <text class="svglab" x="410" y="77" text-anchor="middle" style="font-size:9px;fill:var(--blue)">beq IF</text>
+      <rect x="442" y="62" width="52" height="22" rx="3" fill="rgba(var(--green-rgb),.2)" stroke="var(--green)" stroke-width="1.4"/>
+      <text class="svglab" x="468" y="77" text-anchor="middle" style="font-size:9px;fill:var(--green)">ID</text>
+      <text class="svglab" x="468" y="98" text-anchor="middle" style="font-size:9px;fill:var(--green)">decided</text>
+      <rect x="442" y="110" width="52" height="22" rx="3" fill="rgba(var(--amber-rgb),.2)" stroke="var(--amber)" stroke-width="1.2"/>
+      <text class="svgtxt" x="468" y="125" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)" lang="ko">하나만</text>
+      <text class="svgtxt" x="468" y="125" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)" lang="en">just one</text>
+      <text class="svgtxt" x="522" y="145" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">대신 Decode 에 새 data hazard 가 생긴다</text>
+      <text class="svgtxt" x="522" y="145" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">but it creates a new data hazard in Decode</text>
+
+      <text class="svgtxt" x="350" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">판정을 앞당긴 만큼 버리는 수가 줄어든다. 벌점이 사라지는 게 아니라 작아진다</text>
+      <text class="svgtxt" x="350" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">the earlier you decide, the fewer you throw away. the penalty shrinks, it does not vanish</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 41&ndash;42쪽. 슬라이드 29쪽이 해법을 <strong>Minimize penalty</strong> 라고 적는다. 없애라가 아니다.</figcaption>
+    <figcaption lang="en">Slides 41 and 42. Slide 29 words the fix as <strong>Minimize penalty.</strong> Not eliminate it.</figcaption>
+  </figure>
+
+  <div class="trap">
+    <p lang="ko"><strong>하나를 고치면 다른 게 생긴다.</strong> 슬라이드 43쪽이 직접 말한다. <strong>Introduced another data hazard in Decode stage.</strong> 분기 피연산자가 바로 앞 명령어의 결과면 그 값이 아직 없다. 해법은 같은 도구를 다시 쓰는 것이다. <strong>쓸 수 있으면 forwarding, 아니면 stall.</strong> 파이프라인 설계는 <strong>대가를 옮길 수는 있어도 없앨 수는 없다.</strong></p>
+    <p lang="en"><strong>Fixing one thing creates another.</strong> Slide 43 says it: <strong>Introduced another data hazard in Decode stage.</strong> If a branch operand came from the instruction right before, it is not there yet. The fix is the same toolbox again: <strong>forward if you can, stall if you cannot.</strong> In pipeline design <strong>you can move the cost around, not delete it.</strong></p>
+  </div>
+
+  <p lang="ko">마지막 수단이 <strong>branch prediction</strong> 이다. 판정을 기다리지 않고 찍는다.</p>
+  <p lang="en">The last move is <strong>branch prediction</strong>: guess instead of waiting.</p>
+
+  <ul>
+    <li lang="ko"><strong>Static</strong> &middot; 방향만 본다. 뒤로 가는 분기면 taken (루프일 가능성이 높다), 앞으로 가면 not taken</li>
+    <li lang="en"><strong>Static</strong> &middot; direction only. Backward means taken, since it is probably a loop. Forward means not taken</li>
+    <li lang="ko"><strong>Dynamic</strong> &middot; 최근 수백 개의 분기 이력을 <strong>branch target buffer</strong> 에 기록한다. 목적지와 taken 여부 둘을 담는다</li>
+    <li lang="en"><strong>Dynamic</strong> &middot; keeps the last several hundred branches in a <strong>branch target buffer</strong>, recording the destination and whether it was taken</li>
+  </ul>
+
+  <p lang="ko">슬라이드의 정리가 정확하다. <strong>Good prediction reduces fraction of branches requiring a flush.</strong> flush 를 없애는 게 아니라 <strong>비율</strong>을 줄인다.</p>
+  <p lang="en">The slide's summary is exact: <strong>Good prediction reduces fraction of branches requiring a flush.</strong> Not removing flushes, reducing <strong>the fraction.</strong></p>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+
+  <p lang="ko">quiz 가 객관식이라 <strong>둘 다 맞는 말처럼 보이는 짝</strong>이 나온다. 이 강의의 다섯 짝.</p>
+  <p lang="en">Multiple choice means <strong>pairs where both options sound right.</strong> Five of them here.</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">짝</span><span lang="en">Pair</span></th>
+      <th><span lang="ko">구별 기준 한 줄</span><span lang="en">The one line that separates them</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>Throughput / Latency</td><td><span lang="ko">pipelining 은 앞엣것을 <strong>올리고</strong> 뒤엣것을 <strong>나쁘게 한다</strong></span><span lang="en">pipelining <strong>raises</strong> the first and <strong>worsens</strong> the second</span></td></tr>
+      <tr><td>Stall / Flush</td><td><span lang="ko">기다리면 <strong>쓸 수 있느냐</strong>. 쓸 수 있으면 stall, 아니면 flush</span><span lang="en">will waiting make it <strong>usable</strong>? if yes stall, if no flush</span></td></tr>
+      <tr><td><span lang="ko">forwarding 되는 것 / 안 되는 것</span><span lang="en">forwardable / not</span></td><td><span lang="ko">그 시점에 <strong>값이 존재하느냐.</strong> ALU 결과는 있고 <code>lw</code> 결과는 아직 없다</span><span lang="en">does the value <strong>exist</strong> at that moment? an ALU result does, an <code>lw</code> result does not</span></td></tr>
+      <tr><td><span lang="ko">클럭 주기</span><span lang="en">clock period</span></td><td><span lang="ko"><strong>가장 느린 단계.</strong> 평균도 합도 아니다</span><span lang="en"><strong>the slowest stage.</strong> not the average, not the sum</span></td></tr>
+      <tr><td><span lang="ko">hazard 세 종류</span><span lang="en">the three hazards</span></td><td><span lang="ko"><strong>무엇이 부족한가.</strong> 자원이냐, 값이냐, 방향이냐</span><span lang="en"><strong>what is missing:</strong> a resource, a value, or a direction</span></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">계산 문제라면 슬라이드 16쪽의 speedup 이다. <strong>함정은 단계 수로 나누고 싶어지는 것</strong>이고, 분모는 <strong>가장 느린 단계</strong>다.</p>
+  <p lang="en">For a calculation it will be the speedup from slide 16. <strong>The trap is wanting to divide by the stage count</strong>, when the denominator is <strong>the slowest stage.</strong></p>
+
+  <div class="callout">
+    <p lang="ko"><strong>Lab 2 가 이 강의다.</strong> 슬라이드 35쪽(forwarding), 39쪽(stall), 46쪽(분기 forwarding 과 stall)의 조건식이 <strong>그대로 RTL 이 된다.</strong> 자세한 설명은 <a href="L06-pipelined-cpu-design.html#s7">자세한 판의 07절</a>과 <a href="L06-pipelined-cpu-design.html#s8">08절</a>에 있고, <a href="L06-pipelined-cpu-design.html#s9">09절에 직접 분류해보는 도구</a>가 있다.</p>
+    <p lang="en"><strong>Lab 2 is this lecture.</strong> The conditions on slides 35 (forwarding), 39 (stalling) and 46 (branch forwarding and stalling) <strong>become RTL more or less verbatim.</strong> The full treatment is in <a href="L06-pipelined-cpu-design.html#s7">section 07</a> and <a href="L06-pipelined-cpu-design.html#s8">section 08</a> of the full version, and <a href="L06-pipelined-cpu-design.html#s9">section 09 has a tool</a> for classifying them yourself.</p>
+  </div>
+</section>
+
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 6 개인 학습 노트 (빠른 읽기 판)<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; 원본 슬라이드: Ashmita Sinha (CPU Architect, Intel Corporation) &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 6 personal study notes (quick read)<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; original slide deck by Ashmita Sinha (CPU Architect, Intel Corporation) &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

@@ -427,13 +427,13 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt slide by slide from the lecture deck. What blocks you in this course is not maths but <strong>industry vocabulary</strong>, so every term comes with its full name and a note on who says it and when.</p>
 
   <div class="facts" lang="ko">
-    <span class="chip">5 / 23강 완료</span>
+    <span class="chip">6 / 23강 완료</span>
     <span class="chip">약어 사전 137항목</span>
     <span class="chip">슬라이드 동기화</span>
     <span class="chip">한국어 · English</span>
   </div>
   <div class="facts" lang="en">
-    <span class="chip">5 of 23 lectures</span>
+    <span class="chip">6 of 23 lectures</span>
     <span class="chip">137 glossary entries</span>
     <span class="chip">slide sync</span>
     <span class="chip">Korean &amp; English</span>
@@ -553,7 +553,7 @@ a.mod:hover .num{color:var(--blue)}
 <a class="mod" href="notes/L04-clock-and-reset.html">
   <div class="num">04</div>
   <div>
-    <div class="when">9/7 (Mon) · <span class="who">Chetan Sudarshan</span></div>
+    <div class="when">9/9 (Wed) · <span class="who">Chetan Sudarshan</span></div>
     <h3>Clock and Reset (Timing, CDC, RDC)</h3>
     <p lang="ko">SoC의 globals. Lecture 2의 STA가 여기서 실제 설계 문제로 돌아온다.</p>
     <p lang="en">The globals of an SoC. The STA from Lecture 2 comes back here as a real design problem.</p>
@@ -575,7 +575,7 @@ a.mod:hover .num{color:var(--blue)}
 <a class="mod" href="notes/L05-fifo-design.html">
   <div class="num">05</div>
   <div>
-    <div class="when">9/9 (Wed) · <span class="who">Igor Miranda</span></div>
+    <div class="when">9/11 (Fri) · <span class="who">Igor Miranda</span></div>
     <h3>FIFO Design</h3>
     <p lang="ko">Lab 1의 대상. Lecture 2에서 assertion 예시로 나왔던 "FIFO는 overflow 하면 안 된다"가 여기서 설계 문제가 된다. 어려운 건 저장이 아니라 <strong>가득 찼는지 비었는지를 아는 것</strong>이고, 답은 포인터에 붙은 한 비트다. 깊이 4짜리 FIFO를 직접 눌러보는 도구가 들어 있다.</p>
     <p lang="en">The subject of Lab 1. The assertion example from Lecture 2, that a FIFO must not overflow, becomes a design problem here. The hard part is not storing but <strong>knowing whether it is full or empty</strong>, and the answer is one extra bit on the pointer. Includes a depth-four FIFO you can drive by hand.</p>
@@ -595,24 +595,36 @@ a.mod:hover .num{color:var(--blue)}
 </div>
 
 
-<div class="mod soon">
+<a class="mod" href="notes/L06-pipelined-cpu-design.html">
   <div class="num">06</div>
   <div>
     <div class="when">9/16 (Wed) · Aman Arora</div>
-    <h3>Pipelined CPU design</h3>
-    <p lang="ko">Lab 2의 대상. Lecture 2의 pipelining과 retiming이 여기서 실제 MIPS 설계로 이어진다.</p>
-    <p lang="en">The subject of Lab 2. Pipelining and retiming from Lecture 2 turn into an actual MIPS design here.</p>
+    <h3>Pipelined CPU Design</h3>
+    <p lang="ko">Lab 2의 대상. 명령어를 다섯 단계로 쪼개면 throughput 이 오르고 <strong>latency 는 오히려 나빠진다.</strong> 그리고 명령어끼리 서로 발을 밟는 hazard 가 생긴다. forwarding 으로 대부분 막는데 <code>lw</code> 바로 뒤만은 안 된다. 명령어 묶음을 주고 무엇이 필요한지 고르는 도구가 들어 있다.</p>
+    <p lang="en">The subject of Lab 2. Splitting instructions into five stages raises throughput and <strong>makes latency worse.</strong> It also makes instructions step on each other. Forwarding covers most of it, but not a use right after an <code>lw</code>. Includes a tool that hands you an instruction sequence and asks what the hardware has to do.</p>
+    <div class="tags">
+      <span class="tag d">5-stage pipeline</span>
+      <span class="tag d">pipeline register</span>
+      <span class="tag d">hazard · structural · data · control</span>
+      <span class="tag d">forwarding · stall · flush</span>
+      <span class="tag d">branch prediction</span>
+    </div>
   </div>
-  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L06-pipelined-cpu-design-quick.html" lang="ko">hazard 세 종류와 forwarding 이 멈추는 지점으로 7절</a>
+  <a href="notes/L06-pipelined-cpu-design-quick.html" lang="en">seven sections, three hazards and where forwarding stops</a>
 </div>
 
 <div class="mod soon">
   <div class="num">07</div>
   <div>
-    <div class="when">9/21 (Mon) · <span class="who">Prashant Joshi</span></div>
-    <h3>Floating point arithmetic unit design</h3>
-    <p lang="ko">Lecture 2의 Rule of 10에서 언급된 Intel 부동소수점 버그가 바로 이 종류의 유닛에서 났다.</p>
-    <p lang="en">The Intel floating point bug mentioned in Lecture 2's rule of 10 happened in exactly this kind of unit.</p>
+    <div class="when">9/21 (Mon) · Aman Arora</div>
+    <h3>Efficient design methods + Catch up</h3>
+    <p lang="ko">원래 9/23 이던 강의가 앞당겨졌다. Catch up 이 붙어 있어 밀린 주제를 함께 정리한다.</p>
+    <p lang="en">A schedule change moved this lecture up from 23 September. The catch-up half revisits topics the course ran past.</p>
   </div>
   <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
 </div>
@@ -620,10 +632,10 @@ a.mod:hover .num{color:var(--blue)}
 <div class="mod soon">
   <div class="num">08</div>
   <div>
-    <div class="when">9/23 (Wed) · Aman Arora</div>
-    <h3>Efficient design tips + Catch up</h3>
-    <p lang="ko">Schedule 표에서 10번과 11번의 번호가 날짜순과 어긋나 있다. 강사가 guest speaker 사정으로 순서가 바뀔 수 있다고 밝혔다.</p>
-    <p lang="en">Lectures 10 and 11 are out of date order in the schedule table. The instructor said guest speaker availability shifts the order.</p>
+    <div class="when">9/23 (Wed) · <span class="who">Prashant Joshi</span></div>
+    <h3>Floating point arithmetic unit design</h3>
+    <p lang="ko">Lecture 2의 Rule of 10에서 언급된 Intel 부동소수점 버그가 바로 이 종류의 유닛에서 났다. 게스트 강사 사정으로 9/21 에서 이 날로 밀렸다.</p>
+    <p lang="en">The Intel floating point bug mentioned in Lecture 2's rule of 10 happened in exactly this kind of unit. Guest speaker availability pushed it here from 21 September.</p>
   </div>
   <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
 </div>

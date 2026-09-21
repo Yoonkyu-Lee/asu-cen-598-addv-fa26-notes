@@ -486,6 +486,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Branch Prediction</div>
+  <div class="d" lang="ko">분기 판정을 기다리지 않고 <strong>taken 인지 아닌지를 찍어서</strong> 계속 fetch 하는 것. static 은 방향만 본다 (뒤로 가는 분기면 taken, 루프일 가능성이 높으므로). dynamic 은 최근 분기 이력을 <strong>BTB</strong> 에 기록해서 참고한다. <strong>flush 를 없애는 게 아니라 flush 가 필요한 분기의 비율을 줄인다.</strong></div>
+  <div class="d" lang="en">Guessing <strong>taken or not taken</strong> and continuing to fetch instead of waiting for the branch to resolve. Static prediction looks only at direction: backward means taken, since it is probably a loop. Dynamic prediction records recent branch history in a <strong>BTB</strong>. <strong>It does not remove flushes, it reduces the fraction of branches that need one.</strong></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s8">Lecture 6 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Bring-up</div>
   <div class="d" lang="ko">새 칩이 처음 도착했을 때 <strong>동작하게 만들어가는 과정.</strong> 전원을 넣고 클럭이 도는지부터 확인한다. NVIDIA에는 이 단계에 붙는 고유 이름이 없어서 그냥 bringup이라고 부른다고 슬라이드가 적어놨다. Testbench 쪽에서도 "testbench and DUT bringup"이라는 표현을 같은 뜻으로 쓴다.</div>
   <div class="d" lang="en">The process of <strong>getting a brand new chip to do anything at all</strong>, starting from whether the clock runs when power goes in. The slides note that NVIDIA has no specific name for this stage and just calls it bringup. The same word is used on the testbench side, as in "testbench and DUT bringup".</div>
@@ -493,10 +500,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">BTB &middot; Branch Target Buffer</div>
+  <div class="d" lang="ko">dynamic branch prediction 이 <strong>최근 수백 개의 분기 이력을 기록해두는 표.</strong> 두 가지를 담는다. <strong>분기 목적지</strong>와 <strong>실제로 taken 이었는지.</strong></div>
+  <div class="d" lang="en">The table where dynamic branch prediction <strong>keeps the history of the last several hundred branches.</strong> It records two things: <strong>the branch destination</strong> and <strong>whether it was taken.</strong></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s8">Lecture 6 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Bus Semantics</div>
   <div class="d" lang="ko">여러 드라이버가 <strong>한 선을 공유하되 한 번에 하나만 몰기로 약속한 것.</strong> 나머지는 <code>z</code>로 물러난다. 슬라이드 24의 "multiple driver 금지" 규칙에서 <strong>유일하게 허용되는 예외</strong>이고, 조건은 "explicitly", 즉 실수가 아니라 의도적으로 그렇게 설계했을 때다. 이때 신호는 <code>logic</code>이 아니라 <code>wire</code>여야 한다.</div>
   <div class="d" lang="en">Several drivers <strong>sharing one line on the agreement that only one drives at a time</strong>, the rest sitting back at <code>z</code>. It is <strong>the one exception</strong> to the "no multiple drivers" rule on slide 24, and the condition is "explicitly": designed that way on purpose, not by accident. The signal then has to be a <code>wire</code>, not a <code>logic</code>.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s17">Lecture 3 · 17</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Bypassing</div>
+  <div class="d" lang="ko"><strong>Forwarding 과 같은 것이다.</strong> 회사에 따라 이쪽 표현을 더 쓴다. 같은 회로를 두 이름으로 부르는 것이므로 둘 다 알아둬야 한다.</div>
+  <div class="d" lang="en"><strong>The same thing as forwarding.</strong> Some companies prefer this word. One circuit, two names, so know both.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a></div>
 </div>
 
 <h2 class="gletter" id="gC">C</h2>
@@ -578,6 +599,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">DUT를 <strong>얼마나 잘 두들겼는지를 정량화</strong>한 것. 점수가 높을수록 stimulus의 품질이 높다. <strong>실패한 테스트의 커버리지는 세지 않는다.</strong> Code coverage와 functional coverage 두 갈래가 있다.</div>
   <div class="d" lang="en">A <strong>quantitative measure of how well the DUT was exercised.</strong> A higher score means better stimulus. <strong>Never count coverage from a failing test.</strong> It splits into code coverage and functional coverage.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">CPI &middot; Cycles Per Instruction</div>
+  <div class="d" lang="ko">명령어 하나당 몇 사이클이 드는가. <strong>IPC 의 역수다.</strong> microarchitecture 를 비교할 때 쓴다. <strong>CPI 만으로 속도를 말할 수 없다.</strong> 클럭 주파수와 같이 봐야 한다.</div>
+  <div class="d" lang="en">How many cycles one instruction costs. <strong>The reciprocal of IPC.</strong> Used to compare microarchitectures. <strong>CPI alone does not tell you speed</strong>, you need the clock frequency with it.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s2">Lecture 6 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -761,10 +789,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Flush</div>
+  <div class="d" lang="ko">이미 파이프라인에 들어온 명령어를 <strong>지워버리는 것.</strong> 없던 일로 만든다. 주로 <strong>control hazard</strong> 에서 쓴다. 분기가 성립해서 뒤따라 들어온 명령어들이 <strong>애초에 실행되면 안 되는 것</strong>이었을 때다. stall 과 다르다. stall 은 기다리면 쓸 수 있는 값을 기다리는 것이고, flush 는 기다려도 쓸모가 없는 것을 버리는 것이다.</div>
+  <div class="d" lang="en"><strong>Discarding</strong> an instruction already in the pipeline, as if it never happened. Mostly used for <strong>control hazards</strong>, when a taken branch means the instructions behind it <strong>should never have run.</strong> Not the same as a stall: a stall waits for a value that will become usable, a flush throws away something that will never be useful.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Formal Verification</div>
   <div class="d" lang="ko">검증 문제를 <strong>수학으로</strong> 푸는 것. 설계를 수식으로 표현하고 제약 아래 성립함을 증명한다. Static verification이라고도 한다. <strong>Exhaustive하지만 state explosion problem 때문에 확장이 안 된다.</strong> 슬라이드가 "이 과목의 초점이 아니다"라고 명시했다. 기법은 equivalence checking, model checking, theorem proving 셋.</div>
   <div class="d" lang="en">Solving the verification problem <strong>with mathematics</strong>: express the design as a formula and prove it holds under constraints. Also called static verification. <strong>Exhaustive, but it does not scale, because of the state explosion problem.</strong> The slides state outright that it is not a focus of this course. The three techniques are equivalence checking, model checking and theorem proving.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <span lang="ko">Lecture 21 전체</span><span lang="en">all of Lecture 21</span></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Forwarding</div>
+  <div class="d" lang="ko">아직 register file 에 안 적힌 결과를 <strong>뒤쪽 파이프라인 단계에서 앞쪽 단계로 직접 넘기는 경로.</strong> <strong>bypassing</strong> 이라고도 한다. EX 단계로는 Memory 단계와 Writeback 단계 두 곳에서 받을 수 있다. <strong>모든 data hazard 를 없애지는 못한다.</strong> <code>lw</code> 바로 뒤의 사용은 값이 아직 존재하지 않아서 stall 이 먼저 필요하다.</div>
+  <div class="d" lang="en">A path handing a <strong>not yet written back result from a later pipeline stage to an earlier one.</strong> Also called <strong>bypassing</strong>. Into EX it can come from the Memory stage or the Writeback stage. <strong>It does not cover every data hazard:</strong> a use right after an <code>lw</code> needs a stall first, because the value does not exist yet.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -813,6 +855,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gH">H</h2>
+
+<div class="gterm">
+  <div class="t">Hazard</div>
+  <div class="d" lang="ko">파이프라인이 겹쳐 돌기 때문에 생기는, 그냥 두면 틀린 결과를 내는 상황. 세 종류다. <strong>structural</strong> (자원이 겹침), <strong>data</strong> (값이 아직 준비 안 됨), <strong>control</strong> (어느 명령어를 가져올지 모름). <strong>hazard 는 버그가 아니라 구조적 성질이다.</strong> 버그는 hazard 를 안 막은 쪽이다.</div>
+  <div class="d" lang="en">A situation created by pipeline overlap that gives a wrong result if left alone. Three kinds: <strong>structural</strong> for a resource conflict, <strong>data</strong> for a value not ready, <strong>control</strong> for not knowing which instruction to fetch. <strong>A hazard is a structural fact, not a bug.</strong> The bug is failing to handle one.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">HDL</div>
@@ -876,6 +925,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L02-design-and-verification-overview.html#s7">Lecture 2 · 07</a> · <a href="L02-design-and-verification-overview.html#s22">22</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">IPC &middot; Instructions Per Cycle</div>
+  <div class="d" lang="ko">한 사이클에 명령어가 몇 개 끝나는가. <strong>CPI 의 역수다.</strong> <strong>IPC 가 높다고 빠른 게 아니다.</strong> 클럭 주파수와 곱해야 실제 속도가 나오므로, IPC 를 올리려고 클럭을 떨어뜨리면 손해일 수 있다.</div>
+  <div class="d" lang="en">How many instructions finish per cycle. <strong>The reciprocal of CPI.</strong> <strong>High IPC does not mean fast:</strong> you multiply by clock frequency to get real speed, so buying IPC by lowering the clock can be a net loss.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s2">Lecture 6 &middot; 02</a></div>
+</div>
+
 <h2 class="gletter" id="gL">L</h2>
 
 <div class="gterm">
@@ -905,6 +961,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">코드를 돌리지 않고 읽어서 <strong>가이드라인 위반을 찾는</strong> 정적 분석. 도구는 Synopsys Spyglass. 잡는 것: 도달할 수 없는 코드, 명명 규칙, blocking과 non-blocking 혼용, 합성 불가 구문, 다중 driver, <strong>의도치 않은 latch.</strong> <strong>스타일 지적이 아니다.</strong> 절반 이상이 실물이 코드와 다르게 동작하게 만드는 원인이다. 다만 lint는 verification이 아니다. "규칙을 지키는가"만 볼 뿐 "사양대로인가"는 못 본다.</div>
   <div class="d" lang="en">Static analysis that reads the code without running it and <strong>finds guideline violations.</strong> The tool named is Synopsys Spyglass. It catches unreachable code, naming conventions, mixed blocking and non-blocking assignments, un-synthesisable constructs, multiple drivers and <strong>unintended latches.</strong> <strong>These are not style nits:</strong> more than half of them cause the physical part to behave differently from the code. But lint is not verification; it only asks whether rules are followed, never whether the design matches the spec.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s8">Lecture 2 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Load-Use Hazard</div>
+  <div class="d" lang="ko"><code>lw</code> 바로 뒤의 명령어가 그 결과를 쓰는 경우. <strong>forwarding 으로 못 막는 유일한 data hazard 다.</strong> <code>lw</code> 의 값은 메모리를 읽어야 나오므로 MEM 끝에야 존재하는데 뒤 명령어는 그것을 EX 에서 원한다. <strong>한 사이클 stall 이 반드시 필요하고 그 다음에 forwarding 한다.</strong></div>
+  <div class="d" lang="en">When the instruction right after an <code>lw</code> uses its result. <strong>The one data hazard forwarding cannot fix.</strong> The load value only exists at the end of MEM, and the next instruction wants it in EX. <strong>One stall cycle is mandatory, then you forward.</strong></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -1060,10 +1123,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Pipeline Register</div>
+  <div class="d" lang="ko">파이프라인 단계와 단계 사이에 놓인 flip-flop 묶음. 한 단계의 결과를 다음 클럭까지 붙들어 둔다. 5 단이면 네 단이 있고 경계 이름을 그대로 쓴다 (<code>IF/ID</code>, <code>ID/EX</code>, <code>EX/MEM</code>, <code>MEM/WB</code>). <strong>architectural register 와 다르다.</strong> 프로그램은 존재조차 모른다.</div>
+  <div class="d" lang="en">A bank of flip-flops between two pipeline stages, holding one stage result until the next clock. Five stages means four banks, named after the boundaries: <code>IF/ID</code>, <code>ID/EX</code>, <code>EX/MEM</code>, <code>MEM/WB</code>. <strong>Not an architectural register:</strong> the program does not know it exists.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s3">Lecture 6 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Pipelining</div>
   <div class="d" lang="ko">처리를 단계로 쪼개고 사이에 register를 넣어 <strong>throughput을 올리는</strong> 기법. 주의할 점은 <strong>timing과 performance가 다르다</strong>는 것이다. 파이프라인을 깊게 하면 각 단이 짧아져 timing은 좋아지지만 한 건의 지연은 오히려 늘어난다.</div>
   <div class="d" lang="en">Splitting processing into stages with registers between them, <strong>raising throughput.</strong> Note that <strong>timing and performance are not the same thing:</strong> deepening a pipeline shortens each stage and improves timing while making the latency of a single item worse.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Pipelining</div>
+  <div class="d" lang="ko">명령어를 여러 단계로 쪼개고 <strong>서로 다른 명령어를 서로 다른 단계에 동시에 올려</strong> 겹쳐 돌리는 것. 강의 표현으로 <strong>temporal parallelism</strong>. <strong>throughput 을 올리지 latency 를 줄이지 않는다.</strong> 오히려 명령어 하나의 latency 는 늘어난다. 클럭 주기는 <strong>가장 느린 단계</strong>가 정한다.</div>
+  <div class="d" lang="en">Splitting instructions into stages and overlapping them so <strong>different instructions occupy different stages at once.</strong> The lecture calls it <strong>temporal parallelism</strong>. <strong>It raises throughput, it does not reduce latency</strong>, and in fact one instruction takes longer. The clock period is set by <strong>the slowest stage.</strong></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s3">Lecture 6 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -1204,6 +1281,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Stage Suffix &middot; F D E M W</div>
+  <div class="d" lang="ko">파이프라인 신호 이름 끝에 붙여 <strong>그 신호가 지금 어느 단계에 있는지</strong>를 표시하는 표기. Fetch, Decode, Execute, Memory, Writeback 의 머리글자다. <code>PC<sub>F</sub></code>, <code>IR<sub>D</sub></code>, <code>A<sub>E</sub></code> 처럼 쓴다. <strong><code>rsE</code> 와 <code>rsD</code> 는 다른 신호다.</strong> 같은 필드인데 사이클이 다르다.</div>
+  <div class="d" lang="en">A suffix on pipelined signal names saying <strong>which stage the signal is in</strong>, from the initials of Fetch, Decode, Execute, Memory, Writeback: <code>PC<sub>F</sub></code>, <code>IR<sub>D</sub></code>, <code>A<sub>E</sub></code>. <strong><code>rsE</code> and <code>rsD</code> are different signals</strong>, the same field in different cycles.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s5">Lecture 6 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Stall</div>
+  <div class="d" lang="ko">명령어를 <strong>제자리에 붙들어 두는 것.</strong> 다음 사이클에 같은 단계를 다시 한다. 기다리면 쓸 수 있는 값이 오기 때문이다. 주로 <strong>data hazard</strong> 와 <strong>structural hazard</strong> 에 쓴다. 앞 단계를 멈추면 뒤에 구멍이 생기므로 <strong>flush 가 같이 간다</strong> (<code>StallF = StallD = FlushE</code>).</div>
+  <div class="d" lang="en"><strong>Holding an instruction in place</strong> so it redoes the same stage next cycle, because waiting will make the value available. Used mostly for <strong>data</strong> and <strong>structural</strong> hazards. Holding the front stages leaves a hole behind, so <strong>a flush rides along</strong>: <code>StallF = StallD = FlushE</code>.</div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Standard Cell</div>
   <div class="d" lang="ko">Foundry가 미리 만들어 두고 특성까지 재놓은 <strong>부품.</strong> AND 게이트 하나, flip-flop 하나가 각각 하나의 cell이다. <strong>"standard"인 이유는 높이가 전부 같게 설계돼 줄 세워 늘어놓을 수 있기 때문</strong>이고, 그래야 place and route가 자동화된다. 당신의 RTL은 이 목록에 있는 것으로만 만들어진다.</div>
   <div class="d" lang="en">A <strong>part</strong> the foundry has already built and characterised: one AND gate is a cell, one flip-flop is a cell. <strong>They are standard because they share a height and can be laid out in rows</strong>, which is what makes place and route automatable. Your RTL can only be built from what is on that list.</div>
@@ -1302,6 +1393,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">단위 없는 지연(<code>#10</code>)의 <strong>단위</strong>와, 시뮬레이터가 시간을 쪼개는 <strong>해상도.</strong> <code>`timescale</code>과 하는 일은 같지만 <strong>directive가 아니라 declaration이다.</strong> module 안에 적고 그 module과 중첩된 것에만 적용되므로 <strong>파일을 컴파일한 순서에 휘둘리지 않는다.</strong> <code>`timescale</code>은 파일 목록 순서를 바꾸면 적용 범위가 바뀌었다.</div>
   <div class="d" lang="en">The <strong>unit</strong> for a bare delay such as <code>#10</code>, and the <strong>resolution</strong> at which the simulator slices time. Same job as <code>`timescale</code>, but <strong>a declaration rather than a directive.</strong> Written inside a module, applying only to it and what nests in it, so <strong>compile order cannot reach it.</strong> Reordering a file list really did change what a <code>`timescale</code> covered.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s13">Lecture 3 · 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TLB &middot; Translation Lookaside Buffer</div>
+  <div class="d" lang="ko">가상 주소를 물리 주소로 바꾼 결과를 담아두는 캐시. 현대 CPU 의 <code>IF</code> 와 <code>MEM</code> 단계에 각각 있다. <strong>이 강의에서는 이름과 위치만 나온다.</strong></div>
+  <div class="d" lang="en">A cache of virtual to physical address translations. Modern CPUs have one in <code>IF</code> and another in <code>MEM</code>. <strong>This lecture gives only the name and the position.</strong></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s10">Lecture 6 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
