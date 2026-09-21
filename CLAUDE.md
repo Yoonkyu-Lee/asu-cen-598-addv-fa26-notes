@@ -37,11 +37,13 @@ GitHub Pages로 배포된다: https://yoonkyu-lee.github.io/asu-cen-598-addv-fa2
 | 용도 | 경로 |
 |---|---|
 | 저장소 | `D:\Engineering\asu-cen-598-addv-fa26-notes` |
-| 슬라이드 원본 (읽기 전용) | `D:\Library\01 Immigration Documents\02 ASU\FA26\CEN 598  ADDV` |
+| 강의 자료 원본 (스테이징) | `lecture/` (저장소 안, `.gitignore` 로 제외) |
 | 강의 사이트 (원천) | https://adventlab.notion.site/addv-fall2026-website |
 
-Drive 미러 폴더는 **절대 수정하지 않는다.** 읽기만 한다.
-슬라이드를 다시 변환하고 쪽수를 대조하는 절차는 `convert-slides` 참조.
+**예전에는 Drive 미러가 원본이었으나 머신 초기화로 사라졌다.** 이제 강의 사이트에서
+`lecture/` 로 직접 받는다. 여기 있는 것은 **하나도 커밋되지 않는다.** 원본 PPTX,
+Lab 문제지, 폰트 zip 이 전부 여기 남고, 저장소에 올라가는 것은 변환된 `slides/*.pdf` 뿐이다.
+변환과 쪽수 대조 절차는 `convert-slides` 참조.
 
 ## 브라우저 고르기
 
@@ -77,7 +79,7 @@ gstack 스킬 문서에 Aside 이야기가 나와도 여기서는 fallback 경�
   **자동 검사가 못 잡는다**
 - **em dash(—) 금지.** 콜론, 쉼표, 마침표를 쓴다 (SVG 안과 구분선은 예외)
 - **업계 용어는 영어 유지, 서술은 한국어.** netlist, tapeout, DUT, RTL 을 번역하거나 음차하지 않는다
-- **Drive 원본은 읽기 전용.** `D:\Library\...\CEN 598  ADDV` 를 수정하지 않는다
+- **`lecture/` 는 통째로 커밋 금지.** 원본 PPTX, Lab 문제지, 라이선스 붙은 폰트가 여기 있다
 - **색을 하드코딩하지 않는다.** 그리고 의미가 고정돼 있다
 
 | 대상 | 색 |
@@ -110,6 +112,7 @@ repo는 **Public**이고 GitHub Pages로 서빙된다. 여기 올리는 건 인�
 | `slides/L{NN}-*.pdf` (강의 슬라이드) | O |
 | `vendor/pdf.js/` | O |
 | `*.pptx` 원본 | **X.** PDF만 올린다. 발표자 노트가 딸려 들어간다 |
+| `lecture/` 전체 | **X.** 원본 스테이징 폴더다. 폰트 zip 은 재배포 금지 자산이다 |
 | Lab 문제지, 제출 코드 | **X.** 2인 1조 과제다. 학문적 정직성 문제로 직결된다 |
 | Quiz, Exam 문제 | X |
 | `shots/`, `node_modules/` | X |

@@ -29,3 +29,12 @@ lab/**/slides.jsonl
 # 제출 리포트는 공개하지 않는다. 증거 스크린샷을 임베드하므로 materials/ 와 운명을 같이한다.
 lab/**/report.md
 .superpowers/
+
+# Claude Code 개인 설정 (워크스페이스에 labs 저장소를 붙인다). 커밋하지 않는다.
+.claude/settings.local.json
+
+# 강의 자료 원본 스테이징. 예전에는 Drive 미러가 저장소 밖에 있었지만
+# 머신이 초기화되면서 사라져서, 이제 여기로 직접 받는다. 저장소에 올리는 것은
+# slides/ 로 변환된 PDF 뿐이다. 원본 PPTX, Lab 문제지, 폰트는 전부 여기 남는다.
+# Microsoft Aptos 폰트는 EULA 가 붙은 재배포 금지 자산이다. 공개 저장소다.
+lecture/

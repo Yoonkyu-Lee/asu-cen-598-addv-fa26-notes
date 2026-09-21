@@ -1,6 +1,6 @@
 ---
 name: convert-slides
-description: 강의 PPTX 를 slides/*.pdf 로 변환해 저장소에 넣을 때 쓴다. 숨김 슬라이드를 되살려 쪽 번호를 맞추는 것, 발표자 노트 추출, Drive 원본 갱신 확인, 강의 사이트 Schedule 대조까지. 노트를 쓰기 전에 먼저 끝나 있어야 한다. "슬라이드 변환 / PPTX / 새 강의 올라왔나 / Schedule 대조"에서 호출한다.
+description: 강의 PPTX 를 slides/*.pdf 로 변환해 저장소에 넣을 때 쓴다. 숨김 슬라이드를 되살려 쪽 번호를 맞추는 것, 발표자 노트 추출, 원본 갱신 확인, 강의 사이트 Schedule 대조까지. 노트를 쓰기 전에 먼저 끝나 있어야 한다. "슬라이드 변환 / PPTX / 새 강의 올라왔나 / Schedule 대조"에서 호출한다.
 ---
 
 # 슬라이드를 저장소에 넣기
@@ -17,13 +17,16 @@ description: 강의 PPTX 를 slides/*.pdf 로 변환해 저장소에 넣을 때 
 
 | 용도 | 경로 |
 |---|---|
-| 슬라이드 원본 (읽기 전용) | `D:\Library\01 Immigration Documents\02 ASU\FA26\CEN 598  ADDV` |
+| 강의 자료 원본 (스테이징) | `lecture/` (저장소 안, `.gitignore` 로 통째로 제외) |
 
-Drive 미러 폴더는 **절대 수정하지 않는다.** 읽기만 한다.
-PDF로 변환할 때도 원본을 건드리지 않는다 (아래 [슬라이드 변환](#슬라이드-변환-pptx--pdf) 참조).
+**예전에는 Drive 미러가 원본이었으나 머신 초기화로 사라졌다.** 이제 강의 사이트에서
+`lecture/` 로 직접 받는다. 파일명은 강사가 올린 그대로 둔다 (`07_Pipelined CPU Design.pptx`).
 
-**Drive 원본은 학기 중에 갱신된다.** 강사가 슬라이드를 고치거나 끼워 넣는다.
-**노트를 쓰거나 고치기 전에 반드시 다시 변환하고 쪽수를 대조한다.**
+`lecture/` 는 **하나도 커밋되지 않는다.** PDF로 변환할 때도 원본을 건드리지 않고
+스크래치패드로 복사해서 사본에서만 작업한다.
+
+**원본은 학기 중에 갱신된다.** 강사가 슬라이드를 고치거나 끼워 넣는다.
+**노트를 쓰거나 고치기 전에 반드시 다시 받고 쪽수를 대조한다.**
 낡은 사본으로 앵커를 달면 전부 한 칸씩 어긋난다.
 
 ```bash
@@ -48,7 +51,10 @@ Notion은 SPA라 `WebFetch`로는 빈 페이지가 온다. **브라우저 도구
 
 EEE 554는 슬라이드가 PDF로 배포됐다. **여기는 PPTX다.** 리더가 PDF만 다루므로 변환이 필요하다.
 
-LibreOffice는 이 머신에 없다. **PowerPoint COM 자동화를 쓴다.**
+**PowerPoint COM 자동화를 쓴다.** LibreOffice 로도 시도해봤으나 텍스트 상자를 넘친 글자를
+잘라버리고 수식(OMML)을 외곽선으로 내보내서, 변환본이 강사 화면과 달라진다.
+Office 가 없는 머신이라면 그 손실을 감수하고 쓸 수는 있다.
+
 변환에 쓴 **스크래치패드의 PPTX 사본도 repo 안에 두지 않는다.** 발표자 노트가 딸려 들어간다.
 
 ```powershell
@@ -128,6 +134,7 @@ node scripts/render-slides.mjs slides/L01-course-intro.pdf 12-18
 | `pptx2pdf.ps1` | PPTX → `slides/*.pdf`. 숨김 슬라이드를 되살려서 변환한다 |
 | `pptx-text.py` | 슬라이드 본문 + **발표자 노트** 추출 |
 | `hidden-slides.py` | 숨김 슬라이드 번호 목록 |
+| `clipcheck.py` | PPTX 원문과 PDF 를 대조해 **잘린 글자**를 찾는다. 변환 뒤 필수 |
 | `pagecount.mjs` | `slides/*.pdf`의 쪽 수. PPTX 장수와 대조용 |
 | `pdftext.mjs` | PDF **쪽별** 텍스트. `data-slide` 앵커를 달기 전 대조용 |
 | `render-slides.mjs` | PDF 쪽을 PNG로 렌더 → `shots/slides/` |
@@ -136,12 +143,19 @@ node scripts/render-slides.mjs slides/L01-course-intro.pdf 12-18
 
 새 강의 노트를 쓰기 전에, 슬라이드를 저장소에 넣는 순서:
 
-1. **Drive 원본이 갱신됐는지 확인한다.** 슬라이드 파일이 새로 올라왔거나 바뀌었을 수 있다.
-2. **PPTX를 PDF로 변환한다.** 숨김 슬라이드를 포함시킨다.
-   `slides/L{NN}-{topic}.pdf`로 저장하고 노트와 stem을 맞춘다.
-   `node scripts/pagecount.mjs`로 PPTX 장수와 PDF 쪽 수가 같은지 확인한다. 다르면 변환이 잘못된 것이다.
-3. **슬라이드 본문과 발표자 노트를 뽑아 읽는다.**
+1. **강의 사이트에서 `lecture/` 로 받는다.** 이미 있는 것도 갱신됐을 수 있다.
+   **강사가 파일 앞에 붙인 번호는 강의 번호가 아니다.** 6번부터 Lab 자료 때문에 밀렸다.
+   `docs/schedule.md` 의 주제와 날짜로 대조해서 `L{NN}` 을 정한다.
+2. **PPTX를 PDF로 변환한다.** `powershell -File scripts/pptx2pdf.ps1`
+   `$map` 에 한 줄 추가하고, 파일명은 노트와 stem 을 맞춘다 (`slides/L{NN}-{topic}.pdf`).
+   이미 있는 PDF 는 건너뛴다. 다시 만들려면 `-Force`.
+3. **두 가지를 확인한다. 둘 다 통과해야 한다.**
+   - `node scripts/pagecount.mjs` : PPTX 장수 = PDF 쪽 수. 다르면 숨김 슬라이드가 빠진 것이다
+   - `python scripts/clipcheck.py "<pptx>" "<pdf>"` : 잘린 글자. 걸린 쪽은 렌더해서 눈으로 본다
+4. **슬라이드 본문과 발표자 노트를 뽑아 읽는다.**
    `python scripts/pptx-text.py "<pptx>"`. 필요하면 강의 사이트의 Material 링크도 확인한다.
-   **읽으면서 어느 개념이 몇 쪽인지 기록해둔다.** 노트를 쓸 때 `data-slide`로 쓴다.
+   **노트에 옮길 문구는 PDF 가 아니라 이 XML 추출을 원본으로 삼는다.** 변환기가 무엇이든
+   PDF 텍스트 층은 렌더 결과물이라 믿을 것이 못 된다.
+   **읽으면서 어느 개념이 몇 쪽인지 기록해둔다.**
 
 여기서부터는 `write-note` 스킬의 몫이다.
