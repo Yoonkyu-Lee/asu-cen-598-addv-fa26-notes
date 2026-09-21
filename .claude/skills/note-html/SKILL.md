@@ -348,8 +348,12 @@ vendor/pdf.js/                                    pdf.js 런타임
   상대 경로로 되돌리면 `notes/slides/...` 를 찾아 404 가 난다.
 
 `{NN}`은 **`docs/schedule.md` 의 강의 번호**를 따른다. **Lab overview 는 강의로 세지 않는다.**
-그래서 강의가 23 개이고, 이 번호는 **강사가 PPTX 앞에 붙인 번호와 일치한다.**
-`03_System Verilog for Design.pptx` 가 3 강이고 `04_Clock_Reset_Chetan.pptx` 가 4 강이다.
+그래서 강의가 23 개다.
+
+**강사가 자료 앞에 붙인 번호는 5 번까지만 강의 번호와 일치한다.** Lab 1 릴리스가
+`06_Lab1_Release.pptx` 로 들어가면서 6 번부터 밀렸다. `07_Pipelined CPU Design.pptx` 가
+6 강이고 `08_Efficient Design.pptx` 가 7 강이다. **파일 번호를 믿지 말고
+`docs/schedule.md` 의 주제와 날짜로 대조한다.**
 
 강의 사이트 Schedule 은 Lab 을 함께 세므로 번호가 다르다. `docs/schedule.md` 의 `site` 열이
 그 번호이고 **사이트와 대조할 때만 쓴다.** 사이트 번호는 10 과 11 이 날짜순과 어긋나 있는데
