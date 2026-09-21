@@ -34,7 +34,7 @@
 | 5 | 6 | 9/11 | FIFO design | Igor Miranda | (금요일 보강) |
 | 6 | 8 | 9/16 | Pipelined CPU design | Aman Arora |
 | 7 | 9 | 9/21 | Efficient design methods + Catch up | Aman Arora |
-| 8 | 11 | 9/23 | Floating point arithmetic unit design | Prashant Joshi |
+| 8 | 11 | 9/25 | Floating point arithmetic unit design | Prashant Joshi | (금요일 2:00-3:15pm 으로 이동) |
 | 9 | 13 | 9/30 | Matrix multiplication accelerator design | Aman Arora |
 | 10 | 14 | 10/5 | SoC architecture and on-chip interfaces | Aman Arora |
 | 11 | 15 | 10/7 | Case study: SoC interconnect design | Eric Taylor |
@@ -70,6 +70,15 @@ Lab overview 강의는 별도 노트를 만들지 않고 `LAB{N}` 공략 페이�
 | site | 날짜 | |
 |---|---|---|
 | 31 | 12/7 (월) | Final exam |
+
+## 2026-09-22 에 고친 것
+
+**8강이 9/23 수요일에서 9/25 금요일 오후 2:00-3:15 로 옮겨졌다.** 근거는 `08_Efficient Design.pptx`
+슬라이드 2쪽의 Logistics 다. "No lecture on Wednesday / Friday 2-3:15pm instead / The lecture has
+been set up on the Canvas calendar" 라고 적혀 있다.
+
+**강의 사이트 Schedule 표는 아직 9/23 수요일 그대로다** (2026-09-21 확인). 슬라이드가 더 최신이라
+그쪽을 따랐다. Canvas 캘린더로 한 번 더 확인할 것.
 
 ## 2026-09-21 에 고친 것
 

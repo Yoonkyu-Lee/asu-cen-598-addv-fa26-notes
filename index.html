@@ -427,13 +427,13 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt slide by slide from the lecture deck. What blocks you in this course is not maths but <strong>industry vocabulary</strong>, so every term comes with its full name and a note on who says it and when.</p>
 
   <div class="facts" lang="ko">
-    <span class="chip">6 / 23강 완료</span>
+    <span class="chip">7 / 23강 완료</span>
     <span class="chip">약어 사전 137항목</span>
     <span class="chip">슬라이드 동기화</span>
     <span class="chip">한국어 · English</span>
   </div>
   <div class="facts" lang="en">
-    <span class="chip">6 of 23 lectures</span>
+    <span class="chip">7 of 23 lectures</span>
     <span class="chip">137 glossary entries</span>
     <span class="chip">slide sync</span>
     <span class="chip">Korean &amp; English</span>
@@ -443,16 +443,14 @@ a.mod:hover .num{color:var(--blue)}
     <div class="nh" lang="ko">학기 운영 공지</div>
     <div class="nh" lang="en">Course logistics</div>
     <ul lang="ko">
-      <li><strong>이번 주 office hour는 목요일 오후 3:30~4:30</strong>으로 옮겨졌다.</li>
-      <li><strong>9월 7일 주간 강의는 Zoom 또는 녹화 영상</strong>으로 대체된다. 강사가 출장이라 교실에 오지 말 것.</li>
+      <li><strong>9월 23일 수요일 강의가 없다.</strong> Lecture 8 (Floating point, Prashant Joshi) 이 <strong>금요일 9/25 오후 2:00~3:15</strong> 로 옮겨졌다. Lecture 7 슬라이드 2쪽 공지이고 Canvas 캘린더에 올라가 있다. <strong>강의 사이트 Schedule 표는 아직 9/23 그대로다.</strong></li>
       <li><strong>Lab 제출 정책이 양방향이다.</strong> 늦으면 24시간당 15% 감점(최대 3구간, 그 뒤 0점), <strong>일찍 내면 24시간당 5% 가산점</strong>(최대 10%). 48시간 전에 내면 그냥 10%를 얻는다.</li>
       <li><strong>Synopsys 트레이닝이 유료로 보이면</strong> 먼저 로그인할 것. 강사가 확인한 사항이다.</li>
       <li>Pre-Req Test는 <strong>성적에 반영되지 않고</strong> 여러 번 응시할 수 있다.</li>
       <li>Lecture 3가 Synopsys 트레이닝 <strong>"SystemVerilog for RTL Design"을 이수하라고 지정했다.</strong></li>
     </ul>
     <ul lang="en">
-      <li><strong>Office hours this week move to Thursday, 3:30 to 4:30pm.</strong></li>
-      <li><strong>Lectures in the week of September 7 move to Zoom or a recording.</strong> The instructor is travelling; do not come to the classroom.</li>
+      <li><strong>No lecture on Wednesday 23 September.</strong> Lecture 8 (floating point, Prashant Joshi) moves to <strong>Friday the 25th, 2:00 to 3:15pm</strong>, per slide 2 of Lecture 7 and set up on the Canvas calendar. <strong>The Schedule on the course site still says the 23rd.</strong></li>
       <li><strong>Lab submission runs both ways.</strong> Late costs 15% per 24 hours, up to three periods, then a zero. <strong>Early pays 5% per 24 hours</strong>, up to 10%. Submitting 48 hours ahead is simply worth ten points.</li>
       <li><strong>If the Synopsys training looks paywalled</strong>, log in first. The instructor confirmed this.</li>
       <li>The pre-req test <strong>does not count toward the grade</strong> and allows multiple attempts.</li>
@@ -618,21 +616,33 @@ a.mod:hover .num{color:var(--blue)}
   <a href="notes/L06-pipelined-cpu-design-quick.html" lang="en">seven sections, three hazards and where forwarding stops</a>
 </div>
 
-<div class="mod soon">
+<a class="mod" href="notes/L07-efficient-design.html">
   <div class="num">07</div>
   <div>
     <div class="when">9/21 (Mon) · Aman Arora</div>
-    <h3>Efficient design methods + Catch up</h3>
-    <p lang="ko">원래 9/23 이던 강의가 앞당겨졌다. Catch up 이 붙어 있어 밀린 주제를 함께 정리한다.</p>
-    <p lang="en">A schedule change moved this lecture up from 23 September. The catch-up half revisits topics the course ran past.</p>
+    <h3>Efficient Design Methods</h3>
+    <p lang="ko">"잘 만들어라" 를 기법 목록으로 가르치는 강의. 규칙은 <strong>공짜 점심은 없다</strong>이고 축은 <code>PPA</code> 다. 한 문장으로 줄이면 <strong>코드가 아니라 회로를 보라.</strong> operand isolation 예제는 두 코드가 시뮬레이션에서 똑같이 도는데 전력만 다르다. 기법을 고르고 Area, Delay, Power 가 어디로 가는지 맞혀보는 도구가 들어 있다.</p>
+    <p lang="en">Teaching "make it good" as a catalogue. The rule is <strong>there is no free lunch</strong> and the axis is <code>PPA</code>. In one sentence, <strong>look at the circuit, not the code.</strong> In the operand isolation example both versions simulate identically and only the power differs. Includes a tool for guessing which way area, delay and power move.</p>
+    <div class="tags">
+      <span class="tag d">PPA · no free lunch</span>
+      <span class="tag d">resource sharing · bitwidth</span>
+      <span class="tag d">critical path · retiming</span>
+      <span class="tag d">clock gating · operand isolation</span>
+      <span class="tag d">security · reliability</span>
+    </div>
   </div>
-  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L07-efficient-design-quick.html" lang="ko">기법마다 무엇을 내주는지로 7절</a>
+  <a href="notes/L07-efficient-design-quick.html" lang="en">seven sections, on what each technique gives up</a>
 </div>
 
 <div class="mod soon">
   <div class="num">08</div>
   <div>
-    <div class="when">9/23 (Wed) · <span class="who">Prashant Joshi</span></div>
+    <div class="when">9/25 (Fri) · <span class="who">Prashant Joshi</span></div>
     <h3>Floating point arithmetic unit design</h3>
     <p lang="ko">Lecture 2의 Rule of 10에서 언급된 Intel 부동소수점 버그가 바로 이 종류의 유닛에서 났다. 게스트 강사 사정으로 9/21 에서 이 날로 밀렸다.</p>
     <p lang="en">The Intel floating point bug mentioned in Lecture 2's rule of 10 happened in exactly this kind of unit. Guest speaker availability pushed it here from 21 September.</p>

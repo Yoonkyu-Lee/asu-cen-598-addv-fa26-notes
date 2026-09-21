@@ -486,6 +486,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Bitwidth Reduction</div>
+  <div class="d" lang="ko">필요 없는 비트를 없애 데이터 폭을 줄이는 것. 강의 예가 <code>FP32 &rarr; INT8</code>, <code>INT16 &rarr; INT8</code> 이다. <strong>Area, Delay, Power 가 전부 좋아지는 드문 기법</strong>인데 공짜는 아니다. 내주는 것이 <strong>정확도</strong>라서 PPA 표 바깥에 있을 뿐이다. 괜찮은지는 회로가 아니라 <strong>응용이 정한다.</strong></div>
+  <div class="d" lang="en">Narrowing the data by removing bits you do not need, as in <code>FP32 &rarr; INT8</code> or <code>INT16 &rarr; INT8</code>. <strong>One of the rare techniques where area, delay and power all improve</strong>, and still not free: it pays in <strong>accuracy</strong>, which sits outside the PPA table. Whether that is acceptable is decided <strong>by the application, not the circuit.</strong></div>
+  <div class="src"><a href="L07-efficient-design.html#s3">Lecture 7 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Branch Prediction</div>
   <div class="d" lang="ko">분기 판정을 기다리지 않고 <strong>taken 인지 아닌지를 찍어서</strong> 계속 fetch 하는 것. static 은 방향만 본다 (뒤로 가는 분기면 taken, 루프일 가능성이 높으므로). dynamic 은 최근 분기 이력을 <strong>BTB</strong> 에 기록해서 참고한다. <strong>flush 를 없애는 게 아니라 flush 가 필요한 분기의 비율을 줄인다.</strong></div>
   <div class="d" lang="en">Guessing <strong>taken or not taken</strong> and continuing to fetch instead of waiting for the branch to resolve. Static prediction looks only at direction: backward means taken, since it is probably a loop. Dynamic prediction records recent branch history in a <strong>BTB</strong>. <strong>It does not remove flushes, it reduces the fraction of branches that need one.</strong></div>
@@ -521,6 +528,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gC">C</h2>
+
+<div class="gterm">
+  <div class="t">CAM &middot; Content-Addressable Memory</div>
+  <div class="d" lang="ko">주소가 아니라 <strong>내용으로 찾는 메모리.</strong> 값을 주면 그 값이 어디 있는지를 돌려준다. 강의에서는 숨김 슬라이드의 building block 목록에 이름만 나온다.</div>
+  <div class="d" lang="en">Memory looked up <strong>by content rather than address</strong>: give it a value and it tells you where that value is. In this course it appears only as a name in the building block list on a hidden slide.</div>
+  <div class="src"><a href="L07-efficient-design.html#s0">Lecture 7 &middot; 00</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">Canonical</div>
@@ -588,6 +602,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Concurrency</div>
+  <div class="d" lang="ko">일감을 나눠 <strong>여러 유닛이 동시에</strong> 처리하는 것. <strong>Pipelining 과 다르다.</strong> 강의 표현으로 <em>concurrency does things side-by-side; pipelining instead uses stages</em>. concurrency 는 같은 유닛을 여러 개 두고, pipelining 은 유닛 하나씩을 register 로 이어 붙인다. 둘을 같이 쓸 수도 있다.</div>
+  <div class="d" lang="en">Splitting the work so <strong>several units run at the same time.</strong> <strong>Not the same as pipelining:</strong> in the lecture’s words, <em>concurrency does things side-by-side; pipelining instead uses stages</em>. Concurrency duplicates the unit, pipelining chains one of each through registers. You can do both.</div>
+  <div class="src"><a href="L07-efficient-design.html#s6">Lecture 7 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Constrained Random</div>
   <div class="d" lang="ko">랜덤 자극을 넣되 <strong>constraint로 불법 입력을 걸러내는</strong> 방식. 아무 값이나 넣으면 설계가 애초에 대응할 필요 없는 상황에서 실패하고, 그건 버그가 아니다. 값뿐 아니라 <strong>타이밍과 순서</strong>도 randomize 하는 것이 핵심이다.</div>
   <div class="d" lang="en">Random stimulus with <strong>constraints filtering out illegal inputs.</strong> Throw anything in and the design fails in a situation it was never required to handle, which is not a bug. The important part is randomising <strong>timing and ordering</strong>, not just values.</div>
@@ -606,6 +627,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">명령어 하나당 몇 사이클이 드는가. <strong>IPC 의 역수다.</strong> microarchitecture 를 비교할 때 쓴다. <strong>CPI 만으로 속도를 말할 수 없다.</strong> 클럭 주파수와 같이 봐야 한다.</div>
   <div class="d" lang="en">How many cycles one instruction costs. <strong>The reciprocal of IPC.</strong> Used to compare microarchitectures. <strong>CPI alone does not tell you speed</strong>, you need the clock frequency with it.</div>
   <div class="src"><a href="L06-pipelined-cpu-design.html#s2">Lecture 6 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Critical Path</div>
+  <div class="d" lang="ko">register 에서 register 까지 가는 경로 중 <strong>가장 오래 걸리는 것.</strong> 클럭 주기가 이것보다 짧으면 회로가 틀린다. <strong>고치면 두 번째로 길던 경로가 새 critical path 가 된다.</strong> 그래서 timing 작업은 한 번에 끝나지 않는다.</div>
+  <div class="d" lang="en">The <strong>slowest register to register path.</strong> A clock period shorter than this makes the circuit wrong. <strong>Fix it and the runner-up becomes the new critical path</strong>, which is why timing work never finishes in one pass.</div>
+  <div class="src"><a href="L07-efficient-design.html#s4">Lecture 7 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -708,6 +736,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">DVFS &middot; Dynamic Voltage and Frequency Scaling</div>
+  <div class="d" lang="ko">부하에 맞춰 <strong>전압과 주파수를 함께 조절</strong>해 전력을 아끼는 것. 노트북이 한가할 때 팬이 조용해지는 것이 이것이다.</div>
+  <div class="d" lang="en">Saving power by <strong>scaling voltage and frequency together</strong> with the workload. It is why a laptop fan goes quiet when nothing is happening.</div>
+  <div class="src"><a href="L07-efficient-design.html#s5">Lecture 7 &middot; 05</a></div>
+</div>
+
 <h2 class="gletter" id="gE">E</h2>
 
 <div class="gterm">
@@ -778,6 +813,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">회로에는 있지만 <strong>실제로는 절대 활성화되지 않는 timing path.</strong> STA는 모든 경로를 똑같이 "매 클럭 동작한다"고 가정하므로, 이런 경로는 사람이 timing constraint로 알려줘야 한다. <strong>잘못 선언하면 진짜 위반을 도구가 조용히 무시한다.</strong></div>
   <div class="d" lang="en">A timing path that exists in the circuit but <strong>is never actually activated.</strong> STA assumes every path runs every clock, so a human must declare these through timing constraints. <strong>Declare one wrongly and the tool quietly ignores a real violation.</strong></div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s5">Lecture 2 · 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Fanout</div>
+  <div class="d" lang="ko">한 신호가 <strong>몇 군데를 먹이는가.</strong> 너무 많으면 그 신호가 느려진다. 강의의 해법은 <strong>만드는 쪽을 복제해 부하를 나누는 것</strong>이고, 대가는 면적과 전력이다.</div>
+  <div class="d" lang="en"><strong>How many loads one signal drives.</strong> Too many and that signal gets slow. The lecture’s fix is <strong>duplicating the driver to split the load</strong>, paid for in area and power.</div>
+  <div class="src"><a href="L07-efficient-design.html#s4">Lecture 7 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -1013,6 +1055,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L02-design-and-verification-overview.html#s14">Lecture 2 · 14</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">LUT &middot; Look-Up Table</div>
+  <div class="d" lang="ko">계산하는 대신 <strong>미리 구해둔 답을 꺼내 쓰는 표.</strong> 복잡한 조합 연산을 메모리 읽기로 바꾼다. 강의 예가 Taylor 급수 <code>EXP</code> 를 LUT 기반 <code>EXP</code> 로 바꾸는 것이다.</div>
+  <div class="d" lang="en">A table of <strong>precomputed answers used instead of computing.</strong> It turns a complicated combinational operation into a memory read. The lecture’s example swaps a Taylor series <code>EXP</code> for a LUT based one.</div>
+  <div class="src"><a href="L07-efficient-design.html#s6">Lecture 7 &middot; 06</a></div>
+</div>
+
 <h2 class="gletter" id="gM">M</h2>
 
 <div class="gterm">
@@ -1099,6 +1148,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gO">O</h2>
 
 <div class="gterm">
+  <div class="t">Operand Isolation</div>
+  <div class="d" lang="ko">출력이 필요 없을 때 조합 블록 <strong>안에서 쓸데없이 토글하는 것을 막는 것.</strong> 입력을 먼저 0 으로 묶어 안쪽이 안 움직이게 한다. <strong>시뮬레이션에서는 차이가 안 보인다.</strong> 기능은 원래도 맞았고 전력만 새고 있었기 때문이다. 대가는 입력 경로에 붙는 mux 다.</div>
+  <div class="d" lang="en">Stopping <strong>needless toggling inside a combinational block</strong> when its output is not wanted, by pinning the inputs to zero first. <strong>Simulation shows no difference:</strong> the function was always correct and only the power was leaking. The cost is a mux on the input path.</div>
+  <div class="src"><a href="L07-efficient-design.html#s5">Lecture 7 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Operator Strength Reduction</div>
+  <div class="d" lang="ko">비싼 연산을 싼 연산으로 바꾸는 것. 강의 예가 <strong>곱셈을 shift 로</strong> 바꾸는 것이다. 2 의 거듭제곱 곱셈은 배선만으로 되므로 곱셈기가 통째로 사라진다. 내주는 것은 <strong>일반성</strong>이다.</div>
+  <div class="d" lang="en">Swapping an expensive operator for a cheap one. The lecture’s example is <strong>multiplication into shifts</strong>: multiplying by a power of two is just wiring, so the multiplier disappears. What it costs is <strong>generality.</strong></div>
+  <div class="src"><a href="L07-efficient-design.html#s6">Lecture 7 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">OVM · VMM</div>
   <div class="f">Open Verification Methodology · Verification Methodology Manual</div>
   <div class="d" lang="ko">UVM 이전의 검증 방법론들. <strong>UVM이 이 둘을 합쳐 표준이 됐다.</strong> 지금 새로 배우는 건 UVM이고, 이 둘은 예전 코드에서 마주칠 이름이다.</div>
@@ -1151,6 +1214,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L04-clock-and-reset.html#s2">Lecture 4 · 02</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">Power Gating</div>
+  <div class="d" lang="ko">쓰지 않는 <strong>블록 전체의 전원을 내리는 것.</strong> <a href="L02-design-and-verification-overview.html#s10">clock gating</a> 과 다르다. clock 을 끊으면 flip-flop 이 값을 들고 있지만, <strong>전원을 내리면 상태가 날아간다.</strong> 다시 켤 때 복원 비용이 크므로 <strong>오래 쉴 때만</strong> 쓴다.</div>
+  <div class="d" lang="en">Shutting down <strong>the supply to a whole block.</strong> Not the same as <a href="L02-design-and-verification-overview.html#s10">clock gating</a>: cutting the clock leaves the flip-flops holding their values, while <strong>cutting the power loses the state.</strong> Waking costs enough that it is <strong>for long idles only.</strong></div>
+  <div class="src"><a href="L07-efficient-design.html#s5">Lecture 7 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">PPA &middot; Power, Performance, Area</div>
+  <div class="d" lang="ko">칩 설계에서 <strong>거의 모든 판단의 기준이 되는 세 축.</strong> 슬라이드가 셋을 다 잡는 것을 <strong>The Holy Grail</strong> 이라 부른다. 대개 하나를 얻으면 하나를 내준다. synthesis 가 끝날 때마다 이 세 가지 리포트가 나온다. <strong>Performance 자리에 Delay 를 쓰면 방향이 반대가 된다.</strong> delay 는 작을수록, performance 는 클수록 좋다.</div>
+  <div class="d" lang="en"><strong>The three axes behind nearly every decision</strong> in chip design. The slide calls getting all three <strong>The Holy Grail.</strong> Usually one gain costs another, and synthesis reports all three every run. <strong>Putting Delay in the Performance column flips the direction:</strong> smaller delay is better, larger performance is better.</div>
+  <div class="src"><a href="L07-efficient-design.html#s2">Lecture 7 &middot; 02</a></div>
+</div>
+
 <h2 class="gletter" id="gR">R</h2>
 
 <div class="gterm">
@@ -1181,6 +1258,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">비동기 reset의 <strong>assert는 그대로 두고 de-assert만</strong> 목적지 클럭에 맞춰 내보내는 회로. <strong>Double-FF synchronizer와 회로 모양이 똑같지만</strong>, 통과시키는 게 데이터가 아니라 reset이라는 게 다르다.</div>
   <div class="d" lang="en">A circuit that <strong>leaves the assertion alone and aligns only the de-assertion</strong> of an asynchronous reset to the destination clock. <strong>Drawn identically to a double-FF synchroniser</strong>, but what passes through it is a reset, not data.</div>
   <div class="src"><a href="L04-clock-and-reset.html#s11">Lecture 4 · 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Resource Sharing</div>
+  <div class="d" lang="ko">같은 하드웨어를 <strong>여러 연산이 돌려 쓰게 해서 면적을 줄이는 것.</strong> 강의가 방법을 구체적으로 든다. multiplier 를 명시적으로 instantiate 하고 주위에 control logic 을 쓰거나, 곱셈을 state machine 바깥에 두거나. 대가는 <strong>mux 와 늘어난 사이클</strong>이다.</div>
+  <div class="d" lang="en">Letting <strong>several operations take turns on the same hardware to save area.</strong> The lecture is specific: instantiate the multiplier explicitly and write control logic around it, or keep the multiply outside the state machine. The cost is <strong>muxes and extra cycles.</strong></div>
+  <div class="src"><a href="L07-efficient-design.html#s3">Lecture 7 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -1230,10 +1314,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">SECDED &middot; Single Error Correct, Double Error Detect</div>
+  <div class="d" lang="ko">ECC 의 흔한 등급. <strong>한 비트 오류는 고치고 두 비트 오류는 검출만</strong> 한다. OpenTitan 의 <code>prim_secded_*</code> 가 실제 구현 예다.</div>
+  <div class="d" lang="en">A common ECC grade: <strong>correct one bit error, detect two.</strong> OpenTitan’s <code>prim_secded_*</code> is a real implementation.</div>
+  <div class="src"><a href="L07-efficient-design.html#s11">Lecture 7 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Setup Time</div>
   <div class="d" lang="ko">클럭 엣지가 오기 <strong>전에</strong> 데이터가 미리 안정돼 있어야 하는 최소 시간(<code>tSetUp</code>). flip-flop 셀의 물리적 특성치이고 라이브러리(<code>.lib</code>)에 들어 있으며, <strong>STA가 이 값을 읽어서 검사한다.</strong> hold time과 방향이 반대다.</div>
   <div class="d" lang="en">The minimum time data must already be stable <strong>before</strong> a clock edge (<code>tSetUp</code>). A physical property of the flip-flop cell, stored in the library and <strong>read by STA to check it.</strong> Points the opposite way from hold time.</div>
   <div class="src"><a href="L04-clock-and-reset.html#s1">Lecture 4 · 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Side-Channel Attack</div>
+  <div class="d" lang="ko">연산 자체가 아니라 <strong>전력 소모, 걸린 시간, 전자파</strong> 같은 부수적 신호에서 비밀을 읽어내는 공격. 완화 기법이 <strong>이 강의의 나머지와 정면으로 충돌한다.</strong> dummy cycle 과 shuffling 은 일부러 쓸데없는 일을 시키는 것이라, 효율을 내주고 보안을 산다.</div>
+  <div class="d" lang="en">Reading a secret out of <strong>power draw, timing or emissions</strong> rather than out of the computation. The mitigations <strong>run straight into the rest of this lecture:</strong> dummy cycles and shuffling mean doing pointless work on purpose, buying security with efficiency.</div>
+  <div class="src"><a href="L07-efficient-design.html#s8">Lecture 7 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -1416,6 +1514,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">같은 논리를 <strong>세 벌 만들어 다수결</strong>로 결과를 내는 신뢰성 기법. 하나가 고장 나도 나머지 둘이 이긴다. 대가는 면적이 3배가 넘는다는 것이고, reliability와 area 사이 트레이드오프의 대표 사례다.</div>
   <div class="d" lang="en">A reliability technique that <strong>builds the same logic three times and votes.</strong> One failure loses to the other two. The price is more than triple the area, making it the standard example of the reliability against area trade-off.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TMR &middot; Triple Modular Redundancy</div>
+  <div class="d" lang="ko">같은 회로를 <strong>세 벌 두고 다수결</strong>로 결과를 정하는 것. 하나가 고장나도 나머지 둘이 이긴다. 대가가 <strong>면적 세 배 이상</strong>이라 (투표 회로까지 더해야 한다) <strong>고장이 사람을 다치게 하는 곳</strong>에만 쓴다. 자동차, 항공, 우주.</div>
+  <div class="d" lang="en"><strong>Three copies of the circuit and a majority vote.</strong> One failure loses to the other two. It costs <strong>more than three times the area</strong> once the voter is counted, so it is reserved for <strong>places where a failure hurts someone:</strong> automotive, avionics, space.</div>
+  <div class="src"><a href="L07-efficient-design.html#s8">Lecture 7 &middot; 08</a></div>
 </div>
 
 <div class="gterm">

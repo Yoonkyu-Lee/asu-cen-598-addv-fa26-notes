@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 7 빠른 읽기 &middot; Efficient Design Methods &middot; CEN 598 ADDV</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 7<br>Efficient Design Methods</h1>
+  <p class="subtitle" lang="ko">기법 스무 개가 20 쪽에 들어 있다. 외울 것은 이름이 아니라 <strong>기법마다 무엇을 내주는가</strong>다.</p>
+  <p class="subtitle" lang="en">Twenty techniques in twenty slides. What to remember is not the names but <strong>what each one gives up.</strong></p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L07-efficient-design.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L07-efficient-design.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 7</div>
+    <div class="name">Efficient Design Methods</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">코드가 아니라 회로</span><span lang="en">The circuit, not the code</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">PPA 와 맞바꿈</span><span lang="en">PPA and the trade</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">기법 카탈로그</span><span lang="en">The catalogue</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">도구와 사람의 경계</span><span lang="en">Tool versus human</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">PPA 밖의 축</span><span lang="en">Axes outside PPA</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+
+  <p lang="ko">이 강의는 <strong>같은 것을 더 잘 만드는 법의 목록</strong>이다. 기능은 맞다고 치고 작게, 빠르게, 적게 먹게 만든다. 슬라이드 20 쪽에 기법이 스물 몇 개 들어가므로 대부분 <strong>이름과 한 줄</strong>로 지나간다.</p>
+  <p lang="en">This lecture is <strong>a list of ways to build the same thing better.</strong> Function is assumed correct; make it smaller, faster, hungrier for less. Twenty-odd techniques in twenty slides means most get <strong>a name and one line.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">한 줄로</span><span lang="en">In one line</span></th>
+      <th><span lang="ko">내용</span><span lang="en">What it says</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">규칙</span><span lang="en">The rule</span></td><td><span lang="ko"><strong>There is no free lunch.</strong> 기법마다 benefit 과 cost 가 둘 다 있다</span><span lang="en"><strong>There is no free lunch.</strong> Every technique has both</span></td></tr>
+      <tr><td><span lang="ko">맞바꾸는 축</span><span lang="en">The axes traded</span></td><td><code>PPA</code> &middot; Power, Performance, Area. <span lang="ko">슬라이드가 <strong>The Holy Grail</strong> 이라 부른다</span><span lang="en">the slide calls it <strong>The Holy Grail</strong></span></td></tr>
+      <tr><td><span lang="ko">태도</span><span lang="en">The attitude</span></td><td><span lang="ko"><strong>코드가 아니라 회로를 보라</strong></span><span lang="en"><strong>understand the hardware, not the code</strong></span></td></tr>
+      <tr><td><span lang="ko">경계</span><span lang="en">The boundary</span></td><td><span lang="ko">도구는 <strong>의미를 안 바꾸는 변환</strong>을, 사람은 <strong>의미를 바꾸는 결정</strong>을 한다</span><span lang="en">tools do <strong>meaning preserving transforms</strong>, you make <strong>meaning changing decisions</strong></span></td></tr>
+      <tr><td><span lang="ko">PPA 밖</span><span lang="en">Outside PPA</span></td><td><span lang="ko">security 와 reliability. 여기서 최적화는 <strong>대개 더 넣는 것</strong>이다</span><span lang="en">security and reliability, where optimising usually means <strong>adding</strong></span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">코드가 아니라 회로</h2><h2 lang="en">The circuit, not the code</h2></div>
+
+  <div class="def">
+    <p lang="ko">슬라이드 6쪽은 한 문장뿐이다. <strong>Understand what hardware you are designing. Not what you are coding.</strong></p>
+    <p lang="en">Slide 6 is a single sentence. <strong>Understand what hardware you are designing. Not what you are coding.</strong></p>
+  </div>
+
+  <p lang="ko">앞 슬라이드의 제목이 <strong>Design Guidelines vs. Design Efficiency</strong> 다. <code>vs.</code> 가 핵심이다. 모듈화, 추상화, naming convention 은 전부 <strong>사람을 위한 것</strong>이지 회로를 위한 게 아니다. 모듈 경계가 깔끔하면 읽기는 좋은데 <strong>synthesis 가 그 경계를 넘나들며 최적화하지 못한다.</strong></p>
+  <p lang="en">The slide before it is titled <strong>Design Guidelines vs. Design Efficiency.</strong> The <code>vs.</code> is the point. Modularity, abstraction and naming conventions are <strong>for people</strong>, not for the circuit. Clean module boundaries read well and <strong>stop synthesis from optimising across them.</strong></p>
+
+  <p lang="ko">가장 선명한 예가 <strong>operand isolation</strong> 이다. 슬라이드 본문에는 정의 한 줄뿐인데 <strong>발표자 노트에 코드가 들어 있다.</strong> 이 덱에서 노트가 붙은 유일한 장이다.</p>
+  <p lang="en">The sharpest example is <strong>operand isolation.</strong> The slide body has one line of definition and <strong>the speaker notes carry the code.</strong> The only slide in the deck with notes.</p>
+
+  <pre class="code" lang="ko"><span class="c">// 전. enable 이 0 이어도 a 나 b 가 바뀌면 곱셈기가 통째로 토글한다</span>
+<span class="k">wire</span> [<span class="n">31</span>:<span class="n">0</span>] mult_out = a * b;
+<span class="k">always</span> @(<span class="k">posedge</span> clk) <span class="k">if</span> (enable) result &lt;= mult_out;
+
+<span class="c">// 후. 입력을 먼저 0 으로 묶으면 안쪽이 안 움직인다</span>
+<span class="k">wire</span> [<span class="n">31</span>:<span class="n">0</span>] a_iso = enable ? a : <span class="n">32'b0</span>;
+<span class="k">wire</span> [<span class="n">31</span>:<span class="n">0</span>] b_iso = enable ? b : <span class="n">32'b0</span>;
+<span class="k">wire</span> [<span class="n">63</span>:<span class="n">0</span>] mult_out = a_iso * b_iso;</pre>
+  <pre class="code" lang="en"><span class="c">// before. with enable low, a change on a or b still toggles the whole multiplier</span>
+<span class="k">wire</span> [<span class="n">31</span>:<span class="n">0</span>] mult_out = a * b;
+<span class="k">always</span> @(<span class="k">posedge</span> clk) <span class="k">if</span> (enable) result &lt;= mult_out;
+
+<span class="c">// after. pin the inputs to zero first and nothing inside moves</span>
+<span class="k">wire</span> [<span class="n">31</span>:<span class="n">0</span>] a_iso = enable ? a : <span class="n">32'b0</span>;
+<span class="k">wire</span> [<span class="n">31</span>:<span class="n">0</span>] b_iso = enable ? b : <span class="n">32'b0</span>;
+<span class="k">wire</span> [<span class="n">63</span>:<span class="n">0</span>] mult_out = a_iso * b_iso;</pre>
+
+  <div class="trap">
+    <p lang="ko"><strong>위 코드는 기능적으로 완전히 맞다.</strong> <code>enable</code> 이 0 이면 결과를 안 쓰니 틀릴 일이 없고, <strong>시뮬레이션에서 두 코드가 똑같이 동작한다.</strong> 검증도 똑같이 통과한다. 차이는 <strong>합성된 회로에서만</strong> 보이고 전력 리포트에서만 드러난다. 슬라이드 6쪽의 문장이 뜻하는 바가 이것이다.</p>
+    <p lang="en"><strong>The first version is functionally perfect.</strong> With <code>enable</code> low the result is discarded, and <strong>both versions behave identically in simulation.</strong> Verification passes either way. The difference exists <strong>only in the synthesised circuit</strong> and only shows up in a power report. That is what slide 6 means.</p>
+    <p lang="ko">대가도 있다. mux 두 개가 <strong>곱셈기 입력 경로에 붙으므로 critical path 가 조금 길어진다.</strong> 곱셈기가 충분히 크고 <code>enable</code> 이 자주 0 일 때만 이득이다.</p>
+    <p lang="en">It costs something too. The two muxes sit <strong>on the multiplier input path, so the critical path grows a little.</strong> It only pays when the multiplier is big and <code>enable</code> is often low.</p>
+  </div>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">PPA 와 맞바꿈</h2><h2 lang="en">PPA and the trade</h2></div>
+
+  <figure>
+    <svg viewBox="0 0 700 234" role="img" aria-label="Power, Performance, Area 세 축과 그 사이의 맞바꿈">
+      <defs>
+        <marker id="qa-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--amber)"/>
+        </marker>
+      </defs>
+      <circle cx="350" cy="54" r="38" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="350" y="58" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">Power</text>
+      <circle cx="152" cy="170" r="38" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="152" y="174" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">Performance</text>
+      <circle cx="548" cy="170" r="38" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="548" y="174" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">Area</text>
+      <path d="M196 158 L306 70" stroke="var(--amber)" stroke-width="1.5" marker-start="url(#qa-t)" marker-end="url(#qa-t)"/>
+      <path d="M394 70 L504 158" stroke="var(--amber)" stroke-width="1.5" marker-start="url(#qa-t)" marker-end="url(#qa-t)"/>
+      <path d="M194 178 L506 178" stroke="var(--amber)" stroke-width="1.5" marker-start="url(#qa-t)" marker-end="url(#qa-t)"/>
+      <text class="svgtxt" x="196" y="104" text-anchor="start" style="font-size:9.5px;fill:var(--amber)" lang="ko">빠르게 하면 더 먹는다</text>
+      <text class="svgtxt" x="196" y="104" text-anchor="start" style="font-size:9.5px;fill:var(--amber)" lang="en">faster draws more</text>
+      <text class="svgtxt" x="504" y="104" text-anchor="end" style="font-size:9.5px;fill:var(--amber)" lang="ko">키우면 더 먹는다</text>
+      <text class="svgtxt" x="504" y="104" text-anchor="end" style="font-size:9.5px;fill:var(--amber)" lang="en">bigger draws more</text>
+      <text class="svgtxt" x="350" y="196" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)" lang="ko">작게 하면 느려진다</text>
+      <text class="svgtxt" x="350" y="196" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)" lang="en">smaller runs slower</text>
+      <text class="svgtxt" x="350" y="222" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">셋 다 잡는 것을 슬라이드가 The Holy Grail 이라 부른다</text>
+      <text class="svgtxt" x="350" y="222" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">the slide calls getting all three The Holy Grail</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 4쪽과 7쪽. 화살표가 양방향인 것이 중요하다. 어느 쪽으로 밀어도 반대쪽이 따라 움직인다.</figcaption>
+    <figcaption lang="en">Slides 4 and 7. The arrows point both ways on purpose: push either direction and the other end moves with it.</figcaption>
+  </figure>
+
+  <div class="trap">
+    <p lang="ko"><strong>Performance 자리에 Delay 를 쓰면 방향이 반대가 된다.</strong> 슬라이드 19쪽의 연습 표가 <code>Delay</code> 열을 쓴다. <strong>delay 는 작을수록 좋고 performance 는 클수록 좋다.</strong> 이걸 놓치면 표를 통째로 거꾸로 채운다.</p>
+    <p lang="en"><strong>Putting Delay where Performance was flips the direction.</strong> The exercise table on slide 19 uses a <code>Delay</code> column. <strong>Smaller delay is better, larger performance is better.</strong> Miss it and you fill the whole table backwards.</p>
+  </div>
+
+  <p lang="ko">예외도 있다. <strong>bitwidth 축소</strong>(<code>FP32 &rarr; INT8</code>)와 <strong>operator strength reduction</strong>(곱셈 &rarr; shift)은 <strong>셋 다 좋아진다.</strong> 공짜처럼 보이는데 내주는 것이 <strong>표 바깥에</strong> 있을 뿐이다. 앞엣것은 <strong>정확도</strong>, 뒤엣것은 <strong>일반성</strong>이다.</p>
+  <p lang="en">There are exceptions. <strong>Bitwidth reduction</strong> (<code>FP32 &rarr; INT8</code>) and <strong>operator strength reduction</strong> (multiply to shift) <strong>improve all three.</strong> They look free because what they cost is <strong>outside the table:</strong> accuracy for the first, generality for the second.</p>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">기법 카탈로그</h2><h2 lang="en">The catalogue</h2></div>
+
+  <p lang="ko">축별로 묶으면 이렇다. 각 항목의 대가까지 붙였다.</p>
+  <p lang="en">Grouped by axis, with the cost of each attached.</p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">축</span><span lang="en">Axis</span></th>
+      <th><span lang="ko">기법</span><span lang="en">Techniques</span></th>
+      <th><span lang="ko">쪽</span><span lang="en">Slide</span></th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Area</strong></td>
+        <td><span lang="ko"><strong>resource sharing</strong> (대가: mux 와 사이클), <strong>logic minimization</strong> (식 다시 쓰기, 상수 접기), <strong>bitwidth 축소</strong> (대가: 정확도)</span><span lang="en"><strong>resource sharing</strong> (costs muxes and cycles), <strong>logic minimisation</strong> (rewriting, constant folding), <strong>bitwidth reduction</strong> (costs accuracy)</span></td>
+        <td>8</td>
+      </tr>
+      <tr>
+        <td><strong>Timing</strong></td>
+        <td><span lang="ko"><strong>critical path 단축</strong>, <strong>pipelining</strong> (대가: 면적, 전력, latency), <strong>retiming</strong> (register 를 새로 넣는 게 아니라 옮긴다), <strong>복제</strong> (fanout 을 줄인다), <strong>building block 선택</strong></span><span lang="en"><strong>critical path reduction</strong>, <strong>pipelining</strong> (costs area, power, latency), <strong>retiming</strong> (moving registers, not adding them), <strong>duplication</strong> (cuts fanout), <strong>block selection</strong></span></td>
+        <td>9</td>
+      </tr>
+      <tr>
+        <td><strong>Power</strong></td>
+        <td><span lang="ko"><strong>clock gating</strong>, <strong>power gating</strong>, <strong>operand isolation</strong>, <code>DVFS</code></span><span lang="en"><strong>clock gating</strong>, <strong>power gating</strong>, <strong>operand isolation</strong>, <code>DVFS</code></span></td>
+        <td>11</td>
+      </tr>
+      <tr>
+        <td><span lang="ko"><strong>그 밖</strong></span><span lang="en"><strong>The rest</strong></span></td>
+        <td><span lang="ko"><strong>concurrency</strong>, <strong>상수 하드코딩</strong>, <strong>LUT 로 미리 계산</strong>, <strong>구간 선형 근사</strong>, <strong>strength reduction</strong>, <strong>제어 로직 단순화</strong>, <strong>데이터 인코딩</strong> (gray, one-hot), <strong>트리 균형</strong></span><span lang="en"><strong>concurrency</strong>, <strong>constant hardcoding</strong>, <strong>LUT precomputation</strong>, <strong>piecewise linear</strong>, <strong>strength reduction</strong>, <strong>control simplification</strong>, <strong>data encoding</strong> (gray, one-hot), <strong>tree balancing</strong></span></td>
+        <td>12, 14</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="trap">
+    <p lang="ko"><strong>Clock gating 과 power gating 은 다르다.</strong> 구별 기준 한 줄은 <strong>상태가 남는가</strong>다.</p>
+    <p lang="en"><strong>Clock gating and power gating differ.</strong> The one line test is <strong>whether state survives.</strong></p>
+    <ul>
+      <li lang="ko"><strong>Clock gating</strong> &middot; clock 만 끊는다. flip-flop 이 값을 <strong>그대로 들고 있다.</strong> 다시 켜는 비용이 거의 없어 <strong>짧게 쉴 때</strong></li>
+      <li lang="en"><strong>Clock gating</strong> &middot; cut the clock only. Flip-flops <strong>keep their values.</strong> Waking is nearly free, so it is for <strong>short idles</strong></li>
+      <li lang="ko"><strong>Power gating</strong> &middot; 전원을 내린다. 상태가 <strong>날아간다.</strong> 복원 비용이 커서 <strong>길게 쉴 때</strong></li>
+      <li lang="en"><strong>Power gating</strong> &middot; cut the supply. State is <strong>lost.</strong> Restoring costs enough that it is for <strong>long idles</strong></li>
+    </ul>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>Concurrency 와 pipelining 도 다르다.</strong> 숨김 슬라이드 13쪽이 이 구별을 위해 있다. 슬라이드의 문장이 가장 깔끔하다. <strong>Concurrency does things side-by-side; pipelining instead uses stages (like a factory line).</strong> concurrency 는 유닛을 여러 개 두고, pipelining 은 유닛 하나씩을 register 로 이어 붙인다. <strong>둘을 같이 쓸 수도 있다.</strong></p>
+    <p lang="en"><strong>Concurrency and pipelining differ too.</strong> Hidden slide 13 exists for this, and its own sentence is the cleanest: <strong>Concurrency does things side-by-side; pipelining instead uses stages (like a factory line).</strong> Concurrency duplicates units, pipelining chains one of each through registers. <strong>You can do both.</strong></p>
+  </div>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">도구와 사람의 경계</h2><h2 lang="en">Tool versus human</h2></div>
+
+  <div class="def">
+    <p lang="ko">슬라이드 15쪽도 한 문장이다. <strong>Synthesis and Physical Design tools can do many of these. RTL designers need to focus on what they can't.</strong></p>
+    <p lang="en">Slide 15 is another single sentence. <strong>Synthesis and Physical Design tools can do many of these. RTL designers need to focus on what they can't.</strong></p>
+  </div>
+
+  <p lang="ko">슬라이드는 <strong>어느 것이 어느 쪽인지 말해주지 않는다.</strong> 아래는 자세한 판이 각 기법의 정의에서 갈라본 것이고, 가르는 기준은 하나다. <strong>도구는 의미를 안 바꾸는 변환만 한다.</strong></p>
+  <p lang="en">The slide <strong>does not sort them for you.</strong> The split below is the full note reasoning from the definitions, on one rule: <strong>a tool only applies transformations that preserve meaning.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">대체로 도구</span><span lang="en">Mostly the tool</span></th>
+      <th><span lang="ko">대체로 사람</span><span lang="en">Mostly you</span></th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><span lang="ko">logic minimization, 상수 전파, strength reduction, tree balancing, retiming</span><span lang="en">logic minimisation, constant propagation, strength reduction, tree balancing, retiming</span></td>
+        <td><span lang="ko">pipeline 단수, precision, LUT 로 바꿀지, 구간 선형 근사, building block 아키텍처, 무엇을 상수로 고정할지</span><span lang="en">pipeline depth, precision, whether to go to a LUT, piecewise linear, block architecture, which parameters to freeze</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">가운데도 있다. <strong>clock gating 과 resource sharing</strong> 은 도구가 상당 부분 해주는데 <strong>RTL 모양이 도구의 손을 묶는다.</strong> 슬라이드 8쪽이 곱셈을 state machine 바깥에 두라고 한 것이 그 이야기다.</p>
+  <p lang="en">Some sit in between. <strong>Clock gating and resource sharing</strong> are largely automatic, and <strong>the shape of the RTL can tie the tool's hands.</strong> That is what slide 8 means by keeping the multiply outside the state machine.</p>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">PPA 밖의 축</h2><h2 lang="en">Axes outside PPA</h2></div>
+
+  <p lang="ko">슬라이드 16쪽과 17쪽이 축 둘을 더 든다. <strong>여기서 최적화한다는 것은 대개 더 넣는다는 뜻</strong>이라 방향이 반대다.</p>
+  <p lang="en">Slides 16 and 17 add two more axes, where <strong>optimising usually means adding</strong>, so the direction is reversed.</p>
+
+  <ul>
+    <li lang="ko"><strong>Security</strong> &middot; secure boot 과 암호화 (<code>RSA</code>, <code>ECC</code>, <code>SHA</code>, <code>AES</code> 블록), 하드웨어 난독화, side-channel 완화, 접근 제어 (ARM TrustZone)</li>
+    <li lang="en"><strong>Security</strong> &middot; secure boot and encryption (<code>RSA</code>, <code>ECC</code>, <code>SHA</code>, <code>AES</code> blocks), hardware obfuscation, side-channel mitigation, access control (ARM TrustZone)</li>
+    <li lang="ko"><strong>Reliability</strong> &middot; parity 와 <code>ECC</code> 로 오류 검출과 정정, <code>TMR</code> 같은 중복 (같은 회로 셋에 다수결, 면적 세 배 이상)</li>
+    <li lang="en"><strong>Reliability</strong> &middot; parity and <code>ECC</code> for detection and correction, redundancy such as <code>TMR</code> (three copies and a vote, more than triple the area)</li>
+  </ul>
+
+  <div class="trap">
+    <p lang="ko"><strong><code>ECC</code> 가 이 덱 안에서 두 가지 뜻이다.</strong> 슬라이드가 연달아 나오므로 문맥으로 갈라야 한다.</p>
+    <p lang="en"><strong><code>ECC</code> means two things in this one deck</strong>, on back to back slides, so context is the only separator.</p>
+    <ul>
+      <li lang="ko"><strong>16쪽 (security)</strong> &middot; Elliptic Curve Cryptography. RSA, SHA, AES 와 나란히 있다</li>
+      <li lang="en"><strong>Slide 16, security</strong> &middot; elliptic curve cryptography, listed with RSA, SHA and AES</li>
+      <li lang="ko"><strong>17쪽 (reliability)</strong> &middot; Error-Correcting Code. parity bit 와 나란히 있다</li>
+      <li lang="en"><strong>Slide 17, reliability</strong> &middot; error-correcting code, listed with parity bits</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <p lang="ko"><strong>Side-channel 완화가 이 강의의 나머지와 정면으로 충돌한다.</strong> dummy cycle 과 shuffling 은 <strong>일부러 쓸데없는 일을 시키는 것</strong>이다. 연산 시간과 전력이 데이터에 따라 달라지면 그 차이로 비밀이 새기 때문이다. 슬라이드 4쪽의 no free lunch 가 이렇게도 성립한다.</p>
+    <p lang="en"><strong>Side-channel mitigation runs into the rest of the lecture.</strong> Dummy cycles and shuffling mean <strong>doing pointless work on purpose</strong>, because if time or power varies with the data, that variation leaks the secret. Another shape of the no free lunch rule from slide 4.</p>
+  </div>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">문제 모양</span><span lang="en">Shape of the question</span></th>
+      <th><span lang="ko">구별 기준 한 줄</span><span lang="en">The one line that decides it</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">기법 하나를 주고 Area / Delay / Power 방향</span><span lang="en">given a technique, the direction of area, delay and power</span></td><td><span lang="ko">슬라이드 19쪽 표가 그대로 문제다. <a href="L07-efficient-design.html#s10">자세한 판 10절에 눌러보는 도구</a>가 있다</span><span lang="en">the table on slide 19 is already the question. <a href="L07-efficient-design.html#s10">Section 10 of the full note has a tool for it</a></span></td></tr>
+      <tr><td>Clock gating / Power gating</td><td><span lang="ko"><strong>상태가 남는가</strong></span><span lang="en"><strong>does state survive</strong></span></td></tr>
+      <tr><td>Concurrency / Pipelining</td><td><span lang="ko"><strong>나란히 하느냐 단계로 하느냐</strong></span><span lang="en"><strong>side by side, or in stages</strong></span></td></tr>
+      <tr><td><code>ECC</code></td><td><span lang="ko"><strong>보안 문맥이면 타원곡선, 메모리 문맥이면 오류정정</strong></span><span lang="en"><strong>security context means elliptic curve, memory context means error correction</strong></span></td></tr>
+      <tr><td><span lang="ko">도구가 하는 것 / 사람이 정할 것</span><span lang="en">tool versus human</span></td><td><span lang="ko"><strong>의미가 바뀌는가.</strong> 결과가 달라지면 사람이 정한다</span><span lang="en"><strong>does meaning change.</strong> if the result differs, a human decides</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>Lab 과의 연결.</strong> 이 강의는 특정 Lab 이 아니라 <strong>모든 Lab 에 걸린다.</strong> <a href="L06-pipelined-cpu-design.html">Lab 2 의 pipelined MIPS</a> 에서 단수를 몇으로 할지, resource 를 공유할지, 어떤 adder 를 쓸지가 전부 이 목록이다.</p>
+    <p lang="en"><strong>How it connects to the labs.</strong> Not to one lab but <strong>to all of them.</strong> In <a href="L06-pipelined-cpu-design.html">Lab 2's pipelined MIPS</a>, how many stages, whether to share a resource, which adder to pick, all come off this list.</p>
+  </div>
+
+  <p lang="ko"><strong>다음 강의는 Lecture 8, Floating point arithmetic unit design</strong> (Prashant Joshi). 슬라이드 2쪽이 알리길 <strong>수요일 강의는 없고 금요일 오후 2:00-3:15</strong> 로 옮겼다. <span class="chip dim">확인 필요</span> 강의 사이트 Schedule 표는 아직 9/23 그대로다.</p>
+  <p lang="en"><strong>Next is Lecture 8, Floating point arithmetic unit design</strong> with Prashant Joshi. Slide 2 announces <strong>no lecture on Wednesday, Friday 2:00 to 3:15pm instead.</strong> <span class="chip dim">needs checking</span> The Schedule on the course site still says the 23rd.</p>
+</section>
+
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 7 개인 학습 노트 (빠른 읽기 판)<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 7 personal study notes (quick read)<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
