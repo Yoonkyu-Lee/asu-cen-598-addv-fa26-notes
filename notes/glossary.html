@@ -413,6 +413,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">almost_full · almost_empty</div>
+  <div class="d" lang="ko">FIFO 가 <strong>가득 차기 전에, 비기 전에</strong> 미리 알려주는 플래그. 문턱은 설계가 정한다. Lab 1 은 3/4 로 정했다. 포인터 비교만으로는 못 만들고 <strong>점유량을 세야</strong> 해서 gray code 포인터를 binary 로 되돌리는 계산이 붙는다.</div>
+  <div class="d" lang="en">Flags that warn <strong>before</strong> a FIFO is actually full or empty. The threshold is a design choice; Lab 1 puts it at 3/4. Pointer comparison alone cannot produce them: you have to <strong>count occupancy</strong>, which means turning gray-coded pointers back into binary.</div>
+  <div class="src"><a href="LAB1-fifo-design.html#s4">Lab 1 · 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">always_comb · always_ff</div>
   <div class="d" lang="ko">SystemVerilog가 추가한 <strong>의도를 밝히는 always 블록.</strong> <code>always_comb</code>은 조합 논리를, <code>always_ff</code>는 flip-flop을 만들 셈이라고 도구에게 선언한다. 어긋나면 경고가 나온다. <strong>선언한다고 저절로 그렇게 되지는 않는다.</strong> <code>always_ff</code>에도 <code>@(posedge)</code>와 non-blocking 대입은 직접 써야 한다.</div>
   <div class="d" lang="en">SystemVerilog blocks that <strong>declare your intent.</strong> <code>always_comb</code> says you meant combinational logic and <code>always_ff</code> says you meant flip-flops, and the tool warns when the code disagrees. <strong>Declaring does not make it so:</strong> you still write the <code>@(posedge)</code> and the non-blocking assignments yourself.</div>
@@ -529,6 +536,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">dynamic branch prediction 이 <strong>최근 수백 개의 분기 이력을 기록해두는 표.</strong> 두 가지를 담는다. <strong>분기 목적지</strong>와 <strong>실제로 taken 이었는지.</strong></div>
   <div class="d" lang="en">The table where dynamic branch prediction <strong>keeps the history of the last several hundred branches.</strong> It records two things: <strong>the branch destination</strong> and <strong>whether it was taken.</strong></div>
   <div class="src"><a href="L06-pipelined-cpu-design.html#s8">Lecture 6 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Burst</div>
+  <div class="d" lang="ko">짧은 시간에 몰려 들어오는 데이터 한 덩어리. FIFO 깊이는 평균 속도가 아니라 <strong>burst 동안 못 빠져나간 양</strong>으로 정한다. 평균 속도가 같아도 burst 가 있으면 깊이가 필요하다.</div>
+  <div class="d" lang="en">A clump of data arriving in a short window. FIFO depth is sized not by average rate but by <strong>what cannot drain during the burst.</strong> Equal average rates still need depth if the traffic is bursty.</div>
+  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a></div>
 </div>
 
 <div class="gterm">
@@ -1097,6 +1111,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Mealy · Moore</div>
+  <div class="d" lang="ko">출력이 <strong>지금의 입력을 직접 보면</strong> Mealy, <strong>상태만 보면</strong> Moore. 다음 상태가 입력에 걸리는 것은 둘 다 같다. 기준은 조합이냐 등록이냐가 아니라 입력을 보느냐다. 등록된 출력은 항상 Moore 다.</div>
+  <div class="d" lang="en">An output that <strong>looks at the present input directly</strong> is Mealy; one that <strong>looks only at state</strong> is Moore. Both have next-state logic that depends on inputs. The test is not combinational versus registered but whether an input is looked at. A registered output is always Moore.</div>
+  <div class="src"><a href="LAB1-fifo-design.html#s8">Lab 1 · 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Metastability</div>
   <div class="d" lang="ko">flip-flop의 D 입력이 <strong>setup/hold 윈도우 안에서 바뀌어</strong> Q가 0도 1도 아닌 불확정 상태로 한동안 머무는 현상. <strong>같은 클럭 도메인 안에서는 안 생기고</strong>, 동기화 없이 넘어온 비동기 신호에서만 생긴다. glitch와는 다른 현상이다.</div>
   <div class="d" lang="en">A flop's D input <strong>changes inside the setup/hold window</strong>, and Q sits undecided, neither 0 nor 1, for a while. <strong>It cannot happen inside one clock domain</strong>, only where an unsynchronised asynchronous signal walks straight in. Not the same thing as a glitch.</div>
@@ -1233,6 +1254,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">plusarg</div>
+  <div class="d" lang="ko"><code>+TEST_FLAGS</code> 처럼 <strong>실행할 때</strong> simv 에 주는 인자. testbench 가 <code>$test$plusargs</code> 나 <code>$value$plusargs</code> 로 읽는다. 테스트 여럿을 한 번 컴파일한 실행 파일 안에 넣고 고를 수 있게 해준다.</div>
+  <div class="d" lang="en">A run-time argument to simv, such as <code>+TEST_FLAGS</code>. The testbench reads it with <code>$test$plusargs</code> or <code>$value$plusargs</code>. It lets several tests live in one compiled executable and be picked at run time.</div>
+  <div class="src"><a href="LAB1-fifo-design.html#s5">Lab 1 · 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Power Gating</div>
   <div class="d" lang="ko">쓰지 않는 <strong>블록 전체의 전원을 내리는 것.</strong> <a href="L02-design-and-verification-overview.html#s10">clock gating</a> 과 다르다. clock 을 끊으면 flip-flop 이 값을 들고 있지만, <strong>전원을 내리면 상태가 날아간다.</strong> 다시 켤 때 복원 비용이 크므로 <strong>오래 쉴 때만</strong> 쓴다.</div>
   <div class="d" lang="en">Shutting down <strong>the supply to a whole block.</strong> Not the same as <a href="L02-design-and-verification-overview.html#s10">clock gating</a>: cutting the clock leaves the flip-flops holding their values, while <strong>cutting the power loses the state.</strong> Waking costs enough that it is <strong>for long idles only.</strong></div>
@@ -1269,6 +1297,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">task나 function의 인자를 <strong>복사하지 않고 원본을 가리켜서 넘기는 것.</strong> 보통 <code>output</code> 인자는 <strong>task가 끝날 때 한 번</strong> 복사해 돌려주지만, <code>ref</code>는 <strong>바뀌는 즉시</strong> 바깥에 보인다. 슬라이드의 말풍선이 <em>"All output updates seen"</em>, <em>"Input changes detected"</em>라고 적은 것이 이 뜻이다. <strong>합성되지 않는다.</strong> testbench 문법이다.</div>
   <div class="d" lang="en">Passing a task or function argument <strong>as a handle to the original rather than a copy.</strong> A plain <code>output</code> argument copies back <strong>once, when the task ends</strong>; a <code>ref</code> is visible outside <strong>the moment it changes.</strong> That is what the slide callouts mean by <em>"All output updates seen"</em> and <em>"Input changes detected"</em>. <strong>It does not synthesise</strong>: this is testbench syntax.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Registered Output</div>
+  <div class="d" lang="ko">모듈의 출력을 <strong>flip-flop 을 한 번 거쳐서</strong> 내보내는 것. 출력이 깨끗하고 타이밍 예산을 나누기 쉽지만 <strong>한 사이클이 더 붙는다.</strong> Cummings FIFO 의 <code>rempty</code> 가 그래서 쓰기 뒤 세 엣지에 내려간다.</div>
+  <div class="d" lang="en">Driving a module output <strong>through a flip-flop.</strong> The output is clean and timing budgets split neatly, but it <strong>costs one more cycle.</strong> That is why the Cummings FIFO's <code>rempty</code> falls three edges after a write.</div>
+  <div class="src"><a href="LAB1-fifo-design.html#s3">Lab 1 · 03</a></div>
 </div>
 
 <div class="gterm">

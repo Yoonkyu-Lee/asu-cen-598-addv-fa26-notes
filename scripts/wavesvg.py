@@ -8,6 +8,9 @@
 CSV 에 있는 것만 그린다.
 
 사용법:
+  신호 스펙은 name:kind:role 이다. kind 는 bit / bus / busx / clk, role 은 색을 정한다
+  (clk sig ver ok warn dim, 비우면 이름으로 짐작). CLAUDE.md 의 의미 고정 색상 그대로다.
+
   python scripts/wavesvg.py wave --csv t.csv --time cycle \\
       --signals "write_en:bit,data_in:bus,out_valid:bit,data_out:bus" \\
       --from 0 --to 60 --marks "12=1,41=2" --out frag.svg
@@ -30,7 +33,8 @@ CLK = 'var(--brown)'      # 클럭
 SIG = 'var(--blue)'       # 설계 쪽 신호
 VER = 'var(--pink)'       # 검증 쪽에서 미는 신호
 OK = 'var(--green)'       # 통과, 유효
-WARN = 'var(--amber)'     # 함정, 멈춤
+WARN = 'var(--amber)'     # 함정, 버그. 파형에서는 안 쓴다
+MARK = 'var(--sel)'       # 읽을 자리 마커. 선택 강조 토큰이다
 DIM = 'var(--ink3)'
 INK = 'var(--ink)'
 INK2 = 'var(--ink2)'
@@ -67,7 +71,12 @@ def window(rows, time_col, lo, hi):
     return out
 
 
-def colour_for(name, kind):
+ROLE = {'clk': CLK, 'sig': SIG, 'ver': VER, 'ok': OK, 'warn': WARN, 'dim': DIM}
+
+
+def colour_for(name, kind, role=''):
+    if role:
+        return ROLE[role]
     if kind == 'clk':
         return CLK
     if name.endswith('_en') or name.startswith('write') or name.startswith('read'):
@@ -110,11 +119,11 @@ def render_wave(rows, time_col, specs, marks, label, title_note):
     o.append('<text class="svglab" x="%d" y="%d" style="font-size:10px;fill:%s">%s</text>'
              % (4, HEAD - 28, DIM, esc(title_note)))
 
-    for si, (name, kind) in enumerate(specs):
+    for si, (name, kind, role) in enumerate(specs):
         top = HEAD + ROW * si
         base = top + ROW - 8          # 0 레벨
         high = base - WAVE            # 1 레벨
-        col = colour_for(name, kind)
+        col = colour_for(name, kind, role)
 
         o.append('<text class="svglab" x="%d" y="%.1f" style="font-size:11px;fill:%s">%s</text>'
                  % (4, base - 2, INK2, esc(name)))
@@ -140,19 +149,19 @@ def render_wave(rows, time_col, specs, marks, label, title_note):
                              % ((x0 + x1) / 2.0, base - 3, INK, esc(fmt(vals[i], kind))))
                 i = j + 1
         else:
-            # 0 과 1 의 사각 파형.
+            # 0 과 1 의 사각 파형. 값이 바뀌는 곳에서만 꺾는다. 샘플마다 점을 찍으면
+            # 1 ns 격자 트레이스에서 파일이 수십 KB 가 된다.
             d = []
             prev = None
             for i, v in enumerate(vals):
                 lvl = high if v not in ('0', '', 'x', 'X') else base
                 x0 = GUTTER + step * i
-                x1 = GUTTER + step * (i + 1)
                 if prev is None:
                     d.append('M%.1f,%.1f' % (x0, lvl))
                 elif lvl != prev:
-                    d.append('L%.1f,%.1f' % (x0, lvl))
-                d.append('L%.1f,%.1f' % (x1, lvl))
+                    d.append('H%.1f V%.1f' % (x0, lvl))
                 prev = lvl
+            d.append('H%.1f' % (GUTTER + step * n))
             o.append('<path d="%s" style="fill:none;stroke:%s;stroke-width:1.5"/>' % (' '.join(d), col))
 
     # 눈으로 짚을 자리. 숫자만 찍고 말은 HTML 이 한다.
@@ -167,8 +176,8 @@ def render_wave(rows, time_col, specs, marks, label, title_note):
         x = GUTTER + step * idx
         o.append('<line x1="%.1f" y1="%d" x2="%.1f" y2="%d" '
                  'style="stroke:%s;stroke-width:1.2;stroke-dasharray:3 3"/>'
-                 % (x, HEAD - 14, x, h - 18, WARN))
-        o.append('<circle cx="%.1f" cy="%d" r="8" style="fill:%s"/>' % (x, HEAD - 14, WARN))
+                 % (x, HEAD - 14, x, h - 18, MARK))
+        o.append('<circle cx="%.1f" cy="%d" r="8" style="fill:%s"/>' % (x, HEAD - 14, MARK))
         o.append('<text class="svgnum" x="%.1f" y="%d" style="font-size:10px;text-anchor:middle;fill:var(--paper)">%s</text>'
                  % (x, HEAD - 11, esc(tag)))
 
@@ -177,19 +186,20 @@ def render_wave(rows, time_col, specs, marks, label, title_note):
 
 
 def render_occ(rows, time_col, series, label, ymax=None):
+    """series 는 [(name, role, dashed)]. 두 FIFO 는 둘 다 설계 쪽이라 같은 파랑이고
+    실선과 점선으로 가른다. 색으로 가르면 의미 고정 색상을 어긴다."""
     n = len(rows)
     plot = W - GUTTER - PAD_R
     h = 200
     top, bot = 26, h - 30
     step = plot / float(n - 1 if n > 1 else 1)
 
-    data = {s: [int(r[s]) for r in rows] for s in series}
+    data = {s: [int(r[s]) for r in rows] for s, _, _ in series}
     hi = ymax or max(1, max(max(v) for v in data.values()))
 
     t0 = int(rows[0][time_col])
     t1 = int(rows[-1][time_col])
 
-    cols = [SIG, VER, OK, WARN]
     o = ['<svg viewBox="0 0 %d %d" role="img" aria-label="%s">' % (W, h, esc(label))]
 
     # y 눈금
@@ -209,14 +219,15 @@ def render_occ(rows, time_col, series, label, ymax=None):
         o.append('<text class="svgnum" x="%.1f" y="%d" style="font-size:10px;text-anchor:middle;fill:%s">%d</text>'
                  % (x, h - 12, DIM, t))
 
-    for si, s in enumerate(series):
-        col = cols[si % len(cols)]
+    for si, (s, role, dashed) in enumerate(series):
+        col = ROLE.get(role or 'sig', SIG)
+        dash = ';stroke-dasharray:5 4' if dashed else ''
         pts = []
         for i, v in enumerate(data[s]):
             x = GUTTER + step * i
             y = bot - (bot - top) * (v / float(hi))
             pts.append('%s%.1f,%.1f' % ('M' if i == 0 else 'L', x, y))
-        o.append('<path d="%s" style="fill:none;stroke:%s;stroke-width:1.6"/>' % (' '.join(pts), col))
+        o.append('<path d="%s" style="fill:none;stroke:%s;stroke-width:1.8%s"/>' % (' '.join(pts), col, dash))
         peak = max(data[s])
         pi = data[s].index(peak)
         px = GUTTER + step * pi
@@ -224,8 +235,12 @@ def render_occ(rows, time_col, series, label, ymax=None):
         o.append('<circle cx="%.1f" cy="%.1f" r="3" style="fill:%s"/>' % (px, py, col))
         o.append('<text class="svgnum" x="%.1f" y="%.1f" style="font-size:10px;fill:%s">%d</text>'
                  % (px + 6, py - 4, col, peak))
+        # 범례는 오른쪽 위에 가로로 늘어놓는다. 왼쪽에 두면 y 축 눈금 글자와 겹친다.
+        lx = W - PAD_R - 150 * (len(series) - si)
+        o.append('<line x1="%d" y1="%d" x2="%d" y2="%d" style="stroke:%s;stroke-width:1.8%s"/>'
+                 % (lx, 11, lx + 22, 11, col, dash))
         o.append('<text class="svglab" x="%d" y="%d" style="font-size:11px;fill:%s">%s</text>'
-                 % (4, top + 4 + si * 16, col, esc(s)))
+                 % (lx + 28, 15, INK2, esc(s)))
 
     o.append('</svg>')
     return '\n'.join(o)
@@ -255,9 +270,14 @@ def main():
             tok = tok.strip()
             if not tok:
                 continue
-            name, _, kind = tok.partition(':')
-            specs.append((name, kind or 'bit'))
-        missing = [n for n, _ in specs if n not in rows[0]]
+            parts = tok.split(':')
+            name = parts[0]
+            kind = parts[1] if len(parts) > 1 and parts[1] else 'bit'
+            role = parts[2] if len(parts) > 2 else ''
+            if role and role not in ROLE:
+                sys.exit('모르는 역할: %s (가능: %s)' % (role, ', '.join(ROLE)))
+            specs.append((name, kind, role))
+        missing = [n for n, _, _ in specs if n not in rows[0]]
         if missing:
             sys.exit('CSV 에 없는 신호: %s\n있는 것: %s'
                      % (', '.join(missing), ', '.join(rows[0].keys())))
@@ -270,8 +290,15 @@ def main():
             marks.append((int(t), tag))
         out = render_wave(rows, a.time, specs, marks, a.label, a.note)
     else:
-        series = [s.strip() for s in a.series.split(',') if s.strip()]
-        missing = [s for s in series if s not in rows[0]]
+        series = []
+        for tok in a.series.split(','):
+            tok = tok.strip()
+            if not tok:
+                continue
+            parts = tok.split(':')
+            series.append((parts[0], parts[1] if len(parts) > 1 else 'sig',
+                           len(parts) > 2 and parts[2] == 'dash'))
+        missing = [s for s, _, _ in series if s not in rows[0]]
         if missing:
             sys.exit('CSV 에 없는 신호: %s' % ', '.join(missing))
         out = render_occ(rows, a.time, series, a.label, a.ymax or None)

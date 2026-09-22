@@ -404,7 +404,9 @@ notes/                                            노트는 전부 여기 모은
   L03-system-verilog-for-design.html              Lecture 3
   L04-clock-and-reset.html                        Lecture 4
   L{NN}-{kebab-case-영문주제}.html
-  LAB{N}-{kebab-case-과제제목}.html               Lab 공략 (아래 참조)
+  LAB{N}-{kebab-case-과제제목}.html               Lab 페이지. 장르가 둘이다
+                                                  풀기 전 공략    -> write-note
+                                                  끝낸 뒤 기록    -> write-lab-note
   P03-before-lecture-3.html                       실습 입문 (아래 참조)
   P{NN}-{kebab}.html                              n 강을 읽기 전에 손에 익힐 동작.
                                                   data-slide 없음, reader.js 없음, sim.js 사용

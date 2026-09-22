@@ -854,14 +854,22 @@ a.mod:hover .num{color:var(--blue)}
   <a href="notes/PLAB0-rtl-to-gates.html" lang="ko">리포트 질문 5 번: 이 코드는 무슨 회로가 되나</a>
   <a href="notes/PLAB0-rtl-to-gates.html" lang="en">report question 5: what circuit does this code become?</a>
 </div>
-<div class="mod soon">
+<a class="mod" href="notes/LAB1-fifo-design.html">
   <div class="num">1</div>
   <div>
     <div class="when">9/14 (Mon) · Aman Arora</div>
     <h3>Lab 1 (FIFO) overview</h3>
+    <p lang="ko">공략이 아니라 기록. 스타터 없이 Cummings 논문 코드에서 출발해 비동기 FIFO 를 만들고, 그걸로 짝·홀 교대 회로를 동기·비동기 두 벌로 만들어 같은 testbench 로 쟀다. 무엇이 주어졌고 무엇을 얹었는지, 깊이가 왜 16 이 아니라 40 인지, 측정 도구가 두 번 틀린 이야기까지.</p>
+    <p lang="en">A record, not a walkthrough. No starter code: an asynchronous FIFO built up from the Cummings paper, then an even/odd alternating circuit built twice, synchronous and asynchronous, and measured on one testbench. What was given versus added, why the depth is 40 and not 16, and how the measuring tools were wrong twice.</p>
+    <div class="tags">
+      <span class="tag d">async FIFO · gray code · 2-FF sync</span>
+      <span class="tag d">even/odd FSM · depth 40</span>
+      <span class="tag v">testbench · trace · measurement bugs</span>
+      <span class="tag t">VCS · Apporto · Makefile</span>
+    </div>
   </div>
-  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
-</div>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
 <div class="mod soon">
   <div class="num">2</div>
   <div>
