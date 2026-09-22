@@ -21,7 +21,8 @@ GitHub Pages로 배포된다: https://yoonkyu-lee.github.io/asu-cen-598-addv-fa2
 |---|---|
 | 새 강의 노트를 쓴다 | `convert-slides` → `write-note` → `note-html` **셋 다** |
 | 기존 노트의 문구·도해를 고친다 | `note-html` |
-| Lab 공략 페이지를 쓴다 | `write-note` → `note-html` |
+| Lab 을 **풀기 전**에 공략 페이지를 쓴다 | `write-note` → `note-html` |
+| Lab 을 **끝낸 뒤**에 기록 페이지를 쓴다 | `write-lab-note` → `note-html` |
 | 슬라이드만 저장소에 넣는다 | `convert-slides` |
 | Synopsys 트레이닝을 수집한다 | `synopsys-training` (또는 `-chrome`) |
 | `index.html` 허브를 고친다 (카드·chip·공지 배너) | `note-html`, 노트를 새로 올리는 경우는 `write-note` 도 |
