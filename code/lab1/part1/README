@@ -1,0 +1,116 @@
+CSE 598 - Lab #1 (PART 1)
+Asynchronous FIFO
+
+DESCRIPTION
+-----------
+This project implements a parameterized asynchronous FIFO in SystemVerilog.
+
+The FIFO uses separate read and write clock domains, Gray-code pointers,
+two-flip-flop synchronizers for clock-domain crossing, and status flags
+for full, empty, almost_full, and almost_empty.
+
+DEPTH must be a power of two. async_fifo derives ADDR_WIDTH as $clog2(DEPTH)
+and fifo_mem builds 1<<ADDR_WIDTH entries, so a DEPTH of 12 silently becomes a
+FIFO of 16. The almost_full and almost_empty thresholds, (3*DEPTH)/4 and
+DEPTH/4, are integer divisions and are exact only for powers of two as well.
+
+
+FILES
+-----
+fifo_if.sv
+    SystemVerilog interface and modport used by the FIFO memory.
+
+fifo_mem.sv
+    FIFO memory/register array.
+
+sync_r2w.sv
+    Synchronizes the read pointer into the write clock domain.
+
+sync_w2r.sv
+    Synchronizes the write pointer into the read clock domain.
+
+fifo_rptr.sv
+    Read pointer, read address, empty, and almost_empty logic.
+
+fifo_wptr.sv
+    Write pointer, write address, full, and almost_full logic.
+
+async_fifo.sv
+    Top-level asynchronous FIFO connecting all internal blocks.
+
+tb_async_fifo.sv
+    SystemVerilog testbench containing the three verification scenarios.
+
+Makefile
+    Commands for compilation, simulation, Verdi, and cleanup.
+
+env.cshrc
+    Synopsys tool paths and licence settings, csh syntax.
+
+env.sh
+    The same settings in bash syntax. Use this one on Apporto.
+
+
+SETUP
+-----
+Change into this directory first, then load the course environment.
+
+The Apporto default shell is bash, so use env.sh:
+
+    source env.sh
+
+env.cshrc is the csh version of the same thing. It uses setenv, so sourcing it
+from bash prints "setenv: command not found" for every line and leaves VCS off
+the PATH. Use it only from csh or tcsh:
+
+    source env.cshrc
+
+Check it took effect before compiling:
+
+    which vcs
+
+
+COMPILATION
+-----------
+Compile the design and testbench using:
+
+    make compile
+
+This creates the VCS executable named simv.
+
+
+TESTS
+-----
+Test 1 - Empty -> Full -> Empty:
+
+    do it with: make test1
+
+Test 2 - almost_full and almost_empty flags:
+
+    do it with: make test2
+
+Test 3 - Simultaneous read/write using different clock frequencies:
+
+    do it with: make test3
+
+All tests use the same compiled simv executable.
+
+
+WAVEFORMS
+---------
+Each simulation creates a novas.fsdb waveform database.
+
+To open the most recently generated waveform in Verdi:
+
+    make verdi
+If you want to open the other ones, make sure to simulate them first and them open the waveforms.
+
+
+CLEANUP
+-------
+To remove tool-generated simulation files:
+
+    make clean
+
+The clean target does not remove the SystemVerilog source files,
+Makefile, or README. They are important for the submission of the Lab's part 1.
