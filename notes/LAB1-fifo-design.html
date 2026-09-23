@@ -225,6 +225,10 @@ html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
 
 figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
 figure svg{display:block;width:100%;height:auto;max-width:100%}
+/* 도해 안에서 코드 뷰어로 데려가는 상자 */
+svg .blk{cursor:pointer}
+svg .blk:hover rect,svg .blk:focus rect{stroke-width:2.6}
+svg .blk:focus{outline:none}
 figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
 .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -614,6 +618,68 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 
   <p lang="ko">여섯 파일 원문이 아래에 있다. <strong>논문 코드라 주석까지 원문 그대로</strong> 뒀다. 우리 코드가 아니므로 여기만 예외다. 모듈 계층 탭을 누르면 <code>fifo1</code> 이 나머지 다섯을 어떻게 품는지 보인다.</p>
   <p lang="en">The six files follow, <strong>verbatim, comments and all,</strong> since this is the paper's code, not ours; it is the one exception. The module hierarchy tab shows how <code>fifo1</code> holds the other five.</p>
+  <p lang="ko">코드를 읽기 전에 <strong>이 코드가 어떤 회로인지</strong>부터 보자. 각 칸이 왜 있는지는 다음 03 절이 그림으로 푼다.</p>
+  <p lang="en">Before reading the code, see <strong>what circuit it is.</strong> Why each box exists is what section 03 explains, picture by picture.</p>
+  <figure>
+<svg viewBox="0 0 720 312" role="img" aria-label="Block diagram of the Cummings FIFO. On the write clock side, wptr_full counts writes, turns the count into gray code and decides full, and sync_r2w brings the read pointer over with two flip-flops. On the read clock side, rptr_empty and sync_w2r mirror them. fifomem sits on the boundary: written on the write clock, read without a clock. Only the two gray pointers cross the boundary.">
+<defs><marker id="b2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink2)"/></marker><marker id="b2x" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--blue)"/></marker></defs>
+<path d="M360,28 L360,304" style="fill:none;stroke:var(--brown);stroke-width:1.5;stroke-dasharray:7 5"/>
+<text class="svglab" x="180" y="20" style="font-size:12px;fill:var(--brown);text-anchor:middle;font-weight:700">wclk domain</text>
+<text class="svglab" x="540" y="20" style="font-size:12px;fill:var(--brown);text-anchor:middle;font-weight:700">rclk domain</text>
+<g class="cv-go blk" data-cv="given" data-key="wptr_full" data-at="" tabindex="0" role="button" aria-label="wptr_full">
+<rect x="60" y="62" width="180" height="68" rx="7" style="fill:rgba(var(--blue-rgb),.10);stroke:var(--blue);stroke-width:1.4"/>
+<text class="svglab" x="150" y="93" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">wptr_full</text>
+<text class="svglab" x="150" y="110" style="font-size:10.5px;fill:var(--ink2);text-anchor:middle">count · gray · full?</text>
+</g>
+<g class="cv-go blk" data-cv="given" data-key="rptr_empty" data-at="" tabindex="0" role="button" aria-label="rptr_empty">
+<rect x="480" y="62" width="180" height="68" rx="7" style="fill:rgba(var(--blue-rgb),.10);stroke:var(--blue);stroke-width:1.4"/>
+<text class="svglab" x="570" y="93" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">rptr_empty</text>
+<text class="svglab" x="570" y="110" style="font-size:10.5px;fill:var(--ink2);text-anchor:middle">count · gray · empty?</text>
+</g>
+<g class="cv-go blk" data-cv="given" data-key="fifomem" data-at="" tabindex="0" role="button" aria-label="fifomem">
+<rect x="300" y="110" width="120" height="60" rx="7" style="fill:rgba(var(--blue-rgb),.10);stroke:var(--blue);stroke-width:1.4"/>
+<text class="svglab" x="360" y="137" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">fifomem</text>
+<text class="svglab" x="360" y="154" style="font-size:10.5px;fill:var(--ink2);text-anchor:middle">storage</text>
+</g>
+<g class="cv-go blk" data-cv="given" data-key="sync_r2w" data-at="" tabindex="0" role="button" aria-label="sync_r2w">
+<rect x="60" y="222" width="140" height="48" rx="7" style="fill:rgba(var(--blue-rgb),.10);stroke:var(--blue);stroke-width:1.4"/>
+<text class="svglab" x="130" y="243" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">sync_r2w</text>
+<text class="svglab" x="130" y="260" style="font-size:10.5px;fill:var(--ink2);text-anchor:middle">2 FF on wclk</text>
+</g>
+<g class="cv-go blk" data-cv="given" data-key="sync_w2r" data-at="" tabindex="0" role="button" aria-label="sync_w2r">
+<rect x="480" y="222" width="140" height="48" rx="7" style="fill:rgba(var(--blue-rgb),.10);stroke:var(--blue);stroke-width:1.4"/>
+<text class="svglab" x="550" y="243" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">sync_w2r</text>
+<text class="svglab" x="550" y="260" style="font-size:10.5px;fill:var(--ink2);text-anchor:middle">2 FF on rclk</text>
+</g>
+<path d="M8,86 L58,86" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="10" y="80" style="font-size:11px;fill:var(--ink2)">winc</text>
+<path d="M60,112 L10,112" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="10" y="106" style="font-size:11px;fill:var(--ink2)">wfull</text>
+<path d="M8,46 L330,46 L330,108" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="10" y="40" style="font-size:11px;fill:var(--ink2)">wdata</text>
+<path d="M240,124 L298,124" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="246" y="118" style="font-size:11px;fill:var(--ink2)">waddr</text>
+<path d="M480,124 L422,124" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="474" y="118" style="font-size:11px;fill:var(--ink2);text-anchor:end">raddr</text>
+<path d="M390,110 L390,46 L712,46" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="710" y="40" style="font-size:11px;fill:var(--ink2);text-anchor:end">rdata</text>
+<path d="M712,86 L662,86" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="710" y="80" style="font-size:11px;fill:var(--ink2);text-anchor:end">rinc</text>
+<path d="M660,112 L710,112" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="710" y="106" style="font-size:11px;fill:var(--ink2);text-anchor:end">rempty</text>
+<path d="M225,130 L225,206 L500,206 L500,220" style="fill:none;stroke:var(--blue);stroke-width:2.4" marker-end="url(#b2x)"/>
+<text class="svglab" x="262" y="200" style="font-size:11px;fill:var(--blue);font-weight:700">wptr (gray)</text>
+<path d="M560,222 L560,132" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="566" y="186" style="font-size:11px;fill:var(--ink2)">rq2_wptr</text>
+<path d="M640,130 L640,292 L130,292 L130,272" style="fill:none;stroke:var(--blue);stroke-width:2.4" marker-end="url(#b2x)"/>
+<text class="svglab" x="262" y="286" style="font-size:11px;fill:var(--blue);font-weight:700">rptr (gray)</text>
+<path d="M130,222 L130,132" style="fill:none;stroke:var(--ink2);stroke-width:1.4" marker-end="url(#b2a)"/>
+<text class="svglab" x="136" y="186" style="font-size:11px;fill:var(--ink2)">wq2_rptr</text>
+</svg>
+    <figcaption lang="ko">논문 코드 여섯 파일이 이 한 장이다. <strong>갈색 점선이 두 clock 의 경계</strong>이고, 경계를 넘는 것은 <strong>굵은 파란 선 둘, gray code 포인터뿐</strong>이다. 메모리는 경계에 걸쳐 있다. 쓰기는 <code>wclk</code> 로, 읽기는 clock 없이 한다. <strong>상자를 누르면 아래 코드 뷰어가 그 파일을 연다.</strong> <code>fifo1.v</code> 는 이 그림의 선들 자체다.</figcaption>
+    <figcaption lang="en">The six files of the paper are this one picture. <strong>The brown dashed line is the boundary between the two clocks,</strong> and the only things crossing it are <strong>the two thick blue lines, the gray-coded pointers.</strong> The memory straddles the boundary: written on <code>wclk</code>, read with no clock. <strong>Click a box and the code viewer below opens that file.</strong> <code>fifo1.v</code> is the wiring itself.</figcaption>
+  </figure>
+
   <div class="def">
     <p lang="ko"><strong>코드 뷰어 읽는 법.</strong> 왼쪽 트리에서 파일이나 모듈을 누르면 오른쪽에 코드가 뜬다. 탭으로 트리를 바꾼다 (파일, 모듈 계층, 코드 윤곽, 커밋). <strong>설명 카드는 그 줄 바로 위에</strong> 있다. 설명이 없는 긴 구간은 접혀 있고 눌러서 펼친다. diff 에서 <span style="color:var(--blue)">+</span> 는 새로 생긴 줄, 흐린 <span style="color:var(--ink3)">−</span> 는 사라진 줄이다. <strong>랩 코드에는 주석이 없다.</strong> 코드가 무엇을 하는지는 전부 이 카드들이 말한다.</p>
     <p lang="en"><strong>Reading the code viewer.</strong> Click a file or module in the tree on the left and its code appears on the right. The tabs switch trees (files, module hierarchy, outline, commits). <strong>Each note sits right above its line.</strong> Long stretches without notes are folded; click to open. In a diff, <span style="color:var(--blue)">+</span> is a new line and a faint <span style="color:var(--ink3)">−</span> a removed one. <strong>The lab code has no comments.</strong> These notes are what say what it does.</p>
@@ -655,97 +721,327 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <!-- ══════════════════════════════════════════════════════ 03 -->
 <section id="s3">
   <div class="sec-head"><span class="sec-num">03</span><h2 lang="ko">Part 1 · 왜 이 설계인가</h2><h2 lang="en">Part 1 · Why this design</h2></div>
-  <p class="sec-sub" lang="ko">논문 코드를 그대로 쓰기로 한 이상, 왜 그 구조인지는 알아야 한다. 안 그러면 데모에서 못 버틴다. 핵심은 하나다. <strong>포인터를 그냥 넘기면 안 된다.</strong></p>
-  <p class="sec-sub" lang="en">If you are going to use the paper's code, you had better know why it is shaped that way, or the demo will eat you. It comes down to one thing: <strong>you cannot just hand the pointer across.</strong></p>
+  <p class="sec-sub" lang="ko">논문 코드를 쓰기로 한 이상 왜 그렇게 생겼는지는 알아야 한다. 이 절은 <strong>디지털 회로를 조금만 알아도</strong> 따라올 수 있게, 문제 하나와 해결 둘, 그리고 그 대가를 그림으로 풀어간다. 끝나면 02 절 블록도의 칸마다 왜 있는지가 전부 설명된다.</p>
+  <p class="sec-sub" lang="en">If you're going to use the paper's code you'd better know why it's shaped that way. This section walks through it in pictures, <strong>assuming only a little digital logic:</strong> one problem, two fixes, and what they cost. By the end, every box in the section 02 block diagram has a reason.</p>
 
-  <h3 lang="ko">문제: 두 클럭이 서로를 모른다</h3>
-  <h3 lang="en">The problem: the two clocks know nothing about each other</h3>
+  <h3 lang="ko">1. FIFO 는 원형으로 도는 칸과 손가락 두 개다</h3>
+  <h3 lang="en">1. A FIFO is a ring of slots and two fingers</h3>
 
-  <p lang="ko">FIFO 가 가득 찼는지 알려면 <strong>쓰기 포인터와 읽기 포인터를 비교</strong>해야 한다. 그런데 쓰기 포인터는 <code>wclk</code> 으로 돌고 읽기 포인터는 <code>rclk</code> 으로 돈다. 비교하려면 한쪽이 상대 영역으로 건너가야 하고, 건너가는 순간이 사고 지점이다.</p>
-  <p lang="en">To know whether the FIFO is full you have to <strong>compare the write pointer with the read pointer.</strong> But the write pointer runs on <code>wclk</code> and the read pointer on <code>rclk</code>. Comparing means one of them has to cross, and the crossing is where the accident happens.</p>
+  <p lang="ko">FIFO 는 먼저 들어온 것이 먼저 나가는 줄이다. 하드웨어에서는 메모리 칸을 원형으로 쓰고, <strong>손가락 둘</strong>로 위치를 가리킨다. <strong>W</strong> 는 "다음에 쓸 칸", <strong>R</strong> 은 "다음에 읽을 칸"이다. 쓸 때마다 W 가 한 칸, 읽을 때마다 R 이 한 칸 시계 방향으로 간다. 끝에 닿으면 처음으로 돌아온다. 이 손가락이 코드의 <strong>포인터</strong>다.</p>
+  <p lang="en">A FIFO is a queue: first in, first out. In hardware you use a block of memory as a ring and keep <strong>two fingers</strong> on it. <strong>W</strong> is "the next slot to write", <strong>R</strong> is "the next slot to read". Each write moves W one slot clockwise, each read moves R one slot. At the end they wrap back to the start. Those fingers are the <strong>pointers</strong> in the code.</p>
 
   <figure>
-    <svg viewBox="0 0 700 230" role="img" aria-label="A 4-bit binary pointer going from 0111 to 1000 changes all four bits, so a sampler in the other clock domain can catch any mixture of old and new bits">
-      <text class="svglab" x="20" y="26" style="font-size:12px;fill:var(--ink2)">binary</text>
-
-      <text class="svgnum" x="20" y="62" style="font-size:15px;fill:var(--ink)">0 1 1 1</text>
-      <text class="svglab" x="20" y="80" style="font-size:11px;fill:var(--ink3)">7</text>
-      <text class="svgnum" x="152" y="62" style="font-size:15px;fill:var(--ink)">1 0 0 0</text>
-      <text class="svglab" x="152" y="80" style="font-size:11px;fill:var(--ink3)">8</text>
-      <path d="M104,57 L144,57" style="fill:none;stroke:var(--ink2);stroke-width:1.3" marker-end="url(#l3ar)"/>
-      <defs>
-        <marker id="l3ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink2)"/>
-        </marker>
-      </defs>
-      <text class="svglab" x="238" y="62" style="font-size:12px;fill:var(--amber)">4 bits change at once</text>
-
-      <rect x="16" y="98" width="380" height="58" rx="7" style="fill:rgba(var(--amber-rgb),.11);stroke:var(--amber);stroke-width:1.3"/>
-      <text class="svglab" x="30" y="120" style="font-size:12px;fill:var(--ink)">the other clock can sample any mix</text>
-      <text class="svgnum" x="30" y="143" style="font-size:14px;fill:var(--amber)">1111   0000   1011   0100  …</text>
-
-      <text class="svglab" x="20" y="190" style="font-size:12px;fill:var(--ink2)">gray</text>
-      <text class="svgnum" x="20" y="212" style="font-size:15px;fill:var(--ink)">0 1 0 0</text>
-      <text class="svgnum" x="152" y="212" style="font-size:15px;fill:var(--ink)">1 1 0 0</text>
-      <path d="M104,207 L144,207" style="fill:none;stroke:var(--ink2);stroke-width:1.3" marker-end="url(#l3ar)"/>
-      <text class="svglab" x="238" y="212" style="font-size:12px;fill:var(--green)">1 bit changes</text>
-    </svg>
-    <figcaption lang="ko">binary 로 7 에서 8 로 갈 때는 네 비트가 같이 바뀐다. 받는 쪽 클럭이 그 와중에 샘플하면 옛 값도 새 값도 아닌 조합이 잡힌다. gray code 는 이웃끼리 한 비트만 다르므로, 잡히는 값은 <strong>반드시 옛 값이거나 새 값</strong>이다.</figcaption>
-    <figcaption lang="en">Going from 7 to 8 in binary flips all four bits. If the receiving clock samples mid-flight it can latch a mixture that is neither the old value nor the new one. In gray code neighbours differ in one bit, so whatever gets latched is <strong>either the old value or the new one.</strong></figcaption>
+<svg viewBox="0 0 720 306" role="img" aria-label="Three rings of eight slots. Empty: the write and read pointers point at the same slot. Three entries: the write pointer is three slots ahead. Full: the write pointer has lapped the read pointer and points at the same slot again, told apart only by an extra lap bit.">
+<defs><marker id="r1w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--blue)"/></marker><marker id="r1r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink2)"/></marker></defs>
+<circle cx="120" cy="132" r="66" style="fill:none;stroke:var(--rule);stroke-width:1.2;stroke-dasharray:3 4"/>
+<rect x="108.0" y="54.0" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="120" y="70" style="font-size:10px;fill:var(--ink3);text-anchor:middle">0</text>
+<rect x="154.7" y="73.3" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="166.669" y="89.331" style="font-size:10px;fill:var(--ink3);text-anchor:middle">1</text>
+<rect x="174.0" y="120.0" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="186" y="136" style="font-size:10px;fill:var(--ink3);text-anchor:middle">2</text>
+<rect x="154.7" y="166.7" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="166.669" y="182.669" style="font-size:10px;fill:var(--ink3);text-anchor:middle">3</text>
+<rect x="108.0" y="186.0" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="120" y="202" style="font-size:10px;fill:var(--ink3);text-anchor:middle">4</text>
+<rect x="61.3" y="166.7" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="73.331" y="182.669" style="font-size:10px;fill:var(--ink3);text-anchor:middle">5</text>
+<rect x="42.0" y="120.0" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="54" y="136" style="font-size:10px;fill:var(--ink3);text-anchor:middle">6</text>
+<rect x="61.3" y="73.3" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="73.331" y="89.331" style="font-size:10px;fill:var(--ink3);text-anchor:middle">7</text>
+<path d="M100.2,29.9 L104.0,49.5" style="fill:none;stroke:var(--blue);stroke-width:2" marker-end="url(#r1w)"/>
+<text class="svglab" x="97.8662" y="22.1312" style="font-size:12px;fill:var(--blue);text-anchor:middle;font-weight:700">W</text>
+<path d="M139.8,29.9 L136.0,49.5" style="fill:none;stroke:var(--ink2);stroke-width:2" marker-end="url(#r1r)"/>
+<text class="svglab" x="142.134" y="22.1312" style="font-size:12px;fill:var(--ink2);text-anchor:middle;font-weight:700">R</text>
+<text class="svgnum" x="120" y="272" style="font-size:12.5px;fill:var(--ink);text-anchor:middle">W <tspan style="fill:var(--sel);font-weight:700">0</tspan> 000   R <tspan style="fill:var(--sel);font-weight:700">0</tspan> 000</text>
+<text class="svglab" x="120" y="296" style="font-size:12.5px;fill:var(--ink2);text-anchor:middle;font-weight:700">empty</text>
+<circle cx="360" cy="132" r="66" style="fill:none;stroke:var(--rule);stroke-width:1.2;stroke-dasharray:3 4"/>
+<rect x="348.0" y="54.0" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="360" y="70" style="font-size:10px;fill:var(--ink3);text-anchor:middle">0</text>
+<rect x="394.7" y="73.3" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="406.669" y="89.331" style="font-size:10px;fill:var(--ink3);text-anchor:middle">1</text>
+<rect x="414.0" y="120.0" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="426" y="136" style="font-size:10px;fill:var(--ink3);text-anchor:middle">2</text>
+<rect x="394.7" y="166.7" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="406.669" y="182.669" style="font-size:10px;fill:var(--ink3);text-anchor:middle">3</text>
+<rect x="348.0" y="186.0" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="360" y="202" style="font-size:10px;fill:var(--ink3);text-anchor:middle">4</text>
+<rect x="301.3" y="166.7" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="313.331" y="182.669" style="font-size:10px;fill:var(--ink3);text-anchor:middle">5</text>
+<rect x="282.0" y="120.0" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="294" y="136" style="font-size:10px;fill:var(--ink3);text-anchor:middle">6</text>
+<rect x="301.3" y="73.3" width="24" height="24" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="313.331" y="89.331" style="font-size:10px;fill:var(--ink3);text-anchor:middle">7</text>
+<path d="M360.0,236.0 L360.0,216.0" style="fill:none;stroke:var(--blue);stroke-width:2" marker-end="url(#r1w)"/>
+<text class="svglab" x="360" y="252" style="font-size:12px;fill:var(--blue);text-anchor:middle;font-weight:700">W</text>
+<path d="M433.5,58.5 L419.4,72.6" style="fill:none;stroke:var(--ink2);stroke-width:2" marker-end="url(#r1r)"/>
+<text class="svglab" x="442.024" y="53.9756" style="font-size:12px;fill:var(--ink2);text-anchor:middle;font-weight:700">R</text>
+<text class="svgnum" x="360" y="272" style="font-size:12.5px;fill:var(--ink);text-anchor:middle">W <tspan style="fill:var(--sel);font-weight:700">0</tspan> 100   R <tspan style="fill:var(--sel);font-weight:700">0</tspan> 001</text>
+<text class="svglab" x="360" y="296" style="font-size:12.5px;fill:var(--ink2);text-anchor:middle;font-weight:700">3 entries</text>
+<circle cx="600" cy="132" r="66" style="fill:none;stroke:var(--rule);stroke-width:1.2;stroke-dasharray:3 4"/>
+<rect x="588.0" y="54.0" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="600" y="70" style="font-size:10px;fill:var(--ink3);text-anchor:middle">0</text>
+<rect x="634.7" y="73.3" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="646.669" y="89.331" style="font-size:10px;fill:var(--ink3);text-anchor:middle">1</text>
+<rect x="654.0" y="120.0" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="666" y="136" style="font-size:10px;fill:var(--ink3);text-anchor:middle">2</text>
+<rect x="634.7" y="166.7" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="646.669" y="182.669" style="font-size:10px;fill:var(--ink3);text-anchor:middle">3</text>
+<rect x="588.0" y="186.0" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="600" y="202" style="font-size:10px;fill:var(--ink3);text-anchor:middle">4</text>
+<rect x="541.3" y="166.7" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="553.331" y="182.669" style="font-size:10px;fill:var(--ink3);text-anchor:middle">5</text>
+<rect x="522.0" y="120.0" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="534" y="136" style="font-size:10px;fill:var(--ink3);text-anchor:middle">6</text>
+<rect x="541.3" y="73.3" width="24" height="24" rx="4" style="fill:rgba(var(--blue-rgb),.28);stroke:var(--ink3);stroke-width:1.1"/>
+<text class="svgnum" x="553.331" y="89.331" style="font-size:10px;fill:var(--ink3);text-anchor:middle">7</text>
+<path d="M702.1,112.2 L682.5,116.0" style="fill:none;stroke:var(--blue);stroke-width:2" marker-end="url(#r1w)"/>
+<text class="svglab" x="713.869" y="113.866" style="font-size:12px;fill:var(--blue);text-anchor:middle;font-weight:700">W</text>
+<path d="M702.1,151.8 L682.5,148.0" style="fill:none;stroke:var(--ink2);stroke-width:2" marker-end="url(#r1r)"/>
+<text class="svglab" x="713.869" y="158.134" style="font-size:12px;fill:var(--ink2);text-anchor:middle;font-weight:700">R</text>
+<text class="svgnum" x="600" y="272" style="font-size:12.5px;fill:var(--ink);text-anchor:middle">W <tspan style="fill:var(--sel);font-weight:700">1</tspan> 010   R <tspan style="fill:var(--sel);font-weight:700">0</tspan> 010</text>
+<text class="svglab" x="600" y="296" style="font-size:12.5px;fill:var(--amber);text-anchor:middle;font-weight:700">full</text>
+</svg>
+    <figcaption lang="ko">칸 8 개짜리 예. <strong>비었을 때</strong>는 W 와 R 이 같은 칸이다. 셋을 쓰면 W 가 세 칸 앞선다. 그런데 <strong>가득 찼을 때</strong>도 W 가 R 을 한 바퀴 따라잡아 <strong>다시 같은 칸</strong>이 된다. 칸 번호만으로는 비었는지 찼는지 모른다. 그래서 포인터에 <strong>바퀴 수를 세는 비트를 하나 더</strong> 붙인다 (밑의 강조된 비트). 칸 번호가 같고 그 비트까지 같으면 빈 것, 그 비트만 다르면 가득 찬 것이다.</figcaption>
+    <figcaption lang="en">An eight-slot example. <strong>Empty</strong> means W and R point at the same slot. After three writes, W is three slots ahead. But <strong>full</strong> is W having lapped R, which lands it <strong>on the same slot again.</strong> The slot number alone can't tell empty from full, so each pointer gets <strong>one extra bit that counts laps</strong> (highlighted below). Same slot and same lap bit: empty. Same slot, different lap bit: full.</figcaption>
   </figure>
+
+  <p lang="ko">여기까지는 clock 이 하나인 FIFO 와 같다. <strong>비었는지는 R 을 W 와 비교해서, 찼는지는 W 를 R 과 비교해서</strong> 안다. 문제는 그 비교에서 생긴다.</p>
+  <p lang="en">So far this is no different from a single-clock FIFO. <strong>Empty is decided by comparing R with W, full by comparing W with R.</strong> The trouble starts in that comparison.</p>
+
+  <h3 lang="ko">2. 문제: 두 손가락이 서로 다른 시계를 본다</h3>
+  <h3 lang="en">2. The problem: the two fingers watch different clocks</h3>
+
+  <p lang="ko">이 FIFO 는 쓰는 쪽과 읽는 쪽의 clock 이 다르다. W 는 <code>wclk</code> 에 맞춰 움직이고 R 은 <code>rclk</code> 에 맞춰 움직인다. 두 clock 사이에는 아무 약속이 없다. 그래서 읽는 쪽이 "비었나?" 를 판단하려고 W 를 볼 때, <strong>W 가 마침 바뀌는 중일 수 있다.</strong></p>
+  <p lang="en">In this FIFO the writer and the reader run on different clocks. W moves on <code>wclk</code>, R on <code>rclk</code>, and the two clocks have no agreement at all. So when the reader looks at W to decide "am I empty?", <strong>W may be in the middle of changing.</strong></p>
+
+  <p lang="ko">자동차 주행거리계를 떠올리면 된다. 0799 에서 0800 으로 넘어갈 때는 세 자리가 같이 돈다. 도는 도중에 사진을 찍으면 0899 나 0700 처럼 <strong>있었던 적 없는 숫자</strong>가 찍힐 수 있다. 여러 비트짜리 포인터도 똑같다. 비트들이 정확히 같은 순간에 바뀌지 않기 때문이다. 선마다 길이가 조금씩 달라서 몇십 ps 씩 어긋난다.</p>
+  <p lang="en">Think of a car odometer rolling from 0799 to 0800. Three digits turn together, and a photo taken mid-roll can show 0899 or 0700, <strong>numbers that were never on the dial.</strong> A multi-bit pointer is the same, because its bits never flip at exactly the same instant; each wire is a slightly different length, so they drift apart by tens of picoseconds.</p>
+
+  <figure>
+<svg viewBox="0 0 720 262" role="img" aria-label="Left: a binary pointer going from 0111 to 1000; its four bits flip at slightly different moments, and a read clock edge in the middle captures 1011, which is eleven, a value that never existed. Right: the same step in gray code, 0100 to 1100, flips only one bit, so the capture is either 7 or 8.">
+<text class="svglab" x="20" y="18" style="font-size:12.5px;fill:var(--ink);font-weight:700">binary  0111 → 1000</text>
+<text class="svglab" x="20" y="46" style="font-size:11.5px;fill:var(--brown)">rclk</text>
+<path d="M70,32 L128,32 L128,52 L188,52 L188,32 L248,32 L248,52 L308,52 L308,32 L340,32" style="fill:none;stroke:var(--brown);stroke-width:1.6"/>
+<text class="svglab" x="20" y="90" style="font-size:11.5px;fill:var(--ink2)">b3</text>
+<path d="M70,96 L170,96 L170,76 L340,76" style="fill:none;stroke:var(--blue);stroke-width:1.6"/>
+<text class="svglab" x="20" y="124" style="font-size:11.5px;fill:var(--ink2)">b2</text>
+<path d="M70,110 L182,110 L182,130 L340,130" style="fill:none;stroke:var(--blue);stroke-width:1.6"/>
+<text class="svglab" x="20" y="158" style="font-size:11.5px;fill:var(--ink2)">b1</text>
+<path d="M70,144 L194,144 L194,164 L340,164" style="fill:none;stroke:var(--blue);stroke-width:1.6"/>
+<text class="svglab" x="20" y="192" style="font-size:11.5px;fill:var(--ink2)">b0</text>
+<path d="M70,178 L206,178 L206,198 L340,198" style="fill:none;stroke:var(--blue);stroke-width:1.6"/>
+<path d="M188,26 L188,204" style="fill:none;stroke:var(--sel);stroke-width:1.4;stroke-dasharray:4 3"/>
+<text class="svglab" x="194" y="218" style="font-size:10.5px;fill:var(--sel)">rclk samples here</text>
+<text class="svgnum" x="20" y="238" style="font-size:12.5px;fill:var(--amber);font-weight:700">captured 1011 = 11</text>
+<text class="svglab" x="20" y="256" style="font-size:11.5px;fill:var(--amber)">never existed</text>
+<text class="svglab" x="380" y="18" style="font-size:12.5px;fill:var(--ink);font-weight:700">gray  0100 → 1100</text>
+<text class="svglab" x="380" y="46" style="font-size:11.5px;fill:var(--brown)">rclk</text>
+<path d="M430,32 L488,32 L488,52 L548,52 L548,32 L608,32 L608,52 L668,52 L668,32 L700,32" style="fill:none;stroke:var(--brown);stroke-width:1.6"/>
+<text class="svglab" x="380" y="90" style="font-size:11.5px;fill:var(--ink2)">b3</text>
+<path d="M430,96 L530,96 L530,76 L700,76" style="fill:none;stroke:var(--blue);stroke-width:1.6"/>
+<text class="svglab" x="380" y="124" style="font-size:11.5px;fill:var(--ink2)">b2</text>
+<path d="M430,110 L700,110" style="fill:none;stroke:var(--ink);stroke-width:1.6"/>
+<text class="svglab" x="380" y="158" style="font-size:11.5px;fill:var(--ink2)">b1</text>
+<path d="M430,164 L700,164" style="fill:none;stroke:var(--ink);stroke-width:1.6"/>
+<text class="svglab" x="380" y="192" style="font-size:11.5px;fill:var(--ink2)">b0</text>
+<path d="M430,198 L700,198" style="fill:none;stroke:var(--ink);stroke-width:1.6"/>
+<path d="M548,26 L548,204" style="fill:none;stroke:var(--sel);stroke-width:1.4;stroke-dasharray:4 3"/>
+<text class="svglab" x="554" y="218" style="font-size:10.5px;fill:var(--sel)">rclk samples here</text>
+<text class="svgnum" x="380" y="238" style="font-size:12.5px;fill:var(--green);font-weight:700">captured 1100 = 8</text>
+<text class="svglab" x="380" y="256" style="font-size:11.5px;fill:var(--green)">only 7 or 8 possible</text>
+</svg>
+    <figcaption lang="ko"><strong>왼쪽:</strong> W 가 7 (0111) 에서 8 (1000) 로 가는 순간. 네 비트가 조금씩 어긋나 바뀌는데 그 사이에 <code>rclk</code> 가 찍으면 <strong>1011 = 11</strong> 이 잡힌다. 읽는 쪽은 "11 칸까지 써 있다" 고 믿고 <strong>아직 안 쓴 칸을 읽는다.</strong> 쓰레기 값이 나가는 것이다. <strong>오른쪽:</strong> 같은 한 걸음을 gray code 로 세면 0100 에서 1100 으로 <strong>한 비트만</strong> 바뀐다. 언제 찍든 7 아니면 8 이다.</figcaption>
+    <figcaption lang="en"><strong>Left:</strong> W stepping from 7 (0111) to 8 (1000). The four bits flip at slightly different moments, and an <code>rclk</code> edge in between captures <strong>1011 = 11.</strong> The reader now believes eleven slots have been written and <strong>reads slots that were never written:</strong> garbage goes out. <strong>Right:</strong> count the same step in gray code and only <strong>one bit</strong> changes, 0100 to 1100. Capture it whenever you like, you get 7 or 8.</figcaption>
+  </figure>
+
+  <h3 lang="ko">3. 해결 하나: 한 번에 한 비트만 바뀌게 센다</h3>
+  <h3 lang="en">3. Fix one: count so that only one bit changes at a time</h3>
+
+  <p lang="ko"><strong>gray code</strong> 는 이웃한 두 수가 항상 한 비트만 다르게 만든 숫자 표기다. 0, 1, 2, 3 을 000, 001, 011, 010 으로 쓰는 식이다. 한 비트만 바뀌면 "바뀌는 중" 에 찍어도 그 비트가 옛 값이거나 새 값일 뿐이라, 찍힌 숫자는 <strong>반드시 옛 포인터거나 새 포인터</strong>다. 있었던 적 없는 숫자는 나올 수 없다.</p>
+  <p lang="en"><strong>Gray code</strong> is a way of writing numbers so that neighbours always differ in exactly one bit: 0, 1, 2, 3 become 000, 001, 011, 010. With only one bit moving, a capture taken mid-change sees that bit either old or new, so the number captured is <strong>always the old pointer or the new one.</strong> A value that never existed can't appear.</p>
+
+  <p lang="ko">그래서 논문은 포인터를 <strong>두 벌</strong> 들고 있다. 더하기와 메모리 주소에는 보통 binary 를 쓰고, <strong>경계를 넘길 때만 gray 로 바꾼 사본</strong>을 보낸다. 02 절 블록도의 굵은 파란 선 둘이 그 사본이다. 한 걸음씩만 움직여야 한다는 조건도 여기서 나온다. 포인터는 한 번에 한 칸씩만 가므로 딱 맞는다.</p>
+  <p lang="en">That's why the paper keeps <strong>two copies</strong> of each pointer: ordinary binary for incrementing and addressing, and <strong>a gray-coded copy only for sending across the boundary.</strong> Those copies are the two thick blue lines in the section 02 diagram. The trick needs the value to move one step at a time, which a FIFO pointer does anyway.</p>
 
   <div class="jargon">
     <details open>
       <summary><span lang="ko">용어 뜯어보기 · CDC</span><span lang="en">Unpacking the jargon · CDC</span></summary>
       <table class="parts" lang="ko">
         <tr><td>풀네임</td><td>Clock Domain Crossing</td></tr>
-        <tr><td>한 줄</td><td>한 클럭으로 도는 신호를 다른 클럭으로 도는 회로가 받는 것</td></tr>
-        <tr><td>언제</td><td>설계 단계. 나중에 잡기가 매우 어려워서 구조로 막는다</td></tr>
+        <tr><td>한 줄</td><td>한 clock 으로 도는 신호를 다른 clock 으로 도는 회로가 받는 것. 지금 이 절의 주제다</td></tr>
+        <tr><td>언제</td><td>설계 단계. 시뮬레이션으로는 잘 안 드러나서 구조로 막는다</td></tr>
         <tr><td>누가</td><td>설계자가 막고, 검증과 CDC 전용 lint 도구가 다시 훑는다</td></tr>
-        <tr><td>헷갈리는 것</td><td>단일 비트 CDC 는 동기화기 두 단이면 되지만, <strong>다중 비트는 그것만으로 안 된다.</strong> gray code 나 handshake 가 따로 필요하다</td></tr>
-        </table>
+        <tr><td>헷갈리는 것</td><td>한 비트짜리 신호는 동기화기 두 단이면 되지만, <strong>여러 비트짜리는 그것만으로 안 된다.</strong> 비트마다 다른 사이클에 잡힐 수 있어서다. gray code 나 handshake 가 따로 필요하다</td></tr>
+      </table>
       <table class="parts" lang="en">
         <tr><td>Full name</td><td>Clock Domain Crossing</td></tr>
-        <tr><td>One line</td><td>A signal on one clock being received by logic on another</td></tr>
-        <tr><td>When</td><td>At design time; it is very hard to catch later, so you block it structurally</td></tr>
+        <tr><td>One line</td><td>A signal on one clock being received by logic on another. It's what this whole section is about</td></tr>
+        <tr><td>When</td><td>At design time. Simulation rarely exposes it, so you block it structurally</td></tr>
         <tr><td>Who</td><td>Designers block it; verification and dedicated CDC lint tools sweep for it again</td></tr>
-        <tr><td>Easy to confuse</td><td>A single-bit crossing is fine with a two-stage synchroniser. <strong>A multi-bit crossing is not.</strong> That needs gray code or a handshake</td></tr>
+        <tr><td>Easy to confuse</td><td>A single-bit signal is fine with a two-stage synchroniser. <strong>A multi-bit one isn't,</strong> because each bit can be caught on a different cycle. That needs gray code or a handshake</td></tr>
       </table>
     </details>
   </div>
 
-  <h3 lang="ko">그 구조가 치르는 값</h3>
-  <h3 lang="en">What that structure costs</h3>
+  <h3 lang="ko">4. 해결 둘: 그 한 비트에도 가라앉을 시간을 준다</h3>
+  <h3 lang="en">4. Fix two: give even that one bit time to settle</h3>
 
-  <p lang="ko">gray code 와 동기화기는 <strong>공짜가 아니다.</strong> 쓰기 쪽에서 일어난 일이 읽기 쪽에 도달하는 데 시간이 걸린다. 얼마나 걸리는지는 <strong>레지스터를 몇 개 지나느냐</strong>로 결정된다. 세어보면 넷이다. 그런데 첫째는 쓰기 엣지 그 자체에서 잡으므로, <strong>쓰기 뒤로 세면 세 엣지</strong>다.</p>
-  <p lang="en">Gray code and synchronisers are <strong>not free.</strong> Something that happens on the write side takes time to reach the read side, and how long is decided by <strong>how many registers it passes through.</strong> Count them: four. But the first captures on the write edge itself, so <strong>counted after the write, it is three edges.</strong></p>
+  <p lang="ko">gray code 로 바뀌는 비트가 하나로 줄었어도, <strong>그 한 비트가 flip-flop 의 입력에서 바뀌는 순간과 clock 엣지가 정확히 겹치는 일</strong>은 여전히 생긴다. 그러면 flip-flop 은 잠깐 0 도 1 도 아닌 어중간한 상태에 머물 수 있다. 이것을 <strong>metastability</strong> 라고 한다. 대부분은 금방 한쪽으로 떨어지지만, 그 어중간한 값을 곧바로 비교기에 넣으면 비교기가 엉뚱하게 반응한다.</p>
+  <p lang="en">Gray code cuts the moving bits down to one, but <strong>that one bit can still change exactly as the flip-flop's clock edge arrives.</strong> When that happens the flip-flop can hang for a moment somewhere between 0 and 1. That's <strong>metastability.</strong> It almost always falls to one side quickly, but feed that in-between value straight into a comparator and the comparator can do something daft.</p>
 
-  <p lang="ko">아래는 그 레지스터 넷을 <strong>1 비트로 줄인 모형</strong>이다. 실물은 포인터가 여러 비트이고 비교기도 더 복잡하지만, <strong>지연을 만드는 것은 레지스터의 개수</strong>라서 1 비트로 줄여도 그 수는 그대로다.</p>
-  <p lang="en">Below is <strong>a one-bit model</strong> of those four registers. The real pointers are several bits wide and the comparison is more involved, but <strong>what creates the delay is the number of registers</strong>, and that number survives the reduction.</p>
+  <figure>
+<svg viewBox="0 0 720 262" role="img" aria-label="A gray pointer from the write clock domain enters two flip-flops on the read clock. The first flip-flop may hover between 0 and 1 for a moment if its input changed right at the edge; it has a whole clock period to settle before the second flip-flop samples it, so only a clean value reaches the rest of the read logic.">
+<defs><marker id="s3a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink2)"/></marker></defs>
+<path d="M150,10 L150,112" style="fill:none;stroke:var(--brown);stroke-width:1.4;stroke-dasharray:6 4"/>
+<text class="svglab" x="144" y="22" style="font-size:11px;fill:var(--brown);text-anchor:end">wclk</text>
+<text class="svglab" x="156" y="22" style="font-size:11px;fill:var(--brown)">rclk</text>
+<rect x="20" y="40" width="104" height="40" rx="6" style="fill:rgba(var(--blue-rgb),.10);stroke:var(--blue);stroke-width:1.3"/>
+<text class="svglab" x="72" y="64" style="font-size:12px;fill:var(--ink);text-anchor:middle">gray wptr</text>
+<rect x="200" y="36" width="64" height="48" rx="5" style="fill:var(--card);stroke:var(--ink2);stroke-width:1.4"/>
+<text class="svglab" x="232" y="58" style="font-size:12px;fill:var(--ink);text-anchor:middle;font-weight:700">FF</text>
+<text class="svglab" x="232" y="74" style="font-size:10.5px;fill:var(--ink3);text-anchor:middle">sync1</text>
+<path d="M232,104 L232,84" style="fill:none;stroke:var(--brown);stroke-width:1.3"/>
+<rect x="320" y="36" width="64" height="48" rx="5" style="fill:var(--card);stroke:var(--ink2);stroke-width:1.4"/>
+<text class="svglab" x="352" y="58" style="font-size:12px;fill:var(--ink);text-anchor:middle;font-weight:700">FF</text>
+<text class="svglab" x="352" y="74" style="font-size:10.5px;fill:var(--ink3);text-anchor:middle">sync2</text>
+<path d="M352,104 L352,84" style="fill:none;stroke:var(--brown);stroke-width:1.3"/>
+<path d="M180,104 L372,104" style="fill:none;stroke:var(--brown);stroke-width:1.3"/>
+<text class="svglab" x="384" y="108" style="font-size:11px;fill:var(--brown)">rclk</text>
+<rect x="470" y="40" width="200" height="40" rx="6" style="fill:rgba(var(--blue-rgb),.10);stroke:var(--blue);stroke-width:1.3"/>
+<text class="svglab" x="570" y="64" style="font-size:12px;fill:var(--ink);text-anchor:middle">empty? compare</text>
+<path d="M124,60 L198,60" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#s3a)"/>
+<path d="M264,60 L318,60" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#s3a)"/>
+<path d="M384,60 L468,60" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#s3a)"/>
+<text class="svglab" x="120" y="154" style="font-size:11.5px;fill:var(--brown);text-anchor:end">rclk</text>
+<text class="svglab" x="120" y="196" style="font-size:11.5px;fill:var(--ink2);text-anchor:end">sync1</text>
+<text class="svglab" x="120" y="236" style="font-size:11.5px;fill:var(--ink2);text-anchor:end">sync2</text>
+<path d="M140,160 L260,160 L260,140 L320,140 L320,160 L380,160 L380,140 L440,140 L440,160 L500,160 L500,140 L560,140 L560,160 L620,160 L620,140 L680,140 L680,160 L700,160" style="fill:none;stroke:var(--brown);stroke-width:1.6"/>
+<rect x="260" y="180" width="74" height="24" style="fill:rgba(var(--amber-rgb),.16);stroke:none"/>
+<path d="M140,202 L260,202 C270,190 276,196 284,191 C292,186 300,195 310,189 C318,184 326,182 334,182 L700,182" style="fill:none;stroke:var(--ink);stroke-width:1.6"/>
+<text class="svglab" x="262" y="174" style="font-size:10.5px;fill:var(--amber)">may hover</text>
+<text class="svglab" x="420" y="176" style="font-size:10.5px;fill:var(--ink2)">settles long before the next edge</text>
+<path d="M140,242 L380,242 L380,222 L700,222" style="fill:none;stroke:var(--ink);stroke-width:1.6"/>
+<text class="svglab" x="390" y="238" style="font-size:10.5px;fill:var(--green)">clean value, one clock later</text>
+</svg>
+    <figcaption lang="ko">그래서 받는 쪽 clock 으로 도는 flip-flop 을 <strong>두 개</strong> 잇는다. 첫째가 어중간하게 잡더라도 둘째가 찍기까지 <strong>한 주기 통째로</strong> 가라앉을 시간이 있다. 나머지 회로는 둘째의 출력만 본다. 이 두 칸이 <code>sync_w2r</code> 과 <code>sync_r2w</code> 다. <strong>받는 쪽 clock 으로 돈다</strong>는 점이 중요하다. 동기화는 받는 쪽의 일이다.</figcaption>
+    <figcaption lang="en">So you chain <strong>two</strong> flip-flops on the receiving clock. Even if the first one catches the bit badly, it has <strong>a whole clock period</strong> to settle before the second samples it, and the rest of the circuit only ever looks at the second. Those two stages are <code>sync_w2r</code> and <code>sync_r2w</code>. <strong>They run on the receiving clock:</strong> synchronising is the receiver's job.</figcaption>
+  </figure>
+
+  <h3 lang="ko">5. 늦게 보는 것은 안전한 쪽으로만 틀린다</h3>
+  <h3 lang="en">5. Seeing late only ever errs on the safe side</h3>
+
+  <p lang="ko">두 해결의 결과로 읽는 쪽이 보는 W 는 <strong>늘 조금 옛날 값</strong>이다. 동기화기 두 단을 지나오는 동안 W 는 더 앞으로 갔을 수 있다. 이게 괜찮은 이유가 이 설계의 핵심이다. <strong>늦게 본 값은 틀리더라도 항상 조심스러운 방향으로 틀린다.</strong></p>
+  <p lang="en">After both fixes, the W the reader sees is <strong>always a little out of date:</strong> while it crawled through the two synchroniser stages, the real W may have moved on. Why that's fine is the heart of the design: <strong>a late value, when it's wrong, is always wrong in the cautious direction.</strong></p>
+
+  <figure>
+<svg viewBox="0 0 720 214" role="img" aria-label="Read side: five entries are really in the FIFO but the reader, using an old write pointer, believes there are three, so it reads at most three and never reads an empty slot. Write side: four slots are really free but the writer, using an old read pointer, believes two are free, so it stops early and never overwrites.">
+<text class="svglab" x="20" y="26" style="font-size:12.5px;fill:var(--ink);font-weight:700">read side</text>
+<text class="svglab" x="20" y="54" style="font-size:11.5px;fill:var(--ink2)">really in</text>
+<rect x="150" y="39" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="180" y="39" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="210" y="39" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="240" y="39" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="270" y="39" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="300" y="39" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="330" y="39" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="360" y="39" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<text class="svglab" x="20" y="88" style="font-size:11.5px;fill:var(--ink2)">reader sees</text>
+<rect x="150" y="73" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="180" y="73" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="210" y="73" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="240" y="73" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="270" y="73" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="300" y="73" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="330" y="73" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="360" y="73" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<text class="svglab" x="20" y="128" style="font-size:12.5px;fill:var(--ink);font-weight:700">write side</text>
+<text class="svglab" x="20" y="156" style="font-size:11.5px;fill:var(--ink2)">really</text>
+<rect x="150" y="141" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="180" y="141" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="210" y="141" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="240" y="141" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="270" y="141" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="300" y="141" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="330" y="141" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="360" y="141" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<text class="svglab" x="20" y="190" style="font-size:11.5px;fill:var(--ink2)">writer sees</text>
+<rect x="150" y="175" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="180" y="175" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="210" y="175" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="240" y="175" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="270" y="175" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="300" y="175" width="26" height="22" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<rect x="330" y="175" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="360" y="175" width="26" height="22" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<rect x="470" y="14" width="18" height="16" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--ink3);stroke-width:1"/>
+<text class="svglab" x="494" y="27" style="font-size:11.5px;fill:var(--ink2)">holds data</text>
+<rect x="590" y="14" width="18" height="16" rx="3" style="fill:var(--card);stroke:var(--ink3);stroke-width:1"/>
+<text class="svglab" x="614" y="27" style="font-size:11.5px;fill:var(--ink2)">free</text>
+<text class="svglab" x="410" y="70" style="font-size:12px;fill:var(--ink)">reads at most 3</text>
+<text class="svglab" x="410" y="90" style="font-size:12px;fill:var(--green);font-weight:700">never reads a slot that is empty</text>
+<text class="svglab" x="410" y="172" style="font-size:12px;fill:var(--ink)">stops 2 slots early</text>
+<text class="svglab" x="410" y="192" style="font-size:12px;fill:var(--green);font-weight:700">never overwrites unread data</text>
+</svg>
+    <figcaption lang="ko"><strong>읽는 쪽:</strong> 실제로는 5 개가 들어 있어도 옛날 W 로 계산하면 3 개로 보인다. 그러면 많아야 3 개를 읽는다. <strong>안 쓴 칸을 읽는 일은 없다.</strong> <strong>쓰는 쪽:</strong> 옛날 R 로 계산하면 빈 칸이 실제보다 적게 보인다. 조금 일찍 멈출 뿐 <strong>아직 안 읽은 데이터를 덮어쓰는 일은 없다.</strong> 손해는 처리량뿐이다.</figcaption>
+    <figcaption lang="en"><strong>Read side:</strong> five entries are really in there, but computed from an old W it looks like three, so the reader takes at most three. <strong>It never reads an unwritten slot.</strong> <strong>Write side:</strong> computed from an old R, the free space looks smaller than it is, so the writer stops a little early. <strong>It never overwrites unread data.</strong> The only loss is throughput.</figcaption>
+  </figure>
+
+  <div class="trap">
+    <p lang="ko"><strong>그래서 늦게 풀리는 <code>rempty</code> 는 버그가 아니다.</strong> "데이터가 있는데 없다고 말하는" 쪽으로만 틀리기 때문이다. CDC 회로가 틀리는 방향을 이렇게 한쪽으로 몰아두는 것이 설계의 요령이고, Cummings 논문이 하는 일이 바로 그것이다. 반대 방향, 곧 <strong>없는데 있다고 말하는 일은 구조상 일어날 수 없다.</strong></p>
+    <p lang="en"><strong>So a late <code>rempty</code> isn't a bug.</strong> It only ever errs as "there's data but I say there isn't". Herding a CDC circuit's mistakes into one direction like this is the craft, and it's exactly what the Cummings paper does. The other direction, <strong>saying there's data when there isn't, can't happen by construction.</strong></p>
+  </div>
+
+  <h3 lang="ko">6. 그 안전의 값: 레지스터 넷, 쓰기 뒤 세 엣지</h3>
+  <h3 lang="en">6. The price of that safety: four registers, three edges after the write</h3>
+
+  <p lang="ko">얼마나 늦는지는 <strong>쓰기가 읽는 쪽 플래그에 닿기까지 지나는 레지스터 개수</strong>로 정해진다. 쓰기 포인터 자신, 동기화기 두 단, 그리고 <code>rempty</code> 자체도 등록된 출력이라 한 번 더. 넷이다. 첫째는 쓰기 엣지 그 자체에서 잡으므로 <strong>쓰기 뒤로 세면 세 엣지</strong>다.</p>
+  <p lang="en">How late is decided by <strong>how many registers a write passes before it reaches the read-side flag:</strong> the write pointer itself, the two synchroniser stages, and one more because <code>rempty</code> is a registered output. Four. The first captures on the write edge itself, so <strong>counted after the write it's three edges.</strong></p>
+
+  <p lang="ko">아래는 그 레지스터 넷을 <strong>1 비트로 줄인 모형</strong>이다. 실물은 포인터가 여러 비트이고 비교기도 더 복잡하지만, <strong>지연을 만드는 것은 레지스터의 개수</strong>라서 1 비트로 줄여도 그 수는 그대로다. 반 클럭씩 밟아보자.</p>
+  <p lang="en">Below is <strong>a one-bit model</strong> of those four registers. The real pointers are several bits wide and the comparison is more involved, but <strong>what creates the delay is the number of registers,</strong> and that survives the reduction. Step through it half a clock at a time.</p>
 
   <div class="sim" data-sim="lab1-sync"></div>
 
   <div class="def">
-    <p lang="ko"><strong>한 줄 정리.</strong> 쓰기가 일어나고 나서 <code>rempty</code> 가 풀릴 때까지 <strong>레지스터 넷</strong>을 지난다. 포인터 자신, 동기화기 1 단, 2 단, 그리고 <code>rempty</code> 가 등록된 출력이라 한 번 더. 첫째가 쓰기 엣지에서 잡으므로 <strong>쓰기 뒤로 세 엣지</strong>다. Part 2 가 이걸 실제로 쟀고, 거기까지 가는 데 <strong>두 번 틀렸다.</strong> 14 절에 있다.</p>
-    <p lang="en"><strong>In one line.</strong> Between a write happening and <code>rempty</code> clearing there are <strong>four registers</strong>: the pointer itself, synchroniser stage one, stage two, and one more because <code>rempty</code> is a registered output. The first captures on the write edge, so it is <strong>three edges after the write.</strong> Part 2 measured this, and <strong>got it wrong twice</strong> on the way. Section 14 has the story.</p>
+    <p lang="ko"><strong>한 줄 정리.</strong> 여러 비트를 다른 clock 으로 넘기면 있지도 않은 숫자가 잡힌다. <strong>gray code</strong> 로 바뀌는 비트를 하나로 줄이고, <strong>동기화기 두 단</strong>으로 그 비트에 가라앉을 시간을 준다. 그러면 받는 쪽은 늘 조금 옛날 값을 보는데, <strong>그 오차는 항상 안전한 쪽</strong>이다. 대가는 쓰기 뒤 세 엣지의 지연이다. Part 2 가 이걸 실제로 쟀고, 거기까지 가는 데 두 번 틀렸다 (14 절).</p>
+    <p lang="en"><strong>In one line.</strong> Send several bits to another clock and you can catch a number that never existed. <strong>Gray code</strong> cuts the moving bits to one, and <strong>a two-stage synchroniser</strong> gives that bit time to settle. The receiver then always sees a slightly old value, and <strong>that error is always on the safe side.</strong> The price is a three-edge delay after each write. Part 2 measured it, and got it wrong twice on the way (section 14).</p>
   </div>
 
-  <div class="trap">
-    <p lang="ko"><strong>이게 버그가 아니라는 것이 중요하다.</strong> 늦게 풀리는 <code>rempty</code> 는 "데이터가 있는데 없다고 말하는" 쪽으로 틀린다. 그래서 <strong>읽는 쪽이 없는 데이터를 읽는 일은 절대 안 생긴다.</strong> 손해는 처리량뿐이다. CDC 회로가 틀리는 방향을 이렇게 한쪽으로 몰아두는 것이 설계의 요령이고, Cummings 논문이 하는 일이 바로 그것이다.</p>
-    <p lang="en"><strong>It matters that this is not a bug.</strong> A late <code>rempty</code> errs towards "there is data but I am saying there is none," so <strong>the reader can never read data that is not there.</strong> The only cost is throughput. Forcing a CDC circuit to fail in one direction only is the craft here, and it is exactly what the Cummings paper does.</p>
-  </div>
+  <h3 lang="ko">7. 논문의 여섯 파일에 대응시키면</h3>
+  <h3 lang="en">7. Mapped onto the paper's six files</h3>
+
+  <table>
+    <thead><tr><th><span lang="ko">개념</span><span lang="en">Idea</span></th><th><span lang="ko">어디에 있나</span><span lang="en">Where it lives</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">원형 칸, 바퀴 비트가 붙은 포인터</span><span lang="en">Ring of slots, pointers with a lap bit</span></td>
+          <td><button type="button" class="cv-go" data-cv="given" data-key="wptr_full" data-at="reg  [ADDRSIZE:0] wbin;">wptr_full</button> <button type="button" class="cv-go" data-cv="given" data-key="rptr_empty" data-at="reg  [ADDRSIZE:0] rbin;">rptr_empty</button> <span lang="ko">포인터가 주소보다 한 비트 넓다</span><span lang="en">pointers one bit wider than the address</span></td></tr>
+      <tr><td><span lang="ko">경계를 넘길 사본은 gray 로</span><span lang="en">Gray-coded copy for crossing</span></td>
+          <td><button type="button" class="cv-go" data-cv="given" data-key="rptr_empty" data-at="assign rgraynext">rgraynext</button> <button type="button" class="cv-go" data-cv="given" data-key="wptr_full" data-at="assign wgraynext">wgraynext</button></td></tr>
+      <tr><td><span lang="ko">받는 쪽 clock 의 flip-flop 두 개</span><span lang="en">Two flip-flops on the receiving clock</span></td>
+          <td><button type="button" class="cv-go" data-cv="given" data-key="sync_w2r" data-at="">sync_w2r</button> <button type="button" class="cv-go" data-cv="given" data-key="sync_r2w" data-at="">sync_r2w</button></td></tr>
+      <tr><td><span lang="ko">늦게 본 포인터로 조심스럽게 판정</span><span lang="en">Cautious decisions from a late pointer</span></td>
+          <td><button type="button" class="cv-go" data-cv="given" data-key="rptr_empty" data-at="assign rempty_val">rempty_val</button> <button type="button" class="cv-go" data-cv="given" data-key="wptr_full" data-at="assign wfull_val">wfull_val</button></td></tr>
+      <tr><td><span lang="ko">칸 자체</span><span lang="en">The slots themselves</span></td>
+          <td><button type="button" class="cv-go" data-cv="given" data-key="fifomem" data-at="">fifomem</button></td></tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">가득 찼는지를 gray code 로 판정하는 식은 조금 낯설다. binary 라면 "바퀴 비트만 다르다" 인데, gray 로 바꾸면 <strong>위 두 비트가 뒤집혀 있고 나머지가 같다</strong>가 된다. 코드 뷰어의 <code>wptr_full.v</code> 설명 카드에 풀어 놨다.</p>
+  <p lang="en">The full test in gray code looks odd at first. In binary it's "only the lap bit differs"; in gray code that becomes <strong>"the top two bits are inverted and the rest match".</strong> The note on <code>wptr_full.v</code> in the code viewer unpacks it.</p>
 
   <h3 lang="ko">almost_full 과 almost_empty 는 왜 3/4 인가</h3>
   <h3 lang="en">Why almost_full and almost_empty sit at 3/4</h3>
 
-  <p lang="ko">이건 우리가 정한 게 아니라 <strong>Lab 이 지정했다.</strong> <em>"Assert these flags when the FIFO is 3/4th full or 3/4th empty respectively."</em> 깊이 16 이므로 <code>almost_full</code> 은 12 개에서, <code>almost_empty</code> 는 남은 것이 4 개일 때 선다.</p>
-  <p lang="en">We did not pick this; <strong>the lab specified it:</strong> <em>"Assert these flags when the FIFO is 3/4th full or 3/4th empty respectively."</em> At depth 16 that means <code>almost_full</code> at 12 entries and <code>almost_empty</code> when 4 are left.</p>
+  <p lang="ko">이건 우리가 정한 게 아니라 <strong>Lab 이 지정했다.</strong> <em>"Assert these flags when the FIFO is 3/4th full or 3/4th empty respectively."</em> 깊이 16 이므로 <code>almost_full</code> 은 12 개에서, <code>almost_empty</code> 는 남은 것이 4 개 이하일 때 선다.</p>
+  <p lang="en">We didn't pick this; <strong>the lab specified it:</strong> <em>"Assert these flags when the FIFO is 3/4th full or 3/4th empty respectively."</em> At depth 16 that's <code>almost_full</code> at 12 entries and <code>almost_empty</code> at 4 or fewer left.</p>
 
-  <p lang="ko">쓸모는 <strong>미리 알려주는 것</strong>이다. 위에서 본 대로 플래그가 건너오는 데 시간이 걸리므로, <code>wfull</code> 이 설 때까지 기다렸다가 멈추면 이미 늦을 수 있다. 3/4 에서 미리 알려주면 producer 가 브레이크를 밟을 여유가 생긴다.</p>
-  <p lang="en">Their use is <strong>advance warning.</strong> As we just saw, flags take time to cross, so waiting for <code>wfull</code> before stopping can be too late. A warning at 3/4 gives the producer room to brake.</p>
+  <p lang="ko">쓸모는 <strong>미리 알려주는 것</strong>이다. <code>wfull</code> 은 마지막 칸이 차는 바로 그 엣지 뒤에 선다. 그런데 보내는 쪽이 <strong>멈추라는 말을 듣고도 몇 사이클은 더 보낼 수밖에 없는</strong> 구조라면 (이미 파이프라인에 실려 오는 데이터처럼), 그 몇 개는 가득 찬 FIFO 에 들어가려다 버려진다. 3/4 에서 미리 알려주면 브레이크를 밟을 여유가 생긴다.</p>
+  <p lang="en">Their use is <strong>advance warning.</strong> <code>wfull</code> rises right after the edge that fills the last slot. If the sender <strong>can't stop instantly and will push a few more words after being told</strong> (data already in flight down a pipeline, say), those words hit a full FIFO and get dropped. A warning at 3/4 leaves room to brake.</p>
 
-  <p lang="ko"><a href="L05-fifo-design.html">Lecture 5 노트</a>의 깊이 4 FIFO 도구로 포인터가 한 바퀴 도는 것을 눌러보면, full 과 empty 가 <strong>왜 비트 하나로 갈리는지</strong>가 손에 잡힌다. 여기서는 다시 만들지 않는다.</p>
-  <p lang="en">Drive the depth-four FIFO in the <a href="L05-fifo-design.html">Lecture 5 note</a> through a full wrap and you will feel <strong>why one extra bit separates full from empty.</strong> No point rebuilding it here.</p>
+  <p lang="ko"><a href="L05-fifo-design.html">Lecture 5 노트</a>의 깊이 4 FIFO 도구로 포인터가 한 바퀴 도는 것을 눌러보면, 1 번 그림의 바퀴 비트가 손에 잡힌다. 여기서는 다시 만들지 않는다.</p>
+  <p lang="en">Drive the depth-four FIFO in the <a href="L05-fifo-design.html">Lecture 5 note</a> through a full wrap and the lap bit from picture 1 becomes something you can feel. No point rebuilding it here.</p>
 </section>
 
 <!-- ══════════════════════════════════════════════════════ 04 -->
@@ -1335,6 +1631,66 @@ make trace                 <span class="c"><span lang="ko"># 세 테스트를 CS
   <h3 lang="ko">1. 모양: parity 로 가르고 번갈아 꺼낸다</h3>
   <h3 lang="en">1. Shape: split by parity, take turns on the way out</h3>
 
+  <p lang="ko">먼저 과제가 무엇인지 그림 하나로 보자. 들어오는 순서는 뒤죽박죽이어도 <strong>나갈 때는 홀수와 짝수가 번갈아</strong> 나와야 하고, 같은 홀수끼리 · 짝수끼리는 들어온 순서를 지켜야 한다.</p>
+  <p lang="en">First, the task in one picture. Numbers can arrive in any mix, but <strong>on the way out odd and even must alternate,</strong> and odds among themselves, evens among themselves, must keep their arrival order.</p>
+
+  <figure>
+<svg viewBox="0 0 720 250" role="img" aria-label="Numbers arrive in the order 3, 7, 4, 9, 6, 2. The lowest bit sends odd numbers into the odd FIFO and even numbers into the even FIFO, each keeping its own order. The output takes from the two FIFOs in turn, giving 3, 4, 7, 6, 9, 2.">
+<defs><marker id="tk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink2)"/></marker></defs>
+<text class="svglab" x="20" y="26" style="font-size:12px;fill:var(--ink2);font-weight:700">arrives</text>
+<rect x="30" y="40" width="34" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="47" y="57.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">3</text>
+<rect x="30" y="72" width="34" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="47" y="89.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">7</text>
+<rect x="30" y="104" width="34" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="47" y="121.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">4</text>
+<rect x="30" y="136" width="34" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="47" y="153.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">9</text>
+<rect x="30" y="168" width="34" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="47" y="185.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">6</text>
+<rect x="30" y="200" width="34" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="47" y="217.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">2</text>
+<text class="svglab" x="74" y="57" style="font-size:10.5px;fill:var(--ink3)">1st</text>
+<path d="M84,137 L158,137" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#tk)"/>
+<rect x="160" y="114" width="94" height="46" rx="6" style="fill:rgba(var(--blue-rgb),.10);stroke:var(--blue);stroke-width:1.3"/>
+<text class="svglab" x="207" y="134" style="font-size:11.5px;fill:var(--ink);text-anchor:middle;font-weight:700">Data_in[0]</text>
+<text class="svglab" x="207" y="151" style="font-size:10px;fill:var(--ink2);text-anchor:middle">odd or even?</text>
+<path d="M254,126 L290,84" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#tk)"/>
+<path d="M254,148 L290,190" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#tk)"/>
+<text class="svglab" x="262" y="96" style="font-size:11px;fill:var(--ink2)">1</text>
+<text class="svglab" x="262" y="186" style="font-size:11px;fill:var(--ink2)">0</text>
+<text class="svglab" x="292" y="54" style="font-size:11.5px;fill:var(--ink2)">odd FIFO</text>
+<rect x="292" y="62" width="144" height="36" rx="6" style="fill:none;stroke:var(--ink3);stroke-width:1.2;stroke-dasharray:4 3"/>
+<rect x="298" y="67" width="34" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="315" y="84.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">9</text>
+<rect x="344" y="67" width="34" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="361" y="84.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">7</text>
+<rect x="390" y="67" width="34" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="407" y="84.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">3</text>
+<text class="svglab" x="436" y="112" style="font-size:10px;fill:var(--ink3);text-anchor:end">head</text>
+<text class="svglab" x="292" y="170" style="font-size:11.5px;fill:var(--ink2)">even FIFO</text>
+<rect x="292" y="178" width="144" height="36" rx="6" style="fill:none;stroke:var(--ink3);stroke-width:1.2;stroke-dasharray:4 3"/>
+<rect x="298" y="183" width="34" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="315" y="200.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">2</text>
+<rect x="344" y="183" width="34" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="361" y="200.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">6</text>
+<rect x="390" y="183" width="34" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="407" y="200.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">4</text>
+<text class="svglab" x="436" y="228" style="font-size:10px;fill:var(--ink3);text-anchor:end">head</text>
+<path d="M436,82 L468,126" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#tk)"/>
+<path d="M436,194 L468,150" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#tk)"/>
+<circle cx="484" cy="138" r="16" style="fill:var(--card);stroke:var(--blue);stroke-width:1.4"/>
+<text class="svglab" x="484" y="142" style="font-size:11px;fill:var(--ink);text-anchor:middle;font-weight:700">sel</text>
+<text class="svglab" x="494" y="172" style="font-size:10.5px;fill:var(--ink2)">take turns</text>
+<path d="M500,138 L520,138" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#tk)"/>
+<text class="svglab" x="524" y="110" style="font-size:12px;fill:var(--ink2);font-weight:700">leaves</text>
+<rect x="524" y="125" width="27" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="537.5" y="142.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">3</text>
+<rect x="555" y="125" width="27" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="568.5" y="142.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">4</text>
+<rect x="586" y="125" width="27" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="599.5" y="142.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">7</text>
+<rect x="617" y="125" width="27" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="630.5" y="142.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">6</text>
+<rect x="648" y="125" width="27" height="26" rx="5" style="fill:var(--card);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="661.5" y="142.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">9</text>
+<rect x="679" y="125" width="27" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="692.5" y="142.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">2</text>
+<rect x="524" y="210" width="18" height="16" rx="3" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.1"/>
+<text class="svglab" x="548" y="223" style="font-size:11px;fill:var(--ink2)">even</text>
+<rect x="604" y="210" width="18" height="16" rx="3" style="fill:var(--card);stroke:var(--blue);stroke-width:1.1"/>
+<text class="svglab" x="628" y="223" style="font-size:11px;fill:var(--ink2)">odd</text>
+</svg>
+    <figcaption lang="ko">이 회로가 하는 일 전부다. 숫자가 3, 7, 4, 9, 6, 2 순서로 들어오면 <strong>맨 아래 비트 하나</strong>로 홀수는 홀수 FIFO, 짝수는 짝수 FIFO 에 들어간다. 각 FIFO 안에서는 들어온 순서가 그대로다. 나가는 쪽은 <strong>두 FIFO 의 머리를 번갈아</strong> 꺼내서 3, 4, 7, 6, 9, 2 가 된다. 첫 출력이 홀수인 것은 첫 입력이 홀수였기 때문이다 (판단 2).</figcaption>
+    <figcaption lang="en">That's the whole job. Numbers arrive as 3, 7, 4, 9, 6, 2, and <strong>the lowest bit alone</strong> sends odds into the odd FIFO and evens into the even FIFO, each keeping its arrival order. The output takes <strong>the heads of the two FIFOs in turn,</strong> giving 3, 4, 7, 6, 9, 2. It starts with an odd because the first input was odd (decision 2).</figcaption>
+  </figure>
+
+  <p lang="ko">이걸 회로로 옮기면 아래가 된다. 가르는 쪽은 비트 하나를 보는 조합 논리, 번갈아 꺼내는 쪽은 "지금 누구 차례인가" 하나만 기억하는 FSM 이다.</p>
+  <p lang="en">Turned into a circuit, it's the diagram below: the splitting side is combinational logic looking at one bit, and the alternating side is an FSM that remembers only "whose turn is it".</p>
+
+
   <figure>
     <svg viewBox="0 0 720 250" role="img" aria-label="Data_in is split by its lowest bit into an even FIFO and an odd FIFO. A two-state FSM selects which FIFO to pop next and toggles after every pop. Data_out is registered.">
       <defs>
@@ -1470,6 +1826,33 @@ make trace                 <span class="c"><span lang="ko"># 세 테스트를 CS
     <li>The even FIFO keeps filling until the first odd arrives at cycle 41</li>
   </ol>
 
+  <figure>
+<svg viewBox="0 0 720 268" role="img" aria-label="Snapshot at cycle 40 of the worst case. Forty even numbers have arrived one per cycle. The even FIFO holds 39 of them, almost reaching its depth of 40. The odd FIFO is empty. The output sent one even and is now waiting on the odd turn, so it cannot drain the evens.">
+<defs><marker id="sk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink2)"/></marker></defs>
+<path d="M100,40 L430,40" style="fill:none;stroke:var(--ink2);stroke-width:1.2;stroke-dasharray:6 4"/>
+<text class="svglab" x="96" y="44" style="font-size:11px;fill:var(--ink2);text-anchor:end">depth 40</text>
+<rect x="140" y="40" width="100" height="200" rx="4" style="fill:none;stroke:var(--ink2);stroke-width:1.4"/>
+<rect x="141" y="45" width="98" height="194" style="fill:rgba(var(--blue-rgb),.30);stroke:none"/>
+<text class="svgnum" x="190" y="75" style="font-size:14px;fill:var(--ink);text-anchor:middle;font-weight:700">39</text>
+<text class="svglab" x="190" y="260" style="font-size:11.5px;fill:var(--ink2);text-anchor:middle">even FIFO</text>
+<rect x="300" y="40" width="100" height="200" rx="4" style="fill:none;stroke:var(--ink2);stroke-width:1.4"/>
+<text class="svgnum" x="350" y="230" style="font-size:14px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<text class="svglab" x="350" y="260" style="font-size:11.5px;fill:var(--ink2);text-anchor:middle">odd FIFO</text>
+<path d="M190,10 L190,48" style="fill:none;stroke:var(--ink2);stroke-width:1.6" marker-end="url(#sk)"/>
+<text class="svglab" x="200" y="22" style="font-size:11px;fill:var(--ink2)">one even per cycle</text>
+<text class="svglab" x="470" y="70" style="font-size:12.5px;fill:var(--ink);font-weight:700">cycle 40</text>
+<text class="svglab" x="470" y="100" style="font-size:11.5px;fill:var(--ink2)">out so far:</text>
+<rect x="560" y="83" width="34" height="26" rx="5" style="fill:rgba(var(--blue-rgb),.30);stroke:var(--blue);stroke-width:1.3"/><text class="svgnum" x="577" y="100.5" style="font-size:12.5px;fill:var(--ink);text-anchor:middle;font-weight:700">2</text>
+<text class="svglab" x="470" y="136" style="font-size:12px;fill:var(--ink)">sel = odd turn</text>
+<text class="svglab" x="470" y="158" style="font-size:12px;fill:var(--ink)">odd FIFO empty</text>
+<text class="svglab" x="470" y="186" style="font-size:13px;fill:var(--amber);font-weight:700">stall</text>
+<text class="svglab" x="470" y="208" style="font-size:11.5px;fill:var(--ink2)">evens cannot leave</text>
+<text class="svglab" x="470" y="226" style="font-size:11.5px;fill:var(--ink2)">until the first odd</text>
+</svg>
+    <figcaption lang="ko">최악의 경우를 cycle 40 에서 멈춰 본 것. 짝수 40 개가 사이클마다 하나씩 들어왔다. 나가는 쪽은 짝수 2 하나를 내보낸 뒤 <strong>홀수 차례에서 멈춰</strong> 있다. 홀수 FIFO 가 비었기 때문이다. 판단 1 때문에 짝수를 더 꺼낼 수도 없다. 그래서 짝수 FIFO 에 <strong>39 개</strong>가 쌓인다. 깊이가 40 보다 작으면 여기서 넘친다.</figcaption>
+    <figcaption lang="en">The worst case, frozen at cycle 40. Forty evens have arrived, one per cycle. The output sent a single even, 2, and is now <strong>stuck on the odd turn</strong> because the odd FIFO is empty; decision 1 forbids sending another even. So <strong>39 evens</strong> pile up in the even FIFO. Any depth below 40 overflows right here.</figcaption>
+  </figure>
+
   <p lang="ko"><strong>그래서 한 parity 의 최대 점유량이 그 parity 의 전체 개수에 붙는다.</strong> Lab 이 <em>"40 are even and 40 are odd … This is an important assumption"</em> 이라고 못 박은 이유가 이것이다. 한 parity 가 40 개를 넘지 않으므로 <strong>40 이 상한이고 40 이면 충분하다.</strong> 측정도 맞는다. 최악 case 의 <code>peak_even</code> 은 <strong>39</strong> 였다. 하나를 일찍 꺼냈기 때문에 40 이 아니라 39 다.</p>
   <p lang="en"><strong>So the peak occupancy of one parity sits right against that parity's total count.</strong> That is why the lab insists <em>"40 are even and 40 are odd … This is an important assumption."</em> No parity exceeds 40, so <strong>40 is an upper bound, and 40 is enough.</strong> The measurement agrees: in the worst case <code>peak_even</code> was <strong>39</strong>, one short of 40 because one was popped early.</p>
 
@@ -1526,6 +1909,60 @@ make trace                 <span class="c"><span lang="ko"># 세 테스트를 CS
           <td><span lang="ko">wrapper 하나</span><span lang="en">one wrapper</span></td></tr>
     </tbody>
   </table>
+
+  <p lang="ko">표에서 제일 낯선 줄은 깊이일 것이다. 비동기 FIFO 는 왜 40 을 못 쓰나. 03 절의 gray code 에 조건이 하나 숨어 있다.</p>
+  <p lang="en">The strangest row in that table is probably depth. Why can't the asynchronous FIFO use 40? There's a condition hiding in section 03's gray code.</p>
+
+  <figure>
+<svg viewBox="0 0 720 176" role="img" aria-label="With 16 slots, wrapping from 15 to 0 in gray code changes 1000 to 0000, one bit. With 10 slots, wrapping from 9 to 0 changes 1101 to 0000, three bits, which breaks the one-bit rule that makes crossing safe.">
+<defs><marker id="gw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink2)"/></marker></defs>
+<text class="svglab" x="20" y="50" style="font-size:12.5px;fill:var(--ink);font-weight:700">16 slots</text>
+<text class="svglab" x="118" y="50" style="font-size:11.5px;fill:var(--ink2);text-anchor:end">15 →</text>
+<text class="svglab" x="356" y="50" style="font-size:11.5px;fill:var(--ink2);text-anchor:end">0</text>
+<rect x="128" y="33" width="26" height="26" rx="4" style="fill:rgba(var(--green-rgb),.18);stroke:var(--green);stroke-width:1.3"/>
+<text class="svgnum" x="141" y="51" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">1</text>
+<rect x="366" y="33" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--green);stroke-width:1.3"/>
+<text class="svgnum" x="379" y="51" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="158" y="33" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.3"/>
+<text class="svgnum" x="171" y="51" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="396" y="33" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.3"/>
+<text class="svgnum" x="409" y="51" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="188" y="33" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.3"/>
+<text class="svgnum" x="201" y="51" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="426" y="33" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.3"/>
+<text class="svgnum" x="439" y="51" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="218" y="33" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.3"/>
+<text class="svgnum" x="231" y="51" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="456" y="33" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.3"/>
+<text class="svgnum" x="469" y="51" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<path d="M252,46 L322,46" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#gw)"/>
+<text class="svglab" x="490" y="51" style="font-size:12.5px;fill:var(--green);font-weight:700">1 bit changes</text>
+<text class="svglab" x="20" y="130" style="font-size:12.5px;fill:var(--ink);font-weight:700">10 slots</text>
+<text class="svglab" x="118" y="130" style="font-size:11.5px;fill:var(--ink2);text-anchor:end">9 →</text>
+<text class="svglab" x="356" y="130" style="font-size:11.5px;fill:var(--ink2);text-anchor:end">0</text>
+<rect x="128" y="113" width="26" height="26" rx="4" style="fill:rgba(var(--amber-rgb),.18);stroke:var(--amber);stroke-width:1.3"/>
+<text class="svgnum" x="141" y="131" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">1</text>
+<rect x="366" y="113" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--amber);stroke-width:1.3"/>
+<text class="svgnum" x="379" y="131" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="158" y="113" width="26" height="26" rx="4" style="fill:rgba(var(--amber-rgb),.18);stroke:var(--amber);stroke-width:1.3"/>
+<text class="svgnum" x="171" y="131" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">1</text>
+<rect x="396" y="113" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--amber);stroke-width:1.3"/>
+<text class="svgnum" x="409" y="131" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="188" y="113" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.3"/>
+<text class="svgnum" x="201" y="131" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="426" y="113" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--ink3);stroke-width:1.3"/>
+<text class="svgnum" x="439" y="131" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<rect x="218" y="113" width="26" height="26" rx="4" style="fill:rgba(var(--amber-rgb),.18);stroke:var(--amber);stroke-width:1.3"/>
+<text class="svgnum" x="231" y="131" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">1</text>
+<rect x="456" y="113" width="26" height="26" rx="4" style="fill:var(--card);stroke:var(--amber);stroke-width:1.3"/>
+<text class="svgnum" x="469" y="131" style="font-size:13px;fill:var(--ink);text-anchor:middle;font-weight:700">0</text>
+<path d="M252,126 L322,126" style="fill:none;stroke:var(--ink2);stroke-width:1.5" marker-end="url(#gw)"/>
+<text class="svglab" x="490" y="131" style="font-size:12.5px;fill:var(--amber);font-weight:700">3 bits change</text>
+<text class="svglab" x="490" y="150" style="font-size:11px;fill:var(--ink2)">crossing is no longer safe</text>
+</svg>
+    <figcaption lang="ko">gray code 의 "한 비트만 바뀐다" 는 <strong>끝에서 처음으로 돌아올 때도</strong> 지켜져야 한다. 칸이 16 개면 15 (1000) 에서 0 (0000) 으로 한 비트만 바뀐다. 칸이 10 개면 9 (1101) 에서 0 으로 돌아와야 하는데 <strong>세 비트</strong>가 바뀐다. 03 절 2 번 그림의 사고가 되살아난다. 그래서 비동기 FIFO 는 깊이가 2 의 거듭제곱이어야 하고, 40 대신 <strong>64</strong> 를 쓴다.</figcaption>
+    <figcaption lang="en">Gray code's "one bit at a time" has to hold <strong>on the wrap from the end back to the start</strong> too. With 16 slots, 15 (1000) to 0 (0000) is one bit. With 10 slots you'd wrap from 9 (1101) to 0, and <strong>three bits</strong> change: the accident from picture 2 in section 03 is back. That's why an asynchronous FIFO needs a power-of-two depth, and why it takes <strong>64</strong> instead of 40.</figcaption>
+  </figure>
 
   <div class="jargon">
     <details open>
