@@ -3,11 +3,8 @@ module tb_async_fifo;
     localparam int DATA_WIDTH = 8;
     localparam int DEPTH      = 16;
 
-    // Thresholds the design is required to hit, spelled the same way the
-    // design spells them so the testbench and fifo_wptr/fifo_rptr cannot
-    // drift apart silently.
-    localparam int AF_LEVEL   = (3 * DEPTH) / 4;   // almost_full  at 3/4 full
-    localparam int AE_LEVEL   = DEPTH / 4;         // almost_empty at 3/4 empty
+    localparam int AF_LEVEL   = (3 * DEPTH) / 4;
+    localparam int AE_LEVEL   = DEPTH / 4;
 
     logic [DATA_WIDTH-1:0] wdata;
     logic [DATA_WIDTH-1:0] rdata;
@@ -36,35 +33,24 @@ module tb_async_fifo;
     );
 
 
-    // Write clock: 10 ns period
     initial begin
         wclk = 1'b0;
         forever #5 wclk = ~wclk;
     end
 
 
-    // Read clock: 14 ns period
     initial begin
         rclk = 1'b0;
         forever #7 rclk = ~rclk;
     end
 
 
-    // Dump waveforms for Verdi
     initial begin
         $fsdbDumpfile("novas.fsdb");
         $fsdbDumpvars(0, tb_async_fifo);
     end
 
 
-    // Optional CSV trace, switched on with +TRACE.
-    //
-    // The two clocks have different periods (10 ns and 14 ns), so there is no
-    // one clock to sample on. We sample a flat 1 ns grid instead. That lands
-    // exactly on every edge of both clocks, so a plot can be drawn from the
-    // file without guessing where the edges were.
-    //
-    // Nothing is opened unless +TRACE is passed, so a normal run is untouched.
     int    trace_fd;
     bit    tracing = 1'b0;
     string trace_name = "run";
@@ -88,7 +74,6 @@ module tb_async_fifo;
     end
 
 
-    // Reset the FIFO
     task automatic reset_fifo;
         begin
             winc   = 1'b0;
@@ -113,7 +98,6 @@ module tb_async_fifo;
     endtask
 
 
-    // Write one value into the FIFO
     task automatic write_word(
         input logic [DATA_WIDTH-1:0] data
     );
@@ -130,7 +114,6 @@ module tb_async_fifo;
     endtask
 
 
-    // Read one value from the FIFO
     task automatic read_word(
         output logic [DATA_WIDTH-1:0] data
     );
@@ -147,9 +130,6 @@ module tb_async_fifo;
     endtask
 
 
-    // TEST 1:
-    // FIFO starts empty, fills completely,
-    // then is read until empty again.
     task automatic test_fill_empty;
 
         logic [DATA_WIDTH-1:0] read_value;
@@ -198,17 +178,6 @@ module tb_async_fifo;
     endtask
 
 
-    // TEST 2:
-    // Check that almost_full and almost_empty assert at the right occupancy.
-    //
-    // The earlier version of this test filled to the threshold and then did
-    // wait (almost_full). That only proves the flag asserts at some point, not
-    // that it asserts at the right point: setting ALMOST_FULL_LEVEL to DEPTH/2
-    // in fifo_wptr.sv still passed it, and the test even printed "asserted at
-    // 3/4 full" because that string is a constant.
-    //
-    // So each flag is checked on both sides of its boundary. One entry short
-    // it must be low, and on the entry that crosses it must be high.
     task automatic test_flags;
 
         logic [DATA_WIDTH-1:0] read_value;
@@ -227,10 +196,6 @@ module tb_async_fifo;
                 errors = errors + 1;
             end
 
-            //--------------------------------------------------------------
-            // almost_full boundary. No reads have happened, so the write side
-            // sees an exact occupancy and the check needs no settling time.
-            //--------------------------------------------------------------
             err_mark = errors;
 
             for (i = 0; i < AF_LEVEL - 1; i = i + 1)
@@ -256,13 +221,6 @@ module tb_async_fifo;
                 $display("almost_full correct: low at %0d entries, high at %0d.",
                          AF_LEVEL - 1, AF_LEVEL);
 
-            //--------------------------------------------------------------
-            // almost_empty boundary. This flag lives in the read domain and is
-            // computed from the synchronized write pointer, so wait for that
-            // pointer to arrive before judging it. The writer is idle from here
-            // on, so once it has arrived the occupancy the read side sees is
-            // exact.
-            //--------------------------------------------------------------
             wait (!almost_empty);
 
             err_mark = errors;
@@ -295,8 +253,6 @@ module tb_async_fifo;
     endtask
 
 
-    // TEST 3:
-// Simultaneous reads and writes using different clocks.
 task automatic test_simultaneous;
 
     logic [DATA_WIDTH-1:0] read_value;
@@ -310,12 +266,9 @@ task automatic test_simultaneous;
 
         reset_fifo();
 
-        // Preload 4 entries so the reader has data available
-        // when simultaneous operation begins.
         for (wi = 0; wi < 4; wi = wi + 1)
             write_word(wi + 8'h40);
 
-        // Continue writing while reading at the same time.
         fork
 
             begin : writer
@@ -351,7 +304,6 @@ task automatic test_simultaneous;
 endtask
 
 
-    // Select one test from the command line.
     initial begin
 
         errors = 0;

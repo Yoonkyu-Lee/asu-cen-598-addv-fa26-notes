@@ -1,39 +1,3 @@
-// even_odd_top 의 testbench.
-//
-// 검증 요구는 둘이다.
-//
-//   1. 명시된 속도로 돌린다. 입력 80 data / 100 clock, 출력 8 data / 10 clock
-//   2. FIFO 크기 계산 문서의 case 를 최소 두 개 태운다. 그중 하나는 크기를
-//      정할 때 쓴 case 여야 한다
-//
-// 그래서 네 가지를 돌린다.
-//
-//   case9_skew    Case 9 의 속도. parity 가 최악으로 쏠린 입력 (짝 40개 먼저,
-//                 그 다음 홀 40개). FIFO 깊이를 정한 case 가 이것이다
-//   case9_random  Case 9 의 속도. parity 가 뒤섞인 입력. 정상 동작 확인용
-//   case8         fA = fB, 쓰기 2클럭당 1개, 읽기 4클럭당 1개. 문서 Case 8
-//   case7         fA = fB, 쓰기도 읽기도 매 클럭. 문서 Case 7
-//
-// 하나만 돌리려면 다시 컴파일하지 않고 이렇게 고른다.
-//
-//   ./simv +TEST=case9_skew
-//
-// +TRACE 를 같이 주면 사이클마다 CSV 한 줄을 trace-<test>.csv 로 흘린다.
-// 학습 노트가 파형 그림을 그 파일에서 직접 그린다. 평소 실행에는 영향이 없다.
-//
-// 아무것도 안 주면 넷 다 돈다.
-//
-// -------------------------------------------------------------------------
-// 확인하는 것
-//
-//   교대      연속 두 출력의 parity 가 절대 같지 않다
-//   순서      같은 parity 안에서 입력 순서가 그대로 지켜진다
-//   0 금지    Lab 이 "should not output a 0" 라고 적었다. 입력에 0 이 없으므로
-//             출력에 0 이 나오면 그 자체가 버그다
-//   넘침 없음 두 FIFO 의 full 이 한 번도 서지 않는다. 깊이가 충분하다는 증거다
-//   점유량    각 FIFO 의 최대 점유량을 재서 찍는다. 리포트의 크기 근거가 된다
-// -------------------------------------------------------------------------
-
 `ifndef FIFO_DEPTH
   `define FIFO_DEPTH 64
 `endif
@@ -43,7 +7,6 @@ module tb_even_odd;
     localparam int DATA_WIDTH = 8;
     localparam int DEPTH      = `FIFO_DEPTH;
 
-    // 한 테스트당 보내는 개수. Lab 의 가정대로 짝 40개, 홀 40개다.
     localparam int N_ITEMS = 80;
 
     logic                  Clock;
@@ -73,18 +36,12 @@ module tb_even_odd;
     end
 
 
-    //======================================================================
-    // 채점판. 쓴 것을 parity 별로 쌓아 두고, 나온 것과 맞춰 본다.
-    // 같은 parity 안에서 순서가 보존되는지는 큐의 앞에서 꺼내 비교하면 끝난다.
-    //======================================================================
-
     logic [DATA_WIDTH-1:0] exp_even [$];
     logic [DATA_WIDTH-1:0] exp_odd  [$];
 
     int errors;
     int total_errors;
 
-    // 직전 출력의 parity. -1 은 아직 아무것도 안 나왔다는 뜻이다.
     int prev_parity;
 
     int occ_even, occ_odd;
@@ -92,42 +49,17 @@ module tb_even_odd;
     int out_count;
     int full_seen;
 
-    // 첫 쓰기부터 마지막 출력까지 걸린 사이클. 두 구현의 처리 시간 차이가
-    // 여기서 숫자로 나온다. empty 가 늦게 풀리면 읽기가 늦게 시작되고,
-    // 그만큼 전체가 뒤로 밀린다.
     time start_time;
     time last_out_time;
 
     logic [DATA_WIDTH-1:0] stim [0:N_ITEMS-1];
 
-    // +TRACE 를 주면 사이클마다 CSV 한 줄을 파일로 흘린다. 학습 노트가 파형을
-    // 직접 그릴 때 쓴다. 안 주면 파일을 열지도 않으므로 평소 실행에는 영향이 없다.
     int  trace_fd;
     bit  tracing;
 
     string test_name;
     string want_test;
 
-
-    //======================================================================
-    // 점유량 추적.
-    //
-    // 두 구현이 점유량을 서로 다르게 들고 있으므로 (동기는 카운터 하나,
-    // 비동기는 gray code 포인터 두 벌) FIFO 안을 들여다보지 않는다.
-    // 대신 상위 모듈의 wr_en / rd_en 을 testbench 가 직접 센다.
-    // 그래야 같은 잣대로 두 구현을 비교할 수 있다.
-    //
-    // posedge 이벤트 그 순간에 읽는다. 지연을 두지 않는다.
-    //
-    // 이 시점에는 설계의 always_ff 가 아직 값을 안 바꿨다 (NBA 영역이 뒤에 온다).
-    // 그래서 여기서 읽는 wr_en / rd_en 은 이 엣지가 실제로 쓰는 값이다.
-    //
-    // 처음에는 #1 뒤에 읽었다. 틀렸다. 쓰기(Write_en)는 negedge 까지 붙들려 있어서
-    // 엣지 뒤에 읽어도 같지만, 꺼내기(do_pop)는 조합 신호라 엣지 뒤의 상태로
-    // 다시 계산된다. 그러면 이번 엣지의 쓰기와 다음 엣지의 꺼내기를 한데 세게 된다.
-    // 트레이스를 out_valid 로 다시 세서 알아냈다. 여덟 run 중 다섯에서 최대
-    // 점유량이 1 에서 2 틀렸다. 깊이를 정한 39 는 영향이 없었다.
-    //======================================================================
 
     always @(posedge Clock) begin
         if (!Reset) begin
@@ -147,13 +79,6 @@ module tb_even_odd;
     end
 
 
-    //======================================================================
-    // CSV 트레이스.
-    //
-    // 점유량 추적과 같은 시점(posedge + 1ns)에서 찍는다. 그래야 표에 나오는
-    // peak 값과 파형에 그려지는 점유량이 같은 숫자가 된다.
-    //======================================================================
-
     int trace_cycle;
 
     always @(posedge Clock) begin
@@ -170,25 +95,16 @@ module tb_even_odd;
     end
 
 
-    //======================================================================
-    // 자극 만들기
-    //======================================================================
-
-    // skew 가 1 이면 짝수 40개를 먼저 다 보내고 그 다음 홀수 40개를 보낸다.
-    // 이게 최악이다. 홀수가 하나도 없는 동안 읽기 쪽은 짝수 하나를 내보낸 뒤
-    // 멈춘 채로 기다리고, 그동안 짝수 FIFO 에만 계속 쌓인다.
     task automatic build_stim(input bit skew, input int seed);
         int i, j;
         logic [DATA_WIDTH-1:0] t;
         begin
             for (i = 0; i < 40; i = i + 1) begin
-                stim[i]      = DATA_WIDTH'(2 + 2*i);  // 2, 4, ... 80  짝수
-                stim[40 + i] = DATA_WIDTH'(1 + 2*i);  // 1, 3, ... 79  홀수
+                stim[i]      = DATA_WIDTH'(2 + 2*i);
+                stim[40 + i] = DATA_WIDTH'(1 + 2*i);
             end
 
             if (!skew) begin
-                // Fisher-Yates. seed 를 박아서 매번 같은 순서가 나오게 한다.
-                // 재현되지 않는 테스트는 디버깅할 수 없다.
                 void'($urandom(seed));
                 for (i = N_ITEMS - 1; i > 0; i = i - 1) begin
                     j = $urandom_range(i, 0);
@@ -198,16 +114,6 @@ module tb_even_odd;
         end
     endtask
 
-
-    //======================================================================
-    // 생산자. wr_period 사이클마다 앞의 wr_on 사이클에서 쓴다.
-    //
-    //   Case 9 : wr_on = 80, wr_period = 100  ->  80 data / 100 clock
-    //            문서가 최악을 이렇게 잡으라고 한다. 쓰기는 최대 속도로 몰아
-    //            붙이고 읽기는 최저 속도로 두는 것
-    //   Case 8 : wr_on = 1,  wr_period = 2    ->  2클럭당 1개
-    //   Case 7 : wr_on = 1,  wr_period = 1    ->  매 클럭
-    //======================================================================
 
     task automatic producer(input int wr_on, input int wr_period);
         int sent, c;
@@ -242,11 +148,6 @@ module tb_even_odd;
     endtask
 
 
-    //======================================================================
-    // 소비자. rd_period 사이클마다 앞의 rd_on 사이클에서 읽기를 요청한다.
-    // 다 나올 때까지 계속 요청한다. 설계가 멈춰 있으면 요청은 무시된다.
-    //======================================================================
-
     task automatic consumer(input int rd_on, input int rd_period, input int max_cycles);
         int c;
         begin
@@ -263,10 +164,6 @@ module tb_even_odd;
     endtask
 
 
-    //======================================================================
-    // 감시자. 나온 값 하나하나를 채점판과 맞춘다.
-    //======================================================================
-
     task automatic monitor(input int max_cycles);
         logic [DATA_WIDTH-1:0] d;
         logic [DATA_WIDTH-1:0] want;
@@ -280,14 +177,12 @@ module tb_even_odd;
                 if (dut.out_valid) begin
                     d = Data_out;
 
-                    // 0 은 나오면 안 된다. 자극에 0 이 없기 때문이다.
                     if (d === '0) begin
                         $error("[%s] output 0 at time %0t. The circuit must pause instead.",
                                test_name, $time);
                         errors = errors + 1;
                     end
 
-                    // 교대. 직전과 parity 가 같으면 설계의 핵심이 깨진 것이다.
                     if (prev_parity >= 0 && int'(d[0]) == prev_parity) begin
                         $error("[%s] two %s numbers in a row at time %0t (value %0d)",
                                test_name, d[0] ? "odd" : "even", $time, d);
@@ -295,7 +190,6 @@ module tb_even_odd;
                     end
                     prev_parity = int'(d[0]);
 
-                    // 같은 parity 안의 순서.
                     if (d[0]) begin
                         if (exp_odd.size() == 0) begin
                             $error("[%s] got odd %0d but nothing was written", test_name, d);
@@ -333,10 +227,6 @@ module tb_even_odd;
     endtask
 
 
-    //======================================================================
-    // 한 테스트를 통째로 돌린다.
-    //======================================================================
-
     task automatic run_case(input string name,
                             input bit    skew,
                             input int    seed,
@@ -351,7 +241,6 @@ module tb_even_odd;
             err_mark   = errors;
             max_cycles = 4000;
 
-            // 판을 비운다.
             exp_even.delete();
             exp_odd.delete();
             prev_parity = -1;
@@ -408,7 +297,7 @@ module tb_even_odd;
 
             $display("RESULT %-14s out=%0d/%0d  peak_even=%2d  peak_odd=%2d  cycles=%0d  %s",
                      name, out_count, N_ITEMS, peak_even, peak_odd,
-                     (last_out_time - start_time) / 10, // 클럭 주기가 10ns 다
+                     (last_out_time - start_time) / 10,
                      (errors == err_mark) ? "ok" : "FAILED");
 
             total_errors = errors;
@@ -436,19 +325,15 @@ module tb_even_odd;
         $display("  TEST       = %s", want_test);
         $display("=========================================");
 
-        // Case 9, 최악의 parity 쏠림. FIFO 깊이를 정한 case 다.
         if (selected("case9_skew"))
             run_case("case9_skew",   1'b1,        0, 80, 100, 8, 10);
 
-        // Case 9, parity 가 뒤섞인 보통 입력.
         if (selected("case9_random"))
             run_case("case9_random", 1'b0, 'h5EED_0009, 80, 100, 8, 10);
 
-        // 문서 Case 8. fA = fB, 쓰기 2클럭당 1개, 읽기 4클럭당 1개.
         if (selected("case8"))
             run_case("case8",        1'b0, 'h5EED_0008,  1,   2, 1,  4);
 
-        // 문서 Case 7. fA = fB, 둘 다 idle 없음.
         if (selected("case7"))
             run_case("case7",        1'b0, 'h5EED_0007,  1,   1, 1,  1);
 
@@ -463,7 +348,6 @@ module tb_even_odd;
     end
 
 
-    // 무한 대기 방지.
     initial begin
         #500000;
         $display("TEST FAILED: watchdog timeout");

@@ -1,22 +1,3 @@
-// fifo_q, 비동기 구현.
-//
-// Part 1 에서 만든 async_fifo 를 Part 2 의 동기 포트 계약에 맞춰 감싼 것뿐이다.
-// Part 1 의 파일은 한 줄도 고치지 않는다.
-//
-// 하는 일이 셋이다.
-//   1. wclk 과 rclk 을 clk 하나로 묶는다
-//   2. wrst_n 과 rrst_n 을 rst_n 하나로 묶는다
-//   3. almost_full 과 almost_empty 를 끊는다. Part 2 는 쓰지 않는다
-//
-// 주의할 점이 하나 있다. 클럭을 묶어도 안쪽의 2단 동기화기는 그대로 남는다.
-// 쓰기가 실린 뒤 empty 가 내려가기까지 레지스터 넷을 지난다. 쓰기 포인터 자신,
-// 동기화기 두 단, 그리고 등록된 출력인 rempty. 첫째는 쓰기 엣지 그 자체에서
-// 잡으므로 쓰기 뒤로 세면 세 엣지다. 기능은 맞고 보수적일 뿐이지만, 비었다
-// 찼다를 자주 오가는 회로에서는 처리량을 깎는다.
-//
-// 처음에는 동기화기만 세서 두 사이클로 적었다. 틀렸다. 실측은 tb_fifo_q.sv 가
-// 하고 MEASUREMENTS.md 에 예측과 나란히 적어 두었다.
-
 module fifo_q #(
     parameter int DATA_WIDTH = 8,
     parameter int DEPTH      = 64
@@ -34,7 +15,6 @@ module fifo_q #(
     output logic                  empty
 );
 
-    // Part 2 는 이 둘을 쓰지 않는다. 뜨게는 두되 밖으로 내보내지 않는다.
     logic almost_full_unused;
     logic almost_empty_unused;
 

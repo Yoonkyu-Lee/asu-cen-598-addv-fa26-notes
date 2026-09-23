@@ -38,3 +38,6 @@ lab/**/report.md
 # slides/ 로 변환된 PDF 뿐이다. 원본 PPTX, Lab 문제지, 폰트는 전부 여기 남는다.
 # Microsoft Aptos 폰트는 EULA 가 붙은 재배포 금지 자산이다. 공개 저장소다.
 lecture/
+
+# Python 바이트코드. scripts/codeview_build.py 가 스펙을 import 하면서 남긴다
+__pycache__/

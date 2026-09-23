@@ -22,8 +22,6 @@ test3:
 verdi:
 	$(VERDI) -dbdir ./simv.daidir -ssf novas.fsdb -nologo
 
-# Cycle-accurate CSV trace for plotting. Writes trace-<test>.csv next to simv.
-# Nothing changes in a normal run; the testbench only opens the file on +TRACE.
 trace: compile
 	mkdir -p trace
 	./simv +TEST_FILL_EMPTY   +TRACE=fill_empty
