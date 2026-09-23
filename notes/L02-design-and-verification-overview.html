@@ -503,6 +503,28 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Slide 5. <strong>RTL sits between behavioral and structural.</strong> Above it, things may not synthesise; below it, nobody writes by hand and synthesis tools generate it instead. RTL is the <strong>practical compromise</strong> in between. The slide closes by stating flatly that all these terms are loosely defined.</figcaption>
   </figure>
 
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>위에서 아래로 네 층이다. 위일수록 "무엇을" 만 말하고, 아래일수록 "어떻게" 까지 정한다.</p>
+<table><thead><tr><th>층</th><th>그림 속 예시</th><th>무엇을 말하나</th></tr></thead><tbody>
+<tr><td>Functional</td><td><code>func adder() { result = a + b; }</code></td><td>결과만 말한다. clock 도 포트도 없다. C 같은 소프트웨어 언어로 쓸 수 있다</td></tr>
+<tr><td>Behavioral</td><td><code>module adder(a,b,enable,clk,result)</code><br><code>{ if (enable and clk) result = a + b; }</code></td><td>포트 다섯 개 (<code>a</code>, <code>b</code>, <code>enable</code>, <code>clk</code>, <code>result</code>) 가 생겼고, "enable 과 clk 가 참일 때 더한다" 는 <strong>동작</strong>을 서술한다</td></tr>
+<tr><td>Structural</td><td><code>{ and_gate g(...); or_gate h(...); }</code></td><td>동작 대신 <strong>부품</strong>을 늘어놓는다. <code>g</code> 라는 이름의 AND 게이트, <code>h</code> 라는 이름의 OR 게이트. <code>(...)</code> 는 슬라이드가 포트 연결을 줄여 쓴 자리다</td></tr>
+<tr><td>Physical</td><td>코드 없음</td><td>트랜지스터 회로, 또는 칩 위에 실제로 그려지는 도형 (layout)</td></tr>
+</tbody></table>
+<p><strong>그림 속 코드는 실제로 컴파일되는 Verilog 가 아니다.</strong> 슬라이드가 개념만 보이려고 줄여 쓴 의사 코드다. Verilog 에는 <code>func</code> 도, 중괄호로 묶는 블록도 없고, 조건식에는 <code>and</code> 대신 <code>&amp;&amp;</code> 를 쓴다.</p>
+<p><strong>오른쪽 파란 괄호</strong>는 Behavioral 과 Structural 두 층을 묶는다. Verilog 한 언어로 둘 다 쓸 수 있다는 뜻이다. <strong>왼쪽 보라색 RTL 상자</strong>에서 나온 선 두 개는 Behavioral 상자 아래 모서리와 Structural 상자 위 모서리를 가리킨다. RTL (Register Transfer Level, 레지스터와 레지스터 사이로 값이 옮겨 가는 것을 적는 수준) 이 그 두 층 <strong>사이</strong>에 있다는 뜻이다. <strong>맨 아래 줄</strong>은 양 끝의 단점이다. 위로 가면 합성 도구가 게이트로 못 바꿀 만큼 추상적이고, 아래로 가면 사람이 손으로 쓰기엔 너무 길다.</p></div>
+    <div lang="en"><p>Four layers, top to bottom. The higher you are, the more you only say <em>what</em>; the lower, the more you pin down <em>how</em>.</p>
+<table><thead><tr><th>Layer</th><th>Example in the picture</th><th>What it says</th></tr></thead><tbody>
+<tr><td>Functional</td><td><code>func adder() { result = a + b; }</code></td><td>Only the result. No clock, no ports. You could write it in a software language like C</td></tr>
+<tr><td>Behavioral</td><td><code>module adder(a,b,enable,clk,result)</code><br><code>{ if (enable and clk) result = a + b; }</code></td><td>Five ports appear (<code>a</code>, <code>b</code>, <code>enable</code>, <code>clk</code>, <code>result</code>), and it describes a <strong>behaviour</strong>: add when enable and clk are true</td></tr>
+<tr><td>Structural</td><td><code>{ and_gate g(...); or_gate h(...); }</code></td><td>Instead of behaviour, a list of <strong>parts</strong>: an AND gate named <code>g</code>, an OR gate named <code>h</code>. The <code>(...)</code> is where the slide left out the port connections</td></tr>
+<tr><td>Physical</td><td>no code</td><td>A transistor circuit, or the actual shapes drawn on the chip (the layout)</td></tr>
+</tbody></table>
+<p><strong>The code in the picture isn't Verilog that would compile.</strong> It's pseudo-code the slide trimmed down to show the idea. Verilog has no <code>func</code> and no curly-brace blocks, and conditions use <code>&amp;&amp;</code>, not <code>and</code>.</p>
+<p><strong>The blue bracket on the right</strong> groups the behavioral and structural layers: one language, Verilog, can write both. <strong>The two lines out of the violet RTL box on the left</strong> point at the bottom edge of the behavioral box and the top edge of the structural box, meaning RTL (Register Transfer Level: describing values moving from register to register) sits <strong>between</strong> those two. <strong>The bottom line</strong> gives the weakness at each end: too high and the synthesis tool can't turn it into gates; too low and it's too long to write by hand.</p></div>
+  </div>
+
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · behavioral / structural</span><span lang="en">Unpacking the jargon · behavioral and structural</span></summary>
     <div class="body">
@@ -631,6 +653,34 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Slide 7. What stands out is that <strong>two of the eight boxes are "iterate with another team".</strong> Design is not solitary work, and the round trip with verification is a named stage. Set it beside the verification engineer's version in <a href="#s20">§20</a> and the two roles turn out to mirror each other.</figcaption>
   </figure>
 
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>화살표를 따라가는 순서다. <strong>왼쪽 열은 위에서 아래로, 가운데 열은 아래에서 위로, 오른쪽 열은 다시 위에서 아래로.</strong></p>
+<ol>
+<li><strong>사양 문서 읽기</strong> (Reading specifications): 무엇을 만들지 적힌 문서를 읽는다</li>
+<li><strong>설계 계획 세우기</strong> (Chart a design plan): 밑에 적힌 <code>microarchitecture</code> 는 블록을 어떻게 나누고, 레지스터와 파이프라인 단을 어디에 둘지 정한 내부 구조다</li>
+<li><strong>Coding RTL</strong>: 가장 진하게, 가장 굵은 테두리로 칠한 칸. 여덟 칸 중 RTL 을 직접 쓰는 것은 이 하나다</li>
+<li><strong>간단한 testbench 로 sanity 확인</strong>: 설계자가 직접 기본 동작만 돌려보는 가벼운 점검. sanity 는 "제정신인지" 정도의 뜻이다</li>
+<li><strong>검증 엔지니어와 주고받기</strong>: 검증 쪽이 찾은 버그를 고치고, 사양 해석을 맞춘다</li>
+<li><strong>Synthesize</strong>: RTL 을 게이트로 바꾸는 합성 (04 절)</li>
+<li><strong>STA 엔지니어와 주고받기</strong>: STA 는 Static Timing Analysis. 시뮬레이션 없이 모든 경로의 지연을 계산해서 clock 주기 안에 들어오는지 보는 분석이다. 안 들어오면 RTL 을 고친다</li>
+<li><strong>ECOs</strong>: Engineering Change Order. 설계가 거의 끝난 뒤에 netlist 를 부분적으로 고치는 일이다 (<a href="L01-course-intro.html#s7">Lecture 1 07 절</a>)</li>
+</ol>
+<p><strong>색</strong>은 그림 아래 범례대로다. 파랑 설계, 분홍 검증과 맞추기, 보라 도구, 갈색 물리 쪽 여파. 5 번과 7 번 두 칸이 "다른 팀과 주고받기" 다.</p></div>
+    <div lang="en"><p>Follow the arrows. <strong>The left column runs top to bottom, the middle column bottom to top, the right column top to bottom again.</strong></p>
+<ol>
+<li><strong>Reading specifications</strong>: the document that says what to build</li>
+<li><strong>Chart a design plan</strong>: the <code>microarchitecture</code> underneath is the internal structure, how the blocks split up and where the registers and pipeline stages go</li>
+<li><strong>Coding RTL</strong>: the darkest box with the heaviest border. Of the eight, this is the only one that's actually writing RTL</li>
+<li><strong>Sanity testing with simple testbenches</strong>: the designer runs the basics themselves as a light check. "Sanity" as in "is this even sane"</li>
+<li><strong>Iterate with verification engineers</strong>: fixing the bugs verification finds and agreeing on how to read the spec</li>
+<li><strong>Synthesize</strong>: turning RTL into gates (§04)</li>
+<li><strong>Iterate with STA engineers</strong>: STA is Static Timing Analysis, computing the delay of every path without simulation to see whether it fits in the clock period. If it doesn't, the RTL changes</li>
+<li><strong>ECOs</strong>: Engineering Change Orders, patching the netlist once the design is nearly finished (<a href="L01-course-intro.html#s7">Lecture 1, §07</a>)</li>
+</ol>
+<p><strong>Colours</strong> follow the legend under the picture: blue design, pink syncing with verification, violet tooling, brown physical fallout. Boxes 5 and 7 are the two "iterate with another team" steps.</p></div>
+  </div>
+
   <div class="callout">
     <p lang="ko"><strong>발표자 노트에 이런 말이 적혀 있다.</strong> "하드웨어는 병렬이다. 컴퓨터는 프로그램을 순차적으로 실행한다. 시뮬레이터는 <strong>순차적인 컴퓨터 위에서 병렬 하드웨어를 흉내</strong>내야 한다. 그래서 병렬성을 모델링할 방법이 필요하다." 이게 <a href="#s14">14절</a>의 simulated time과 wall clock time 구분으로 이어진다.</p>
     <p lang="en"><strong>The speaker notes carry this line:</strong> hardware is parallel, computers run programs sequentially, and a simulator has to <strong>imitate parallel hardware on a sequential machine</strong>, so it needs a way to model that parallelism. It leads directly into the simulated time versus wall clock time distinction in <a href="#s14">§14</a>.</p>
@@ -707,6 +757,34 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="ko">슬라이드 9쪽. <strong>입력이 셋이라는 게 핵심이다.</strong> 같은 RTL이라도 constraint를 바꾸거나 tech library를 바꾸면 전혀 다른 netlist가 나온다. 그래서 <a href="L01-course-intro.html#s7">Lecture 1에서 본 ECO</a>가 필요했던 것이다. 합성을 다시 돌리면 "그때 그 netlist"가 재현된다는 보장이 없다.</figcaption>
     <figcaption lang="en">Slide 9. <strong>The point is that there are three inputs.</strong> The same RTL with different constraints, or a different tech library, produces a completely different netlist. That is precisely why the <a href="L01-course-intro.html#s7">ECO from Lecture 1</a> exists: re-running synthesis gives no guarantee of reproducing the netlist you had.</figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>왼쪽 세 칸이 입력</strong>이다.</p>
+<ul>
+<li><strong>RTL Design</strong>: 우리가 쓴 코드</li>
+<li><strong>Constraints</strong>: 도구에게 주는 목표와 조건. 예를 들어 "clock 주기를 얼마 안에 맞춰라" 같은 것</li>
+<li><strong>Tech Library</strong>: foundry 가 주는 standard cell 목록. cell 마다 면적, 지연, 전력 값이 적혀 있다. 공장 쪽에서 오는 것이라 갈색이다</li>
+</ul>
+<p>세 화살표가 <strong>가운데 보라색 Synthesis</strong> 로 모인다. 보라는 도구의 색이다. <strong>오른쪽 두 칸이 출력</strong>이다.</p>
+<ul>
+<li><strong>Netlist</strong>: 어떤 standard cell 을 몇 개 쓰고 wire 로 어떻게 이었는지의 목록</li>
+<li><strong>Area, Timing, Power Reports</strong>: 면적이 얼마, 가장 느린 경로가 얼마, 전력이 얼마 나왔는지 적은 보고서</li>
+</ul>
+<p>그 밑의 "됐다가 아니라 이만큼 들었다" 는 합성의 결과가 성공 · 실패 한 줄이 아니라 <strong>비용 보고서</strong>라는 뜻이다. timing 보고서가 "목표 clock 주기를 못 맞췄다" 고 말할 수도 있다. 맨 아래 줄대로, 입력 셋 중 하나만 바뀌어도 netlist 가 달라진다.</p></div>
+    <div lang="en"><p><strong>The three boxes on the left are inputs.</strong></p>
+<ul>
+<li><strong>RTL Design</strong>: the code you wrote</li>
+<li><strong>Constraints</strong>: goals and conditions for the tool, such as "meet this clock period"</li>
+<li><strong>Tech Library</strong>: the foundry's list of standard cells, each with its area, delay and power. It comes from the fab side, hence brown</li>
+</ul>
+<p>The three arrows meet at <strong>Synthesis in the middle,</strong> violet because it's a tool. <strong>The two boxes on the right are outputs.</strong></p>
+<ul>
+<li><strong>Netlist</strong>: which standard cells were used, how many, and how the wires join them</li>
+<li><strong>Area, Timing, Power Reports</strong>: how much area it took, how slow the slowest path is, how much power it burns</li>
+</ul>
+<p>"Not 'it worked' but 'here is what it cost'" means synthesis doesn't hand back a pass or fail line; it hands back <strong>a bill.</strong> The timing report may well say you missed the target clock period. And as the bottom line says, change any one of the three inputs and the netlist changes.</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · standard cell</span><span lang="en">Unpacking the jargon · standard cell</span></summary>
@@ -1045,6 +1123,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Slide 19. <strong>The fundamental trade-off in digital design and computer architecture.</strong> Going faster costs area; saving area costs time. To compare two designs, people commonly use the <strong>area delay product.</strong></figcaption>
   </figure>
 
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>가로축은 Area</strong> (면적, 오른쪽일수록 크다), <strong>세로축은 Delay</strong> (지연, 위일수록 느리다). 곡선은 경향을 보이는 개념도이고 측정값을 찍은 것이 아니다.</p>
+<ul>
+<li><strong>왼쪽 위 점, Ripple Carry Adder.</strong> 자리올림(carry)이 가장 아래 자리에서 윗자리로 한 칸씩 물결처럼(ripple) 전해지는 덧셈기다. 비트마다 full adder 하나만 두니 작다. 대신 n 비트면 carry 가 n 칸을 차례로 지나야 결과가 확정되니 느리다</li>
+<li><strong>오른쪽 아래 점, Carry Lookahead Adder.</strong> 각 자리의 carry 를 미리(lookahead) 한꺼번에 계산하는 논리를 더 얹어서 기다림을 줄인다. 빠르지만 그 논리만큼 면적이 는다</li>
+</ul>
+<p><strong>Area Delay Product</strong> 는 면적 × 지연이다. 작을수록 좋다. 가상의 숫자로 예를 들면, 설계 A 가 면적 2 · 지연 6 이면 2 × 6 = 12, 설계 B 가 면적 4 · 지연 2 면 4 × 2 = 8. 곱으로 보면 B 가 낫다. 이 숫자는 계산을 보이려는 예시일 뿐이다.</p></div>
+    <div lang="en"><p><strong>The horizontal axis is area</strong> (bigger to the right), <strong>the vertical axis is delay</strong> (slower going up). The curve shows a trend; it isn't plotted from measurements.</p>
+<ul>
+<li><strong>Top left, the ripple carry adder.</strong> The carry travels from the lowest bit up one position at a time, rippling. One full adder per bit keeps it small, but with n bits the carry has to pass through n stages in turn before the result settles, so it's slow</li>
+<li><strong>Bottom right, the carry lookahead adder.</strong> Extra logic works out every position's carry ahead of time, all at once, cutting the wait. Fast, but that logic costs area</li>
+</ul>
+<p><strong>Area delay product</strong> is area × delay, and smaller is better. With made-up numbers: design A with area 2 and delay 6 gives 2 × 6 = 12; design B with area 4 and delay 2 gives 4 × 2 = 8. By the product, B wins. The numbers are only there to show the arithmetic.</p></div>
+  </div>
+
   <div class="trap">
     <span class="tag" lang="ko">복습 문제 2번: 목표들이 어떻게 서로 충돌하나</span><span class="tag" lang="en">Review question 2: how the goals conflict</span>
     <p lang="ko">슬라이드 59쪽이 <strong>"디지털 설계의 흔한 목표들은 무엇이고 서로 어떻게 충돌하는가"</strong>를 묻는다. 일곱 개를 나열만 하면 절반짜리 답이다. 충돌하는 짝을 들어야 한다.</p>
@@ -1237,6 +1331,28 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="ko">슬라이드 29쪽. 왼쪽 숫자는 <strong>상대 비용</strong>이다. 설계 단계에서 잡으면 1, 응용 단계에서 잡으면 10000. 발표자 노트가 구체적인 예를 적어놨다: <strong>Intel 프로세서의 부동소수점 유닛 버그가 약 10억 달러를 물렸다.</strong></figcaption>
     <figcaption lang="en">Slide 29. The numbers on the left are <strong>relative cost</strong>: one if you catch it during design, ten thousand if it surfaces in the application. The speaker notes give the concrete case: <strong>the floating point bug in Intel processors cost around a billion dollars.</strong></figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>왼쪽 숫자가 상대 비용</strong>, <strong>오른쪽이 버그를 발견한 단계</strong>다. 한 줄 내려갈 때마다 10 을 곱한다.</p>
+<table><thead><tr><th>발견한 곳</th><th>상대 비용</th><th>계산</th></tr></thead><tbody>
+<tr><td>Design</td><td>1</td><td>기준</td></tr>
+<tr><td>Wafer</td><td>10</td><td>1 × 10</td></tr>
+<tr><td>Chip</td><td>100</td><td>10 × 10</td></tr>
+<tr><td>System</td><td>1000</td><td>100 × 10</td></tr>
+<tr><td>Application</td><td>10000</td><td>1000 × 10, 곧 10<sup>4</sup></td></tr>
+</tbody></table>
+<p>단계 이름은 슬라이드 그대로다. 일반적인 뜻으로 풀면, Design 은 설계 중 (주로 시뮬레이션에서), Wafer 는 칩을 찍어낸 웨이퍼를 시험할 때, Chip 은 잘라서 패키지에 넣은 칩을 시험할 때, System 은 보드나 제품에 넣은 뒤, Application 은 고객이 쓰고 있을 때다. 칸 색은 1 만 초록이고 아래로 갈수록 주황이 진해진다. 초록은 "여기서 잡으면 된다", 주황은 버그의 대가다. <strong>10 배는 경험칙</strong>이다. 이름부터 Rule of 10 이라, 정확히 측정한 비율이 아니라 규모를 기억하라는 숫자다.</p></div>
+    <div lang="en"><p><strong>The numbers on the left are relative cost;</strong> <strong>the right column is where the bug was found.</strong> Each row down multiplies by 10.</p>
+<table><thead><tr><th>Found in</th><th>Relative cost</th><th>Arithmetic</th></tr></thead><tbody>
+<tr><td>Design</td><td>1</td><td>baseline</td></tr>
+<tr><td>Wafer</td><td>10</td><td>1 × 10</td></tr>
+<tr><td>Chip</td><td>100</td><td>10 × 10</td></tr>
+<tr><td>System</td><td>1000</td><td>100 × 10</td></tr>
+<tr><td>Application</td><td>10000</td><td>1000 × 10, i.e. 10<sup>4</sup></td></tr>
+</tbody></table>
+<p>The stage names are the slide's. In everyday terms: Design is during design (mostly in simulation), Wafer is testing the fabricated wafer, Chip is testing the chip once it's cut out and packaged, System is after it's in a board or product, and Application is while the customer is using it. Only the 1 is green; the amber deepens as you go down. Green means "catch it here", amber is the price of the bug. <strong>The factor of ten is a rule of thumb.</strong> It's called the rule of 10 for a reason: it's a number for remembering the scale, not a measured ratio.</p></div>
+  </div>
 
   <div class="def">
     <span class="tag" lang="ko">규모의 숫자</span><span class="tag" lang="en">The numbers on scale</span>
@@ -1755,6 +1871,26 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Slides 47 to 51. Drag the bar and the boxes appear <strong>in the order the lecture stacked them.</strong> <strong>Two interfaces means two drivers and two monitors</strong>, and the last frame is the finished testbench.</figcaption>
   </figure>
 
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>모든 컷에 공통인 뼈대.</strong> 가운데 파란 <strong>DUT</strong> (Design Under Test, 검증 대상 설계) 가 있고, 인터페이스가 양쪽에 하나씩이라 좌우가 대칭이다. 바깥의 보라색 <strong>Stimulus</strong> 는 "주소 0x40 에 0xDEAD 를 써라" 같은 <strong>transaction</strong> (한 번의 의미 있는 동작) 을 만든다. 분홍 <strong>Driver</strong> 는 그것을 실제 신호로 바꿔 DUT 의 핀을 흔든다. 그림 아래 라벨 "transaction 수준" 과 "신호 수준으로 번역" 이 그 경계다. 화살표는 데이터가 흐르는 방향이다.</p>
+<ol start="0">
+<li><strong>컷 0 (슬라이드 47):</strong> Stimulus → Driver → DUT 뿐이다. 결과를 보는 칸이 하나도 없다</li>
+<li><strong>컷 1 (48):</strong> Driver 위에 분홍 <strong>Monitor</strong> 둘이 생기고, Driver 쪽에서 Monitor 로 위를 향한 화살표가 붙는다. Monitor 는 인터페이스의 신호를 지켜보고 다시 transaction 으로 묶어 올린다. Driver 와 Monitor 를 두른 회색 테두리가 <strong>Agent</strong> 이고, 라벨처럼 BFM (Bus Functional Model) 이나 Transactor 라고도 부른다</li>
+<li><strong>컷 2 (49):</strong> 두 Monitor 에서 위로 올라가 가운데 <strong>Checker</strong> 로 모이는 화살표. 한쪽에서 들어간 것과 다른 쪽에서 나온 것을 함께 받아야 옳은지 판정할 수 있다</li>
+<li><strong>컷 3 (50):</strong> Checker 에서 초록 <strong>Coverage</strong> 로 가는 화살표. 실제로 어떤 경우가 일어났는지 세어 둔다. 초록이라 "다 했다" 의 근거가 되는 칸이다</li>
+<li><strong>컷 4 (51):</strong> DUT 아래로 주황 점선 화살표와 <strong>Assertions</strong>. 점선은 신호를 받아 오는 선이 아니라 DUT 안에 박혀 있다는 표시다. 주황은 위반, 곧 버그를 잡는 칸이라서다</li>
+</ol></div>
+    <div lang="en"><p><strong>The skeleton shared by every frame.</strong> In the middle is the blue <strong>DUT</strong> (Design Under Test), with one interface on each side, so the picture is mirrored left and right. On the outside, violet <strong>Stimulus</strong> produces a <strong>transaction</strong> (one meaningful operation), such as "write 0xDEAD to address 0x40". The pink <strong>Driver</strong> turns that into real signals and wiggles the DUT's pins. The labels under the picture, "transaction level" and "translated to signal level", mark that boundary. Arrows show the direction data flows.</p>
+<ol start="0">
+<li><strong>Frame 0 (slide 47):</strong> just Stimulus → Driver → DUT. Nothing looks at the result</li>
+<li><strong>Frame 1 (48):</strong> two pink <strong>Monitors</strong> appear above the drivers, with arrows pointing up from the driver side. A monitor watches the interface signals and bundles them back up into transactions. The grey border around driver and monitor is the <strong>Agent</strong>, which, as the label says, also goes by BFM (Bus Functional Model) or Transactor</li>
+<li><strong>Frame 2 (49):</strong> arrows rise from both monitors and meet at the <strong>Checker</strong> in the middle. It needs what went in on one side and what came out on the other to judge whether it's right</li>
+<li><strong>Frame 3 (50):</strong> an arrow from the checker to green <strong>Coverage</strong>, which counts which cases actually happened. Green because it's what lets you say you're done</li>
+<li><strong>Frame 4 (51):</strong> a dashed amber arrow below the DUT, and <strong>Assertions</strong>. Dashed because it isn't a wire feeding in signals; it's bound inside the DUT. Amber because it's there to catch violations, meaning bugs</li>
+</ol></div>
+  </div>
+
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · Driver · Monitor · Agent · BFM</span><span lang="en">Unpacking the jargon · driver, monitor, agent, BFM</span></summary>
     <div class="body">
@@ -1963,6 +2099,32 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="ko">슬라이드 53쪽. <strong>분홍 화살표가 양방향인 게 핵심이다.</strong> 랜덤 테스트를 돌리고 커버리지를 분석하는 사이를 계속 왕복한다. 커버리지에 구멍이 보이면 그 구멍을 메울 constraint를 다시 쓰고, 다시 돌리고, 다시 본다. 그리고 슬라이드가 멈추는 조건을 셋 적어놓고 그 옆에 <strong>"사실은 절대 안 멈춘다"</strong>고 덧붙였다.</figcaption>
     <figcaption lang="en">Slide 53. <strong>The point is that the pink arrow runs both ways.</strong> You shuttle between running random tests and analysing coverage: a hole shows up, you rewrite constraints to fill it, run again, look again. And after listing three stopping conditions the slide adds <strong>"actually, never stop".</strong></figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>03 절 그림과 같은 순서로 읽는다. <strong>왼쪽 열은 아래로, 가운데 열은 위로, 그다음 오른쪽.</strong> 작업 칸은 일곱이다.</p>
+<ol>
+<li><strong>사양 문서 읽기</strong>: 설계자와 같은 문서에서 출발한다</li>
+<li><strong>verification plan 작성</strong>: 기능마다 stimulus · checking · coverage 세 줄을 적는 문서 (바로 위 절)</li>
+<li><strong>testbench 만들기</strong>: 18 절에서 조립한 그 구조</li>
+<li><strong>testbench 와 DUT bring-up</strong>: 둘을 처음 붙여서 기본적으로라도 돌아가게 만드는 단계</li>
+<li><strong>checker 와 functional coverage 작성</strong>: functional coverage 는 설계의 기능 중 무엇을 시험했는지 세는 것</li>
+<li><strong>constrained random test 작성</strong>: 무작위로 자극을 만들되 규칙(constraint) 안에서만 만드는 test</li>
+<li><strong>커버리지 분석 · 실패 디버깅</strong></li>
+</ol>
+<p><strong>6 번과 7 번 사이의 분홍 곡선은 양쪽에 화살촉이 있다.</strong> 한 번 가고 끝이 아니라 계속 왕복한다는 뜻이다. 커버리지에 구멍이 보이면 constraint 를 고쳐 다시 돌린다. <strong>초록 상자</strong>가 멈추는 조건 셋이다. 커버리지 목표 달성, 테스트 통과율이 높음, 버그 발견율이 평평해짐 (더 돌려도 새 버그가 거의 안 나옴). 오른쪽 분홍 글씨 "사실은 절대 안 멈춘다" 와 "리뷰와 체크리스트가 더 붙는다" 는 슬라이드가 조건 옆에 덧붙인 말이다.</p></div>
+    <div lang="en"><p>Read it the same way as the §03 picture: <strong>down the left column, up the middle, then right.</strong> There are seven work boxes.</p>
+<ol>
+<li><strong>Reading specifications</strong>: the same document the designer starts from</li>
+<li><strong>Charting out a verification plan</strong>: the document with three lines per feature, stimulus, checking and coverage (the section just above)</li>
+<li><strong>Building a testbench</strong>: the structure assembled in §18</li>
+<li><strong>Testbench and DUT bringup</strong>: hooking the two together for the first time and getting them to run at all</li>
+<li><strong>Write checkers and functional coverage</strong>: functional coverage counts which of the design's features have been exercised</li>
+<li><strong>Writing constrained random tests</strong>: tests that generate random stimulus, but only within rules (constraints)</li>
+<li><strong>Analyzing coverage, debug failures</strong></li>
+</ol>
+<p><strong>The pink curve between boxes 6 and 7 has an arrowhead at each end:</strong> you don't go once, you keep going back and forth. A hole in coverage means fixing a constraint and running again. <strong>The green box</strong> holds the three stopping conditions: coverage goals met, a high test pass rate, and a bug rate that has flattened (running more finds almost nothing new). The pink "actually, never stop" and "plus reviews and checklists on top" on the right are what the slide adds beside those conditions.</p></div>
+  </div>
 
   <div class="callout">
     <p lang="ko"><strong><a href="#s3">03절의 설계자 그림</a>과 나란히 놓으면 두 직무가 거울이다.</strong> 둘 다 "사양 읽기"에서 시작해서 "계획 세우기"로 간다. 그다음이 갈린다. 설계자는 RTL을 쓰고, 검증자는 testbench를 쓴다. 그리고 <strong>둘 다 "상대와 주고받기"가 정식 단계로 들어 있다.</strong></p>

@@ -519,6 +519,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Two branches leave RTL. The upper one becomes the entire second half of this course; the lower one heads for physical implementation. Lab 0 walks each branch once.</figcaption>
   </figure>
 
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>왼쪽의 <strong>RTL</strong> 상자에서 시작해 화살표를 따라간다. 상자 밑의 <code>.v / .sv</code> 는 파일 확장자다. <code>.v</code> 는 Verilog, <code>.sv</code> 는 SystemVerilog 소스다.</p>
+    <ul>
+      <li><strong>위쪽 갈래 ("맞게 도나?")</strong>: <code>VCS</code> 가 RTL 을 시뮬레이션한다 (simulate). VCS 와 Verdi 사이 화살표 위의 <code>FSDB</code> 는 둘 사이를 건너가는 <strong>파일</strong>이다. 시뮬레이션 중 신호 값이 어떻게 바뀌었는지 기록한 파형 파일이고, 08 절에서 다룬다. <code>Verdi</code> 가 그 파일을 열어 디버그한다 (debug). 버그를 찾으면 오른쪽 "버그를 고친다" 로 가고, 분홍 점선이 <strong>RTL 로 되돌아가는 길</strong>이다 (back to RTL). 고치고 다시 돌리는 이 고리가 검증의 일상이다</li>
+      <li><strong>아래쪽 갈래 ("gate로 내려가나?")</strong>: <code>Design Compiler</code> 가 RTL 을 합성한다 (synthesize). 결과가 <code>netlist</code> 이고, 밑의 <code>gate-level</code> 은 그 netlist 가 AND, OR, flip-flop 같은 실제 gate 를 이어 붙인 목록이라는 뜻이다</li>
+      <li>netlist 다음의 점선 화살표와 <code>P&amp;R, fab</code> 은 이 과목이 다루지 않는 다음 단계다. <strong>P&amp;R</strong> 은 Place and Route, 칩 위에 gate 를 놓고(place) 선을 잇는(route) 단계다. <strong>fab</strong> 은 fabrication, 공장에서 실제로 칩을 만드는 것이다. 점선과 회색이 "이 과목 밖" 표시다</li>
+    </ul>
+    <p><strong>색에도 뜻이 있다.</strong> 파랑은 설계(RTL), 보라는 도구(VCS, Verdi, Design Compiler), 분홍은 검증 쪽 일(버그 고치기), 갈색은 물리 쪽 산출물(netlist), 회색은 범위 밖이다. 이 노트의 그림은 모두 같은 규칙을 쓴다.</p></div>
+    <div lang="en"><p>Start at the <strong>RTL</strong> box on the left and follow the arrows. The <code>.v / .sv</code> under it are file extensions: <code>.v</code> is Verilog source, <code>.sv</code> is SystemVerilog.</p>
+    <ul>
+      <li><strong>Upper branch ("does it behave?")</strong>: <code>VCS</code> simulates the RTL. The <code>FSDB</code> on the arrow between VCS and Verdi is a <strong>file</strong> handed from one to the other: a waveform file recording how signal values changed during simulation (section 08). <code>Verdi</code> opens it to debug. When you find a bug you go to "fix the bug", and the pink dashed line is <strong>the road back to RTL</strong>. Fix, rerun, repeat: that loop is everyday verification</li>
+      <li><strong>Lower branch ("can it become gates?")</strong>: <code>Design Compiler</code> synthesises the RTL. The result is a <code>netlist</code>, and <code>gate-level</code> means that netlist is a list of real gates, AND, OR, flip-flops, wired together</li>
+      <li>The dashed arrow after the netlist and <code>P&amp;R, fab</code> are next steps this course doesn't cover. <strong>P&amp;R</strong> is Place and Route: placing gates on the chip and routing the wires between them. <strong>fab</strong> is fabrication, the factory actually making the chip. Dashed and grey mark "outside this course"</li>
+    </ul>
+    <p><strong>The colours mean something too.</strong> Blue is design (RTL), violet is tools (VCS, Verdi, Design Compiler), pink is verification work (fixing bugs), brown is physical output (the netlist), grey is out of scope. Every picture in these notes uses the same rule.</p></div>
+  </div>
+
   <div class="grid3">
     <div class="mini">
       <p><strong class="cT">VCS</strong></p>
@@ -637,6 +655,26 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">Two commands. <code>vcs</code> bakes an executable, you run the executable, done. Needing no configuration file at all is the point of this flow.</figcaption>
   </figure>
 
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><ul>
+      <li><strong>소스 파일</strong> 밑의 <code>design.v  tb.sv</code> 는 예시 이름이다. 설계 파일 하나와 testbench 파일 하나라는 뜻이고, Lab 0 의 실제 이름은 <code>18_19_Slice.v</code> 와 <code>18_19_Slice_tb.v</code> 다 (아래 명령 참고)</li>
+      <li>첫 화살표 위의 <code>vcs</code> 가 1 단계 명령이다. 화살표 밑의 <code>elaborate + compile</code> 은 이 한 명령이 하는 두 가지 일이다. <strong>elaborate</strong> 는 모듈들을 이어 붙여 설계 전체의 구조(어느 모듈이 어느 모듈을 인스턴스로 품는지)를 만드는 것이고, <strong>compile</strong> 은 그것을 컴퓨터가 실행할 수 있는 프로그램으로 바꾸는 것이다</li>
+      <li>그 결과가 <code>simv</code> 라는 실행 파일이다. 설계와 testbench 가 한 프로그램 안에 들어 있다</li>
+      <li>둘째 화살표 위의 <code>./simv</code> 가 2 단계 명령이다. 앞의 <code>./</code> 는 "지금 이 디렉토리에 있는" 이라는 Unix 표기다. 실행하면 시뮬레이션이 돈다 (simulate)</li>
+      <li>결과는 <code>log</code> (실행 중 찍히는 메시지) 와 <code>FSDB</code> (파형 파일) 다. FSDB 는 testbench 가 dump 를 요청했을 때만 생긴다 (08 절)</li>
+      <li>오른쪽의 "setup 파일 없음 / library 매핑 없음" 은 다음 04 절의 3-step flow 와 견준 말이다. 2-step 에는 그 준비가 필요 없다</li>
+    </ul></div>
+    <div lang="en"><ul>
+      <li>The <code>design.v  tb.sv</code> under <strong>source files</strong> are placeholder names for one design file and one testbench file. In Lab 0 they're really <code>18_19_Slice.v</code> and <code>18_19_Slice_tb.v</code> (see the commands below)</li>
+      <li>The <code>vcs</code> over the first arrow is the step-one command, and <code>elaborate + compile</code> under it are the two jobs that one command does. <strong>Elaborate</strong> means stitching the modules together into the structure of the whole design (which module instantiates which); <strong>compile</strong> means turning that into a program the computer can run</li>
+      <li>The result is an executable called <code>simv</code>, with the design and testbench inside one program</li>
+      <li>The <code>./simv</code> over the second arrow is the step-two command. The leading <code>./</code> is Unix for "the one in this directory". Running it runs the simulation</li>
+      <li>Out come a <code>log</code> (the messages printed while it runs) and an <code>FSDB</code> (the waveform file). The FSDB only appears if the testbench asks for a dump (section 08)</li>
+      <li>"no setup file / no library mapping" on the right is a comparison with the 3-step flow in section 04. The 2-step flow needs none of that</li>
+    </ul></div>
+  </div>
+
   <pre class="code" lang="ko"><span class="c"># 1단계: elaborate + compile. simv 라는 실행 파일이 생긴다</span>
 %&gt; vcs <span class="k">-sverilog</span> 18_19_Slice.v 18_19_Slice_tb.v
 
@@ -691,10 +729,10 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
       <path d="M290 86 L352 86" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#l0ar3)"/>
       <path d="M290 134 L352 96" stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#l0ar3)"/>
 
-      <rect x="358" y="54" width="150" height="66" rx="9" fill="rgba(var(--green-rgb),.13)" stroke="var(--green)" stroke-width="1.5"/>
-      <text class="svgtxt" x="433" y="80" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--green-deep)">logical library</text>
-      <text class="svglab" x="433" y="100" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="ko">분석 결과가 쌓인다</text>
-      <text class="svglab" x="433" y="100" text-anchor="middle" style="font-size:10px;fill:var(--green-deep)" lang="en">analysed results pile up</text>
+      <rect x="358" y="54" width="150" height="66" rx="9" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="433" y="80" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--violet)">logical library</text>
+      <text class="svglab" x="433" y="100" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="ko">분석 결과가 쌓인다</text>
+      <text class="svglab" x="433" y="100" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="en">analysed results pile up</text>
 
       <path d="M514 87 L576 87" stroke="var(--ink3)" stroke-width="1.6" fill="none" marker-end="url(#l0ar3)"/>
       <text class="svglab" x="545" y="76" text-anchor="middle" style="font-size:12px;fill:var(--violet);font-weight:600">vcs</text>
@@ -719,6 +757,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="ko">언어마다 분석기가 다르다. 분석 결과는 logical library라는 이름표가 붙은 곳에 쌓이고, 그 이름표가 실제로 어느 디렉토리인지는 설정 파일이 정한다.</figcaption>
     <figcaption lang="en">Each language has its own analyser. Analysed results pile up somewhere labelled a logical library, and a configuration file decides which real directory that label points at.</figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>번호 1, 2, 3 이 단계다.</p>
+    <ol>
+      <li><strong>analysis</strong>: 왼쪽 세 상자는 소스의 언어다. 언어마다 분석 명령이 따로 있다. <code>vlogan</code> 은 Verilog / SystemVerilog, <code>vhdlan</code> 은 VHDL, <code>syscan</code> 은 SystemC 용이다. 세 이름 모두 끝이 an 이라, analysis 의 an 으로 묶어 외우면 쉽다. analysis 는 소스의 문법을 검사하고 중간 결과로 바꿔 두는 단계이고, 세 화살표가 모두 가운데 한 상자로 모인다</li>
+      <li><strong>elaborate</strong>: 가운데 <strong>logical library</strong> 는 분석 결과가 쌓이는 곳의 <strong>이름</strong>이다 (05 절 예시의 <code>WORK</code> 같은). 다음 화살표의 <code>vcs</code> 가 그 조각들을 top 모듈부터 이어 붙여 <code>simv</code> 실행 파일을 만든다. 2-step 에서는 vcs 가 소스 읽기부터 한꺼번에 했지만 여기서는 이 단계만 맡는다</li>
+      <li><strong>simulate</strong>: simv 를 돌려 결과를 얻는다. 2-step 과 같다</li>
+    </ol>
+    <p>아래 주황 점선 상자 <code>synopsys_sim.setup</code> 에서 위로 올라가는 점선 화살표는 <strong>"이 파일이 logical library 이름이 실제로 어느 디렉토리인지 정한다"</strong> 는 뜻이다. 상자 안의 "logical 이름 → 실제 디렉토리" 가 그 말이다. 05 절의 <code>WORK : ./work</code> 한 줄이 예다. <code>WORK</code> 라는 이름이 지금 디렉토리 밑의 <code>work</code> 폴더를 가리킨다는 뜻이다.</p></div>
+    <div lang="en"><p>The numbers 1, 2, 3 are the stages.</p>
+    <ol>
+      <li><strong>analysis</strong>: the three boxes on the left are source languages, and each has its own analysis command. <code>vlogan</code> is for Verilog / SystemVerilog, <code>vhdlan</code> for VHDL, <code>syscan</code> for SystemC. All three end in "an", so tie them to the "an" in analysis and they stick. Analysis checks the source's syntax and turns it into intermediate results; all three arrows land in the one box in the middle</li>
+      <li><strong>elaborate</strong>: the <strong>logical library</strong> in the middle is the <strong>name</strong> of the place analysed results pile up in (like <code>WORK</code> in the section 05 example). The <code>vcs</code> on the next arrow stitches those pieces together from the top module down and builds the <code>simv</code> executable. In the 2-step flow vcs also read the source; here it only does this stage</li>
+      <li><strong>simulate</strong>: run simv and get results, same as the 2-step flow</li>
+    </ol>
+    <p>The dashed arrow rising from the amber dashed box <code>synopsys_sim.setup</code> means <strong>"this file decides which real directory a logical library name points at"</strong>, which is what "logical name to real directory" inside the box says. The line <code>WORK : ./work</code> from section 05 is an example: the name <code>WORK</code> points at the <code>work</code> folder under the current directory.</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · logical library</span><span lang="en">Unpacking the jargon · logical library</span></summary>
@@ -879,11 +935,11 @@ TIMEBASE : ns</pre>
       <text class="svglab" x="518" y="145" text-anchor="middle" style="font-size:10px;fill:var(--violet)" lang="en">reads both together</text>
 
       <path d="M614 129 L690 129" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#l0ar4)"/>
-      <rect x="698" y="96" width="146" height="66" rx="10" fill="rgba(var(--green-rgb),.13)" stroke="var(--green)" stroke-width="1.5"/>
-      <text class="svgtxt" x="771" y="120" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)" lang="ko">파형의 이 지점이</text>
-      <text class="svgtxt" x="771" y="120" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)" lang="en">this point on the waveform</text>
-      <text class="svgtxt" x="771" y="140" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)" lang="ko">소스의 이 줄</text>
-      <text class="svgtxt" x="771" y="140" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--green-deep)" lang="en">is this line of source</text>
+      <rect x="698" y="96" width="146" height="66" rx="10" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.5"/>
+      <text class="svgtxt" x="771" y="120" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--violet)" lang="ko">파형의 이 지점이</text>
+      <text class="svgtxt" x="771" y="120" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--violet)" lang="en">this point on the waveform</text>
+      <text class="svgtxt" x="771" y="140" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--violet)" lang="ko">소스의 이 줄</text>
+      <text class="svgtxt" x="771" y="140" text-anchor="middle" style="font-size:12px;font-weight:600;fill:var(--violet)" lang="en">is this line of source</text>
 
       <text class="svglab" x="330" y="34" style="font-size:10px;fill:var(--ink3)">vcs -kdb</text>
       <text class="svglab" x="330" y="238" style="font-size:10px;fill:var(--ink3)">simv + dump</text>
@@ -891,6 +947,22 @@ TIMEBASE : ns</pre>
     <figcaption lang="ko">둘 중 하나만으로는 부족하다. KDB만 있으면 구조는 보이는데 값이 없고, FSDB만 있으면 파형은 보이는데 그게 소스 어느 줄인지 모른다.</figcaption>
     <figcaption lang="en">Neither is enough on its own. With only KDB you see structure but no values; with only FSDB you see waveforms but cannot tell which source line they came from.</figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><ul>
+      <li><strong>KDB</strong> 는 Knowledge Database 다. 설계의 <strong>구조</strong>를 담는다. 어느 모듈이 어느 신호로 이어지는지, 소스 몇 번째 줄에 무엇이 있는지. "정적" 은 시간에 따라 변하지 않는다는 뜻이다. 오른쪽 위의 <code>vcs -kdb</code> 가 만드는 방법이다. compile 할 때 <code>-kdb</code> 옵션을 붙인다</li>
+      <li><strong>FSDB</strong> 는 Fast Signal Database 다. 시뮬레이션 동안 신호 값이 <strong>언제 무엇으로 바뀌었는지</strong>의 기록, 곧 파형이다. "동적" 은 시간에 따라 변하는 값이라는 뜻이다. 오른쪽 아래의 <code>simv + dump</code> 는 simv 를 돌리면서 dump(값을 파일로 쏟아내기)를 요청해야 생긴다는 뜻이다. Lab 0 에서 생기는 <code>novas.fsdb</code> 가 이 파일이다</li>
+      <li>두 화살표가 <strong>Verdi</strong> 로 모인다. Verdi 가 둘을 겹쳐 읽어야 오른쪽 상자처럼 "파형의 이 지점이 소스의 이 줄" 이라고 이어줄 수 있다</li>
+    </ul>
+    <p>이름이 헷갈리면 가운데 글자로 기억한다. <strong>K</strong>nowledge 는 아는 것(설계가 어떻게 생겼나), <strong>S</strong>ignal 은 신호 값(무슨 일이 일어났나).</p></div>
+    <div lang="en"><ul>
+      <li><strong>KDB</strong> is the Knowledge Database. It holds the design's <strong>structure</strong>: which module connects to which through which signal, what's on which source line. "Static" means it doesn't change over time. The <code>vcs -kdb</code> at top right is how you get one: add <code>-kdb</code> when you compile</li>
+      <li><strong>FSDB</strong> is the Fast Signal Database: a record of <strong>when each signal changed and to what</strong> during simulation, in other words the waveform. "Dynamic" means values that change over time. The <code>simv + dump</code> at bottom right means it only appears if you run simv and ask for a dump (pouring values out into a file). The <code>novas.fsdb</code> you get in Lab 0 is this file</li>
+      <li>Both arrows meet at <strong>Verdi</strong>. Only by reading the two together can it tell you, as the box on the right says, "this point on the waveform is this line of source"</li>
+    </ul>
+    <p>If the names blur, go by the letter that differs: <strong>K</strong>nowledge is what's known (what the design looks like), <strong>S</strong>ignal is signal values (what happened).</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · KDB와 FSDB</span><span lang="en">Unpacking the jargon · KDB and FSDB</span></summary>
@@ -1174,10 +1246,10 @@ dc_shell-topo&gt; <span class="k">report_constraint</span> -all_violators
       <path d="M226 121 L300 121" stroke="var(--blue)" stroke-width="1.5" fill="none" marker-end="url(#lab0tr)"/>
       <path d="M226 193 L300 152" stroke="var(--violet)" stroke-width="1.5" fill="none" marker-end="url(#lab0tr)"/>
 
-      <rect x="306" y="92" width="250" height="88" rx="9" fill="rgba(var(--green-rgb),.11)" stroke="var(--green)" stroke-width="1.5"/>
-      <text class="svgtxt" x="431" y="118" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--green-deep)">4. Summary</text>
-      <text class="svglab" x="431" y="140" text-anchor="middle" style="font-size:11px;fill:var(--green-deep)">required - arrival</text>
-      <text class="svgtxt" x="431" y="164" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--green-deep)">= slack</text>
+      <rect x="306" y="92" width="250" height="88" rx="9" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.5"/>
+      <text class="svgtxt" x="431" y="118" text-anchor="middle" style="font-size:13px;font-weight:600;fill:var(--ink)">4. Summary</text>
+      <text class="svglab" x="431" y="140" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">required - arrival</text>
+      <text class="svgtxt" x="431" y="164" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--ink)">= slack</text>
 
       <path d="M562 136 L636 136" stroke="var(--ink3)" stroke-width="1.5" fill="none" marker-end="url(#lab0tr)"/>
 
@@ -1190,6 +1262,28 @@ dc_shell-topo&gt; <span class="k">report_constraint</span> -all_violators
     <figcaption lang="ko">앞의 세 구역은 재료이고 마지막 한 줄이 결론이다. slack이 양수면 통과, 음수면 위반. 리포트를 처음 열면 <strong>맨 아래부터 본다.</strong></figcaption>
     <figcaption lang="en">The first three sections are the ingredients and the last line is the verdict. Positive slack passes, negative violates. When you open a report, <strong>read the bottom first.</strong></figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><ul>
+      <li>번호 1 부터 4 는 리포트에 <strong>위에서 아래로</strong> 나오는 순서다</li>
+      <li><strong>1. Path Information</strong>: 어느 경로를 쟀는지(출발점과 도착점), 어느 library 의 값을 썼는지. 계산 재료가 아니라 이름표다</li>
+      <li><strong>2. Path Delay</strong> 밑의 <code>data arrival time</code>: 신호가 출발점에서 도착점까지 실제로 <strong>도착하는 시각</strong>. 지나는 gate 와 선의 지연을 차례로 더한 값이다</li>
+      <li><strong>3. Path Required</strong> 밑의 <code>data required time</code>: 신호가 <strong>늦어도 이때까지는 도착해야 하는 시각</strong>. 대개 clock 주기에서 받는 flip-flop 이 요구하는 준비 시간(setup)을 뺀 값이다</li>
+      <li>두 화살표가 <strong>4. Summary</strong> 로 모여 <code>required - arrival = slack</code> 을 계산한다</li>
+      <li>오른쪽: slack 이 <code>+</code> 면 <code>(MET)</code>, 조건을 만족했다. <code>-</code> 면 <code>(VIOLATED)</code>, 위반이다</li>
+    </ul>
+    <p><strong>숫자로 한 번.</strong> required 가 2.00 ns, arrival 이 1.63 ns 라면 slack = 2.00 − 1.63 = <strong>+0.37 ns</strong>, <code>(MET)</code> 이다. 신호가 0.37 ns 여유를 두고 도착했다. arrival 이 2.10 ns 라면 2.00 − 2.10 = <strong>−0.10 ns</strong>, <code>(VIOLATED)</code> 다. 0.10 ns 늦었다. 이 숫자들은 설명을 위해 지어낸 예다.</p></div>
+    <div lang="en"><ul>
+      <li>The numbers 1 to 4 are the order the sections appear in the report, <strong>top to bottom</strong></li>
+      <li><strong>1. Path Information</strong>: which path was measured (start and end point) and which library's values were used. It's a label, not an ingredient</li>
+      <li><code>data arrival time</code> under <strong>2. Path Delay</strong>: the time the signal actually <strong>arrives</strong> at the end point, found by adding up the delays of every gate and wire along the way</li>
+      <li><code>data required time</code> under <strong>3. Path Required</strong>: the time the signal <strong>must arrive by at the latest</strong>. Usually that's the clock period minus the setup time the receiving flip-flop needs</li>
+      <li>Both arrows meet in <strong>4. Summary</strong>, which computes <code>required - arrival = slack</code></li>
+      <li>On the right: slack with a <code>+</code> is <code>(MET)</code>, the requirement is satisfied; with a <code>-</code> it's <code>(VIOLATED)</code></li>
+    </ul>
+    <p><strong>Once with numbers.</strong> Required 2.00 ns and arrival 1.63 ns give slack = 2.00 − 1.63 = <strong>+0.37 ns</strong>, <code>(MET)</code>: the signal made it with 0.37 ns to spare. Arrival 2.10 ns gives 2.00 − 2.10 = <strong>−0.10 ns</strong>, <code>(VIOLATED)</code>: 0.10 ns late. These numbers are made up for illustration.</p></div>
+  </div>
 
   <p lang="ko"><strong>slack</strong>이라는 단어가 여기서 처음 나온다. <strong>여유 시간</strong>이다. 신호가 도착해야 하는 시각(required)에서 실제로 도착한 시각(arrival)을 뺀 값이고, 양수면 <code>(MET)</code>, 음수면 <code>(VIOLATED)</code>가 붙는다. 이 수업 후반의 타이밍 이야기가 전부 이 한 줄에서 출발한다.</p>
   <p lang="en">This is where the word <strong>slack</strong> first appears. It is spare time: the time the signal was required by minus the time it actually arrived, marked <code>(MET)</code> when positive and <code>(VIOLATED)</code> when negative. Every timing discussion later in this course starts from that single line.</p>

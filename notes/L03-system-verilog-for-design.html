@@ -458,6 +458,12 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="en">One cell on the map. That one cell is <strong>the whole of Labs 1, 2 and 3.</strong></figcaption>
   </figure>
 
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>왼쪽에서 오른쪽으로 칩 하나가 만들어지는 순서다. 화살표는 "이 단계의 결과물이 다음 단계의 입력이 된다" 는 뜻이다.</p><ul><li><strong>Spec:</strong> 무엇을 만들지 적은 문서. 아직 회로가 아니다</li><li><strong>RTL:</strong> Register Transfer Level. 레지스터 사이로 값이 어떻게 옮겨 가는지를 SystemVerilog 로 적은 코드. <strong>이 강의가 여기다</strong> (파랑, 설계)</li><li><strong>Synthesis:</strong> 합성 도구가 RTL 을 읽고 게이트와 flip-flop 으로 번역한다 (보라, 도구). 그림 밑 두 줄이 이 칸에 붙은 말이다. 도구가 번역할 수 없는 코드는 하드웨어가 못 되므로 "합성되는 코드만 쓴다"</li><li><strong>P&amp;R:</strong> Place and Route. 그 게이트들을 칩 위 어디에 놓고(place) 어떤 길로 선을 이을지(route) 정한다 (갈색, 물리)</li><li><strong>Silicon:</strong> 공장에서 실제로 찍어낸 칩 (갈색, 물리)</li></ul><p>색은 이 노트 전체의 규칙이다. 파랑은 설계자가 쓰는 것, 보라는 도구가 하는 것, 갈색은 물리적인 것.</p></div>
+    <div lang="en"><p>Left to right, the order in which a chip gets made. Each arrow means "this stage's output is the next stage's input".</p><ul><li><strong>Spec:</strong> the document saying what to build. Not a circuit yet</li><li><strong>RTL:</strong> Register Transfer Level, SystemVerilog code describing how values move between registers. <strong>This lecture lives here</strong> (blue, design)</li><li><strong>Synthesis:</strong> the tool reads the RTL and translates it into gates and flip-flops (violet, tools). The two lines under the picture belong to this box: code the tool can't translate never becomes hardware, so you only write code it can</li><li><strong>P&amp;R:</strong> Place and Route, deciding where each gate sits on the die (place) and which path each wire takes (route) (brown, physical)</li><li><strong>Silicon:</strong> the chip as it comes out of the fab (brown, physical)</li></ul><p>The colours are this whole site's rule: blue is what the designer writes, violet is what a tool does, brown is physical.</p></div>
+  </div>
+
   <h3 data-slide="3"><span lang="ko">전제: Verilog는 안다고 치고 시작한다</span><span lang="en">The premise: you already know Verilog</span></h3>
   <p lang="ko">슬라이드 3쪽이 문장 하나만 띄운다. <em>"Assumption: You're familiar with Verilog."</em> 이건 예의상 하는 말이 아니라 <strong>강의 설계 자체다.</strong> 이 강의는 Verilog 입문이 아니라 <strong>Verilog와 SystemVerilog의 차분</strong>이다. 슬라이드 절반이 왼쪽에 Verilog, 오른쪽에 SystemVerilog를 놓고 비교하는 형태인 이유가 이것이다.</p>
   <p lang="ko">그래서 노트도 그 형태를 따른다. <strong>Verilog에서는 이렇게 했는데 왜 불편했나, SV가 무엇으로 바꿨나, 그래서 무엇이 달라지나</strong>를 반복한다.</p>
@@ -607,6 +613,12 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="ko">두 갈래가 하나로 합쳐진다. <strong>다만 완전히 하나가 되지는 않는다.</strong> 남는 경우는 <a href="#s17">17절</a>에서 강사가 직접 그려 보인다.</figcaption>
     <figcaption lang="en">Two words collapse into one. <strong>Not completely, though.</strong> The case that survives is the one the instructor draws by hand in <a href="#s17">§17</a>.</figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>왼쪽 (Verilog):</strong> 같은 신호라도 <strong>어디서 값을 받느냐</strong>에 따라 선언을 달리해야 했다.</p><ul><li><code>wire a;</code> : <code>a</code> 가 <code>assign</code> 문의 좌변(LHS, left-hand side, 등호 왼쪽)에 올 때</li><li><code>reg b, c;</code> : <code>b</code>, <code>c</code> 가 <code>always</code> 블록 안에서 대입될 때. 조합 논리든 flip-flop 이든 상관없이 <code>reg</code> 였다</li></ul><p><strong>오른쪽 (SystemVerilog):</strong> 두 화살표가 한 상자로 모인다. <code>logic a, b, c;</code> 한 줄이면 셋 다 된다. 어떤 하드웨어가 될지는 선언이 아니라 <strong>그 신호에 값을 넣는 코드</strong>가 정한다.</p><p><strong>아래 주황 상자:</strong> 예외 하나. <code>logic</code> 은 값을 넣는 곳(드라이버)을 <strong>하나만</strong> 허용한다. 같은 선을 두 곳 이상에서 모는 경우는 여전히 <code>wire</code> 여야 한다. 그 경우가 17 절 그림이다.</p></div>
+    <div lang="en"><p><strong>Left (Verilog):</strong> the same kind of signal needed a different declaration depending on <strong>where it got its value.</strong></p><ul><li><code>wire a;</code> : when <code>a</code> sits on the LHS (left-hand side, left of the equals sign) of an <code>assign</code></li><li><code>reg b, c;</code> : when <code>b</code> and <code>c</code> are assigned inside an <code>always</code> block, whether that block is combinational or clocked</li></ul><p><strong>Right (SystemVerilog):</strong> both arrows land in one box. <code>logic a, b, c;</code> covers all three. What hardware you get is decided by <strong>the code that drives the signal,</strong> not by the declaration.</p><p><strong>The amber box:</strong> one exception. A <code>logic</code> accepts <strong>one</strong> driver. When two or more places drive the same line it still has to be a <code>wire</code>. That case is the picture in section 17.</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · net과 variable</span><span lang="en">Unpacking the jargon · nets and variables</span></summary>
@@ -778,6 +790,12 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
     <figcaption lang="ko"><strong>같은 블록 종류인데 결과가 갈린다.</strong> 갈라지는 지점은 오직 하나, <code>else</code>가 있느냐다.</figcaption>
     <figcaption lang="en"><strong>Same kind of block, different hardware.</strong> One thing decides it: whether the <code>else</code> is there.</figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>왼쪽 코드 세 개가 오른쪽 하드웨어 세 개로 번역된다. 줄마다 읽어 보자.</p><table><thead><tr><th>줄</th><th>코드가 말하는 것</th><th>합성 도구가 만드는 것</th></tr></thead><tbody><tr><td>1</td><td><code>x</code> 가 1 이면 <code>b = a</code>, 아니면 <code>b = !a</code> (<code>!</code> 는 반전). <strong>어느 경우든 <code>b</code> 가 정해진다</strong></td><td>게이트만. 기억할 것이 없으니 flip-flop 이 필요 없다</td></tr><tr><td>2</td><td><code>posedge clk</code>, 곧 clock 이 0 에서 1 로 오르는 순간에만 <code>c</code> 를 바꾼다. <code>&lt;=</code> 는 non-blocking 대입</td><td>D flip-flop. 엣지 사이에는 값을 들고 있다</td></tr><tr><td>3</td><td><code>x</code> 가 1 이면 <code>b = a</code>. <strong><code>x</code> 가 0 일 때 할 일이 적혀 있지 않다</strong></td><td>D latch. 적혀 있지 않으면 "<code>b</code> 는 옛 값을 유지한다" 로 해석되고, 값을 유지하려면 기억 소자가 있어야 하기 때문이다</td></tr></tbody></table><p>1 번과 3 번은 <strong>블록 이름도 같고 첫 줄도 같다.</strong> 다른 것은 <code>else</code> 한 줄뿐이다. 그래서 3 번은 주황(함정)이다. 맨 아래 문장처럼 <code>always_comb</code> 은 이 경우 경고를 내 주지만, Verilog 의 <code>always @(*)</code> 는 조용히 latch 를 만든다.</p></div>
+    <div lang="en"><p>Three pieces of code on the left become three pieces of hardware on the right. Row by row:</p><table><thead><tr><th>Row</th><th>What the code says</th><th>What synthesis builds</th></tr></thead><tbody><tr><td>1</td><td>If <code>x</code> is 1, <code>b = a</code>; otherwise <code>b = !a</code> (<code>!</code> inverts). <strong><code>b</code> gets a value either way</strong></td><td>Gates only. Nothing to remember, so no flip-flop</td></tr><tr><td>2</td><td><code>c</code> only changes at <code>posedge clk</code>, the instant the clock rises from 0 to 1. <code>&lt;=</code> is a non-blocking assignment</td><td>A D flip-flop, holding its value between edges</td></tr><tr><td>3</td><td>If <code>x</code> is 1, <code>b = a</code>. <strong>Nothing is said about <code>x</code> being 0</strong></td><td>A D latch. Saying nothing means "<code>b</code> keeps its old value", and keeping a value takes a storage element</td></tr></tbody></table><p>Rows 1 and 3 have <strong>the same block type and the same first line.</strong> The only difference is the <code>else</code>, which is why row 3 is amber. As the bottom line says, <code>always_comb</code> warns you about it; Verilog's <code>always @(*)</code> quietly builds the latch.</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · latch inference</span><span lang="en">Unpacking the jargon · latch inference</span></summary>
@@ -1219,6 +1237,12 @@ instruction_word_t IW;   <span class="c">// structure allocation</span>
     <figcaption lang="en">The declaration puts <strong>bits on the left and elements on the right</strong>, but access goes <strong>element first, bit second.</strong> That the order flips is the one thing to memorise here.</figcaption>
   </figure>
 
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><code>logic [3:0] t [6];</code> 를 읽는 순서:</p><ul><li><code>[3:0]</code> (이름 왼쪽, packed): 원소 하나가 <strong>비트 4 개</strong>짜리이고, 비트 번호는 왼쪽부터 3, 2, 1, 0 이다. 작은 칸 네 개가 이것이다</li><li><code>t</code>: 이름</li><li><code>[6]</code> (이름 오른쪽, unpacked): 그런 원소가 <strong>6 개</strong>. 번호는 0 부터 5 까지다. 큰 테두리 여섯 개가 <code>t[0]</code> 부터 <code>t[5]</code> 다</li></ul><p>그래서 전체는 4 × 6 = <strong>24 비트</strong>다. 주황으로 칠한 칸이 <code>t[5][3]</code>: 먼저 <code>[5]</code> 로 원소를 고르고(맨 오른쪽 테두리), 그 안에서 <code>[3]</code> 으로 비트를 고른다(그 원소의 맨 왼쪽 칸, 최상위 비트).</p><table><thead><tr><th></th><th>선언할 때 위치</th><th>접근할 때 순서</th><th>이 예의 범위</th></tr></thead><tbody><tr><td>packed</td><td>이름 왼쪽</td><td>둘째</td><td>3 ~ 0</td></tr><tr><td>unpacked</td><td>이름 오른쪽</td><td><strong>첫째</strong></td><td>0 ~ 5</td></tr></tbody></table><p><code>[6]</code> 은 "6 번 원소" 가 아니라 "원소 6 개" 라서 <code>t[6]</code> 이라는 원소는 없다. 마지막은 <code>t[5]</code> 다.</p></div>
+    <div lang="en"><p>Reading <code>logic [3:0] t [6];</code> in order:</p><ul><li><code>[3:0]</code> (left of the name, packed): each element is <strong>four bits,</strong> numbered 3, 2, 1, 0 from the left. Those are the four small cells</li><li><code>t</code>: the name</li><li><code>[6]</code> (right of the name, unpacked): <strong>six</strong> such elements, numbered 0 to 5. The six outlined groups are <code>t[0]</code> to <code>t[5]</code></li></ul><p>So the whole thing is 4 × 6 = <strong>24 bits.</strong> The amber cell is <code>t[5][3]</code>: <code>[5]</code> picks the element first (the rightmost group), then <code>[3]</code> picks the bit inside it (that group's leftmost cell, the most significant bit).</p><table><thead><tr><th></th><th>Where it goes in the declaration</th><th>Order when accessing</th><th>Range here</th></tr></thead><tbody><tr><td>packed</td><td>left of the name</td><td>second</td><td>3 to 0</td></tr><tr><td>unpacked</td><td>right of the name</td><td><strong>first</strong></td><td>0 to 5</td></tr></tbody></table><p><code>[6]</code> means "six elements", not "element six", so there's no <code>t[6]</code>. The last one is <code>t[5]</code>.</p></div>
+  </div>
+
   <h3 data-slide="15"><span lang="ko">개별 비트에 접근하기</span><span lang="en">Getting at an individual bit</span></h3>
 <pre class="code"><span class="c"><span lang="ko">// 선언: packed 는 이름 왼쪽, unpacked 는 이름 오른쪽</span><span lang="en">// declaring: packed on the left of the name, unpacked on the right</span></span>
 <span class="k">logic</span> [packed_dimensions] name [unpacked_dimensions];
@@ -1293,9 +1317,7 @@ t[<span class="n">5</span>][<span class="n">3</span>]</pre>
       <text class="svgtxt" x="617" y="75" text-anchor="middle" style="font-size:12px;fill:var(--ink2)">Mem</text>
 
       <g stroke="var(--ink3)" stroke-width="1.1">
-        <line x1="126" y1="50" x2="574" y2="50"/><line x1="126" y1="58" x2="574" y2="58"/>
-        <line x1="126" y1="66" x2="574" y2="66"/><line x1="126" y1="74" x2="574" y2="74"/>
-        <line x1="126" y1="82" x2="574" y2="82"/><line x1="126" y1="90" x2="574" y2="90"/>
+        <line x1="126" y1="50" x2="574" y2="50"/><line x1="126" y1="57" x2="574" y2="57"/><line x1="126" y1="64" x2="574" y2="64"/><line x1="126" y1="71" x2="574" y2="71"/><line x1="126" y1="78" x2="574" y2="78"/><line x1="126" y1="85" x2="574" y2="85"/><line x1="126" y1="92" x2="574" y2="92"/>
       </g>
 
       <text class="svgtxt" x="40" y="130" style="font-size:11px;font-weight:700;fill:var(--blue)" lang="ko">interface 하나로</text>
@@ -1309,12 +1331,18 @@ t[<span class="n">5</span>][<span class="n">3</span>]</pre>
       <rect x="126" y="160" width="448" height="24" rx="6" fill="rgba(var(--blue-rgb),.24)" stroke="var(--blue)" stroke-width="2"/>
       <text class="svglab" x="350" y="176" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--blue)">simple_bus sb_intf()</text>
 
-      <text class="svgtxt" x="350" y="214" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)" lang="ko">신호를 하나 추가할 때 고칠 곳이 일곱 군데에서 한 군데로 줄어든다.</text>
-      <text class="svgtxt" x="350" y="214" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)" lang="en">Adding one signal goes from editing seven places to editing one.</text>
+      <text class="svgtxt" x="350" y="214" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)" lang="ko">신호를 하나 더할 때 고칠 곳이 모든 module 의 포트에서 interface 한 곳으로 준다.</text>
+      <text class="svgtxt" x="350" y="214" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)" lang="en">Adding a signal: edit the interface once, not every module's ports.</text>
     </svg>
-    <figcaption lang="ko">슬라이드가 말하는 "simplify"의 실체는 <strong>타이핑이 줄어드는 것이 아니라 고칠 곳이 한 군데로 모이는 것</strong>이다.</figcaption>
-    <figcaption lang="en">What the slide means by "simplify" is not less typing. It is <strong>having one place to edit instead of seven.</strong></figcaption>
+    <figcaption lang="ko">슬라이드가 말하는 "simplify"의 실체는 <strong>타이핑이 줄어드는 것이 아니라 고칠 곳이 interface 한 군데로 모이는 것</strong>이다.</figcaption>
+    <figcaption lang="en">What the slide means by "simplify" is not less typing. It is <strong>having one place to edit, the interface, instead of every module.</strong></figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>위 (interface 없이):</strong> CPU 와 Mem 사이에 선이 신호마다 한 가닥씩, 모두 일곱 가닥이다. 위에 적힌 이름이 그 일곱이다. 이 예제에서 쓰는 이름이고, 보통 이렇게 줄여 쓴다.</p><table><thead><tr><th>이름</th><th>풀어 쓰면</th><th>뜻</th></tr></thead><tbody><tr><td><code>req</code></td><td>request</td><td>CPU 가 버스를 쓰겠다고 요청</td></tr><tr><td><code>gnt</code></td><td>grant</td><td>요청을 허락함</td></tr><tr><td><code>addr</code></td><td>address</td><td>읽거나 쓸 주소</td></tr><tr><td><code>data</code></td><td>data</td><td>오가는 데이터</td></tr><tr><td><code>mode</code></td><td>mode</td><td>읽기인지 쓰기인지 같은 동작 종류</td></tr><tr><td><code>start</code></td><td>start</td><td>전송 시작</td></tr><tr><td><code>rdy</code></td><td>ready</td><td>준비됐음 / 끝났음</td></tr></tbody></table><p><strong>아래 (interface 하나로):</strong> 일곱 가닥을 <code>simple_bus</code> 라는 interface 하나로 묶었다. <code>sb_intf()</code> 는 부모 module 이 그 interface 를 하나 만들어 붙인 이름(인스턴스)이다. CPU 와 Mem 은 포트 하나로 이 묶음을 통째로 받는다.</p><p>신호를 하나 더하면 interface 없이는 <strong>그 신호가 지나는 module 마다</strong> 포트 목록과 연결을 고쳐야 한다. interface 가 있으면 interface 정의 한 곳만 고치면 된다. 그림 밑 문장이 이 차이다.</p></div>
+    <div lang="en"><p><strong>Top (no interface):</strong> one wire per signal between CPU and Mem, seven in all; the names above are those seven. They're the example's names, abbreviated the usual way.</p><table><thead><tr><th>Name</th><th>Spelled out</th><th>Meaning</th></tr></thead><tbody><tr><td><code>req</code></td><td>request</td><td>the CPU asks to use the bus</td></tr><tr><td><code>gnt</code></td><td>grant</td><td>the request is allowed</td></tr><tr><td><code>addr</code></td><td>address</td><td>where to read or write</td></tr><tr><td><code>data</code></td><td>data</td><td>the data going across</td></tr><tr><td><code>mode</code></td><td>mode</td><td>what kind of operation, e.g. read or write</td></tr><tr><td><code>start</code></td><td>start</td><td>begin a transfer</td></tr><tr><td><code>rdy</code></td><td>ready</td><td>ready, or done</td></tr></tbody></table><p><strong>Bottom (one interface):</strong> the seven wires are bundled into one interface called <code>simple_bus</code>. <code>sb_intf()</code> is the instance: the parent module creates one of those interfaces under that name. CPU and Mem each take the whole bundle through a single port.</p><p>Add a signal without an interface and you edit the port list and connections of <strong>every module the signal passes through.</strong> With an interface you edit its definition once. That's the sentence under the picture.</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · interface</span><span lang="en">Unpacking the jargon · interface</span></summary>
@@ -1397,6 +1425,12 @@ t[<span class="n">5</span>][<span class="n">3</span>]</pre>
     <figcaption lang="ko"><code>req</code>는 CPU에게는 <code>output</code>이고 Mem에게는 <code>input</code>이다. <strong>같은 전선이다.</strong></figcaption>
     <figcaption lang="en"><code>req</code> is an <code>output</code> to the CPU and an <code>input</code> to the memory. <strong>It is the same wire.</strong></figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>가운데 점선 상자가 interface <code>simple_bus</code> 이고, 안에 신호가 세 무리로 적혀 있다. 양옆 화살표가 <strong>그 신호가 어느 쪽에서 어느 쪽으로 가는지</strong>이고, 화살표 위의 단어가 그 쪽 module 이 보는 방향이다.</p><table><thead><tr><th>신호</th><th>cpuMod 에게 (master)</th><th>memMod 에게 (slave)</th><th>값이 가는 방향</th></tr></thead><tbody><tr><td><code>req</code>, <code>addr</code>, <code>mode</code>, <code>start</code></td><td>output</td><td>input</td><td>CPU → Mem</td></tr><tr><td><code>gnt</code>, <code>rdy</code></td><td>input</td><td>output</td><td>Mem → CPU</td></tr><tr><td><code>data</code></td><td>inout</td><td>inout</td><td>양쪽 (쓰기 때는 CPU 가, 읽기 때는 Mem 이 보낸다)</td></tr></tbody></table><p>한 행을 가로로 읽으면 <strong>한쪽의 output 이 반대쪽의 input</strong>이다. 같은 전선을 양 끝에서 본 것이다. 이 "어느 쪽에서 보느냐" 하나하나에 이름을 붙인 것이 modport 이고, <code>simple_bus.master</code> 는 "<code>simple_bus</code> interface 를 <code>master</code> 라는 modport 로 본다" 라고 읽는다.</p></div>
+    <div lang="en"><p>The dashed box in the middle is the interface <code>simple_bus</code>, with its signals in three groups. The arrows on each side show <strong>which way each signal flows,</strong> and the word on each arrow is the direction as that module sees it.</p><table><thead><tr><th>Signals</th><th>To cpuMod (master)</th><th>To memMod (slave)</th><th>Values flow</th></tr></thead><tbody><tr><td><code>req</code>, <code>addr</code>, <code>mode</code>, <code>start</code></td><td>output</td><td>input</td><td>CPU → Mem</td></tr><tr><td><code>gnt</code>, <code>rdy</code></td><td>input</td><td>output</td><td>Mem → CPU</td></tr><tr><td><code>data</code></td><td>inout</td><td>inout</td><td>both ways (CPU sends on a write, Mem on a read)</td></tr></tbody></table><p>Read any row across: <strong>one side's output is the other side's input.</strong> It's the same wire seen from both ends. A modport is a name for one of those points of view, so read <code>simple_bus.master</code> as "the <code>simple_bus</code> interface, seen through the modport called <code>master</code>".</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · modport</span><span lang="en">Unpacking the jargon · modport</span></summary>
@@ -1495,6 +1529,12 @@ t[<span class="n">5</span>][<span class="n">3</span>]</pre>
     <figcaption lang="ko">Verilog에서 이름 충돌을 피하는 유일한 방법은 <strong>이름을 길게 짓는 것</strong>이었다. <code>package</code>가 그 짓을 그만두게 한다.</figcaption>
     <figcaption lang="en">In Verilog the only defence against a name clash was <strong>longer names.</strong> A <code>package</code> lets you stop doing that.</figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>왼쪽 (Verilog):</strong> 점선 상자 하나가 설계 전체가 공유하는 이름 공간이다. 두 팀이 각자 <code>state_t</code> 라는 형(type)을 만들었더니 같은 공간에 같은 이름이 둘 생겼다. 주황 두 칸이 그 충돌이다. <code>addr_t</code> 는 하나뿐이라 문제없다. 이름 끝의 <code>_t</code> 는 "type 이다" 를 표시하는 관습이다.</p><p><strong>오른쪽 (SystemVerilog):</strong> 각자의 <code>state_t</code> 가 <code>cpu_pkg</code> 와 <code>mem_pkg</code> 라는 package 안에 들어 있다. 칸이 다르니 이름이 같아도 부딪히지 않는다. 둘 중 하나를 콕 집어야 할 때는 <code>cpu_pkg::state_t</code> 처럼 쓴다. <code>::</code> 는 "왼쪽 package 안의 오른쪽 이름" 이라고 읽는다.</p></div>
+    <div lang="en"><p><strong>Left (Verilog):</strong> the dashed box is the one namespace the whole design shares. Two teams each defined a type called <code>state_t</code>, and now the same space holds the same name twice: the two amber cells. <code>addr_t</code> exists once, so it's fine. The <code>_t</code> suffix is just the convention for "this is a type".</p><p><strong>Right (SystemVerilog):</strong> each <code>state_t</code> lives inside its own package, <code>cpu_pkg</code> or <code>mem_pkg</code>. Different boxes, so the same name doesn't collide. When you need to point at one of them, write <code>cpu_pkg::state_t</code>. Read <code>::</code> as "the name on the right, inside the package on the left".</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · package와 import</span><span lang="en">Unpacking the jargon · package and import</span></summary>
@@ -1624,6 +1664,12 @@ t[<span class="n">5</span>][<span class="n">3</span>]</pre>
     <figcaption lang="ko">둘째 줄과 셋째 줄이 요점이다. <code>6'b1</code>은 <strong>숫자 1</strong>이고 <code>'1</code>은 <strong>전부 1</strong>이다. 그리고 폭이 모자란 <code>x</code> 리터럴은 <strong>위쪽이 <code>x</code>가 아니라 <code>0</code>으로 채워진다.</strong></figcaption>
     <figcaption lang="en">Rows two and three carry the lesson. <code>6'b1</code> is <strong>the number one</strong>; <code>'1</code> is <strong>all ones</strong>. And a too-short <code>x</code> literal is padded on top with <strong><code>0</code>, not <code>x</code>.</strong></figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>먼저 리터럴 읽는 법. <code>6'b1</code> 은 <strong>폭</strong> 6, <strong>진법</strong> b (binary), <strong>값</strong> 1 이다. <code>4'bx</code> 는 폭 4 에 값이 전부 x (모름). 폭 없이 따옴표로 시작하는 <code>'1</code>, <code>'x</code> 가 이 절의 unsized literal 이다. 오른쪽 칸 여섯 개는 <code>databus[5]</code> 부터 <code>databus[0]</code> 까지, 왼쪽이 최상위 비트다.</p><table><thead><tr><th>쓴 것</th><th>담기는 값</th><th>왜</th></tr></thead><tbody><tr><td><code>6'b1</code></td><td><code>000001</code></td><td>숫자 1 을 6 비트로 쓴 것. 맨 아래 비트만 1</td></tr><tr><td><code>'1</code></td><td><code>111111</code></td><td>"1 을 대상 폭 전체에 채워라". 폭을 알아서 맞춘다</td></tr><tr><td><code>4'bx</code></td><td><code>00xxxx</code></td><td>리터럴은 4 비트 <code>xxxx</code> 인데 대상은 6 비트다. 모자란 위쪽 2 비트는 대입 규칙에 따라 <strong>0</strong> 으로 채워진다. 주황 두 칸이 그것이다</td></tr><tr><td><code>'x</code></td><td><code>xxxxxx</code></td><td>x 를 대상 폭 전체에 채운다</td></tr></tbody></table><p>헷갈리기 쉬운 점 둘. <code>6'b1</code> 과 <code>'1</code> 은 둘 다 "1" 처럼 보이지만 하나는 숫자 1, 하나는 <strong>모든 비트가 1</strong> 이다. 그리고 x 리터럴이라도 폭이 모자라면 위쪽은 x 가 아니라 0 이 된다.</p></div>
+    <div lang="en"><p>First, how to read a literal. <code>6'b1</code> is <strong>width</strong> 6, <strong>base</strong> b (binary), <strong>value</strong> 1. <code>4'bx</code> is width 4, every bit x (unknown). The ones that start with a bare apostrophe, <code>'1</code> and <code>'x</code>, are this section's unsized literals. The six cells on the right are <code>databus[5]</code> down to <code>databus[0]</code>, most significant bit on the left.</p><table><thead><tr><th>Written</th><th>Lands as</th><th>Why</th></tr></thead><tbody><tr><td><code>6'b1</code></td><td><code>000001</code></td><td>the number 1 in six bits: only the bottom bit is 1</td></tr><tr><td><code>'1</code></td><td><code>111111</code></td><td>"fill the target's whole width with 1", whatever that width is</td></tr><tr><td><code>4'bx</code></td><td><code>00xxxx</code></td><td>the literal is four bits, <code>xxxx</code>, but the target has six. The missing top two bits are padded with <strong>0</strong> by the assignment rule: the two amber cells</td></tr><tr><td><code>'x</code></td><td><code>xxxxxx</code></td><td>fills the whole width with x</td></tr></tbody></table><p>Two easy traps. <code>6'b1</code> and <code>'1</code> both look like "1", but one is the number one and the other is <strong>every bit set.</strong> And even an x literal gets zeros, not x, on top when it's too short.</p></div>
+  </div>
 
   <div class="trap">
     <span class="tag" lang="ko">함정: 4'bx 를 6비트에 넣으면 00xxxx 다</span><span class="tag" lang="en">Trap: 4'bx into six bits gives 00xxxx</span>
@@ -1940,7 +1986,7 @@ t[<span class="n">5</span>][<span class="n">3</span>]</pre>
       <text class="svglab" x="332" y="164" text-anchor="end" style="font-size:10px;fill:var(--ink2)">(c | a)</text>
       <line x1="336" y1="160" x2="380" y2="160" stroke="var(--ink2)" stroke-width="1.4"/>
       <path d="M380 138 L380 182 L430 160 Z" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.8"/>
-      <line x1="405" y1="200" x2="405" y2="182" stroke="var(--ink2)" stroke-width="1.4"/>
+      <line x1="405" y1="200" x2="405" y2="190" stroke="var(--ink2)" stroke-width="1.4"/><circle cx="405" cy="186" r="4" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.4"/>
       <text class="svglab" x="412" y="200" style="font-size:10px;fill:var(--ink2)">N</text>
 
       <line x1="430" y1="80" x2="510" y2="80" stroke="var(--ink2)" stroke-width="1.4"/>
@@ -1959,6 +2005,12 @@ t[<span class="n">5</span>][<span class="n">3</span>]</pre>
     <figcaption lang="ko">삼각형은 tristate buffer다. enable이 꺼지면 출력을 놓아버려서(<code>'z</code>) <strong>다른 드라이버가 그 선을 가져갈 수 있다.</strong></figcaption>
     <figcaption lang="en">The triangles are tristate buffers. With the enable off they let the output go (<code>'z</code>), so <strong>another driver can take the line.</strong></figcaption>
   </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>왼쪽 두 줄이 강사가 판서한 코드이고, 오른쪽이 그 회로다. 삼각형이 tristate buffer, 삼각형에 위아래로 꽂힌 선이 enable (켜고 끄는 신호) 이다.</p><ul><li><code>assign b = M ? (x &amp; y) : 'z;</code> : <code>M</code> 이 1 이면 <code>x &amp; y</code> 를 <code>b</code> 로 보내고, 0 이면 <code>'z</code>, 곧 <strong>손을 뗀다</strong>. 위 삼각형</li><li><code>assign b = N ? 'z : (c | a);</code> : 반대로 <code>N</code> 이 <strong>0</strong> 일 때 <code>c | a</code> 를 보내고, 1 이면 손을 뗀다. 아래 삼각형. enable 입구의 작은 동그라미가 "0 일 때 켜진다" 는 표시다</li></ul><p>두 출력이 가운데 점에서 만나 한 선 <code>b</code> 가 된다. <code>M</code> 과 <code>N</code> 의 조합별로 보면:</p><table><thead><tr><th>M</th><th>N</th><th>위 buffer</th><th>아래 buffer</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>몬다</td><td>뗀다</td><td><code>x &amp; y</code></td></tr><tr><td>0</td><td>0</td><td>뗀다</td><td>몬다</td><td><code>c | a</code></td></tr><tr><td>0</td><td>1</td><td>뗀다</td><td>뗀다</td><td><code>z</code> (아무도 안 몲)</td></tr><tr><td>1</td><td>0</td><td>몬다</td><td>몬다</td><td><strong>충돌</strong>: 시뮬레이션에서 x, 실물에서 두 출력이 싸운다</td></tr></tbody></table><p>"M 과 N 이 서로를 배제하도록 짜여 있다" 는 <strong>마지막 줄이 절대 안 생기게</strong> 두 enable 을 만든다는 뜻이다. 예를 들어 <code>N</code> 을 <code>M</code> 과 같은 신호로 두면 늘 첫째나 둘째 줄이라 정확히 하나만 몬다. 이렇게 한 선을 여럿이 번갈아 쓰는 것이 bus semantics 이고, 드라이버가 둘이므로 <code>b</code> 는 <code>logic</code> 이 아니라 <code>wire</code> 여야 한다 (02 절 그림의 주황 상자).</p></div>
+    <div lang="en"><p>The two lines on the left are the code the instructor wrote in class; the right is the circuit. The triangles are tristate buffers, and the line entering each from above or below is its enable (the on/off signal).</p><ul><li><code>assign b = M ? (x &amp; y) : 'z;</code> : when <code>M</code> is 1 it drives <code>x &amp; y</code> onto <code>b</code>; when 0 it drives <code>'z</code>, meaning it <strong>lets go.</strong> The top triangle</li><li><code>assign b = N ? 'z : (c | a);</code> : the other way round. It drives <code>c | a</code> when <code>N</code> is <strong>0</strong> and lets go when it's 1. The bottom triangle; the small circle at its enable marks "on when 0"</li></ul><p>Both outputs meet at the dot and become the single line <code>b</code>. For each combination of <code>M</code> and <code>N</code>:</p><table><thead><tr><th>M</th><th>N</th><th>Top buffer</th><th>Bottom buffer</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>drives</td><td>lets go</td><td><code>x &amp; y</code></td></tr><tr><td>0</td><td>0</td><td>lets go</td><td>drives</td><td><code>c | a</code></td></tr><tr><td>0</td><td>1</td><td>lets go</td><td>lets go</td><td><code>z</code> (nobody drives)</td></tr><tr><td>1</td><td>0</td><td>drives</td><td>drives</td><td><strong>conflict</strong>: x in simulation, two outputs fighting in silicon</td></tr></tbody></table><p>"M and N are written to exclude each other" means the two enables are built so <strong>the last row never happens.</strong> Tie <code>N</code> to the same signal as <code>M</code>, for instance, and you're always in row one or two, with exactly one driver. Sharing one line in turns like this is bus semantics, and since there are two drivers, <code>b</code> has to be a <code>wire</code>, not a <code>logic</code> (the amber box in the section 02 picture).</p></div>
+  </div>
 
   <details class="jargon" open>
     <summary><span lang="ko">용어 뜯어보기 · bus semantics와 tristate</span><span lang="en">Unpacking the jargon · bus semantics and tristate</span></summary>
