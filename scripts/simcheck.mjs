@@ -39,11 +39,12 @@ export function checkScenario(sc) {
       if (!sigs[name]) errs.push(`${sc.id}: 노드 ${n.id} 의 ${pin} 이 없는 신호 ${name}`);
 
   if (errs.length) return errs;                    // 구조가 깨졌으면 의미 검사는 무의미하다
-  for (const n of (sc.circuit && sc.circuit.nodes) || []) checkNode(n, F, bits, errs, sc.id);
+  const clkSigs = new Set((sc.signals || []).filter(s => s.kind === 'clk').map(s => s.n));
+  for (const n of (sc.circuit && sc.circuit.nodes) || []) checkNode(n, F, bits, errs, sc.id, clkSigs);
   return errs;
 }
 
-function checkNode(n, F, bits, errs, id) {
+function checkNode(n, F, bits, errs, id, clkSigs) {
   const N = F.length;
   const v = (i, s) => F[i].v[s];
   const IN = n.in || {}, OUT = n.out || {};
@@ -57,7 +58,14 @@ function checkNode(n, F, bits, errs, id) {
       case 'ff': {
         if (IN.arst_n && v(i, IN.arst_n) === 0) { expect(i, OUT.q, 0); break; }
         if (i === 0) break;
-        if (i % 2 === 0) {
+        // clk 핀이 kind:"clk" 신호가 아니면 gated clock 이다 (clock gating cell 의 출력).
+        // 그때는 프레임 번호가 아니라 그 신호가 실제로 0 에서 1 로 올라왔는지로 엣지를 본다.
+        // gating 이 걸린 프레임은 엣지 프레임이어도 flop 이 값을 안 잡는다.
+        const derived = IN.clk && clkSigs && !clkSigs.has(IN.clk);
+        const edge = derived
+          ? (v(i, IN.clk) === 1 && v(i - 1, IN.clk) === 0)
+          : (i % 2 === 0);
+        if (edge) {
           if (IN.rst_n && v(i - 1, IN.rst_n) === 0) expect(i, OUT.q, 0);
           else expect(i, OUT.q, v(n.late ? i : i - 1, IN.d));
         } else expect(i, OUT.q, v(i - 1, OUT.q));
@@ -140,6 +148,30 @@ const GOOD2 = {
     { v: { clk: 0, rst_n: 1, d: 0, q1: 1, e: 1, q2: 0, en: 0, dl: 0, ql: 0, xy: 1, an: 0, x: 0, one: 1, sum: 1, pm: 0 } },
   ],
 };
+// clock gating. ff 의 clk 핀에 master clk 가 아니라 gating cell 의 출력이 물린다.
+// en 이 0 인 구간에서는 엣지 프레임이어도 gclk 이 안 올라오므로 flop 이 값을 안 잡는다.
+const GOOD3 = {
+  id: 'self-gated',
+  code: [
+    { t: 'assign gclk = clk & en;', drives: ['gclk'] },
+    { t: 'always_ff @(posedge gclk) q <= d;', drives: ['q'] },
+  ],
+  circuit: { w: 400, h: 160,
+    nodes: [
+      { id: 'g1', kind: 'and', x: 120, y: 100, in: { a: 'clk', b: 'en' }, out: { y: 'gclk' } },
+      { id: 'f1', kind: 'ff', x: 260, y: 30, in: { d: 'd', clk: 'gclk' }, out: { q: 'q' } },
+    ],
+    ports: [], wires: [{ sig: 'd', pts: [[20, 46], [260, 46]] }, { sig: 'gclk', pts: [[168, 120], [260, 120]] }] },
+  signals: [{ n: 'clk', kind: 'clk' }, { n: 'en' }, { n: 'd' }, { n: 'gclk' }, { n: 'q' }],
+  frames: [
+    { v: { clk: 1, en: 1, d: 0, gclk: 1, q: 0 } },
+    { v: { clk: 0, en: 1, d: 1, gclk: 0, q: 0 } },
+    { v: { clk: 1, en: 1, d: 1, gclk: 1, q: 1 } },
+    { v: { clk: 0, en: 0, d: 0, gclk: 0, q: 1 } },
+    { v: { clk: 1, en: 0, d: 0, gclk: 0, q: 1 } },
+    { v: { clk: 0, en: 0, d: 1, gclk: 0, q: 1 } },
+  ],
+};
 const clone = o => JSON.parse(JSON.stringify(o));
 const CASES = [
   ['정상', GOOD, 0],
@@ -155,6 +187,10 @@ const CASES = [
   ['latch 가 en=1 인데 앞 값을 붙듦', (() => { const s = clone(GOOD2); s.frames[3].v.ql = 1; return s; })(), 1],
   ['late 플롭이 d[i-1] 을 읽음', (() => { const s = clone(GOOD2); s.frames[2].v.q2 = 0; return s; })(), 1],
   ['엣지에서 rst_n 을 무시함', (() => { const s = clone(GOOD2); s.frames[2].v.q1 = 1; return s; })(), 1],
+  ['정상 (gated clock)', GOOD3, 0],
+  ['gclk 엣지에서 d 를 안 잡음', (() => { const s = clone(GOOD3); s.frames[2].v.q = 0; return s; })(), 1],
+  ['gating 중인데 flop 이 잡음', (() => { const s = clone(GOOD3); s.frames[4].v.q = 0; return s; })(), 1],
+  ['gclk 이 AND 결과와 다름', (() => { const s = clone(GOOD3); s.frames[4].v.gclk = 1; return s; })(), 1],
 ];
 
 function selftest() {

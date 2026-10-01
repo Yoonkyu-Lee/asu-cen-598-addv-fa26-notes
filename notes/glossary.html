@@ -296,9 +296,9 @@ figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;bor
 .animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
 .animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
 .animbar button:disabled{opacity:.35;cursor:default}
-.animbar .animplay{min-width:86px}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
 .animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
-.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;min-width:46px;text-align:right}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
 .animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
 html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
@@ -404,6 +404,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gA">A</h2>
+
+<div class="gterm">
+  <div class="t">Activity Factor</div>
+  <div class="d" lang="ko">한 노드가 <strong>클럭 한 번당 평균 몇 번이나 값을 바꾸는가</strong>를 나타내는 값. dynamic power 를 좌우하는 네 가지 중 하나이고, <strong>RTL 설계자가 가장 직접 건드릴 수 있는 것</strong>이다. <a href="#gO">operand isolation</a> 과 <a href="#gC">clock gating</a> 이 둘 다 이 값을 낮추는 기법이다. 기능과 무관하므로 시뮬레이션 결과는 그대로다.</div>
+  <div class="d" lang="en">How many times a node <strong>changes value per clock, on average.</strong> One of the four things that set dynamic power, and <strong>the one an RTL designer can reach most directly.</strong> Both <a href="#gO">operand isolation</a> and <a href="#gC">clock gating</a> work by lowering it. It has nothing to do with function, so simulation results do not move.</div>
+  <div class="src"><a href="L07-efficient-design.html#s5">Lecture 7 &middot; 05</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">Agent</div>
@@ -775,6 +782,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L07-efficient-design.html#s5">Lecture 7 &middot; 05</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">Dynamic Power</div>
+  <div class="d" lang="ko"><strong>신호가 토글할 때만</strong> 나가는 전력. 노드 값이 0 에서 1 로 갈 때 capacitance 를 충전하고 1 에서 0 으로 갈 때 그 전하를 버리는 데 드는 비용이라, <strong>결과를 쓰든 안 쓰든 토글 자체가 값이다.</strong> activity factor, capacitance, 공급 전압의 제곱, 주파수가 좌우한다. <a href="#gL">static power</a> 와 달리 <strong>clock 을 세우면 사라진다.</strong></div>
+  <div class="d" lang="en">Power spent <strong>only when signals toggle.</strong> It is the cost of charging a capacitance on a 0 to 1 transition and throwing that charge away on the way back, so <strong>the toggle is the price whether or not you use the result.</strong> Set by activity factor, capacitance, the square of the supply voltage, and frequency. Unlike <a href="#gL">static power</a>, it <strong>disappears when you park the clock.</strong></div>
+  <div class="src"><a href="L07-efficient-design.html#s5">Lecture 7 &middot; 05</a></div>
+</div>
+
 <h2 class="gletter" id="gE">E</h2>
 
 <div class="gterm">
@@ -1021,6 +1035,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">조합 논리를 쓸 셈이었는데 <strong>합성 도구가 latch를 만들어버리는 것.</strong> <code>if</code>에 <code>else</code>가 없거나 <code>case</code>에 <code>default</code>가 없으면 "그 경우엔 이전 값을 유지"가 되고, <strong>유지하려면 저장 소자가 필요하다.</strong> latch는 scan chain에 안 들어가서 <strong>테스트가 안 되므로</strong> 대부분의 설계 규칙이 금지한다. 시뮬레이션은 대개 통과하고 <strong>합성 리포트나 lint에서 뒤늦게 드러난다.</strong></div>
   <div class="d" lang="en">You meant combinational logic and <strong>the tool built a latch.</strong> An <code>if</code> with no <code>else</code>, or a <code>case</code> with no <code>default</code>, means "otherwise keep the old value", and <strong>keeping a value needs storage.</strong> A latch does not join the scan chain, so <strong>it cannot be tested</strong>, and most design rules ban it. Simulation usually passes; <strong>it surfaces late, in the synthesis report or from lint.</strong></div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s3">Lecture 3 · 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Leakage &middot; Static Power</div>
+  <div class="d" lang="ko">아무것도 토글하지 않아도 <strong>전원이 들어와 있기만 하면</strong> 흐르는 전류. off 인 트랜지스터가 새는 <strong>subthreshold leakage</strong> 와 gate oxide 를 전자가 뚫는 <strong>gate leakage</strong> 로 나뉜다. 앞엣것은 <strong>온도가 오르면 지수적으로 커진다.</strong> <a href="#gC">clock gating</a> 으로는 하나도 안 줄고, <a href="#gP">power gating</a> 처럼 전원을 끊어야 사라진다. 공정이 미세화될수록 비중이 커졌다.</div>
+  <div class="d" lang="en">Current that flows <strong>whenever the supply is on</strong>, with nothing toggling. It splits into <strong>subthreshold leakage</strong>, where a transistor that is off still trickles, and <strong>gate leakage</strong>, where electrons tunnel through the gate oxide. The first <strong>grows exponentially with temperature.</strong> <a href="#gC">Clock gating</a> does nothing for it; only cutting the supply, as <a href="#gP">power gating</a> does, makes it go away. Its share has grown with every process shrink.</div>
+  <div class="src"><a href="L07-efficient-design.html#s5">Lecture 7 &middot; 05</a></div>
 </div>
 
 <div class="gterm">

@@ -23,7 +23,8 @@ const CSS = `
 .sim-bar button{font-family:var(--mono);font-size:11.5px;padding:5px 9px;border:1px solid var(--rule);border-radius:7px;background:var(--card);color:var(--ink2);cursor:pointer}
 .sim-bar button:hover{border-color:var(--blue);color:var(--blue)}
 .sim-bar input[type=range]{flex:1;min-width:120px;accent-color:var(--blue)}
-.sim-label{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2);white-space:nowrap}
+.sim-bar button[data-act=play]{width:78px;text-align:center;white-space:nowrap}
+.sim-label{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink2);white-space:nowrap;width:168px;text-align:right;font-variant-numeric:tabular-nums}
 .sim-note{margin:10px 0 0;font-size:14px;line-height:1.6;color:var(--ink);min-height:1.6em}
 .sim-fail{font-family:var(--mono);font-size:12px;color:var(--ink3)}
 .sim .wv{fill:none;stroke-linejoin:round}
@@ -114,7 +115,7 @@ function renderWave(sc, host) {
     const y0 = TOP + r * RH, hi = y0 + 5, lo = y0 + RH - 7;
     const bits = s.bits || 1;
     svg.appendChild(svgEl('text', { x: lg - 8, y: y0 + RH / 2 + 4, 'text-anchor': 'end',
-      class: 'lab' + (s.kind === 'clk' ? ' clk' : '') }, s.n));
+      class: 'lab' + (isClkish(s.kind) ? ' clk' : '') }, s.n));
     const val = i => sc.frames[i].v[s.n];
 
     if (bits === 1) {
@@ -127,7 +128,7 @@ function renderWave(sc, host) {
         else if (val(i - 1) !== v) d += `L${x} ${y}`;
         d += `L${x + CW} ${y}`;
       }
-      svg.appendChild(svgEl('path', { d, class: 'wv ' + (s.kind === 'clk' ? 'clk' : 'sig') }));
+      svg.appendChild(svgEl('path', { d, class: 'wv ' + (isClkish(s.kind) ? 'clk' : 'sig') }));
     } else {
       // 버스: 같은 값이 이어지는 구간마다 육각 띠와 값 글자
       let i = 0;
@@ -188,6 +189,19 @@ const GEOM = {
   const: { w: 32, h: 24, pins: { y: [32, 12] } },
 };
 
+// 파형과 배선을 클럭 색으로 칠할 신호. kind:"clk" 는 master clock 이고
+// kind:"gclk" 는 gating cell 을 지나온 clock 이다. 색은 같고 엣지 판정만 다르다.
+const isClkish = k => k === 'clk' || k === 'gclk';
+
+// flop 이 이번 프레임에 값을 잡았는가. 보통은 엣지 프레임(짝수)이면 잡지만,
+// clk 핀에 gating cell 의 출력이 물려 있으면 그 신호가 실제로 올라온 프레임만 잡는다.
+// simcheck.mjs 의 ff 규칙과 같은 판정이다. 한쪽만 고치면 그림과 검사가 갈라진다.
+function ffEdge(sc, n, i, masterClk) {
+  const c = n.in && n.in.clk;
+  if (!c || masterClk.has(c)) return i % 2 === 0;
+  return sc.frames[i].v[c] === 1 && sc.frames[i - 1].v[c] === 0;
+}
+
 function renderCircuit(sc, host) {
   const C = sc.circuit;
   // 회로 없는 시나리오도 있다. 파형만으로 충분한 카드까지 예외로 죽이지 않는다.
@@ -195,7 +209,10 @@ function renderCircuit(sc, host) {
   const svg = svgEl('svg', { viewBox: `0 0 ${C.w} ${C.h}`, role: 'img',
     'aria-label': L('회로도. 프레임에 따라 배선 값이 바뀐다', 'circuit diagram; wire values follow the frame') });
   host.replaceChildren(svg);
-  const clkSigs = new Set(sc.signals.filter(s => s.kind === 'clk').map(s => s.n));
+  // 칠하는 집합과 엣지를 판정하는 집합은 다르다. gated clock 은 클럭처럼 칠하되
+  // 엣지는 프레임 번호가 아니라 그 신호를 직접 봐야 하기 때문이다.
+  const clkSigs = new Set(sc.signals.filter(s => isClkish(s.kind)).map(s => s.n));
+  const masterClk = new Set(sc.signals.filter(s => s.kind === 'clk').map(s => s.n));
 
   // 배선을 먼저 깔고 상자를 그 위에 올린다
   const wires = (C.wires || []).map(w => {
@@ -272,7 +289,9 @@ function renderCircuit(sc, host) {
     nodes.forEach(({ el, n }) => {
       let cls = 'node ' + n.kind;
       const out = n.out && (n.out.q || n.out.y);
-      if (n.kind === 'ff' && i > 0 && i % 2 === 0) cls += ' edge';
+      // clk 핀이 kind:"clk" 신호가 아니면 gated clock 이다. 프레임 번호로 깜빡이면
+      // 엣지가 안 온 프레임에도 flop 이 잡는 것처럼 보이므로 신호를 직접 본다.
+      if (n.kind === 'ff' && i > 0 && ffEdge(sc, n, i, masterClk)) cls += ' edge';
       if (n.kind === 'latch' && n.in && v[n.in.en] === 1) cls += ' open';
       if (out && isXM(v[out])) cls += ' bad';
       el.setAttribute('class', cls);

@@ -296,9 +296,9 @@ figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;bor
 .animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
 .animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
 .animbar button:disabled{opacity:.35;cursor:default}
-.animbar .animplay{min-width:86px}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
 .animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
-.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;min-width:46px;text-align:right}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
 .animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
 html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
@@ -710,6 +710,73 @@ y = a + <span class="n">8</span>;</pre>
 <section id="s5">
   <div class="sec-head" data-slide="11"><span class="sec-num">05</span><h2 lang="ko">Power 를 줄이는 법</h2><h2 lang="en">Cutting power</h2></div>
 
+  <h3 lang="ko">그전에, power 는 한 덩어리가 아니다</h3>
+  <h3 lang="en">First: power is not one thing</h3>
+
+  <p lang="ko">슬라이드는 기법 넷을 나열할 뿐 <strong>power 자체를 쪼개지 않는다.</strong> 그런데 넷이 왜 서로 다른 상황에 쓰이는지는 이 구분을 알아야 설명된다. <strong>아래 두 이름은 슬라이드에 없는 보충이다.</strong></p>
+  <p lang="en">The slide lists four techniques and <strong>never splits power itself.</strong> You cannot say why the four belong in different situations without that split, so here it is first. <strong>The two names below are supplementary, not from the slide.</strong></p>
+
+  <p lang="ko"><strong>Dynamic power</strong> 는 신호가 토글할 때만 나간다. 노드의 값이 0 에서 1 로 갈 때마다 그 노드가 끌고 다니는 capacitance 를 충전해야 하고, 1 에서 0 으로 갈 때 그 전하를 그냥 버린다. <strong>결과를 쓰든 안 쓰든 토글 자체가 비용이다.</strong> 좌우하는 것이 넷인데, 한 노드가 클럭당 얼마나 자주 값을 바꾸는가(activity factor), 그 노드가 끌고 다니는 capacitance, 공급 전압, clock 주파수다. <strong>전압만 제곱으로 들어간다.</strong> 여기에 전환하는 찰나 PMOS 와 NMOS 가 동시에 살짝 켜지면서 VDD 에서 GND 로 흐르는 short-circuit 성분이 조금 섞인다.</p>
+  <p lang="en"><strong>Dynamic power</strong> is spent only when signals toggle. Every time a node goes from 0 to 1 you have to charge the capacitance hanging off it, and going back to 0 throws that charge away. <strong>The toggle is the cost, whether or not you use the result.</strong> Four things set it: how often a node changes per clock (the activity factor), the capacitance it drives, the supply voltage and the clock frequency. <strong>Only the voltage enters squared.</strong> Mixed in is a smaller short-circuit component, from the instant during a transition when the PMOS and NMOS are both slightly on and current runs straight from VDD to ground.</p>
+
+  <p lang="ko"><strong>Static power</strong> 는 <code>leakage</code> 라고도 부르고, <strong>전원이 들어와 있기만 하면</strong> 흐른다. 클럭을 세워두고 아무 신호도 안 움직여도 계속 나간다. 종류가 둘인데, off 인 트랜지스터가 그래도 조금씩 새는 <strong>subthreshold leakage</strong> 와 얇아진 gate oxide 를 전자가 뚫고 지나가는 <strong>gate leakage</strong> 다. 앞엣것은 <strong>온도가 오르면 지수적으로 커져서</strong>, 칩이 뜨거워지면 leakage 가 늘고 그래서 더 뜨거워지는 되먹임이 생긴다. 뒤엣것은 high-k 유전체를 도입한 이유다.</p>
+  <p lang="en"><strong>Static power</strong>, also called <code>leakage</code>, flows <strong>whenever the supply is on.</strong> Park the clock, let nothing move, and it keeps going. There are two kinds: <strong>subthreshold leakage</strong>, where a transistor that is off still trickles, and <strong>gate leakage</strong>, where electrons tunnel through a gate oxide thin enough to let them. The first <strong>grows exponentially with temperature</strong>, so a hot chip leaks more and therefore runs hotter. The second is why high-k dielectrics exist.</p>
+
+  <table>
+    <thead><tr>
+      <th></th>
+      <th>Dynamic power</th>
+      <th>Static power (leakage)</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><span lang="ko">언제 나가나</span><span lang="en">When it is spent</span></td>
+        <td><span lang="ko">신호가 <strong>토글할 때만</strong></span><span lang="en"><strong>only when signals toggle</strong></span></td>
+        <td><span lang="ko">전원이 들어와 있으면 <strong>항상</strong></span><span lang="en"><strong>always</strong>, as long as the supply is on</span></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">무엇이 좌우하나</span><span lang="en">What drives it</span></td>
+        <td><span lang="ko">activity factor, capacitance, <strong>전압의 제곱</strong>, 주파수</span><span lang="en">activity factor, capacitance, <strong>voltage squared</strong>, frequency</span></td>
+        <td><span lang="ko">트랜지스터 <strong>개수</strong>, threshold 전압, <strong>온도</strong></span><span lang="en">the <strong>number</strong> of transistors, threshold voltage, <strong>temperature</strong></span></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">clock 을 세우면</span><span lang="en">Stop the clock</span></td>
+        <td><span lang="ko">사라진다</span><span lang="en">it goes away</span></td>
+        <td><span lang="ko"><strong>그대로 남는다</strong></span><span lang="en"><strong>it stays exactly the same</strong></span></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">전원을 내리면</span><span lang="en">Cut the supply</span></td>
+        <td><span lang="ko">사라진다</span><span lang="en">it goes away</span></td>
+        <td><span lang="ko">사라진다</span><span lang="en">it goes away</span></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">RTL 에서 건드리나</span><span lang="en">Reachable from RTL</span></td>
+        <td><span lang="ko"><strong>그렇다.</strong> 토글을 줄이는 것이 전부 여기에 든다</span><span lang="en"><strong>yes.</strong> everything that cuts toggling lands here</span></td>
+        <td><span lang="ko">게이트 수를 줄이는 정도. 나머지는 <strong>공정과 cell 선택, 그리고 물리 설계</strong>의 몫이다</span><span lang="en">only by using fewer gates. the rest belongs to <strong>the process, the cell choice and physical design</strong></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="jargon" open>
+    <summary><span lang="ko">용어 뜯어보기 &middot; Leakage</span><span lang="en">Unpacking the jargon &middot; Leakage</span></summary>
+    <div class="body">
+      <table class="parts" lang="ko">
+        <tr><td>다른 이름</td><td>Static power, leakage power, leakage current. 셋이 같은 것을 가리킨다</td></tr>
+        <tr><td>한 줄</td><td>아무것도 토글하지 않아도 전원만 들어와 있으면 흐르는 전류</td></tr>
+        <tr><td>언제</td><td><strong>항상.</strong> clock 을 세워도, 칩이 idle 이어도 계속 나간다</td></tr>
+        <tr><td>누가</td><td>RTL 설계자가 거의 못 건드린다. <strong>공정 노드와 standard cell 선택</strong>(HVT 를 쓸지 LVT 를 쓸지)이 정하고, 전원을 실제로 끊는 것은 <strong>물리 설계</strong> 쪽 일이다</td></tr>
+        <tr><td>헷갈리는 것</td><td>"새는" 것이라 불량처럼 들리지만 <strong>정상 동작이다.</strong> 그리고 <a href="glossary.html#gC">clock gating</a> 으로는 <strong>하나도 안 줄어든다</strong></td></tr>
+      </table>
+      <table class="parts" lang="en">
+        <tr><td>Also called</td><td>static power, leakage power, leakage current. all the same thing</td></tr>
+        <tr><td>One line</td><td>current that flows whenever the supply is on, with nothing toggling</td></tr>
+        <tr><td>When</td><td><strong>always.</strong> the clock can be parked and the chip idle, and it keeps going</td></tr>
+        <tr><td>Who</td><td>hardly reachable from RTL. <strong>the process node and the cell choice</strong> (HVT versus LVT) set it, and actually cutting the supply is <strong>physical design</strong> work</td></tr>
+        <tr><td>Easy to confuse</td><td>"leak" sounds like a defect, but <strong>it is normal behaviour.</strong> and <a href="glossary.html#gC">clock gating</a> does <strong>nothing</strong> for it</td></tr>
+      </table>
+    </div>
+  </details>
+
   <p lang="ko">슬라이드 11쪽이 네 가지를 든다. 앞의 둘은 <strong>안 쓰는 것을 끄는 것</strong>이고, 셋째는 <strong>안 쓰는데 움직이는 것을 멈추는 것</strong>, 넷째는 <strong>필요한 만큼만 돌리는 것</strong>이다.</p>
   <p lang="en">Slide 11 lists four. The first two are <strong>switching off what is idle</strong>, the third is <strong>stopping what moves without being needed</strong>, and the fourth is <strong>running only as hard as required.</strong></p>
 
@@ -726,6 +793,63 @@ y = a + <span class="n">8</span>;</pre>
     </tbody>
   </table>
 
+
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="전력을 dynamic 과 static 두 덩어리로 나누고, 슬라이드 11쪽의 네 기법이 각각 어느 덩어리를 겨냥하는지 화살표로 연결한 그림">
+      <defs>
+        <marker id="pw-d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+        <marker id="pw-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--brown)"/>
+        </marker>
+      </defs>
+
+      <text class="svgtxt" x="580" y="24" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">칩이 먹는 전력 전체</text>
+      <text class="svgtxt" x="580" y="24" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">everything the chip draws</text>
+
+      <rect x="500" y="38" width="160" height="150" rx="6" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="580" y="94" text-anchor="middle" style="font-size:12.5px;fill:var(--blue);font-weight:700">Dynamic</text>
+      <text class="svgtxt" x="580" y="116" text-anchor="middle" style="font-size:11px;fill:var(--blue)">&#945; &middot; C &middot; V&#178; &middot; f</text>
+      <text class="svgtxt" x="580" y="138" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">토글할 때만</text>
+      <text class="svgtxt" x="580" y="138" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">only when it toggles</text>
+
+      <rect x="500" y="196" width="160" height="68" rx="6" fill="rgba(var(--brown-rgb),.14)" stroke="var(--brown)" stroke-width="1.6"/>
+      <text class="svglab" x="580" y="222" text-anchor="middle" style="font-size:12.5px;fill:var(--brown);font-weight:700">Static</text>
+      <text class="svgtxt" x="580" y="240" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">전원이 켜져 있으면 늘</text>
+      <text class="svgtxt" x="580" y="240" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">while the supply is on</text>
+      <text class="svgtxt" x="580" y="256" text-anchor="middle" style="font-size:9.5px;fill:var(--brown)">leakage</text>
+
+      <rect x="26" y="48" width="216" height="34" rx="6" fill="rgba(var(--blue-rgb),.08)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svglab" x="134" y="70" text-anchor="middle" style="font-size:11.5px;fill:var(--blue)">Clock gating</text>
+      <path d="M246 65 L494 65" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#pw-d)"/>
+      <text class="svgtxt" x="371" y="57" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">쉬는 쪽의 주파수를 0 으로</text>
+      <text class="svgtxt" x="371" y="57" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">frequency to zero, locally</text>
+
+      <rect x="26" y="106" width="216" height="34" rx="6" fill="rgba(var(--blue-rgb),.08)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svglab" x="134" y="128" text-anchor="middle" style="font-size:11.5px;fill:var(--blue)">Operand isolation</text>
+      <path d="M246 123 L494 123" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#pw-d)"/>
+      <text class="svgtxt" x="371" y="115" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">activity factor 를 낮춘다</text>
+      <text class="svgtxt" x="371" y="115" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">drops the activity factor</text>
+
+      <rect x="26" y="154" width="216" height="34" rx="6" fill="rgba(var(--blue-rgb),.08)" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svglab" x="134" y="176" text-anchor="middle" style="font-size:11.5px;fill:var(--blue)">DVFS</text>
+      <path d="M246 171 L494 171" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#pw-d)"/>
+      <text class="svgtxt" x="371" y="163" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="ko">전압과 주파수를 같이 내린다</text>
+      <text class="svgtxt" x="371" y="163" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)" lang="en">scales voltage and frequency down</text>
+
+      <rect x="26" y="208" width="216" height="34" rx="6" fill="rgba(var(--brown-rgb),.08)" stroke="var(--brown)" stroke-width="1.4"/>
+      <text class="svglab" x="134" y="230" text-anchor="middle" style="font-size:11.5px;fill:var(--brown)">Power gating</text>
+      <path d="M246 225 L494 225" stroke="var(--brown)" stroke-width="1.5" marker-end="url(#pw-s)"/>
+      <text class="svgtxt" x="371" y="217" text-anchor="middle" style="font-size:9.5px;fill:var(--brown)" lang="ko">누설이 흐를 데를 없앤다</text>
+      <text class="svgtxt" x="371" y="217" text-anchor="middle" style="font-size:9.5px;fill:var(--brown)" lang="en">leaves the leakage nowhere to go</text>
+
+      <text class="svgtxt" x="350" y="288" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">clock 을 세우면 위 덩어리만 사라진다. 아래 덩어리는 전원을 내려야 사라진다</text>
+      <text class="svgtxt" x="350" y="288" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">parking the clock removes only the upper block. the lower one needs the supply cut</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 11쪽의 네 기법을 겨냥하는 성분으로 갈라본 것이다. <strong>슬라이드에는 이 구분이 없다.</strong> 두 덩어리의 크기는 그림을 읽기 쉽게 그린 것이지 실제 비율이 아니다. 실제 비율은 공정 노드와 회로 종류에 따라 크게 달라지고, <strong>미세 공정으로 갈수록 아래 덩어리가 커졌다.</strong></figcaption>
+    <figcaption lang="en">The four techniques from slide 11, sorted by which component they attack. <strong>The slide does not make this split.</strong> The two blocks are drawn for legibility, not to scale: the real ratio swings with the process node and the kind of circuit, and <strong>the lower block has grown with every shrink.</strong></figcaption>
+  </figure>
   <div class="trap">
     <p lang="ko"><strong>Clock gating 과 power gating 을 섞어 쓰면 안 된다.</strong> 이름이 비슷하고 둘 다 "끈다" 라서 헷갈린다.</p>
     <p lang="en"><strong>Clock gating and power gating are not the same.</strong> The names rhyme and both mean "switch off", which is the problem.</p>
@@ -797,6 +921,130 @@ y = a + <span class="n">8</span>;</pre>
   <div class="trap">
     <p lang="ko"><strong>대가가 있다.</strong> mux 두 개가 추가된다. 32비트짜리 두 벌이니 공짜가 아니고, 그 mux 가 <strong>multiplier 입력 경로에 붙으므로 critical path 가 조금 길어진다.</strong> 곱셈기가 충분히 크고 <code>enable</code> 이 자주 0 일 때만 이득이다. <strong>항상 켜져 있는 블록에 operand isolation 을 붙이면 순손해다.</strong></p>
     <p lang="en"><strong>It is not free.</strong> You added two muxes, 32 bits each, and they sit <strong>on the multiplier's input path, so the critical path grows a little.</strong> It pays off only when the multiplier is big enough and <code>enable</code> is low often enough. <strong>Isolating operands on a block that is always enabled is a pure loss.</strong></p>
+  </div>
+
+  <h3 lang="ko">Clock gating 과 operand isolation 은 다른 자리를 막는다</h3>
+  <h3 lang="en">Clock gating and operand isolation cut in different places</h3>
+
+  <p lang="ko">둘 다 <strong>쓸데없이 움직이는 것을 멈춘다</strong>이고 둘 다 dynamic power 를 겨냥한다. 그래서 하나만 알면 다른 하나가 필요 없어 보인다. 그렇지 않다. <strong>겨냥하는 회로의 종류가 다르다.</strong></p>
+  <p lang="en">Both of them <strong>stop useless movement</strong> and both attack dynamic power, so knowing one makes the other look redundant. It is not. <strong>They target different kinds of circuit.</strong></p>
+
+  <table>
+    <thead><tr>
+      <th></th>
+      <th>Clock gating</th>
+      <th>Operand isolation</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><span lang="ko">겨냥하는 회로</span><span lang="en">Target</span></td>
+        <td><span lang="ko"><strong>Sequential.</strong> flip-flop 과 그리로 가는 clock tree</span><span lang="en"><strong>sequential.</strong> flip-flops and the clock tree feeding them</span></td>
+        <td><span lang="ko"><strong>Combinational.</strong> 곱셈기, ALU 같은 datapath</span><span lang="en"><strong>combinational.</strong> datapath blocks like multipliers and ALUs</span></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">무엇을 끊나</span><span lang="en">What is cut</span></td>
+        <td><span lang="ko">clock 신호</span><span lang="en">the clock signal</span></td>
+        <td><span lang="ko">입력 데이터</span><span lang="en">the input data</span></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">붙는 하드웨어</span><span lang="en">Hardware added</span></td>
+        <td><span lang="ko">clock 경로의 gating cell 하나</span><span lang="en">one gating cell on the clock path</span></td>
+        <td><span lang="ko">데이터 폭만큼의 mux 또는 AND</span><span lang="en">muxes or AND gates, as wide as the data</span></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">못 막는 것</span><span lang="en">What it cannot stop</span></td>
+        <td><span lang="ko"><strong>앞단 조합 로직.</strong> clock 을 안 쓰므로 입력이 흔들리면 계속 토글한다</span><span lang="en"><strong>the combinational logic in front.</strong> it has no clock, so it toggles whenever its inputs move</span></td>
+        <td><span lang="ko"><strong>flip-flop 의 clock 소비.</strong> clock 은 여전히 도착한다</span><span lang="en"><strong>the clock draw of the flip-flops.</strong> the clock still arrives</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">그래서 둘은 경쟁 관계가 아니라 <strong>서로의 사각지대를 메운다.</strong> 같은 회로 위에 자리만 다르게 붙는다.</p>
+  <p lang="en">So they are not competing options. <strong>Each covers the blind spot of the other</strong>, sitting at different points on the same circuit.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 260" role="img" aria-label="같은 datapath 위에서 operand isolation 은 곱셈기 입력에, clock gating 은 flip-flop 으로 가는 clock 경로에 붙는다는 것을 보여주는 회로도">
+      <defs>
+        <marker id="ci-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/>
+        </marker>
+        <marker id="ci-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--brown)"/>
+        </marker>
+        <marker id="ci-e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/>
+        </marker>
+      </defs>
+
+      <text class="svglab" x="143" y="20" text-anchor="middle" style="font-size:11px;fill:var(--violet);font-weight:700">Operand isolation</text>
+      <text class="svgtxt" x="143" y="38" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">조합 로직 입력을 묶는다</text>
+      <text class="svgtxt" x="143" y="38" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">pins the combinational inputs</text>
+
+      <text class="svglab" x="24" y="66" style="font-size:11px;fill:var(--blue)">a</text>
+      <text class="svglab" x="24" y="104" style="font-size:11px;fill:var(--blue)">b</text>
+      <path d="M40 62 L110 62" stroke="var(--blue)" stroke-width="1.5"/>
+      <path d="M40 100 L110 100" stroke="var(--blue)" stroke-width="1.5"/>
+
+      <rect x="110" y="44" width="66" height="74" rx="6" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.6"/>
+      <text class="svglab" x="143" y="86" text-anchor="middle" style="font-size:12px;fill:var(--violet);font-weight:700">ISO</text>
+
+      <path d="M176 62 L234 62" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#ci-a)"/>
+      <path d="M176 100 L234 100" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#ci-a)"/>
+
+      <rect x="240" y="44" width="76" height="74" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svgtxt" x="278" y="90" text-anchor="middle" style="font-size:24px;fill:var(--blue)">&#215;</text>
+      <text class="svgtxt" x="278" y="134" text-anchor="middle" style="font-size:9px;fill:var(--ink3)">combinational</text>
+
+      <text class="svglab" x="357" y="73" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">mult_out</text>
+      <path d="M316 81 L398 81" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#ci-a)"/>
+
+      <rect x="404" y="50" width="76" height="68" rx="6" fill="rgba(var(--blue-rgb),.13)" stroke="var(--blue)" stroke-width="1.6"/>
+      <text class="svglab" x="412" y="78" style="font-size:12px;fill:var(--blue)">D</text>
+      <text class="svglab" x="472" y="78" text-anchor="end" style="font-size:12px;fill:var(--blue)">Q</text>
+      <path d="M404 90 L413 97 L404 104" fill="none" stroke="var(--blue)" stroke-width="1.4"/>
+      <text class="svgtxt" x="442" y="134" text-anchor="middle" style="font-size:9px;fill:var(--ink3)">sequential</text>
+
+      <path d="M480 81 L586 81" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#ci-a)"/>
+      <text class="svglab" x="598" y="85" style="font-size:11px;fill:var(--blue)">result</text>
+
+      <text class="svglab" x="18" y="160" style="font-size:10px;fill:var(--ink2)">enable</text>
+      <path d="M68 156 L292 156" stroke="var(--ink3)" stroke-width="1.3"/>
+      <path d="M143 156 L143 122" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#ci-e)"/>
+      <path d="M292 156 L292 188" stroke="var(--ink3)" stroke-width="1.3" marker-end="url(#ci-e)"/>
+
+      <text class="svglab" x="292" y="180" text-anchor="middle" style="font-size:11px;fill:var(--violet);font-weight:700">Clock gating</text>
+
+      <text class="svglab" x="22" y="212" style="font-size:11px;fill:var(--brown)">clk</text>
+      <path d="M52 208 L244 208" stroke="var(--brown)" stroke-width="1.5"/>
+      <rect x="250" y="192" width="84" height="32" rx="6" fill="rgba(var(--violet-rgb),.13)" stroke="var(--violet)" stroke-width="1.6"/>
+      <text class="svglab" x="292" y="213" text-anchor="middle" style="font-size:11px;fill:var(--violet)">GATE</text>
+      <path d="M334 208 L376 208 L376 97 L398 97" stroke="var(--brown)" stroke-width="1.5" marker-end="url(#ci-c)" fill="none"/>
+      <text class="svglab" x="384" y="150" style="font-size:9.5px;fill:var(--brown)">gclk</text>
+
+      <text class="svgtxt" x="474" y="212" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="ko">엣지가 아예 도착하지 않는다</text>
+      <text class="svgtxt" x="474" y="212" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)" lang="en">no edge arrives at all</text>
+
+      <text class="svgtxt" x="350" y="248" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="ko">같은 enable 이 두 자리에 쓰인다. 왼쪽은 데이터를 묶고 오른쪽은 clock 을 끊는다</text>
+      <text class="svgtxt" x="350" y="248" text-anchor="middle" style="font-size:10px;fill:var(--ink2)" lang="en">one enable, two places: it pins the data on the left and cuts the clock on the right</text>
+    </svg>
+    <figcaption lang="ko"><strong>슬라이드에 없는 그림이다.</strong> 이 절의 코드 예제를 회로로 옮기고 clock gating 을 같은 그림에 얹은 것이다. 실제 clock gating cell 은 <code>AND</code> 하나가 아니라 <strong>latch 와 AND 를 묶은 것</strong>이다. <code>enable</code> 이 clock 이 high 인 동안 바뀌면 clock 에 짧은 가짜 펄스가 생기는데, latch 가 <code>enable</code> 을 clock 의 low 구간에 붙들어서 그걸 막는다. 합성 도구가 자동으로 넣는 것이 이 형태라 손으로 쓸 일은 거의 없다.</figcaption>
+    <figcaption lang="en"><strong>Not a slide figure.</strong> It is the code example from this section drawn as a circuit, with clock gating laid over the same picture. A real clock gating cell is not a bare <code>AND</code> but <strong>a latch and an AND together.</strong> If <code>enable</code> moves while the clock is high you get a short false pulse on the clock, and the latch prevents it by holding <code>enable</code> across the low phase. Synthesis inserts this form for you, so you rarely write it by hand.</figcaption>
+  </figure>
+
+  <div class="ex">
+    <p lang="ko"><strong>현장 감각.</strong> 32비트 곱셈기 앞에 <code>enable</code> 이 있고 전체 시간의 90% 동안 0 이다. 곱셈기 입력 <code>a</code>, <code>b</code> 는 다른 블록의 출력이라 <strong>매 사이클 바뀐다.</strong> 여기에 clock gating 을 걸었더니 전력이 거의 안 줄었다. 왜인가?</p>
+    <p lang="en"><strong>On the job.</strong> A 32 bit multiplier sits behind an <code>enable</code> that is low 90% of the time. Its inputs <code>a</code> and <code>b</code> come from another block and <strong>change every cycle.</strong> You add clock gating and the power barely moves. Why?</p>
+    <details>
+      <summary><span lang="ko">답 보기</span><span lang="en">Show the answer</span></summary>
+      <p lang="ko"><strong>이 설계에서 전력의 대부분은 곱셈기에 있는데, clock gating 은 곱셈기를 못 막는다.</strong> 막은 것은 결과를 받는 flip-flop 쪽뿐이다. 곱셈기는 clock 을 아예 쓰지 않는 조합 회로라, <code>enable</code> 이 0 이든 말든 <code>a</code> 와 <code>b</code> 가 바뀌는 한 32비트 전체가 계속 토글한다. <strong>operand isolation 이 필요한 자리다.</strong></p>
+      <p lang="en"><strong>Most of the power in this design is in the multiplier, and clock gating cannot reach it.</strong> All it stopped was the flip-flop taking the result. The multiplier is combinational and uses no clock at all, so while <code>a</code> and <code>b</code> keep moving, all 32 bits keep toggling no matter what <code>enable</code> says. <strong>This is exactly where operand isolation belongs.</strong></p>
+      <p lang="ko">조건 하나만 뒤집어보면 판단 기준이 보인다. <code>a</code> 와 <code>b</code> 가 idle 동안 <strong>고정되어 있었다면</strong> 곱셈기는 어차피 안 움직였을 테고, operand isolation 은 mux 만 붙이고 아무것도 못 벌었을 것이다. <strong>무엇을 걸지는 "무엇이 실제로 흔들리는가" 로 정한다.</strong> <code>enable</code> 이 얼마나 자주 0 인가만으로는 안 정해진다.</p>
+      <p lang="en">Flip one condition and the rule appears. <strong>Had <code>a</code> and <code>b</code> held still</strong> through the idle stretches, the multiplier would not have moved anyway, and operand isolation would have bought nothing but a pair of muxes. <strong>What you reach for is decided by what actually moves</strong>, not by how often <code>enable</code> is low.</p>
+    </details>
+  </div>
+  <div class="callout">
+    <p lang="ko"><strong>손으로 밟아보려면.</strong> <a href="P07-toggles-and-power.html">7 강 전 페이지</a>가 이 절의 코드를 반 클럭씩 밟아볼 수 있게 해뒀다. operand isolation 을 걸기 전과 건 뒤를 <strong>같은 입력으로 나란히 돌리면</strong>, <code>result</code> 줄은 한 칸도 안 다른데 <code>mult_out</code> 줄만 다르다. clock gating 도 같은 방식으로 <code>gclk</code> 이 평평해지는 것을 본다.</p>
+    <p lang="en"><strong>To step through it.</strong> <a href="P07-toggles-and-power.html">The P07 primer page</a> runs this section's code half a clock at a time. Drive the isolated and un-isolated versions <strong>with the same inputs</strong> and the <code>result</code> rows match frame for frame while only the <code>mult_out</code> rows differ. Clock gating gets the same treatment, watching <code>gclk</code> go flat.</p>
   </div>
 </section>
 

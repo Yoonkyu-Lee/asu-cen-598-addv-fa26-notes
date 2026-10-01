@@ -378,6 +378,8 @@ class Viewer {
     } else if (at === '') at = null;
     this.key = key; this.at = at != null ? at : null;
     this.render();
+    // 뷰어가 접힌 <details> 안에 있으면 펼쳐야 보인다.
+    for (let d = this.host.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
     this.host.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }

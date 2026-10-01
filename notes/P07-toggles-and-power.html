@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before Lecture 7 · 같은 동작, 다른 전력 · CEN 598 ADDV</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+/* 애니메이션 슬라이더. 덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간을 한 자리에서 밟아본다. */
+/* 마크업 규약과 동작은 anim.js 가 단일 출처다. 스크립트가 없으면 첫 프레임만 보이고 막대가 안 생긴다. */
+.anim [data-f]{display:none}
+.anim [data-f~="0"]{display:revert}
+.anim.js-anim [data-f]{display:none}
+.anim.js-anim [data-f].on{display:revert}
+.anim:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.animbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--rule)}
+.animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.animbar button:disabled{opacity:.35;cursor:default}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
+.animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
+.animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
+@media(prefers-reduced-motion:reduce){.animbar button{transition:none}}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow" lang="ko">CEN 598 &middot; Advanced Digital Design and Verification &middot; 실습 입문</div>
+  <div class="eyebrow" lang="en">CEN 598 &middot; Advanced Digital Design and Verification &middot; hands-on primer</div>
+  <h1 class="title">Before Lecture 7<br><span lang="ko">같은 동작, 다른 전력</span><span lang="en">Same behaviour, different power</span></h1>
+  <p class="subtitle" lang="ko">7 강의 power 기법들은 <strong>시뮬레이션에서 아무 차이도 안 만든다.</strong> 파형이 똑같은데 전력만 다르다. 그 차이가 어디에 있는지 네 번 밟아본다.</p>
+  <p class="subtitle" lang="en">The power techniques in Lecture 7 <strong>make no difference in simulation.</strong> The waveforms match and only the power does not. Four traces to find where the difference actually lives.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">실습 입문</span>
+    <span class="chip">시뮬레이션 4 개</span>
+    <span class="chip dim">P03 의 2 &middot; 3 단원을 전제</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">hands-on primer</span>
+    <span class="chip">4 simulations</span>
+    <span class="chip dim">assumes P03 units 2 and 3</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Before Lecture 7</div>
+    <div class="name"><span lang="ko">같은 동작, 다른 전력</span><span lang="en">Same behaviour, different power</span></div>
+    <div class="rule"></div>
+  </div>
+  <div class="lab" lang="ko">목차</div>
+  <div class="lab" lang="en">Contents</div>
+  <a href="#u0"><span class="n">00</span><span lang="ko">파형이 못 보여주는 것</span><span lang="en">What a waveform cannot show</span></a>
+  <a href="#u1"><span class="n">01</span><span lang="ko">조합 로직에는 enable 이 없다</span><span lang="en">Combinational logic has no enable</span></a>
+  <a href="#u2"><span class="n">02</span><span lang="ko">입력을 묶으면 안쪽이 멈춘다</span><span lang="en">Pin the inputs and the inside stops</span></a>
+  <a href="#u3"><span class="n">03</span><span lang="ko">flop 쪽은 clock 이 계속 온다</span><span lang="en">On the flop side the clock keeps coming</span></a>
+  <a href="#u4"><span class="n">04</span><span lang="ko">그래서 무엇을 어디에 거나</span><span lang="en">So what goes where</span></a>
+  <a href="#u5"><span class="n">05</span><span lang="ko">7 강 어느 절로 가면 되나</span><span lang="en">Where to go in Lecture 7</span></a>
+</nav>
+
+<main>
+<section id="u0">
+  <div class="sec-head"><span class="sec-num">00</span><h2 lang="ko">파형이 못 보여주는 것</h2><h2 lang="en">What a waveform cannot show</h2></div>
+
+  <p lang="ko">지금까지의 실습 입문 페이지는 <strong>동작이 틀리는 것</strong>을 보여줬다. latch 가 생기고, 값이 한 칸 늦고, <code>X</code> 가 뜨는 것. 전부 파형에 나타나는 사고다.</p>
+  <p lang="en">The primer pages so far showed <strong>behaviour going wrong</strong>: a latch appearing, a value arriving a step late, an <code>X</code> turning up. Every one of those is an accident you can see in a waveform.</p>
+
+  <p lang="ko"><a href="L07-efficient-design.html">7 강</a>의 power 기법들은 다르다. <strong>고치기 전과 고친 뒤의 파형이 완전히 같다.</strong> 같은 testbench 를 똑같이 통과한다. 그런데 하나는 전력을 더 먹는다. 7 강 슬라이드 6 쪽의 한 줄이 이것이다.</p>
+  <p lang="en"><a href="L07-efficient-design.html">Lecture 7</a>'s power techniques are different. <strong>The waveforms before and after the fix are identical.</strong> The same testbench passes the same way. And one of them draws more power. That is what slide 6 of Lecture 7 says in one line.</p>
+
+  <div class="def">
+    <p lang="ko"><strong>Understand what hardware you are designing. Not what you are coding.</strong></p>
+    <p lang="en"><strong>Understand what hardware you are designing. Not what you are coding.</strong></p>
+  </div>
+
+  <p lang="ko">그래서 이 페이지는 <strong>파형 한 줄을 더 본다.</strong> 결과 register 만 보면 두 설계가 같고, 그 안쪽 신호를 보면 갈린다. 여기서 볼 것은 <strong>값이 맞는가</strong>가 아니라 <strong>얼마나 자주 움직이는가</strong>다.</p>
+  <p lang="en">So this page <strong>watches one extra row.</strong> Look only at the result register and the two designs agree; look at a signal inside and they part. What to watch here is not <strong>whether a value is right</strong> but <strong>how often it moves.</strong></p>
+
+  <div class="callout">
+    <p lang="ko"><strong>전제.</strong> <a href="P03-before-lecture-3.html">3 강 전 페이지</a>의 <strong>2 단원(조합 논리)과 3 단원(flip-flop)</strong>을 안다고 본다. 조합 논리는 입력이 바뀌면 바로 따라오고 flip-flop 은 엣지에서만 듣는다는 것, 이 둘의 차이가 이 페이지의 전부다.</p>
+    <p lang="en"><strong>Assumed.</strong> <strong>Units 2 (combinational logic) and 3 (the flip-flop)</strong> of <a href="P03-before-lecture-3.html">the P03 page</a>. Combinational logic follows its inputs at once and a flip-flop listens only at the edge. The gap between those two is this whole page.</p>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>값은 작게 줄여 썼다.</strong> 7 강 예제는 32 비트 곱셈기지만 여기서는 3 비트짜리를 쓴다. 파형에 숫자가 들어가야 하고, 시뮬레이터가 <code>1 &lt;&lt; bits</code> 로 폭을 자르기 때문이다. <strong>토글하는 게이트 수가 폭에 비례한다</strong>는 것만 머리에 얹어두고 보면 된다. 3 비트에서 낭비처럼 보이는 것이 32 비트에서는 수천 개의 게이트다.</p>
+    <p lang="en"><strong>The numbers are shrunk.</strong> Lecture 7's example is a 32 bit multiplier; this page uses 3 bit operands, because the waveform has to hold the digits and the viewer masks widths with <code>1 &lt;&lt; bits</code>. Just keep in mind that <strong>the number of toggling gates scales with the width.</strong> What looks like small waste at 3 bits is thousands of gates at 32.</p>
+  </div>
+</section>
+
+<section id="u1">
+  <div class="sec-head"><span class="sec-num">01</span><h2 lang="ko">조합 로직에는 enable 이 없다</h2><h2 lang="en">Combinational logic has no enable</h2></div>
+
+  <div class="callout">
+    <p lang="ko"><strong>흔한 그림.</strong> "<code>if (enable)</code> 로 감싸놨으니 enable 이 0 이면 그 안의 계산은 안 일어난다."</p>
+    <p lang="en"><strong>The usual picture.</strong> "It is wrapped in <code>if (enable)</code>, so when enable is low the computation inside does not happen."</p>
+  </div>
+
+  <p lang="ko">소프트웨어라면 맞는 말이다. <code>if</code> 안에 안 들어가면 그 줄은 실행되지 않는다. <strong>회로에는 그런 게 없다.</strong> <code>assign mult_out = a * b;</code> 는 <strong>항상 거기 있는 곱셈기</strong>이고, <code>if (enable)</code> 는 <strong>그 결과를 저장할지만 고르는 문장</strong>이다. 고르기 전에 곱셈은 이미 끝나 있다.</p>
+  <p lang="en">In software that is true: a line inside an <code>if</code> that you do not enter does not run. <strong>A circuit has no such thing.</strong> <code>assign mult_out = a * b;</code> is <strong>a multiplier that is always there</strong>, and <code>if (enable)</code> is <strong>a sentence that only chooses whether to store the result.</strong> By the time it chooses, the multiply is already done.</p>
+
+  <div class="sim" data-sim="p07-no-iso"></div>
+
+  <div class="def">
+    <p lang="ko"><strong>한 줄 정리.</strong> <code>enable</code> 은 <strong>register 앞의 MUX</strong> 가 될 뿐, 곱셈기에는 닿지 않는다. 조합 로직은 <strong>입력이 바뀌면 무조건 따라 움직인다.</strong> 그 움직임이 dynamic power 이고, 결과를 버려도 환불되지 않는다.</p>
+    <p lang="en"><strong>In one line.</strong> <code>enable</code> becomes <strong>a MUX in front of the register</strong> and never reaches the multiplier. Combinational logic <strong>moves whenever its inputs move</strong>, full stop. That movement is dynamic power, and discarding the result does not refund it.</p>
+  </div>
+</section>
+
+<section id="u2">
+  <div class="sec-head"><span class="sec-num">02</span><h2 lang="ko">입력을 묶으면 안쪽이 멈춘다</h2><h2 lang="en">Pin the inputs and the inside stops</h2></div>
+
+  <div class="callout">
+    <p lang="ko"><strong>흔한 그림.</strong> "조합 로직은 못 끄니까 어쩔 수 없다."</p>
+    <p lang="en"><strong>The usual picture.</strong> "You cannot switch combinational logic off, so nothing can be done."</p>
+  </div>
+
+  <p lang="ko">끄는 게 아니라 <strong>입력을 가만히 있게 만들면</strong> 된다. 조합 회로는 입력이 안 움직이면 안쪽도 안 움직인다. 이것이 7 강 슬라이드 11 쪽의 <a href="glossary.html#gO">operand isolation</a> 이다. 아래 카드는 <strong>앞 단원과 <code>a</code>, <code>b</code>, <code>enable</code> 이 프레임 단위로 완전히 같다.</strong> MUX 두 개만 붙었다.</p>
+  <p lang="en">You do not switch it off. You <strong>hold its inputs still.</strong> A combinational block whose inputs do not move does not move inside. This is <a href="glossary.html#gO">operand isolation</a> from slide 11 of Lecture 7. The card below has <strong>exactly the same <code>a</code>, <code>b</code> and <code>enable</code> as the previous unit, frame for frame.</strong> Only two MUXes were added.</p>
+
+  <div class="sim" data-sim="p07-iso"></div>
+
+  <div class="def">
+    <p lang="ko"><strong>한 줄 정리.</strong> <code>result</code> 줄은 두 단원이 한 칸도 다르지 않고 <code>mult_out</code> 줄만 다르다. <strong>기능은 원래도 맞았고 전력만 새고 있었다.</strong> 그래서 이 차이는 검증이 아니라 <strong>합성 뒤의 전력 리포트</strong>에서만 드러난다.</p>
+    <p lang="en"><strong>In one line.</strong> The <code>result</code> rows of the two units match frame for frame and only the <code>mult_out</code> rows differ. <strong>The function was always correct and only the power was leaking.</strong> Which is why this difference shows up in <strong>a post-synthesis power report</strong>, never in verification.</p>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>공짜가 아니다.</strong> MUX 두 개가 <strong>곱셈기 입력 경로 위에</strong> 얹혔다. 면적이 늘고 critical path 가 조금 길어진다. 그리고 그 MUX 자체도 <code>enable</code> 이 바뀔 때마다 토글한다. <strong>곱셈기가 충분히 크고, <code>enable</code> 이 자주 0 이고, 그 동안 입력이 실제로 흔들릴 때만</strong> 이득이다. 셋 중 하나라도 아니면 순손해다.</p>
+    <p lang="en"><strong>It is not free.</strong> Two MUXes now sit <strong>on the multiplier's input path</strong>, costing area and a little of the critical path, and they toggle themselves every time <code>enable</code> moves. It pays <strong>only when the multiplier is big enough, <code>enable</code> is low often enough, and the inputs actually move while it is low.</strong> Miss any one of the three and it is a loss.</p>
+  </div>
+</section>
+
+<section id="u3">
+  <div class="sec-head"><span class="sec-num">03</span><h2 lang="ko">flop 쪽은 clock 이 계속 온다</h2><h2 lang="en">On the flop side the clock keeps coming</h2></div>
+
+  <div class="callout">
+    <p lang="ko"><strong>흔한 그림.</strong> "<code>enable</code> 이 0 이면 register 는 쉬고 있으니 전력도 안 쓴다."</p>
+    <p lang="en"><strong>The usual picture.</strong> "With <code>enable</code> low the register is idle, so it costs nothing."</p>
+  </div>
+
+  <p lang="ko">앞 두 단원은 <strong>조합 로직</strong> 이야기였다. 이번은 <strong>register 쪽</strong>이다. 둘을 나란히 놓는다. 왼쪽은 <code>if (enable)</code> 만 쓴 것, 오른쪽은 <a href="glossary.html#gC">clock gating</a> 을 건 것이다. <strong><code>din</code> 과 <code>enable</code> 이 양쪽 다 같고 <code>result</code> 도 같다.</strong> 다른 것은 <code>gclk</code> 줄 하나뿐이다.</p>
+  <p lang="en">The last two units were about <strong>combinational logic.</strong> This one is about <strong>the register.</strong> Two cards side by side: on the left, <code>if (enable)</code> alone; on the right, <a href="glossary.html#gC">clock gating</a>. <strong><code>din</code> and <code>enable</code> are the same on both sides, and so is <code>result</code>.</strong> The only row that differs is <code>gclk</code>.</p>
+
+  <div class="grid2"><div class="sim" data-sim="p07-en-flop"></div><div class="sim" data-sim="p07-gated"></div></div>
+
+  <p lang="ko">왼쪽에서는 <code>clk</code> 이 여덟 프레임 내내 뛰고, 그때마다 flip-flop 안쪽과 <strong>거기까지 오는 clock tree 전체</strong>가 같이 움직인다. 큰 칩에서 clock tree 는 전력을 가장 많이 먹는 그물 중 하나다. 오른쪽에서는 <code>enable</code> 이 내려간 순간부터 <strong><code>gclk</code> 이 바닥에 붙어서</strong> 엣지가 아예 도착하지 않는다.</p>
+  <p lang="en">On the left <code>clk</code> beats through all eight frames, and each beat stirs the inside of the flip-flop <strong>and the entire clock tree that carried it there.</strong> On a large chip that tree is one of the hungriest nets there is. On the right, from the moment <code>enable</code> drops, <strong><code>gclk</code> lies flat</strong> and no edge arrives at all.</p>
+
+  <div class="def">
+    <p lang="ko"><strong>한 줄 정리.</strong> <a href="glossary.html#gO">Operand isolation</a> 은 <strong>조합 로직</strong>을 막고 clock gating 은 <strong>sequential</strong> 을 막는다. 서로의 사각지대를 메우므로 <strong>둘 중 하나를 고르는 문제가 아니다.</strong></p>
+    <p lang="en"><strong>In one line.</strong> <a href="glossary.html#gO">Operand isolation</a> stops <strong>combinational</strong> logic and clock gating stops <strong>sequential</strong> logic. They cover each other's blind spots, so <strong>it is not a choice between them.</strong></p>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>오른쪽 그림은 단순화한 것이다.</strong> 실제 clock gating cell 은 <code>AND</code> 하나가 아니라 <strong>latch 와 AND 를 묶은 것</strong>이다. <code>enable</code> 이 clock 의 high 구간에서 바뀌면 clock 에 짧은 가짜 펄스가 생기는데, latch 가 <code>enable</code> 을 low 구간에 붙들어서 그걸 막는다. <strong>그래서 clock 에 직접 <code>AND</code> 를 거는 RTL 은 쓰지 않는다.</strong> <code>if (enable)</code> 로 쓰고 합성 도구가 gating cell 을 넣게 두는 것이 정석이다.</p>
+    <p lang="en"><strong>The right-hand picture is simplified.</strong> A real clock gating cell is not a bare <code>AND</code> but <strong>a latch and an AND together.</strong> If <code>enable</code> moves while the clock is high you get a short false pulse on the clock, and the latch stops that by holding <code>enable</code> across the low phase. <strong>So you do not write RTL that ANDs a clock directly.</strong> You write <code>if (enable)</code> and let synthesis insert the gating cell.</p>
+  </div>
+</section>
+
+<section id="u4">
+  <div class="sec-head"><span class="sec-num">04</span><h2 lang="ko">그래서 무엇을 어디에 거나</h2><h2 lang="en">So what goes where</h2></div>
+
+  <p lang="ko">네 카드를 한 표로 줄이면 이렇다. 판단 기준은 <strong>"무엇이 실제로 흔들리는가"</strong> 하나다.</p>
+  <p lang="en">The four cards compressed into one table. The deciding question is just <strong>"what actually moves?"</strong></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">흔들리는 것</span><span lang="en">What moves</span></th>
+      <th><span lang="ko">거는 것</span><span lang="en">What to reach for</span></th>
+      <th><span lang="ko">이 페이지의 단원</span><span lang="en">Unit here</span></th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><span lang="ko">쉬는 동안에도 <strong>조합 블록 입력</strong>이 바뀐다</span><span lang="en">the <strong>inputs of a combinational block</strong> move while it is idle</span></td>
+        <td><a href="glossary.html#gO">Operand isolation</a></td>
+        <td><a href="#u2">02</a></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">쉬는 동안에도 <strong>clock 이 flip-flop 에 도착</strong>한다</span><span lang="en">the <strong>clock keeps reaching the flip-flops</strong> while they are idle</span></td>
+        <td><a href="glossary.html#gC">Clock gating</a></td>
+        <td><a href="#u3">03</a></td>
+      </tr>
+      <tr>
+        <td><span lang="ko">아무것도 안 흔들리는데 <strong>전원이 켜져 있다</strong></span><span lang="en">nothing moves at all but <strong>the supply is on</strong></span></td>
+        <td><a href="glossary.html#gP">Power gating</a></td>
+        <td><span lang="ko">여기서는 안 다룬다</span><span lang="en">not covered here</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p lang="ko">셋째 줄이 이 페이지에 없는 이유는 <strong>시뮬레이션으로 보여줄 것이 없어서</strong>다. <a href="glossary.html#gL">leakage</a> 는 신호가 하나도 안 움직여도 흐르는 전류라 파형에 아무 흔적을 안 남긴다. 앞의 둘이 <strong>토글을 줄이는</strong> 기법이고 셋째가 <strong>전원을 끊는</strong> 기법인 것이 그래서 중요하다. 이 구분은 <a href="L07-efficient-design.html#s5">7 강 05 절</a>에 정리해 뒀다.</p>
+  <p lang="en">The third row is missing from this page because <strong>there is nothing to show in a trace.</strong> <a href="glossary.html#gL">Leakage</a> flows with no signal moving at all, so it leaves no mark on a waveform. That is exactly why it matters that the first two <strong>cut toggling</strong> while the third <strong>cuts the supply.</strong> <a href="L07-efficient-design.html#s5">Section 05 of Lecture 7</a> lays that split out.</p>
+
+  <div class="callout">
+    <p lang="ko"><strong>셋 다 기능을 안 바꾼다.</strong> 그래서 셋 다 <strong>testbench 로는 검증되지 않는다.</strong> 잘못 걸어서 기능이 깨진 경우만 검증이 잡는다. 제대로 걸었는지, 걸 만한 자리였는지는 <strong>전력 리포트를 읽어야</strong> 안다.</p>
+    <p lang="en"><strong>None of the three changes function.</strong> Which means <strong>no testbench verifies them.</strong> Verification only catches the case where you applied one wrongly and broke the function. Whether you applied it well, and whether it was worth applying, is <strong>read from a power report.</strong></p>
+  </div>
+</section>
+
+<section id="u5">
+  <div class="sec-head"><span class="sec-num">05</span><h2 lang="ko">7 강 어느 절로 가면 되나</h2><h2 lang="en">Where to go in Lecture 7</h2></div>
+
+  <p lang="ko">이 페이지의 단원이 7 강 노트의 어느 절에 대응하는지.</p>
+  <p lang="en">Where each unit lands in the Lecture 7 notes.</p>
+  <table>
+    <thead><tr><th><span lang="ko">여기</span><span lang="en">Here</span></th><th><span lang="ko">7 강에서</span><span lang="en">In Lecture 7</span></th></tr></thead>
+    <tbody>
+      <tr><td><a href="#u1">01</a></td><td><a href="L07-efficient-design.html#s1"><span lang="ko">&sect;01 &middot; 코드가 아니라 회로를 본다</span><span lang="en">&sect;01 &middot; Look at the circuit, not the code</span></a></td></tr>
+      <tr><td><a href="#u2">02</a></td><td><a href="L07-efficient-design.html#s5"><span lang="ko">&sect;05 &middot; Operand isolation 을 코드로 보면</span><span lang="en">&sect;05 &middot; Operand isolation in code</span></a></td></tr>
+      <tr><td><a href="#u3">03</a></td><td><a href="L07-efficient-design.html#s5"><span lang="ko">&sect;05 &middot; Clock gating 과 power gating</span><span lang="en">&sect;05 &middot; Clock gating and power gating</span></a></td></tr>
+      <tr><td><a href="#u4">04</a></td><td><a href="L07-efficient-design.html#s5"><span lang="ko">&sect;05 &middot; power 는 한 덩어리가 아니다</span><span lang="en">&sect;05 &middot; Power is not one thing</span></a> &middot; <a href="L07-efficient-design.html#s10"><span lang="ko">&sect;10 &middot; 직접 채워보기</span><span lang="en">&sect;10 &middot; Fill the table yourself</span></a></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>이 페이지가 안 다룬 것.</strong> DVFS 와 power gating (7 강 05 절), resource sharing 과 logic duplication (03 · 04 절), bitwidth reduction 과 strength reduction (03 · 06 절). 앞의 둘은 파형에 흔적을 안 남기고, 뒤의 넷은 <strong>동작이 실제로 달라지므로</strong> 이 페이지의 주제인 "같은 파형, 다른 전력" 에 안 맞는다. 그쪽은 7 강 노트가 표와 도해로 다룬다.</p>
+    <p lang="en"><strong>Not covered here.</strong> DVFS and power gating (Lecture 7 &sect;05), resource sharing and logic duplication (&sect;03, &sect;04), bitwidth and strength reduction (&sect;03, &sect;06). The first two leave no trace in a waveform, and the last four <strong>genuinely change the behaviour</strong>, which puts them outside this page's subject of "same waveform, different power". The Lecture 7 notes handle those with tables and figures.</p>
+  </div>
+</section>
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Before Lecture 7 개인 학습 노트<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 페이지는 수강생이 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  이 과목 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Before Lecture 7 personal study notes<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  This page is personal study material written by a student. It is not official course material.<br>
+  Copyright in the course's lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<script type="application/json" id="sim-data">[{"id": "p07-no-iso", "title": {"ko": "enable 이 0 인데 곱셈기는 계속 돈다", "en": "enable is low and the multiplier keeps going"}, "code": [{"t": "assign mult_out = a * b;", "drives": ["mult_out"]}, {"t": "always_ff @(posedge clk)"}, {"t": "  if (enable) result <= mult_out;", "drives": ["result"]}], "circuit": {"w": 480, "h": 185, "nodes": [{"id": "m1", "kind": "mul", "x": 110, "y": 40, "in": {"a": "a", "b": "b"}, "out": {"y": "mult_out"}}, {"id": "x1", "kind": "mux", "x": 220, "y": 40, "in": {"a": "result", "b": "mult_out", "sel": "enable"}, "out": {"y": "dmux"}}, {"id": "f1", "kind": "ff", "x": 340, "y": 44, "in": {"d": "dmux", "clk": "clk"}, "out": {"q": "result"}}], "ports": [{"sig": "a", "side": "in", "y": 40}, {"sig": "b", "side": "in", "y": 80}, {"sig": "enable", "side": "in", "y": 130}, {"sig": "clk", "side": "in", "y": 165}, {"sig": "result", "side": "out", "y": 60}], "wires": [{"sig": "a", "pts": [[36, 40], [80, 40], [80, 52], [110, 52]]}, {"sig": "b", "pts": [[36, 80], [80, 80], [80, 68], [110, 68]]}, {"sig": "mult_out", "pts": [[158, 60], [190, 60], [190, 68], [220, 68]]}, {"sig": "result", "pts": [[396, 60], [412, 60], [412, 18], [200, 18], [200, 52], [220, 52]]}, {"sig": "dmux", "pts": [[268, 60], [340, 60]]}, {"sig": "result", "pts": [[396, 60], [444, 60]]}, {"sig": "enable", "pts": [[36, 130], [244, 130], [244, 80]]}, {"sig": "clk", "pts": [[36, 165], [300, 165], [300, 78], [340, 78]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "enable"}, {"n": "a", "bits": 3}, {"n": "b", "bits": 3}, {"n": "mult_out", "bits": 6}, {"n": "dmux", "bits": 6}, {"n": "result", "bits": 6}], "frames": [{"v": {"clk": 1, "enable": 0, "a": 2, "b": 3, "mult_out": 6, "dmux": 0, "result": 0}, "note": {"ko": "곱셈기 하나와 그 결과를 받는 register 다. enable 이 0 이라 register 는 값을 안 받는다. 그림에서 MUX 가 result 를 자기 자신에게 되먹이고 있는 것이 if (enable) 의 정체다.", "en": "A multiplier and a register that takes its result. With enable low the register takes nothing. The MUX feeding result back into itself is what if (enable) actually is."}}, {"v": {"clk": 0, "enable": 0, "a": 5, "b": 3, "mult_out": 15, "dmux": 0, "result": 0}, "note": {"ko": "a 가 2 에서 5 로 바뀌었다. mult_out 이 6 에서 15 로 따라 바뀐다. enable 은 여전히 0 이다.", "en": "a moved from 2 to 5, and mult_out followed, 6 to 15. enable is still low."}}, {"v": {"clk": 1, "enable": 0, "a": 5, "b": 3, "mult_out": 15, "dmux": 0, "result": 0}, "note": {"ko": "엣지. result 는 0 그대로다. 받을 게 없으니 맞다.", "en": "Edge. result stays 0, correctly, since there is nothing to take."}}, {"v": {"clk": 0, "enable": 1, "a": 7, "b": 6, "mult_out": 42, "dmux": 42, "result": 0}, "note": {"ko": "이번엔 enable 을 걸었다. MUX 가 방향을 바꿔 mult_out 을 register 앞까지 보낸다.", "en": "This time enable goes high. The MUX flips and carries mult_out up to the register."}}, {"v": {"clk": 1, "enable": 1, "a": 7, "b": 6, "mult_out": 42, "dmux": 42, "result": 42}, "note": {"ko": "엣지. result 가 42 를 잡았다. 여기까지는 아무 문제가 없다.", "en": "Edge. result captures 42. Nothing wrong so far."}}, {"v": {"clk": 0, "enable": 0, "a": 1, "b": 7, "mult_out": 7, "dmux": 42, "result": 42}, "note": {"ko": "enable 을 내렸다. result 는 42 를 들고 있다. 그런데 a 와 b 가 또 바뀌었고 mult_out 이 7 이 됐다. 아무도 안 쓰는 값이다.", "en": "enable drops and result holds 42. But a and b moved again and mult_out became 7. A number nobody will use."}}, {"v": {"clk": 1, "enable": 0, "a": 1, "b": 7, "mult_out": 7, "dmux": 42, "result": 42}, "note": {"ko": "엣지. result 는 42 그대로.", "en": "Edge. result still 42."}}, {"v": {"clk": 0, "enable": 0, "a": 4, "b": 5, "mult_out": 20, "dmux": 42, "result": 42}, "note": {"ko": "또 바뀌어서 20. mult_out 줄을 처음부터 다시 보라. 6, 15, 42, 7, 20 으로 쉬지 않고 움직였는데 그중 실제로 쓰인 것은 42 하나뿐이다. 나머지 네 번은 32 비트 곱셈기 전체가 토글하고 그 전력이 그냥 나간 것이다.", "en": "Changed again, to 20. Read the mult_out row from the start: 6, 15, 42, 7, 20, never resting, and exactly one of those, 42, was ever used. The other four had the whole multiplier toggling and the power leaving with it."}}]}, {"id": "p07-iso", "title": {"ko": "입력을 묶으면 안쪽이 멈춘다", "en": "Pin the inputs and the inside stops"}, "code": [{"t": "assign a_iso = enable ? a : 3'b0;", "drives": ["a_iso"]}, {"t": "assign b_iso = enable ? b : 3'b0;", "drives": ["b_iso"]}, {"t": "assign mult_out = a_iso * b_iso;", "drives": ["mult_out"]}, {"t": "always_ff @(posedge clk)"}, {"t": "  if (enable) result <= mult_out;", "drives": ["result"]}], "circuit": {"w": 600, "h": 210, "nodes": [{"id": "c0", "kind": "const", "x": 60, "y": 24, "val": 0, "out": {"y": "zero_a"}}, {"id": "c1", "kind": "const", "x": 60, "y": 104, "val": 0, "out": {"y": "zero_b"}}, {"id": "xa", "kind": "mux", "x": 130, "y": 28, "in": {"a": "zero_a", "b": "a", "sel": "enable"}, "out": {"y": "a_iso"}}, {"id": "xb", "kind": "mux", "x": 130, "y": 104, "in": {"a": "zero_b", "b": "b", "sel": "enable"}, "out": {"y": "b_iso"}}, {"id": "m1", "kind": "mul", "x": 250, "y": 66, "in": {"a": "a_iso", "b": "b_iso"}, "out": {"y": "mult_out"}}, {"id": "x1", "kind": "mux", "x": 360, "y": 66, "in": {"a": "result", "b": "mult_out", "sel": "enable"}, "out": {"y": "dmux"}}, {"id": "f1", "kind": "ff", "x": 470, "y": 70, "in": {"d": "dmux", "clk": "clk"}, "out": {"q": "result"}}], "ports": [{"sig": "a", "side": "in", "y": 56}, {"sig": "b", "side": "in", "y": 140}, {"sig": "enable", "side": "in", "y": 170}, {"sig": "clk", "side": "in", "y": 196}, {"sig": "result", "side": "out", "y": 86}], "wires": [{"sig": "zero_a", "pts": [[92, 36], [112, 36], [112, 40], [130, 40]]}, {"sig": "zero_b", "pts": [[92, 116], [130, 116]]}, {"sig": "a", "pts": [[36, 56], [130, 56]]}, {"sig": "b", "pts": [[36, 140], [100, 140], [100, 132], [130, 132]]}, {"sig": "a_iso", "pts": [[178, 48], [212, 48], [212, 78], [250, 78]]}, {"sig": "b_iso", "pts": [[178, 124], [212, 124], [212, 94], [250, 94]]}, {"sig": "mult_out", "pts": [[298, 86], [324, 86], [324, 94], [360, 94]]}, {"sig": "result", "pts": [[526, 86], [552, 86], [552, 16], [340, 16], [340, 78], [360, 78]]}, {"sig": "dmux", "pts": [[408, 86], [470, 86]]}, {"sig": "result", "pts": [[526, 86], [564, 86]]}, {"sig": "enable", "pts": [[36, 170], [154, 170], [154, 144]]}, {"sig": "enable", "pts": [[154, 170], [384, 170], [384, 106]]}, {"sig": "enable", "pts": [[48, 170], [48, 68], [154, 68]]}, {"sig": "clk", "pts": [[36, 196], [440, 196], [440, 104], [470, 104]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "enable"}, {"n": "a", "bits": 3}, {"n": "b", "bits": 3}, {"n": "zero_a", "bits": 3}, {"n": "zero_b", "bits": 3}, {"n": "a_iso", "bits": 3}, {"n": "b_iso", "bits": 3}, {"n": "mult_out", "bits": 6}, {"n": "dmux", "bits": 6}, {"n": "result", "bits": 6}], "frames": [{"v": {"clk": 1, "enable": 0, "a": 2, "b": 3, "zero_a": 0, "zero_b": 0, "a_iso": 0, "b_iso": 0, "mult_out": 0, "dmux": 0, "result": 0}, "note": {"ko": "앞 단원과 a, b, enable 이 완전히 같은 시나리오다. 달라진 것은 곱셈기 앞에 MUX 두 개가 붙은 것뿐이다. enable 이 0 이므로 둘 다 상수 0 쪽을 고른다.", "en": "Same a, b and enable as the previous unit, frame for frame. The only change is the two MUXes in front of the multiplier. With enable low, both select the constant 0."}}, {"v": {"clk": 0, "enable": 0, "a": 5, "b": 3, "zero_a": 0, "zero_b": 0, "a_iso": 0, "b_iso": 0, "mult_out": 0, "dmux": 0, "result": 0}, "note": {"ko": "a 가 5 로 바뀌었다. a_iso 는 0 그대로다. 그래서 mult_out 도 0 그대로다. 앞 단원에서는 여기서 15 가 됐었다.", "en": "a moved to 5. a_iso does not move. So mult_out does not either. In the previous unit this frame read 15."}}, {"v": {"clk": 1, "enable": 0, "a": 5, "b": 3, "zero_a": 0, "zero_b": 0, "a_iso": 0, "b_iso": 0, "mult_out": 0, "dmux": 0, "result": 0}, "note": {"ko": "엣지. result 는 0. 앞 단원과 같다.", "en": "Edge. result is 0, the same as before."}}, {"v": {"clk": 0, "enable": 1, "a": 7, "b": 6, "zero_a": 0, "zero_b": 0, "a_iso": 7, "b_iso": 6, "mult_out": 42, "dmux": 42, "result": 0}, "note": {"ko": "enable 이 올라가자 MUX 가 진짜 a 와 b 를 통과시킨다. mult_out 이 42. 필요할 때는 정확히 같은 값이 나온다.", "en": "enable rises and the MUXes let the real a and b through. mult_out is 42. When it is needed, the same number comes out."}}, {"v": {"clk": 1, "enable": 1, "a": 7, "b": 6, "zero_a": 0, "zero_b": 0, "a_iso": 7, "b_iso": 6, "mult_out": 42, "dmux": 42, "result": 42}, "note": {"ko": "엣지. result 가 42. 앞 단원의 같은 프레임과 완전히 같다.", "en": "Edge. result is 42, identical to the same frame in the previous unit."}}, {"v": {"clk": 0, "enable": 0, "a": 1, "b": 7, "zero_a": 0, "zero_b": 0, "a_iso": 0, "b_iso": 0, "mult_out": 0, "dmux": 42, "result": 42}, "note": {"ko": "enable 을 내렸다. a_iso 와 b_iso 가 다시 0 으로 묶인다. a 가 1 로 바뀌어도 곱셈기는 아무것도 안 한다.", "en": "enable drops and a_iso, b_iso are pinned to 0 again. a moves to 1 and the multiplier does nothing."}}, {"v": {"clk": 1, "enable": 0, "a": 1, "b": 7, "zero_a": 0, "zero_b": 0, "a_iso": 0, "b_iso": 0, "mult_out": 0, "dmux": 42, "result": 42}, "note": {"ko": "엣지. result 는 42.", "en": "Edge. result is 42."}}, {"v": {"clk": 0, "enable": 0, "a": 4, "b": 5, "zero_a": 0, "zero_b": 0, "a_iso": 0, "b_iso": 0, "mult_out": 0, "dmux": 42, "result": 42}, "note": {"ko": "result 줄을 두 단원에서 나란히 놓으면 한 칸도 다르지 않다. mult_out 줄만 다르다. 시뮬레이션으로는 절대 못 잡는 차이이고, 전력 리포트에서만 보인다.", "en": "Put the result rows of the two units side by side and not one frame differs. Only the mult_out rows differ. Simulation can never catch this. A power report can."}}]}, {"id": "p07-en-flop", "title": {"ko": "enable 만 걸었을 때", "en": "With only an enable"}, "code": [{"t": "always_ff @(posedge clk)"}, {"t": "  if (enable) result <= din;", "drives": ["result"]}], "circuit": {"w": 400, "h": 170, "nodes": [{"id": "x1", "kind": "mux", "x": 140, "y": 46, "in": {"a": "result", "b": "din", "sel": "enable"}, "out": {"y": "dmux"}}, {"id": "f1", "kind": "ff", "x": 260, "y": 50, "in": {"d": "dmux", "clk": "clk"}, "out": {"q": "result"}}], "ports": [{"sig": "din", "side": "in", "y": 74}, {"sig": "enable", "side": "in", "y": 120}, {"sig": "clk", "side": "in", "y": 150}, {"sig": "result", "side": "out", "y": 66}], "wires": [{"sig": "din", "pts": [[36, 74], [140, 74]]}, {"sig": "result", "pts": [[316, 66], [336, 66], [336, 20], [120, 20], [120, 58], [140, 58]]}, {"sig": "dmux", "pts": [[188, 66], [260, 66]]}, {"sig": "result", "pts": [[316, 66], [364, 66]]}, {"sig": "enable", "pts": [[36, 120], [164, 120], [164, 86]]}, {"sig": "clk", "pts": [[36, 150], [230, 150], [230, 84], [260, 84]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "enable"}, {"n": "din", "bits": 3}, {"n": "dmux", "bits": 3}, {"n": "result", "bits": 3}], "frames": [{"v": {"clk": 1, "enable": 1, "din": 1, "dmux": 1, "result": 0}, "note": {"ko": "if (enable) 만 쓴 register 다. 합성하면 되먹임 MUX 가 붙는다.", "en": "A register written with if (enable) alone. Synthesis gives it a feedback MUX."}}, {"v": {"clk": 0, "enable": 1, "din": 2, "dmux": 2, "result": 0}, "note": {"ko": "din 이 2.", "en": "din is 2."}}, {"v": {"clk": 1, "enable": 1, "din": 2, "dmux": 2, "result": 2}, "note": {"ko": "엣지. result 가 2 를 잡았다.", "en": "Edge. result captures 2."}}, {"v": {"clk": 0, "enable": 0, "din": 5, "dmux": 2, "result": 2}, "note": {"ko": "enable 을 내렸다. MUX 가 result 를 자기에게 되먹인다.", "en": "enable drops. The MUX feeds result back to itself."}}, {"v": {"clk": 1, "enable": 0, "din": 5, "dmux": 2, "result": 2}, "note": {"ko": "엣지. result 는 2 를 유지한다. 기능은 맞다. 그런데 clk 줄을 보라. 여전히 매 프레임 오르내린다.", "en": "Edge. result holds 2, which is correct. Now look at the clk row. It still rises and falls every frame."}}, {"v": {"clk": 0, "enable": 0, "din": 6, "dmux": 2, "result": 2}, "note": {"ko": "din 이 6 으로 바뀌어도 상관없다. 대신 MUX 는 매번 두 입력을 다시 고른다.", "en": "din moving to 6 changes nothing here. But the MUX re-selects between its two inputs every time."}}, {"v": {"clk": 1, "enable": 0, "din": 6, "dmux": 2, "result": 2}, "note": {"ko": "엣지. 또 왔다. flip-flop 은 쉬는 동안에도 엣지마다 내부가 움직이고 거기까지 오는 clock tree 도 같이 움직인다.", "en": "Edge, again. Even while idle the flip-flop stirs on every edge, and so does the clock tree that carried it there."}}, {"v": {"clk": 0, "enable": 0, "din": 3, "dmux": 2, "result": 2}, "note": {"ko": "여덟 프레임 동안 clk 이 여덟 번 움직였다. 그중 일이 된 것은 한 번뿐이다.", "en": "Eight frames, eight clk transitions, one of which did any work."}}]}, {"id": "p07-gated", "title": {"ko": "clock gating 을 걸면", "en": "With clock gating"}, "code": [{"t": "assign gclk = clk & enable;", "drives": ["gclk"]}, {"t": "always_ff @(posedge gclk)"}, {"t": "  result <= din;", "drives": ["result"]}], "circuit": {"w": 400, "h": 170, "nodes": [{"id": "g1", "kind": "and", "x": 140, "y": 110, "in": {"a": "clk", "b": "enable"}, "out": {"y": "gclk"}}, {"id": "f1", "kind": "ff", "x": 260, "y": 50, "in": {"d": "din", "clk": "gclk"}, "out": {"q": "result"}}], "ports": [{"sig": "din", "side": "in", "y": 66}, {"sig": "clk", "side": "in", "y": 122}, {"sig": "enable", "side": "in", "y": 152}, {"sig": "result", "side": "out", "y": 66}], "wires": [{"sig": "din", "pts": [[36, 66], [260, 66]]}, {"sig": "clk", "pts": [[36, 122], [140, 122]]}, {"sig": "enable", "pts": [[36, 152], [110, 152], [110, 138], [140, 138]]}, {"sig": "gclk", "pts": [[188, 130], [220, 130], [220, 84], [260, 84]]}, {"sig": "result", "pts": [[316, 66], [364, 66]]}]}, "signals": [{"n": "clk", "kind": "clk"}, {"n": "enable"}, {"n": "gclk", "kind": "gclk"}, {"n": "din", "bits": 3}, {"n": "result", "bits": 3}], "frames": [{"v": {"clk": 1, "enable": 1, "gclk": 1, "din": 1, "result": 0}, "note": {"ko": "왼쪽 카드와 din, enable 이 완전히 같다. 달라진 것은 MUX 가 사라지고 clock 경로에 게이트가 하나 붙은 것이다.", "en": "Same din and enable as the card on the left. What changed: the MUX is gone and a gate sits on the clock path."}}, {"v": {"clk": 0, "enable": 1, "gclk": 0, "din": 2, "result": 0}, "note": {"ko": "enable 이 1 이므로 gclk 이 clk 을 그대로 따라간다.", "en": "With enable high, gclk simply follows clk."}}, {"v": {"clk": 1, "enable": 1, "gclk": 1, "din": 2, "result": 2}, "note": {"ko": "gclk 이 올라갔고 flop 이 2 를 잡았다. 왼쪽 카드와 같은 프레임에 같은 값이다.", "en": "gclk rises and the flop captures 2, in the same frame and with the same value as the left card."}}, {"v": {"clk": 0, "enable": 0, "gclk": 0, "din": 5, "result": 2}, "note": {"ko": "enable 을 내렸다. 여기서부터 gclk 줄이 평평해진다. clk 줄은 계속 뛰는데 gclk 은 바닥에 붙어 있다.", "en": "enable drops, and from here the gclk row flattens. The clk row keeps beating while gclk lies on the floor."}}, {"v": {"clk": 1, "enable": 0, "gclk": 0, "din": 5, "result": 2}, "note": {"ko": "clk 은 엣지인데 gclk 은 안 올라갔다. flop 은 이번 프레임에 깜빡이지 않는다. 엣지가 아예 안 온 것이다.", "en": "clk is at an edge and gclk did not rise. The flop does not blink this frame. No edge ever arrived."}}, {"v": {"clk": 0, "enable": 0, "gclk": 0, "din": 6, "result": 2}, "note": {"ko": "din 이 바뀌어도 아무 일도 없다.", "en": "din moves and nothing happens."}}, {"v": {"clk": 1, "enable": 0, "gclk": 0, "din": 6, "result": 2}, "note": {"ko": "또 clk 엣지. 또 gclk 은 가만히 있다. flop 도, 거기까지 오는 clock tree 도 이 구간에서는 안 움직인다.", "en": "Another clk edge, and gclk stays put. Neither the flop nor the clock tree behind it moves through this stretch."}}, {"v": {"clk": 0, "enable": 0, "gclk": 0, "din": 3, "result": 2}, "note": {"ko": "result 줄을 왼쪽 카드와 비교하라. 여덟 프레임이 한 칸도 다르지 않다. 다른 것은 gclk 줄 하나뿐이다.", "en": "Compare the result row with the left card. Eight frames, not one different. The only row that differs is gclk."}}]}]</script>
+<script src="../sim.js" type="module"></script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
