@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 8 빠른 읽기 &middot; Floating Point Arithmetic Unit Design &middot; CEN 598 ADDV</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+/* 애니메이션 슬라이더. 덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간을 한 자리에서 밟아본다. */
+/* 마크업 규약과 동작은 anim.js 가 단일 출처다. 스크립트가 없으면 첫 프레임만 보이고 막대가 안 생긴다. */
+.anim [data-f]{display:none}
+.anim [data-f~="0"]{display:revert}
+.anim.js-anim [data-f]{display:none}
+.anim.js-anim [data-f].on{display:revert}
+.anim:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.animbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--rule)}
+.animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.animbar button:disabled{opacity:.35;cursor:default}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
+.animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
+.animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
+@media(prefers-reduced-motion:reduce){.animbar button{transition:none}}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 8<br>Floating Point Arithmetic Unit Design</h1>
+  <p class="subtitle" lang="ko">FP32 의 32비트는 네 가지만 알면 읽힌다. <strong>bias, hidden bit, 남겨 둔 두 패턴, rounding.</strong> 회로는 <strong>덧셈은 정렬, 곱셈은 곱셈기 크기</strong>다.</p>
+  <p class="subtitle" lang="en">FP32's 32 bits read with four ideas: <strong>the bias, the hidden bit, two reserved patterns, rounding.</strong> The circuits come down to <strong>alignment for addition, multiplier size for multiplication.</strong></p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L08-floating-point.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L08-floating-point.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 8</div>
+    <div class="name">Floating Point Arithmetic Unit Design</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">fixed 에서 floating 으로</span><span lang="en">From fixed to floating</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">FP32 를 한 칸씩</span><span lang="en">FP32, cell by cell</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">남겨 둔 두 패턴</span><span lang="en">The two reserved patterns</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">Rounding</span><span lang="en">Rounding</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">덧셈기와 곱셈기</span><span lang="en">The adder and the multiplier</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+
+  <p lang="ko">외부 강사 Prashant D. Joshi (UT Austin) 의 강의다. 앞 절반은 <strong>정수가 아닌 수를 비트에 담는 형식 (IEEE 754)</strong>, 뒤 절반은 <strong>그 수를 더하고 곱하는 회로</strong>다. <a href="L07-efficient-design.html#s0">Lecture 7 의 building block 표</a>에 있던 floating-point unit 의 뚜껑을 여는 강의다.</p>
+  <p lang="en">A guest lecture by Prashant D. Joshi (UT Austin). The first half is <strong>the format for putting non-integers into bits (IEEE 754)</strong>, the second half <strong>the circuits that add and multiply them.</strong> It lifts the lid on the floating-point unit from <a href="L07-efficient-design.html#s0">Lecture 7's building block table.</a></p>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">한 줄로</span><span lang="en">In one line</span></th>
+      <th><span lang="ko">내용</span><span lang="en">What it says</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">왜 FP 인가</span><span lang="en">Why FP</span></td><td><span lang="ko">fixed point 는 간격이 어디서나 같아 아주 작은 수와 아주 큰 수를 같이 못 담는다. FP 는 <strong>간격이 수의 크기를 따라간다</strong></span><span lang="en">fixed point spaces values evenly, so tiny and huge can't coexist; FP's <strong>spacing follows the size of the number</strong></span></td></tr>
+      <tr><td><span lang="ko">모양</span><span lang="en">Shape</span></td><td><span lang="ko"><code>&plusmn;1.f &times; 2<sup>E</sup></code>. sign 1 + exponent <code>q</code> + fraction <code>p &minus; 1</code> 비트</span><span lang="en"><code>&plusmn;1.f &times; 2<sup>E</sup></code>: 1 sign + <code>q</code> exponent + <code>p &minus; 1</code> fraction bits</span></td></tr>
+      <tr><td>bias</td><td><span lang="ko">exponent 에 2<sup>q&minus;1</sup> &minus; 1 을 더해 부호 없이 저장. FP32 는 127</span><span lang="en">add 2<sup>q&minus;1</sup> &minus; 1 and store unsigned; 127 for FP32</span></td></tr>
+      <tr><td>hidden bit</td><td><span lang="ko">맨 앞 1 은 저장 안 한다. FP32 는 23비트 저장, <strong>정밀도 24</strong></span><span lang="en">the leading 1 isn't stored; FP32 stores 23 bits, <strong>precision 24</strong></span></td></tr>
+      <tr><td><span lang="ko">특수값</span><span lang="en">Special values</span></td><td><span lang="ko">exponent 전부 0 은 &plusmn;0 과 subnormal, 전부 1 은 &plusmn;∞ 와 NaN</span><span lang="en">exponent all 0 is &plusmn;0 and subnormals; all 1 is &plusmn;∞ and NaN</span></td></tr>
+      <tr><td>rounding</td><td><span lang="ko">mode 넷, 기본은 RTE (tie 는 짝수 쪽). guard, round, sticky 로 판정</span><span lang="en">four modes, RTE by default (ties to even), decided with guard, round, sticky</span></td></tr>
+      <tr><td><span lang="ko">회로</span><span lang="en">Circuits</span></td><td><span lang="ko">덧셈은 compare &rarr; shift &rarr; add &rarr; normalize &rarr; round. 곱셈은 sign XOR, exponent 덧셈 (bias 한 번 빼기), significand 곱셈</span><span lang="en">add is compare &rarr; shift &rarr; add &rarr; normalize &rarr; round; multiply is sign XOR, add exponents (minus one bias), multiply significands</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">fixed 에서 floating 으로</h2><h2 lang="en">From fixed to floating</h2></div>
+
+  <p lang="ko">슬라이드 6쪽의 fixed point 는 32비트를 sign 1, 정수부 15, 소수부 16 으로 나눈다. &minus;5½ 는 <code>0x80058000</code> 으로 정확히 담기지만 1/10 은 2진으로 <code>0.0<span style="text-decoration:overline">0011</span></code> 이 끝없이 반복되어 <code>0x00001999</code> = 0.0999908&hellip; 로 잘린다. 간격이 어디서나 2<sup>&minus;16</sup> 이라 Planck 상수는 0 이 되고 10<sup>80</sup> 은 넘친다.</p>
+  <p lang="en">Slide 6's fixed point splits 32 bits into 1 sign, 15 integer, 16 fraction. &minus;5½ fits exactly as <code>0x80058000</code>, but 1/10 is the endless binary <code>0.0<span style="text-decoration:overline">0011</span></code> and gets cut to <code>0x00001999</code> = 0.0999908&hellip;. With a spacing of 2<sup>&minus;16</sup> everywhere, Planck's constant becomes 0 and 10<sup>80</sup> overflows.</p>
+
+  <p lang="ko">floating point 는 2진 과학적 표기다. normalized 조건 <code>1 &le; b<sub>0</sub> &lt; 2</code> 때문에 앞자리가 언제나 1 이다. exponent 하나 안에 수가 <strong>언제나 같은 개수</strong> (2<sup>p&minus;1</sup>) 있고, exponent 가 하나 오를 때마다 <strong>간격이 두 배</strong>가 된다. 1 근처의 간격이 machine epsilon <code>&epsilon; = 2<sup>&minus;(p&minus;1)</sup></code>, x 근처의 간격이 <code>ulp(x) = &epsilon; &times; 2<sup>E</sup></code> 다.</p>
+  <p lang="en">Floating point is binary scientific notation; the normalized condition <code>1 &le; b<sub>0</sub> &lt; 2</code> pins the leading digit to 1. Each exponent holds <strong>the same count</strong> of numbers (2<sup>p&minus;1</sup>), and each step up in exponent <strong>doubles the spacing.</strong> The spacing near 1 is machine epsilon, <code>&epsilon; = 2<sup>&minus;(p&minus;1)</sup></code>; near x it's <code>ulp(x) = &epsilon; &times; 2<sup>E</sup></code>.</p>
+
+  <figure>
+<svg viewBox="0 0 700 264" role="img" aria-label="p 가 3 인 장난감 형식의 수직선. 지수가 하나 늘 때마다 표현 가능한 값 사이의 간격이 두 배가 되지만 지수 하나당 값의 개수는 4개로 같다">
+<path d="M30 70 L690 70" stroke="var(--ink2)" stroke-width="1.2" fill="none"/>
+<path d="M60.0 56 L60.0 84" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+<path d="M65.0 62 L65.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M70.0 62 L70.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M75.0 62 L75.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M80.0 56 L80.0 84" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+<path d="M90.0 62 L90.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M100.0 62 L100.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M110.0 62 L110.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M120.0 56 L120.0 84" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+<path d="M140.0 62 L140.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M160.0 62 L160.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M180.0 62 L180.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M200.0 56 L200.0 84" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+<path d="M240.0 62 L240.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M280.0 62 L280.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M320.0 62 L320.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M360.0 56 L360.0 84" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+<path d="M440.0 62 L440.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M520.0 62 L520.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M600.0 62 L600.0 78" stroke="var(--blue)" stroke-width="1.2" fill="none"/>
+<path d="M680 56 L680 84" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+<path d="M40 64 L40 76" stroke="var(--ink3)" stroke-width="1.2" fill="none"/>
+<text class="svglab" x="40" y="100" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">0</text>
+<text class="svglab" x="80.0" y="100" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">0.5</text>
+<text class="svglab" x="120" y="100" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">1</text>
+<text class="svglab" x="200" y="100" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">2</text>
+<text class="svglab" x="360" y="100" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">4</text>
+<text class="svglab" x="680" y="100" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">8</text>
+<text class="svglab" x="80.0" y="48" text-anchor="middle" style="font-size:10px;fill:var(--blue)">2⁻¹</text>
+<text class="svglab" x="120" y="48" text-anchor="middle" style="font-size:10px;fill:var(--blue)">2⁰</text>
+<text class="svglab" x="200" y="48" text-anchor="middle" style="font-size:10px;fill:var(--blue)">2¹</text>
+<text class="svglab" x="360" y="48" text-anchor="middle" style="font-size:10px;fill:var(--blue)">2²</text>
+<text class="svglab" x="680" y="48" text-anchor="middle" style="font-size:10px;fill:var(--blue)">2³</text>
+<path d="M122 110 L122 116 L198 116 L198 110" stroke="var(--ink3)" stroke-width="1" fill="none"/>
+<text class="svglab" x="160.0" y="126" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">gap 0.25</text>
+<path d="M202 110 L202 116 L358 116 L358 110" stroke="var(--ink3)" stroke-width="1" fill="none"/>
+<text class="svglab" x="280.0" y="126" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">gap 0.5</text>
+<path d="M362 110 L362 116 L678 116 L678 110" stroke="var(--ink3)" stroke-width="1" fill="none"/>
+<text class="svglab" x="520.0" y="126" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">gap 1</text>
+<path d="M60.0 110 L60.0 116 L118 116 L118 110" stroke="var(--ink3)" stroke-width="1" fill="none"/>
+<text class="svglab" x="60.0" y="140" text-anchor="start" style="font-size:9px;fill:var(--ink2)">gaps 0.0625, 0.125</text>
+<text class="svgtxt" x="350" y="166" text-anchor="middle" style="font-size:11px;fill:var(--ink2)" lang="ko">지수 하나당 몇 개, 간격은 얼마</text>
+<text class="svgtxt" x="350" y="166" text-anchor="middle" style="font-size:11px;fill:var(--ink2)" lang="en">per exponent: how many, and how far apart</text>
+<rect x="40" y="178" width="116" height="76" rx="5" fill="rgba(var(--blue-rgb),.06)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="98" y="196" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">E = −2</text>
+<text class="svglab" x="98" y="212" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">[0.25, 0.5)</text>
+<text class="svglab" x="98" y="228" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">4 values</text>
+<text class="svglab" x="98" y="244" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:600">gap 2⁻⁴</text>
+<rect x="166" y="178" width="116" height="76" rx="5" fill="rgba(var(--blue-rgb),.06)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="224" y="196" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">E = −1</text>
+<text class="svglab" x="224" y="212" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">[0.5, 1)</text>
+<text class="svglab" x="224" y="228" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">4 values</text>
+<text class="svglab" x="224" y="244" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:600">gap 2⁻³</text>
+<rect x="292" y="178" width="116" height="76" rx="5" fill="rgba(var(--blue-rgb),.06)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="350" y="196" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">E = 0</text>
+<text class="svglab" x="350" y="212" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">[1, 2)</text>
+<text class="svglab" x="350" y="228" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">4 values</text>
+<text class="svglab" x="350" y="244" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:600">gap 2⁻²</text>
+<rect x="418" y="178" width="116" height="76" rx="5" fill="rgba(var(--blue-rgb),.06)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="476" y="196" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">E = 1</text>
+<text class="svglab" x="476" y="212" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">[2, 4)</text>
+<text class="svglab" x="476" y="228" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">4 values</text>
+<text class="svglab" x="476" y="244" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:600">gap 2⁻¹</text>
+<rect x="544" y="178" width="116" height="76" rx="5" fill="rgba(var(--blue-rgb),.06)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="602" y="196" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">E = 2</text>
+<text class="svglab" x="602" y="212" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">[4, 8)</text>
+<text class="svglab" x="602" y="228" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">4 values</text>
+<text class="svglab" x="602" y="244" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:600">gap 2⁰</text>
+</svg>
+    <figcaption lang="ko"><strong>슬라이드의 그림이 아니다.</strong> 손으로 셀 수 있게 <code>p = 3</code> (significand 3비트, 저장되는 비트 2개) 인 장난감 형식을 골라 exponent &minus;2 부터 2 까지만 그렸다. 윗줄은 선형 눈금이라 간격이 커지는 게 보이고, 아랫줄은 exponent 마다 칸을 같은 폭으로 둬서 슬라이드의 로그 눈금처럼 개수가 같은 게 보인다.</figcaption>
+    <figcaption lang="en"><strong>Not a slide figure.</strong> To keep it countable, this is a toy format with <code>p = 3</code> (a 3 bit significand, 2 stored bits), drawn only for exponents &minus;2 to 2. The top row is a linear scale so the growing gaps show; the bottom row gives each exponent an equal-width box, like the slide's log ruler, so the equal counts show.</figcaption>
+  </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko">
+      <p><strong>윗줄의 눈금 하나가 표현 가능한 수 하나다.</strong> <code>p = 3</code> 이면 significand 가 <code>1.b<sub>1</sub>b<sub>2</sub></code> 꼴이라 <code>1.00, 1.01, 1.10, 1.11</code> 넷, 십진수로 1, 1.25, 1.5, 1.75 다. 여기에 2<sup>E</sup> 를 곱한 것이 각 구간의 눈금이다.</p>
+      <table><thead><tr><th>E</th><th>구간</th><th>눈금 (= significand &times; 2<sup>E</sup>)</th><th>간격 = &epsilon; &times; 2<sup>E</sup></th></tr></thead><tbody>
+        <tr><td>&minus;2</td><td>[0.25, 0.5)</td><td>0.25, 0.3125, 0.375, 0.4375</td><td>0.25 &times; 2<sup>&minus;2</sup> = 0.0625 = 2<sup>&minus;4</sup></td></tr>
+        <tr><td>&minus;1</td><td>[0.5, 1)</td><td>0.5, 0.625, 0.75, 0.875</td><td>0.25 &times; 2<sup>&minus;1</sup> = 0.125 = 2<sup>&minus;3</sup></td></tr>
+        <tr><td>0</td><td>[1, 2)</td><td>1, 1.25, 1.5, 1.75</td><td>0.25 = 2<sup>&minus;2</sup></td></tr>
+        <tr><td>1</td><td>[2, 4)</td><td>2, 2.5, 3, 3.5</td><td>0.5 = 2<sup>&minus;1</sup></td></tr>
+        <tr><td>2</td><td>[4, 8)</td><td>4, 5, 6, 7</td><td>1 = 2<sup>0</sup></td></tr>
+      </tbody></table>
+      <p>여기서 <code>&epsilon; = 2<sup>&minus;(p&minus;1)</sup> = 2<sup>&minus;2</sup> = 0.25</code> 다. 맨 오른쪽 8 은 다음 구간 (E = 3) 의 첫 눈금이다. 눈금 위의 <code>2<sup>&minus;1</sup></code>, <code>2<sup>0</sup></code>, &hellip;, <code>2<sup>3</sup></code> 는 구간이 시작하는 2의 거듭제곱이고 그 눈금만 길게 그렸다. 0.25 와 0.5 사이, 0.5 와 1 사이는 너무 좁아서 간격 둘을 <code>gaps 0.0625, 0.125</code> 로 한 번에 적었다.</p>
+      <p><strong>0 과 0.25 사이에는 눈금이 없다.</strong> 이 그림은 E = &minus;2 에서 잘랐기 때문이기도 하지만, 03절의 함정대로 normalized 수로는 <strong>0 자체도 없다.</strong> 07절의 subnormal 이 이 구간을 다룬다.</p>
+      <p><strong>아랫줄이 슬라이드의 두 질문에 대한 답이다.</strong> 상자 다섯이 모두 <code>4 values</code> 다. exponent 하나에 significand 표현은 <strong>언제나 2<sup>p&minus;1</sup> 개</strong>로 같다 (여기서 2<sup>2</sup> = 4, FP32 에서 2<sup>23</sup>). 그런데 간격은 <code>2<sup>&minus;4</sup> &rarr; 2<sup>&minus;3</sup> &rarr; 2<sup>&minus;2</sup> &rarr; 2<sup>&minus;1</sup> &rarr; 2<sup>0</sup></code> 로 exponent 가 하나 오를 때마다 <strong>정확히 두 배</strong>가 된다. 같은 exponent 안에서는 간격이 일정하고, exponent 를 넘어가면 두 배로 뛴다.</p>
+      <p>그래서 <strong>상대 오차</strong>는 거의 일정하다. 간격 &divide; 수의 크기 가 어느 구간에서나 2<sup>&minus;2</sup> 와 2<sup>&minus;3</sup> 사이에 있다. fixed point 가 절대 간격을 고정한 것과 정반대로, floating point 는 <strong>상대 간격을 고정한다.</strong></p>
+    </div>
+    <div lang="en">
+      <p><strong>Each tick on the top row is one representable number.</strong> With <code>p = 3</code> the significand looks like <code>1.b<sub>1</sub>b<sub>2</sub></code>, so there are four: <code>1.00, 1.01, 1.10, 1.11</code>, i.e. 1, 1.25, 1.5, 1.75. Multiply by 2<sup>E</sup> and you get each range's ticks.</p>
+      <table><thead><tr><th>E</th><th>range</th><th>ticks (= significand &times; 2<sup>E</sup>)</th><th>gap = &epsilon; &times; 2<sup>E</sup></th></tr></thead><tbody>
+        <tr><td>&minus;2</td><td>[0.25, 0.5)</td><td>0.25, 0.3125, 0.375, 0.4375</td><td>0.25 &times; 2<sup>&minus;2</sup> = 0.0625 = 2<sup>&minus;4</sup></td></tr>
+        <tr><td>&minus;1</td><td>[0.5, 1)</td><td>0.5, 0.625, 0.75, 0.875</td><td>0.25 &times; 2<sup>&minus;1</sup> = 0.125 = 2<sup>&minus;3</sup></td></tr>
+        <tr><td>0</td><td>[1, 2)</td><td>1, 1.25, 1.5, 1.75</td><td>0.25 = 2<sup>&minus;2</sup></td></tr>
+        <tr><td>1</td><td>[2, 4)</td><td>2, 2.5, 3, 3.5</td><td>0.5 = 2<sup>&minus;1</sup></td></tr>
+        <tr><td>2</td><td>[4, 8)</td><td>4, 5, 6, 7</td><td>1 = 2<sup>0</sup></td></tr>
+      </tbody></table>
+      <p>Here <code>&epsilon; = 2<sup>&minus;(p&minus;1)</sup> = 2<sup>&minus;2</sup> = 0.25</code>. The 8 at the far right is the first tick of the next range (E = 3). The labels <code>2<sup>&minus;1</sup></code>, <code>2<sup>0</sup></code>, &hellip;, <code>2<sup>3</sup></code> above the line mark the powers of two where ranges begin, and only those ticks are drawn long. The ranges between 0.25 and 0.5 and between 0.5 and 1 are too narrow to label, so their two gaps are written together as <code>gaps 0.0625, 0.125</code>.</p>
+      <p><strong>Nothing between 0 and 0.25.</strong> Partly because the figure stops at E = &minus;2, but also, as section 03's trap said, normalized numbers <strong>don't even include 0.</strong> Section 07's subnormals deal with that stretch.</p>
+      <p><strong>The bottom row answers the slide's two questions.</strong> All five boxes say <code>4 values</code>: one exponent always holds <strong>2<sup>p&minus;1</sup> significands</strong> (2<sup>2</sup> = 4 here, 2<sup>23</sup> in FP32). The gap, though, goes <code>2<sup>&minus;4</sup> &rarr; 2<sup>&minus;3</sup> &rarr; 2<sup>&minus;2</sup> &rarr; 2<sup>&minus;1</sup> &rarr; 2<sup>0</sup></code>: <strong>exactly double</strong> per exponent step. Constant within an exponent, doubling across one.</p>
+      <p>So the <strong>relative</strong> error is nearly constant: gap &divide; size stays between 2<sup>&minus;3</sup> and 2<sup>&minus;2</sup> in every range. Where fixed point pins the absolute spacing, floating point <strong>pins the relative spacing.</strong></p>
+    </div>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>슬라이드 6쪽의 &epsilon; 와 9쪽의 &epsilon; 는 다르다.</strong> 앞의 것은 fixed point 의 한 칸 (2<sup>&minus;16</sup>, 어디서나 같음), 뒤의 것은 machine epsilon (1 근처의 간격, 다른 수에서는 2<sup>E</sup> 배). 기준은 <strong>간격이 수의 크기를 따라 변하는가</strong>다.</p>
+    <p lang="en"><strong>The &epsilon; on slide 6 and the &epsilon; on slide 9 differ.</strong> The first is one fixed point step (2<sup>&minus;16</sup>, the same everywhere); the second is machine epsilon (the spacing near 1, scaled by 2<sup>E</sup> elsewhere). The test: <strong>does the spacing change with the size of the number?</strong></p>
+  </div>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">FP32 를 한 칸씩</h2><h2 lang="en">FP32, cell by cell</h2></div>
+
+  <p lang="ko">exponent 는 <strong>bias</strong> 를 더해 부호 없는 정수로 저장한다. <code>bias = 2<sup>q&minus;1</sup> &minus; 1</code>, 비트 패턴 X 의 값은 <code>X &minus; bias</code>. 양 끝 패턴 <code>0<sup>q</sup></code> 와 <code>1<sup>q</sup></code> 는 특수값용으로 떼어 두니 normalized 의 exponent 는 <code>E<sub>min</sub> = 1 &minus; bias</code> 부터 <code>E<sub>max</sub> = bias</code> 까지다. significand 맨 앞의 1 은 언제나 1 이라 <strong>저장하지 않는다 (hidden bit)</strong>.</p>
+  <p lang="en">The exponent is stored as an unsigned integer with a <strong>bias</strong> added: <code>bias = 2<sup>q&minus;1</sup> &minus; 1</code>, and pattern X means <code>X &minus; bias</code>. The extreme patterns <code>0<sup>q</sup></code> and <code>1<sup>q</sup></code> are kept for special values, so normalized exponents run from <code>E<sub>min</sub> = 1 &minus; bias</code> to <code>E<sub>max</sub> = bias</code>. The significand's leading 1 is always 1, so <strong>it isn't stored (the hidden bit).</strong></p>
+
+  <table>
+    <thead><tr><th></th><th>Single (FP32)</th><th>Double (FP64)</th></tr></thead>
+    <tbody>
+      <tr><td><code>(sign, q, p &minus; 1)</code></td><td>(1, 8, 23)</td><td>(1, 11, 52)</td></tr>
+      <tr><td><span lang="ko">precision <code>p</code></span><span lang="en">precision <code>p</code></span></td><td>24</td><td>53</td></tr>
+      <tr><td>bias</td><td>127</td><td>1023</td></tr>
+      <tr><td><code>E<sub>min</sub></code>, <code>E<sub>max</sub></code></td><td>&minus;126, 127</td><td>&minus;1022, 1023</td></tr>
+      <tr><td><code>N<sub>min</sub></code>, <code>N<sub>max</sub></code></td><td>&asymp; 1.2 &times; 10<sup>&minus;38</sup>, &asymp; 3.4 &times; 10<sup>38</sup></td><td>&asymp; 2.2 &times; 10<sup>&minus;308</sup>, &asymp; 1.8 &times; 10<sup>308</sup></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">마지막 줄은 슬라이드 14쪽에서 화면 아래로 잘려 있다. 원본 파일의 텍스트에서 가져왔다.</p>
+  <p lang="en">The last row runs off the bottom of slide 14; it comes from the text in the original file.</p>
+
+  <figure>
+<svg viewBox="0 0 700 210" role="img" aria-label="FP32 의 비트 배치와 두 예. -5.5 는 1 10000001 0110..0 = 0xC0B00000 으로 정확히, 0.1 은 0 01111011 10011001100110011001101 = 0x3DCCCCCD 로 반올림되어 저장된다">
+<text class="svglab" x="105" y="34" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">s</text>
+<text class="svglab" x="186.0" y="34" text-anchor="middle" style="font-size:10px;fill:var(--blue)">exponent  (q = 8)</text>
+<text class="svglab" x="465.0" y="34" text-anchor="middle" style="font-size:10px;fill:var(--blue)">fraction  (p − 1 = 23 bits, leading 1 not stored)</text>
+<rect x="96" y="48" width="18" height="22" rx="0" fill="var(--chip)" stroke="var(--ink3)" stroke-width="1.1"/>
+<rect x="114" y="48" width="144" height="22" rx="0" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.1"/>
+<rect x="258" y="48" width="414" height="22" rx="0" fill="rgba(var(--blue-rgb),.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<path d="M168 70 L168 76" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M240 70 L240 76" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M312 70 L312 76" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M384 70 L384 76" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M456 70 L456 76" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M528 70 L528 76" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M600 70 L600 76" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<text class="svglab" x="86" y="63" text-anchor="end" style="font-size:12px;fill:var(--ink);font-weight:700">−5.5</text>
+<text class="svglab" x="105.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="123.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="141.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="159.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="177.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="195.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="213.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="231.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="249.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="267.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="285.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="303.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="321.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="339.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="357.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="375.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="393.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="411.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="429.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="447.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="465.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="483.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="501.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="519.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="537.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="555.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="573.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="591.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="609.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="627.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="645.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="663.0" y="63" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="86" y="88" text-anchor="end" style="font-size:9px;fill:var(--ink3)">hex</text>
+<text class="svglab" x="132" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">C</text>
+<text class="svglab" x="204" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">0</text>
+<text class="svglab" x="276" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">B</text>
+<text class="svglab" x="348" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">0</text>
+<text class="svglab" x="420" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">0</text>
+<text class="svglab" x="492" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">0</text>
+<text class="svglab" x="564" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">0</text>
+<text class="svglab" x="636" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">0</text>
+<text class="svglab" x="384" y="110" text-anchor="middle" style="font-size:10.5px;fill:var(--green);font-weight:600">= −1.011₂ × 2² = −5.5  ·  exact</text>
+<rect x="96" y="128" width="18" height="22" rx="0" fill="var(--chip)" stroke="var(--ink3)" stroke-width="1.1"/>
+<rect x="114" y="128" width="144" height="22" rx="0" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.1"/>
+<rect x="258" y="128" width="414" height="22" rx="0" fill="rgba(var(--blue-rgb),.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<path d="M168 150 L168 156" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M240 150 L240 156" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M312 150 L312 156" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M384 150 L384 156" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M456 150 L456 156" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M528 150 L528 156" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<path d="M600 150 L600 156" stroke="var(--ink3)" stroke-width="0.9" fill="none"/>
+<rect x="655" y="129" width="16" height="20" rx="2" fill="none" stroke="var(--amber)" stroke-width="1.8"/>
+<text class="svglab" x="86" y="143" text-anchor="end" style="font-size:12px;fill:var(--ink);font-weight:700">0.1</text>
+<text class="svglab" x="105.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="123.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="141.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="159.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="177.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="195.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="213.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="231.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="249.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="267.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="285.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="303.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="321.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="339.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="357.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="375.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="393.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="411.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="429.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="447.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="465.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="483.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="501.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="519.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="537.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="555.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="573.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="591.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="609.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="627.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="645.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">0</text>
+<text class="svglab" x="663.0" y="143" text-anchor="middle" style="font-size:11px;fill:var(--ink)">1</text>
+<text class="svglab" x="86" y="168" text-anchor="end" style="font-size:9px;fill:var(--ink3)">hex</text>
+<text class="svglab" x="132" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">3</text>
+<text class="svglab" x="204" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">D</text>
+<text class="svglab" x="276" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">C</text>
+<text class="svglab" x="348" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">C</text>
+<text class="svglab" x="420" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">C</text>
+<text class="svglab" x="492" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">C</text>
+<text class="svglab" x="564" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">C</text>
+<text class="svglab" x="636" y="168" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">D</text>
+<text class="svglab" x="384" y="190" text-anchor="middle" style="font-size:10.5px;fill:var(--amber);font-weight:600">≈ 0.100000001490116…  ·  last bit rounded up</text>
+</svg>
+    <figcaption lang="ko">FP32 의 32칸. 칸 아래 짧은 눈금이 4비트마다, 그 아래 회색 글자가 16진수 한 자리다. 0.1 의 맨 끝 칸에 주황 테두리를 친 것은 그 비트가 <strong>반올림으로 바뀐 비트</strong>이기 때문이다.</figcaption>
+    <figcaption lang="en">The 32 cells of FP32. The short ticks under the cells mark every 4 bits, and the grey characters below are one hex digit each. The amber outline on the last cell of 0.1 marks the bit <strong>that rounding changed.</strong></figcaption>
+  </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko">
+      <p><strong>칸 배치.</strong> sign 1칸, exponent 8칸, fraction 23칸. 1 + 8 + 23 = 32. 맨 앞의 1 (hidden bit) 은 칸이 없다.</p>
+      <p><strong>윗줄, &minus;5.5.</strong> 세 단계로 만든다.</p>
+      <table><thead><tr><th>단계</th><th>계산</th><th>결과 비트</th></tr></thead><tbody>
+        <tr><td>1. 부호</td><td>음수</td><td>sign <code>1</code></td></tr>
+        <tr><td>2. 2진수로 바꾸고 normalize</td><td>5.5 = 4 + 1 + 0.5 = <code>101.1</code><sub>2</sub>. 점을 왼쪽으로 두 칸 옮기면 <code>1.011</code><sub>2</sub> &times; 2<sup>2</sup></td><td>E = 2, significand <code>1.011</code></td></tr>
+        <tr><td>3. exponent 에 bias</td><td>2 + 127 = 129 = 128 + 1</td><td><code>1000 0001</code></td></tr>
+        <tr><td>4. fraction</td><td>significand 에서 맨 앞 1 을 떼고 <code>011</code>, 나머지 20칸은 0</td><td><code>011</code> + <code>0</code> &times; 20</td></tr>
+      </tbody></table>
+      <p>이어 붙이면 <code>1 10000001 01100000000000000000000</code>. 4개씩 끊으면 <code>1100</code> <code>0000</code> <code>1011</code> <code>0000</code> &hellip; 이라 16진수 <code>C 0 B 0 0 0 0 0</code> = <strong><code>0xC0B00000</code></strong>. 첫 자리 <code>C</code> = <code>1100</code> 은 sign <code>1</code> 과 exponent 의 앞 세 비트 <code>100</code> 이 합쳐진 것이고, 셋째 자리 <code>B</code> = <code>1011</code> 은 exponent 의 마지막 비트 <code>1</code> 과 fraction 앞 세 비트 <code>011</code> 이 합쳐진 것이다. <strong>16진수 자리는 필드 경계와 어긋난다.</strong> 5.5 는 2<sup>&minus;1</sup> 의 배수라 오차 없이 담겨서 초록이다.</p>
+      <p><strong>아랫줄, 0.1.</strong> 02절에서 0.1 = 0.0<span style="text-decoration:overline">0011</span><sub>2</sub> 을 구했다.</p>
+      <table><thead><tr><th>단계</th><th>계산</th><th>결과 비트</th></tr></thead><tbody>
+        <tr><td>1. 부호</td><td>양수</td><td>sign <code>0</code></td></tr>
+        <tr><td>2. normalize</td><td><code>0.0001 1001 1001 &hellip;</code> 에서 첫 1 이 소수점 아래 넷째 자리라 점을 오른쪽으로 네 칸. <code>1.1001 1001 1001 &hellip;</code><sub>2</sub> &times; 2<sup>&minus;4</sup>. 십진수로는 1.6 &times; 2<sup>&minus;4</sup> = 1.6 / 16 = 0.1</td><td>E = &minus;4</td></tr>
+        <tr><td>3. exponent 에 bias</td><td>&minus;4 + 127 = 123 = 64 + 32 + 16 + 8 + 2 + 1</td><td><code>0111 1011</code></td></tr>
+        <tr><td>4. fraction 23칸</td><td>맨 앞 1 을 떼면 <code>1001</code> 이 반복된다. 23칸에 담기는 것은 <code>1001 1001 1001 1001 1001 100</code> 이고, 그 뒤로 <code>1 1001 &hellip;</code> 이 남는다</td><td><code>10011001100110011001100</code> (반올림 전)</td></tr>
+        <tr><td>5. 반올림</td><td>남은 부분 <code>0.11001&hellip;</code> 칸은 마지막 칸 하나의 절반 (<code>0.1</code>) 보다 크다. 그래서 위로 올린다 (09절의 기본 모드)</td><td>끝 칸 <code>0 &rarr; 1</code>. <code>10011001100110011001101</code></td></tr>
+      </tbody></table>
+      <p>이어 붙이면 <code>0 01111011 10011001100110011001101</code>, 4개씩 끊어 <code>0011 1101 1100 1100 1100 1100 1100 1101</code> = <strong><code>0x3DCCCCCD</code></strong>. 끝 자리가 <code>D</code> 인 것이 반올림의 흔적이다. 반올림을 안 했으면 <code>C</code> 였다. 실제로 담긴 값은 0.100000001490116&hellip; 이라 <strong>참값보다 약 1.5 &times; 10<sup>&minus;9</sup> 크다.</strong> 02절의 fixed point 는 잘라내서 참값보다 작았던 것과 방향이 반대다.</p>
+    </div>
+    <div lang="en">
+      <p><strong>Layout.</strong> 1 sign cell, 8 exponent cells, 23 fraction cells: 1 + 8 + 23 = 32. The leading 1 (the hidden bit) has no cell.</p>
+      <p><strong>Top row, &minus;5.5.</strong> Built in steps.</p>
+      <table><thead><tr><th>Step</th><th>Working</th><th>Bits</th></tr></thead><tbody>
+        <tr><td>1. sign</td><td>negative</td><td>sign <code>1</code></td></tr>
+        <tr><td>2. to binary, normalize</td><td>5.5 = 4 + 1 + 0.5 = <code>101.1</code><sub>2</sub>; move the point two places left to get <code>1.011</code><sub>2</sub> &times; 2<sup>2</sup></td><td>E = 2, significand <code>1.011</code></td></tr>
+        <tr><td>3. bias the exponent</td><td>2 + 127 = 129 = 128 + 1</td><td><code>1000 0001</code></td></tr>
+        <tr><td>4. fraction</td><td>drop the leading 1 of the significand, leaving <code>011</code>; the other 20 cells are 0</td><td><code>011</code> + 20 &times; <code>0</code></td></tr>
+      </tbody></table>
+      <p>Joined: <code>1 10000001 01100000000000000000000</code>. In fours that's <code>1100</code> <code>0000</code> <code>1011</code> <code>0000</code> &hellip;, hex <code>C 0 B 0 0 0 0 0</code> = <strong><code>0xC0B00000</code></strong>. The first digit <code>C</code> = <code>1100</code> is the sign <code>1</code> plus the first three exponent bits <code>100</code>; the third digit <code>B</code> = <code>1011</code> is the last exponent bit <code>1</code> plus the first three fraction bits <code>011</code>. <strong>Hex digits straddle field boundaries.</strong> 5.5 is a multiple of 2<sup>&minus;1</sup>, so it fits exactly: green.</p>
+      <p><strong>Bottom row, 0.1.</strong> Section 02 found 0.1 = 0.0<span style="text-decoration:overline">0011</span><sub>2</sub>.</p>
+      <table><thead><tr><th>Step</th><th>Working</th><th>Bits</th></tr></thead><tbody>
+        <tr><td>1. sign</td><td>positive</td><td>sign <code>0</code></td></tr>
+        <tr><td>2. normalize</td><td>in <code>0.0001 1001 1001 &hellip;</code> the first 1 is the fourth place after the point, so move the point four places right: <code>1.1001 1001 1001 &hellip;</code><sub>2</sub> &times; 2<sup>&minus;4</sup>. In decimal, 1.6 &times; 2<sup>&minus;4</sup> = 1.6 / 16 = 0.1</td><td>E = &minus;4</td></tr>
+        <tr><td>3. bias the exponent</td><td>&minus;4 + 127 = 123 = 64 + 32 + 16 + 8 + 2 + 1</td><td><code>0111 1011</code></td></tr>
+        <tr><td>4. 23 fraction cells</td><td>drop the leading 1 and <code>1001</code> repeats. The 23 cells hold <code>1001 1001 1001 1001 1001 100</code>, and <code>1 1001 &hellip;</code> is left over</td><td><code>10011001100110011001100</code> (before rounding)</td></tr>
+        <tr><td>5. round</td><td>the leftover, <code>0.11001&hellip;</code> of a last cell, is more than half a cell (<code>0.1</code>), so round up (section 09's default mode)</td><td>last cell <code>0 &rarr; 1</code>: <code>10011001100110011001101</code></td></tr>
+      </tbody></table>
+      <p>Joined: <code>0 01111011 10011001100110011001101</code>; in fours <code>0011 1101 1100 1100 1100 1100 1100 1101</code> = <strong><code>0x3DCCCCCD</code></strong>. The final <code>D</code> is the trace of rounding; without it the digit would be <code>C</code>. The value actually stored is 0.100000001490116&hellip;, <strong>about 1.5 &times; 10<sup>&minus;9</sup> above the true value.</strong> Section 02's fixed point chopped and came out below; this goes the other way.</p>
+    </div>
+  </div>
+
+  <div class="trap">
+    <p lang="ko"><strong>FP32 의 mantissa 는 23비트인가 24비트인가.</strong> 저장된 칸 (fraction) 은 23, hidden bit 를 붙인 정밀도는 24. 기준은 <strong>hidden bit 를 붙인 뒤인가</strong>다. 슬라이드 13쪽 안에서도 그림 라벨은 <code>p &minus; 1 bits</code>, 본문은 <code>p bits</code> 로 갈린다.</p>
+    <p lang="en"><strong>Is FP32's mantissa 23 bits or 24?</strong> 23 stored (the fraction), 24 of precision with the hidden bit. The test is <strong>whether the hidden bit is attached yet.</strong> Even slide 13 splits: the figure label says <code>p &minus; 1 bits</code>, the text says <code>p bits</code>.</p>
+  </div>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">남겨 둔 두 패턴</h2><h2 lang="en">The two reserved patterns</h2></div>
+
+  <p lang="ko">슬라이드 12, 17, 19쪽에 같은 4비트 exponent 표가 다시 나오며 첫 줄과 끝 줄이 바뀐다. 막대로 넘겨 본다.</p>
+  <p lang="en">The same 4 bit exponent table returns on slides 12, 17 and 19 with its first and last rows changing. Step through it with the bar.</p>
+
+  <figure class="anim">
+    <svg viewBox="0 0 700 352" role="img" aria-label="4비트 exponent 의 16 패턴이 슬라이드를 넘길 때마다 어떻게 쓰이는지. 0000 은 예약에서 0 과 subnormal 로, 1111 은 예약에서 무한대와 NaN 으로 바뀐다">
+<text class="svglab" x="64" y="24" text-anchor="middle" style="font-size:10px;fill:var(--ink3);font-weight:700">X</text>
+<text class="svglab" x="140" y="24" text-anchor="middle" style="font-size:10px;fill:var(--ink3);font-weight:700">bits</text>
+<text class="svglab" x="226" y="24" text-anchor="middle" style="font-size:10px;fill:var(--ink3);font-weight:700">E = X − 7</text>
+<text class="svglab" x="296" y="24" text-anchor="middle" style="font-size:10px;fill:var(--ink3);font-weight:700">b0</text>
+<text class="svglab" x="336" y="24" text-anchor="start" style="font-size:10px;fill:var(--ink3);font-weight:700">what the pattern means</text>
+<path d="M24 31 L684 31" stroke="var(--rule)" stroke-width="1" fill="none"/>
+<rect data-f="1" x="24" y="36" width="660" height="19" rx="0" fill="var(--chip)" stroke="none" stroke-width="0"/>
+<rect data-f="1 2 3" x="24" y="321" width="660" height="19" rx="0" fill="var(--chip)" stroke="none" stroke-width="0"/>
+<rect data-f="2 3 4 5" x="24" y="36" width="660" height="19" rx="0" fill="rgba(var(--blue-rgb),.10)" stroke="none" stroke-width="0"/>
+<rect data-f="4 5" x="24" y="321" width="660" height="19" rx="0" fill="rgba(var(--amber-rgb),.16)" stroke="none" stroke-width="0"/>
+<text class="svglab" x="64" y="50" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">0</text>
+<text class="svglab" x="140" y="50" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0000</text>
+<text class="svglab" x="64" y="69" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text class="svglab" x="140" y="69" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0001</text>
+<text class="svglab" x="226" y="69" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700">−6</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="69" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="69" text-anchor="start" style="font-size:10px;fill:var(--ink)">normal  1.f × 2^E   ← Emin = −6</text>
+<text data-f="0" class="svglab" x="336" y="69" text-anchor="start" style="font-size:10px;fill:var(--ink2)">X = 1 → E = −6</text>
+<text class="svglab" x="64" y="88" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">2</text>
+<text class="svglab" x="140" y="88" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0010</text>
+<text class="svglab" x="226" y="88" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">−5</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="88" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="88" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="107" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">3</text>
+<text class="svglab" x="140" y="107" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0011</text>
+<text class="svglab" x="226" y="107" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">−4</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="107" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="107" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="126" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">4</text>
+<text class="svglab" x="140" y="126" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0100</text>
+<text class="svglab" x="226" y="126" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">−3</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="126" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="126" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="145" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">5</text>
+<text class="svglab" x="140" y="145" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0101</text>
+<text class="svglab" x="226" y="145" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">−2</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="145" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="145" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="164" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">6</text>
+<text class="svglab" x="140" y="164" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0110</text>
+<text class="svglab" x="226" y="164" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">−1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="164" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="164" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="183" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">7</text>
+<text class="svglab" x="140" y="183" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0111</text>
+<text class="svglab" x="226" y="183" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">0</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="183" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="183" text-anchor="start" style="font-size:10px;fill:var(--ink2)">normal  1.f × 2^E</text>
+<text data-f="0" class="svglab" x="336" y="183" text-anchor="start" style="font-size:10px;fill:var(--ink2)">X = 7 = bias → E = 0</text>
+<text class="svglab" x="64" y="202" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">8</text>
+<text class="svglab" x="140" y="202" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1000</text>
+<text class="svglab" x="226" y="202" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="202" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="202" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="221" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">9</text>
+<text class="svglab" x="140" y="221" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1001</text>
+<text class="svglab" x="226" y="221" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">2</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="221" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="221" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="240" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">10</text>
+<text class="svglab" x="140" y="240" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1010</text>
+<text class="svglab" x="226" y="240" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">3</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="240" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="240" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="259" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">11</text>
+<text class="svglab" x="140" y="259" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1011</text>
+<text class="svglab" x="226" y="259" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">4</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="259" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="259" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="278" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">12</text>
+<text class="svglab" x="140" y="278" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1100</text>
+<text class="svglab" x="226" y="278" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">5</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="278" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="278" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="297" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">13</text>
+<text class="svglab" x="140" y="297" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1101</text>
+<text class="svglab" x="226" y="297" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">6</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="297" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="297" text-anchor="start" style="font-size:10px;fill:var(--ink3)">normal  1.f × 2^E</text>
+<text class="svglab" x="64" y="316" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">14</text>
+<text class="svglab" x="140" y="316" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1110</text>
+<text class="svglab" x="226" y="316" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700">7</text>
+<text data-f="1 2 3 4 5" class="svglab" x="296" y="316" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">1</text>
+<text data-f="1 2 3 4 5" class="svglab" x="336" y="316" text-anchor="start" style="font-size:10px;fill:var(--ink)">normal  1.f × 2^E   ← Emax = 7 = bias</text>
+<text data-f="0" class="svglab" x="336" y="316" text-anchor="start" style="font-size:10px;fill:var(--ink2)">X = 14 → E = 7</text>
+<text class="svglab" x="64" y="335" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">15</text>
+<text class="svglab" x="140" y="335" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">1111</text>
+<text data-f="0" class="svglab" x="226" y="50" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">−7</text>
+<text data-f="1 2" class="svglab" x="226" y="50" text-anchor="middle" style="font-size:10.5px;fill:var(--ink3)">−7</text>
+<path data-f="1 2" d="M214 46 L238 46" stroke="var(--ink3)" stroke-width="1.2" fill="none"/>
+<text data-f="3 4 5" class="svglab" x="226" y="50" text-anchor="middle" style="font-size:10.5px;fill:var(--blue);font-weight:700">−6</text>
+<text data-f="3 4 5" class="svglab" x="296" y="50" text-anchor="middle" style="font-size:10.5px;fill:var(--blue);font-weight:700">0</text>
+<text data-f="0" class="svglab" x="336" y="50" text-anchor="start" style="font-size:10px;fill:var(--ink2)">X = 0 → E = −7</text>
+<text data-f="1" class="svglab" x="336" y="50" text-anchor="start" style="font-size:10px;fill:var(--ink3)">reserved for special use</text>
+<text data-f="2" class="svglab" x="336" y="50" text-anchor="start" style="font-size:10px;fill:var(--blue)">f = 0 → ±0      (f ≠ 0: not yet decided)</text>
+<text data-f="3 4 5" class="svglab" x="336" y="50" text-anchor="start" style="font-size:10px;fill:var(--blue)">f = 0 → ±0   ·   f ≠ 0 → subnormal 0.f × 2^−6</text>
+<text data-f="0" class="svglab" x="226" y="335" text-anchor="middle" style="font-size:10.5px;fill:var(--ink)">8</text>
+<text data-f="1 2 3 4 5" class="svglab" x="226" y="335" text-anchor="middle" style="font-size:10.5px;fill:var(--ink3)">8</text>
+<path data-f="1 2 3 4 5" d="M216 331 L236 331" stroke="var(--ink3)" stroke-width="1.2" fill="none"/>
+<text data-f="0" class="svglab" x="336" y="335" text-anchor="start" style="font-size:10px;fill:var(--ink2)">X = 15 → E = 8</text>
+<text data-f="1 2 3" class="svglab" x="336" y="335" text-anchor="start" style="font-size:10px;fill:var(--ink3)">reserved for special use</text>
+<text data-f="4" class="svglab" x="336" y="335" text-anchor="start" style="font-size:10px;fill:var(--amber)">f = 0 → ±∞      (f ≠ 0: not yet decided)</text>
+<text data-f="5" class="svglab" x="336" y="335" text-anchor="start" style="font-size:10px;fill:var(--amber)">f = 0 → ±∞   ·   f ≠ 0 → NaN</text>
+    </svg>
+    <div class="animcap" data-f="0" data-src="11"><span lang="ko"><strong>bias 만 정한 상태.</strong> <code>q = 4</code> 라 bias = 7 이고 모든 패턴이 <code>E = X &minus; 7</code> 로 읽힌다. <code>0000</code> 은 &minus;7, <code>0111</code> 은 0, <code>1111</code> 은 8. 아직 아무 줄도 특별하지 않다. 슬라이드 11쪽은 이 표를 그리지 않고 규칙만 준다.</span><span lang="en"><strong>Only the bias is set.</strong> With <code>q = 4</code>, bias = 7 and every pattern reads as <code>E = X &minus; 7</code>: <code>0000</code> is &minus;7, <code>0111</code> is 0, <code>1111</code> is 8. No row is special yet. Slide 11 gives only the rule, not the table.</span></div>
+    <div class="animcap" data-f="1" data-src="12"><span lang="ko"><strong>양 끝을 떼어 둔다.</strong> <code>0000</code> 과 <code>1111</code> 은 normalized 수에 안 쓴다 (회색, 줄 그음). 그래서 normalized 의 exponent 는 <code>0001</code> 의 <strong>E<sub>min</sub> = &minus;6</strong> 부터 <code>1110</code> 의 <strong>E<sub>max</sub> = 7 = bias</strong> 까지다. 나머지 14줄은 전부 hidden bit <code>b0 = 1</code> 인 <code>1.f &times; 2<sup>E</sup></code> 다.</span><span lang="en"><strong>Set the ends aside.</strong> <code>0000</code> and <code>1111</code> aren't used for normalized numbers (grey, struck through). So normalized exponents run from <strong>E<sub>min</sub> = &minus;6</strong> at <code>0001</code> to <strong>E<sub>max</sub> = 7 = bias</strong> at <code>1110</code>. The other 14 rows are all <code>1.f &times; 2<sup>E</sup></code> with hidden bit <code>b0 = 1</code>.</span></div>
+    <div class="animcap" data-f="2" data-src="16"><span lang="ko"><strong><code>0000</code> 의 첫 쓰임, 0.</strong> exponent 도 fraction 도 전부 0 이면 0 이다. sign 이 둘이라 <strong>+0 과 &minus;0 이 따로 있다.</strong> fraction 이 0 이 아닌 경우는 아직 정하지 않았다.</span><span lang="en"><strong>First use of <code>0000</code>: zero.</strong> Exponent and fraction all zeros means zero. With two signs, <strong>+0 and &minus;0 both exist.</strong> A nonzero fraction here isn't decided yet.</span></div>
+    <div class="animcap" data-f="3" data-src="17"><span lang="ko"><strong><code>0000</code> 의 나머지, subnormal.</strong> fraction 이 0 이 아니면 <strong>hidden bit 을 0 으로</strong> 보고 <code>0.f &times; 2<sup>&minus;6</sup></code> 로 읽는다. E 칸이 &minus;7 이 아니라 <strong>&minus;6 (= E<sub>min</sub>)</strong> 으로 바뀐 게 핵심이다. 슬라이드가 <code>0<sup>q</sup> = E<sub>min</sub>. Note, not E<sub>min</sub> &minus; 1</code> 이라고 노란색으로 짚은 그 자리다. 0 은 이 규칙에서 f = 0 인 특수한 경우가 된다.</span><span lang="en"><strong>The rest of <code>0000</code>: subnormals.</strong> With a nonzero fraction, treat <strong>the hidden bit as 0</strong> and read <code>0.f &times; 2<sup>&minus;6</sup></code>. The key change is the E cell going to <strong>&minus;6 (= E<sub>min</sub>)</strong>, not &minus;7: the spot the slide flags in yellow with <code>0<sup>q</sup> = E<sub>min</sub>. Note, not E<sub>min</sub> &minus; 1</code>. Zero becomes just the f = 0 case of this rule.</span></div>
+    <div class="animcap" data-f="4" data-src="19"><span lang="ko"><strong><code>1111</code> 의 첫 쓰임, 무한대.</strong> exponent 가 전부 1 이고 fraction 이 0 이면 sign 에 따라 <strong>+∞ 와 &minus;∞</strong>. 슬라이드 표의 마지막 칸이 <code>&plusmn;∞</code> 로 바뀐다. 슬라이드는 "아직도 남는 패턴이 있다" 고 덧붙인다.</span><span lang="en"><strong>First use of <code>1111</code>: infinity.</strong> Exponent all ones and fraction zero gives <strong>+∞ or &minus;∞</strong> by sign; the last cell of the slide's table becomes <code>&plusmn;∞</code>. The slide adds that there are still patterns left over.</span></div>
+    <div class="animcap" data-f="5" data-src="20"><span lang="ko"><strong><code>1111</code> 의 나머지, NaN.</strong> exponent 가 전부 1 인데 fraction 이 0 이 아니면 <strong>전부 NaN</strong> 이다. 이제 16줄 모두 쓰임이 정해졌다. 슬라이드 20쪽에는 표가 없고 규칙만 있다.</span><span lang="en"><strong>The rest of <code>1111</code>: NaN.</strong> Exponent all ones with a nonzero fraction is <strong>always NaN.</strong> Now every one of the 16 rows has a job. Slide 20 has only the rule, no table.</span></div>
+    <figcaption lang="ko">슬라이드 11, 12, 16, 17, 19, 20쪽. 연속한 쪽은 아니지만 <strong>같은 표가 값만 바뀌며</strong> 세 번 나오고 (12, 17, 19), 그 사이의 16쪽과 20쪽이 바뀌는 이유를 준다. 그래서 슬라이더로 묶었다. 슬라이드에는 b0 열이 없다. hidden bit 이 어디서 0 으로 바뀌는지 보이려고 더했다. 오른쪽 열의 <code>f</code> 는 fraction 칸 전체를 뜻한다.</figcaption>
+    <figcaption lang="en">Slides 11, 12, 16, 17, 19 and 20. Not consecutive pages, but <strong>the same table appears three times with only its values changing</strong> (12, 17, 19), and slides 16 and 20 in between explain the changes, so they're bundled into one slider. The b0 column isn't on the slides; it's added to show where the hidden bit flips to 0. In the right column, <code>f</code> means the whole fraction field.</figcaption>
+  </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko">
+      <p><strong>열 다섯.</strong> <code>X</code> 는 4비트를 부호 없는 정수로 읽은 값 (0~15), <code>bits</code> 는 그 패턴, <code>E = X &minus; 7</code> 은 bias 7 을 뺀 exponent 값, <code>b0</code> 는 그 줄에서 unpack 할 때 붙이는 hidden bit, 마지막 열은 그 패턴이 무엇으로 쓰이는지다.</p>
+      <p><strong>가운데 14줄 (<code>0001</code>~<code>1110</code>) 은 첫 컷 이후로 변하지 않는다.</strong> E 는 &minus;6, &minus;5, &hellip;, 6, 7 이고 b0 는 모두 1. 굵게 쓴 &minus;6 과 7 이 E<sub>min</sub>, E<sub>max</sub> 다. <code>0111</code> 은 X = 7 = bias 라 E = 0 이다. 변하는 것은 <strong>첫 줄과 끝 줄뿐</strong>이다.</p>
+      <table><thead><tr><th>컷</th><th><code>0000</code> 줄</th><th><code>1111</code> 줄</th></tr></thead><tbody>
+        <tr><td>0 (11쪽)</td><td>E = &minus;7, 평범한 값</td><td>E = 8, 평범한 값</td></tr>
+        <tr><td>1 (12쪽)</td><td>&minus;7 에 줄, reserved</td><td>8 에 줄, reserved</td></tr>
+        <tr><td>2 (16쪽)</td><td>f = 0 이면 &plusmn;0</td><td>reserved</td></tr>
+        <tr><td>3 (17쪽)</td><td>E 가 <strong>&minus;6</strong> 으로, b0 = <strong>0</strong>. f &ne; 0 이면 subnormal</td><td>reserved</td></tr>
+        <tr><td>4 (19쪽)</td><td>그대로</td><td>f = 0 이면 &plusmn;∞ (주황 배경)</td></tr>
+        <tr><td>5 (20쪽)</td><td>그대로</td><td>f &ne; 0 이면 NaN</td></tr>
+      </tbody></table>
+      <p><strong>왜 <code>0000</code> 이 &minus;7 이 아니라 &minus;6 인가.</strong> 바로 위 줄 <code>0001</code> 이 E<sub>min</sub> = &minus;6 이고 가장 작은 normalized 수는 <code>1.000 &times; 2<sup>&minus;6</sup></code> 이다. subnormal 이 <code>0.f &times; 2<sup>&minus;6</sup></code> 이면 가장 큰 subnormal <code>0.111 &times; 2<sup>&minus;6</sup></code> 다음이 곧바로 <code>1.000 &times; 2<sup>&minus;6</sup></code> 이라 <strong>틈 없이 이어진다.</strong> &minus;7 로 읽으면 <code>0.111 &times; 2<sup>&minus;7</sup></code> 까지밖에 안 가서 그 사이에 구멍이 생긴다. 아래 그림이 그 이음매를 보여준다.</p>
+      <p>색은 이렇게 읽는다. 회색은 아직 안 쓰는 패턴, 파란 배경은 숫자 (0, subnormal) 로 쓰는 특수 패턴, 주황 배경은 숫자가 아닌 결과 (∞, NaN) 로 쓰는 패턴이다.</p>
+    </div>
+    <div lang="en">
+      <p><strong>Five columns.</strong> <code>X</code> is the 4 bits read as an unsigned integer (0 to 15), <code>bits</code> the pattern, <code>E = X &minus; 7</code> the exponent with the bias of 7 removed, <code>b0</code> the hidden bit attached when unpacking that row, and the last column what the pattern is used for.</p>
+      <p><strong>The middle 14 rows (<code>0001</code> to <code>1110</code>) never change after the first frame.</strong> E runs &minus;6, &minus;5, &hellip;, 6, 7 and b0 is 1 throughout. The bold &minus;6 and 7 are E<sub>min</sub> and E<sub>max</sub>; <code>0111</code> is X = 7 = bias, so E = 0. <strong>Only the first and last rows change.</strong></p>
+      <table><thead><tr><th>Frame</th><th><code>0000</code> row</th><th><code>1111</code> row</th></tr></thead><tbody>
+        <tr><td>0 (slide 11)</td><td>E = &minus;7, an ordinary value</td><td>E = 8, an ordinary value</td></tr>
+        <tr><td>1 (slide 12)</td><td>&minus;7 struck, reserved</td><td>8 struck, reserved</td></tr>
+        <tr><td>2 (slide 16)</td><td>f = 0 gives &plusmn;0</td><td>reserved</td></tr>
+        <tr><td>3 (slide 17)</td><td>E becomes <strong>&minus;6</strong>, b0 = <strong>0</strong>; f &ne; 0 gives a subnormal</td><td>reserved</td></tr>
+        <tr><td>4 (slide 19)</td><td>unchanged</td><td>f = 0 gives &plusmn;∞ (amber band)</td></tr>
+        <tr><td>5 (slide 20)</td><td>unchanged</td><td>f &ne; 0 gives NaN</td></tr>
+      </tbody></table>
+      <p><strong>Why <code>0000</code> means &minus;6, not &minus;7.</strong> The row just above, <code>0001</code>, is E<sub>min</sub> = &minus;6, and the smallest normalized number is <code>1.000 &times; 2<sup>&minus;6</sup></code>. If subnormals are <code>0.f &times; 2<sup>&minus;6</sup></code>, the largest one, <code>0.111 &times; 2<sup>&minus;6</sup></code>, is followed directly by <code>1.000 &times; 2<sup>&minus;6</sup></code>: <strong>no gap.</strong> Read it as &minus;7 and they'd only reach <code>0.111 &times; 2<sup>&minus;7</sup></code>, leaving a hole. The next figure shows that seam.</p>
+      <p>Colour key: grey is a pattern not in use yet, a blue band is a special pattern used for a number (0, subnormals), an amber band is a pattern used for a non-number result (∞, NaN).</p>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>exponent</th><th>fraction</th><th><span lang="ko">뜻</span><span lang="en">Meaning</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">전부 0</span><span lang="en">all 0</span></td><td>0</td><td>&plusmn;0 <span lang="ko">(둘인 것은 일부러다. 0 에 어느 쪽에서 다가갔는지를 남긴다)</span><span lang="en">(two of them on purpose: they remember which side you approached from)</span></td></tr>
+      <tr><td><span lang="ko">전부 0</span><span lang="en">all 0</span></td><td><span lang="ko">0 아님</span><span lang="en">nonzero</span></td><td><span lang="ko">subnormal <code>&plusmn;0.f &times; 2<sup>E<sub>min</sub></sup></code>. E<sub>min</sub> &minus; 1 이 아니다</span><span lang="en">subnormal <code>&plusmn;0.f &times; 2<sup>E<sub>min</sub></sup></code>, not E<sub>min</sub> &minus; 1</span></td></tr>
+      <tr><td><span lang="ko">그 사이</span><span lang="en">in between</span></td><td><span lang="ko">아무거나</span><span lang="en">any</span></td><td>normal <code>&plusmn;1.f &times; 2<sup>X &minus; bias</sup></code></td></tr>
+      <tr><td><span lang="ko">전부 1</span><span lang="en">all 1</span></td><td>0</td><td>&plusmn;∞</td></tr>
+      <tr><td><span lang="ko">전부 1</span><span lang="en">all 1</span></td><td><span lang="ko">0 아님</span><span lang="en">nonzero</span></td><td><span lang="ko">NaN. 전파되고, 어떤 것과도 (자기 자신과도) 같지 않다</span><span lang="en">NaN: it propagates and equals nothing, itself included</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="trap">
+    <p lang="ko"><strong>subnormal 과 denormal 은 같은 것이다.</strong> IEEE 754 의 판에 따라 이름이 다를 뿐이다. 그리고 슬라이드 18쪽의 <code># of +ve subnormals = 2<sup>23</sup></code> 은 fraction 이 전부 0 인 +0 까지 센 수다. 0 아닌 양의 subnormal 은 2<sup>23</sup> &minus; 1 개다.</p>
+    <p lang="en"><strong>Subnormal and denormal are the same thing</strong>, just named differently across IEEE 754 editions. And slide 18's <code># of +ve subnormals = 2<sup>23</sup></code> counts +0 (the all-zero fraction); nonzero positive subnormals number 2<sup>23</sup> &minus; 1.</p>
+  </div>
+
+  <p lang="ko">비트를 직접 눌러 보려면 <a href="L08-floating-point.html#s8">자세한 판 08절의 도구</a>를 쓴다.</p>
+  <p lang="en">To click the bits yourself, use <a href="L08-floating-point.html#s8">the tool in section 08 of the full version.</a></p>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">Rounding</h2><h2 lang="en">Rounding</h2></div>
+
+  <p lang="ko">참값이 표현 가능한 두 수 <code>x<sub>&minus;</sub></code> 와 <code>x<sub>+</sub></code> 사이에 떨어지면 그때 설정된 rounding mode 가 고른다. <code>RD</code> 는 아래로, <code>RU</code> 는 위로, <code>RTZ</code> 는 0 쪽으로, <code>RTE</code> (기본) 는 가까운 쪽, 정확히 가운데면 significand lsb 가 0 인 쪽으로.</p>
+  <p lang="en">When the true value lands between two representable numbers <code>x<sub>&minus;</sub></code> and <code>x<sub>+</sub></code>, the current rounding mode picks: <code>RD</code> down, <code>RU</code> up, <code>RTZ</code> toward zero, <code>RTE</code> (the default) the nearer one, and on an exact tie the one with significand lsb 0.</p>
+
+  <figure>
+<svg viewBox="0 0 700 206" role="img" aria-label="네 rounding mode 가 음수 x 와 양수 x 를 각각 어느 쪽 이웃으로 보내는지. RD 는 아래로, RU 는 위로, RTZ 는 0 쪽으로, RTE 는 가까운 쪽으로">
+<defs><marker id="rd-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink2)"/></marker><marker id="rd-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--green)"/></marker></defs>
+<path d="M20 150 L680 150" stroke="var(--ink2)" stroke-width="1.2" fill="none"/>
+<path d="M350 140 L350 160" stroke="var(--ink)" stroke-width="1.6" fill="none"/>
+<text class="svglab" x="350" y="176" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">0</text>
+<circle cx="110" cy="150" r="5" fill="var(--ink)"/>
+<path d="M110 26 L110 142" stroke="var(--rule)" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+<circle cx="230" cy="150" r="5" fill="var(--ink)"/>
+<path d="M230 26 L230 142" stroke="var(--rule)" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+<circle cx="196" cy="150" r="5" fill="var(--card)" stroke="var(--ink)" stroke-width="1.6"/>
+<path d="M196 26 L196 142" stroke="var(--rule)" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+<text class="svglab" x="110" y="176" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">x−</text>
+<text class="svglab" x="230" y="176" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">x+</text>
+<text class="svglab" x="196" y="176" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700">x</text>
+<circle cx="470" cy="150" r="5" fill="var(--ink)"/>
+<path d="M470 26 L470 142" stroke="var(--rule)" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+<circle cx="590" cy="150" r="5" fill="var(--ink)"/>
+<path d="M590 26 L590 142" stroke="var(--rule)" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+<circle cx="504" cy="150" r="5" fill="var(--card)" stroke="var(--ink)" stroke-width="1.6"/>
+<path d="M504 26 L504 142" stroke="var(--rule)" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+<text class="svglab" x="470" y="176" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">x−</text>
+<text class="svglab" x="590" y="176" text-anchor="middle" style="font-size:10.5px;fill:var(--ink2)">x+</text>
+<text class="svglab" x="504" y="176" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700">x</text>
+<text class="svglab" x="170" y="196" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">x &lt; 0 (closer to x+)</text>
+<text class="svglab" x="530" y="196" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">x &gt; 0 (closer to x−)</text>
+<text class="svglab" x="24" y="40" text-anchor="start" style="font-size:11px;fill:var(--ink2);font-weight:700">RD</text>
+<path d="M196 36 L117 36" stroke="var(--ink2)" stroke-width="1.6" fill="none" marker-end="url(#rd-a)"/>
+<path d="M504 36 L477 36" stroke="var(--ink2)" stroke-width="1.6" fill="none" marker-end="url(#rd-a)"/>
+<text class="svglab" x="24" y="68" text-anchor="start" style="font-size:11px;fill:var(--ink2);font-weight:700">RU</text>
+<path d="M196 64 L223 64" stroke="var(--ink2)" stroke-width="1.6" fill="none" marker-end="url(#rd-a)"/>
+<path d="M504 64 L583 64" stroke="var(--ink2)" stroke-width="1.6" fill="none" marker-end="url(#rd-a)"/>
+<text class="svglab" x="24" y="96" text-anchor="start" style="font-size:11px;fill:var(--ink2);font-weight:700">RTZ</text>
+<path d="M196 92 L223 92" stroke="var(--ink2)" stroke-width="1.6" fill="none" marker-end="url(#rd-a)"/>
+<path d="M504 92 L477 92" stroke="var(--ink2)" stroke-width="1.6" fill="none" marker-end="url(#rd-a)"/>
+<text class="svglab" x="24" y="124" text-anchor="start" style="font-size:11px;fill:var(--green);font-weight:700">RTE</text>
+<path d="M196 120 L223 120" stroke="var(--green)" stroke-width="1.6" fill="none" marker-end="url(#rd-g)"/>
+<path d="M504 120 L477 120" stroke="var(--green)" stroke-width="1.6" fill="none" marker-end="url(#rd-g)"/>
+<text class="svglab" x="58" y="124" text-anchor="start" style="font-size:9.5px;fill:var(--green);font-weight:600">(default)</text>
+</svg>
+    <figcaption lang="ko">슬라이드 21쪽 오른쪽 아래 그림을 음수 쪽까지 늘렸다. 검은 점이 표현 가능한 수, 속이 빈 점이 참값 <code>x</code> 다. 화살표 끝이 각 mode 가 고르는 수다.</figcaption>
+    <figcaption lang="en">The picture at the bottom right of slide 21, extended to the negative side. Filled dots are representable numbers, the hollow dot is the true value <code>x</code>, and each arrow ends at the number its mode picks.</figcaption>
+  </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko">
+      <p>가운데 굵은 눈금이 0 이다. 오른쪽 (<code>x &gt; 0</code>) 에서 x 는 x<sub>&minus;</sub> 쪽에 더 가깝고, 왼쪽 (<code>x &lt; 0</code>) 에서 x 는 x<sub>+</sub> 쪽에 더 가깝게 놓았다. 음수에서 x<sub>&minus;</sub> 는 <strong>0 에서 먼 쪽</strong>, x<sub>+</sub> 는 <strong>0 에 가까운 쪽</strong>이다.</p>
+      <table><thead><tr><th>mode</th><th>x &lt; 0 에서</th><th>x &gt; 0 에서</th><th>한 줄로</th></tr></thead><tbody>
+        <tr><td><code>RD</code></td><td>x<sub>&minus;</sub> (왼쪽, 0 에서 멀어짐)</td><td>x<sub>&minus;</sub> (왼쪽)</td><td>언제나 <strong>&minus;∞ 쪽</strong></td></tr>
+        <tr><td><code>RU</code></td><td>x<sub>+</sub> (오른쪽)</td><td>x<sub>+</sub> (오른쪽)</td><td>언제나 <strong>+∞ 쪽</strong></td></tr>
+        <tr><td><code>RTZ</code></td><td>x<sub>+</sub> (오른쪽, 0 쪽)</td><td>x<sub>&minus;</sub> (왼쪽, 0 쪽)</td><td>언제나 <strong>0 쪽</strong>. 비트를 그냥 잘라내는 것 (truncation) 과 같다</td></tr>
+        <tr><td><code>RTE</code></td><td>x<sub>+</sub> (가까운 쪽)</td><td>x<sub>&minus;</sub> (가까운 쪽)</td><td><strong>가까운 쪽</strong>. 이 그림에서는 우연히 RTZ 와 같다</td></tr>
+      </tbody></table>
+      <p><code>RTE</code> 옆의 초록 <code>(default)</code> 는 <code>RTE</code> 가 기본값이라는 슬라이드의 <code>[Default]</code> 다. <code>RD</code> 와 <code>RTZ</code> 는 오른쪽 절반에서 화살표가 같고 <strong>왼쪽 절반에서 반대로 간다.</strong></p>
+    </div>
+    <div lang="en">
+      <p>The heavy tick in the middle is 0. On the right (<code>x &gt; 0</code>), x sits closer to x<sub>&minus;</sub>; on the left (<code>x &lt; 0</code>), closer to x<sub>+</sub>. For negatives, x<sub>&minus;</sub> is <strong>the side farther from 0</strong> and x<sub>+</sub> <strong>the side nearer 0.</strong></p>
+      <table><thead><tr><th>Mode</th><th>for x &lt; 0</th><th>for x &gt; 0</th><th>In one line</th></tr></thead><tbody>
+        <tr><td><code>RD</code></td><td>x<sub>&minus;</sub> (left, away from 0)</td><td>x<sub>&minus;</sub> (left)</td><td>always <strong>toward &minus;∞</strong></td></tr>
+        <tr><td><code>RU</code></td><td>x<sub>+</sub> (right)</td><td>x<sub>+</sub> (right)</td><td>always <strong>toward +∞</strong></td></tr>
+        <tr><td><code>RTZ</code></td><td>x<sub>+</sub> (right, toward 0)</td><td>x<sub>&minus;</sub> (left, toward 0)</td><td>always <strong>toward 0</strong>; the same as just chopping bits off (truncation)</td></tr>
+        <tr><td><code>RTE</code></td><td>x<sub>+</sub> (nearer)</td><td>x<sub>&minus;</sub> (nearer)</td><td><strong>the nearer one</strong>; in this picture it happens to match RTZ</td></tr>
+      </tbody></table>
+      <p>The green <code>(default)</code> beside <code>RTE</code> is the slide's <code>[Default]</code> on <code>RTE</code>. <code>RD</code> and <code>RTZ</code> share an arrow on the right half and <strong>go opposite ways on the left half.</strong></p>
+    </div>
+  </div>
+
+  <p lang="ko">슬라이드는 <strong>Guard, Round, Sticky</strong> 를 이름으로만 든다. 보충하면 G 는 남길 칸 바로 다음 비트, R 은 그 다음, S 는 나머지 전부를 OR 한 것이다. G = 0 이면 내리고, G = 1 이고 R 이나 S 가 1 이면 올리고, G = 1, R = S = 0 이면 tie 라 짝수 쪽이다. 자세한 그림은 <a href="L08-floating-point.html#s9">자세한 판 09절</a>.</p>
+  <p lang="en">The slide names <strong>Guard, Round, Sticky</strong> and nothing more. Supplementing: G is the bit right after the kept ones, R the next, S the OR of everything below. G = 0 rounds down; G = 1 with R or S = 1 rounds up; G = 1, R = S = 0 is a tie and goes to even. The figure is in <a href="L08-floating-point.html#s9">section 09 of the full version.</a></p>
+
+  <div class="trap">
+    <p lang="ko"><strong>기본 rounding 은 학교 반올림이 아니다.</strong> 2.5 를 정수로 하면 학교식은 3, <code>RTE</code> 는 2. 차이는 <strong>정확히 가운데일 때만</strong> 나서 무작위 테스트로는 거의 안 잡힌다.</p>
+    <p lang="en"><strong>Default rounding is not school rounding.</strong> 2.5 to an integer is 3 in school and 2 under <code>RTE</code>. They differ <strong>only on exact ties</strong>, which random tests rarely hit.</p>
+  </div>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">덧셈기와 곱셈기</h2><h2 lang="en">The adder and the multiplier</h2></div>
+
+  <p lang="ko"><strong>덧셈은 exponent 를 맞춰야 더할 수 있다.</strong> 슬라이드 23쪽의 예 <code>3.141 &times; 10<sup>0</sup> + 9.718 &times; 10<sup>1</sup></code> 를 다섯 단계에 흘려 보면 이렇다.</p>
+  <p lang="en"><strong>Addition can only happen once the exponents match.</strong> Here's slide 23's example, <code>3.141 &times; 10<sup>0</sup> + 9.718 &times; 10<sup>1</sup></code>, run through the five stages.</p>
+
+  <figure>
+<svg viewBox="0 0 700 500" role="img" aria-label="FP 덧셈의 다섯 단계와 슬라이드 23쪽 예제 값이 단계마다 어떻게 바뀌는지. 3.141 곱하기 10의 0승 더하기 9.718 곱하기 10의 1승이 1.003 곱하기 10의 2승이 된다">
+<defs><marker id="ad-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink2)"/></marker><marker id="ad-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--amber)"/></marker></defs>
+<rect x="150" y="10" width="180" height="30" rx="5" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.2"/>
+<text class="svglab" x="240" y="30" text-anchor="middle" style="font-size:11px;fill:var(--ink)">A = 3.141 × 10⁰</text>
+<rect x="370" y="10" width="180" height="30" rx="5" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.2"/>
+<text class="svglab" x="460" y="30" text-anchor="middle" style="font-size:11px;fill:var(--ink)">B = 9.718 × 10¹</text>
+<path d="M240 40 L300 70" stroke="var(--ink2)" stroke-width="1.3" fill="none" marker-end="url(#ad-a)"/>
+<path d="M460 40 L400 70" stroke="var(--ink2)" stroke-width="1.3" fill="none" marker-end="url(#ad-a)"/>
+<text class="svglab" x="350" y="58" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">exponents 0 and 1</text>
+<rect x="230" y="72" width="240" height="40" rx="6" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.4"/>
+<text class="svglab" x="350.0" y="89" text-anchor="middle" style="font-size:11.5px;fill:var(--blue);font-weight:700">1  Compare exponents</text>
+<text class="svglab" x="350.0" y="104" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">comparator (small ALU)</text>
+<rect x="230" y="152" width="240" height="40" rx="6" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.4"/>
+<text class="svglab" x="350.0" y="169" text-anchor="middle" style="font-size:11.5px;fill:var(--blue);font-weight:700">2  Shift smaller right</text>
+<text class="svglab" x="350.0" y="184" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">shift register</text>
+<rect x="230" y="232" width="240" height="40" rx="6" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.4"/>
+<text class="svglab" x="350.0" y="249" text-anchor="middle" style="font-size:11.5px;fill:var(--blue);font-weight:700">3  Add significands</text>
+<text class="svglab" x="350.0" y="264" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">integer adder, 2s complement</text>
+<rect x="230" y="312" width="240" height="40" rx="6" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.4"/>
+<text class="svglab" x="350.0" y="329" text-anchor="middle" style="font-size:11.5px;fill:var(--blue);font-weight:700">4  Normalize</text>
+<text class="svglab" x="350.0" y="344" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">bidirectional shifter, exp ± 1</text>
+<rect x="230" y="392" width="240" height="40" rx="6" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.4"/>
+<text class="svglab" x="350.0" y="409" text-anchor="middle" style="font-size:11.5px;fill:var(--blue);font-weight:700">5  Round</text>
+<text class="svglab" x="350.0" y="424" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">rounding hardware</text>
+<path d="M350 112 L350 152" stroke="var(--ink2)" stroke-width="1.3" fill="none" marker-end="url(#ad-a)"/>
+<text class="svglab" x="362" y="136.0" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">diff = 1: shift A right 1 place</text>
+<path d="M350 192 L350 232" stroke="var(--ink2)" stroke-width="1.3" fill="none" marker-end="url(#ad-a)"/>
+<text class="svglab" x="362" y="216.0" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">0.314 × 10¹ and 9.718 × 10¹</text>
+<path d="M350 272 L350 312" stroke="var(--ink2)" stroke-width="1.3" fill="none" marker-end="url(#ad-a)"/>
+<text class="svglab" x="362" y="296.0" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">10.032 × 10¹</text>
+<path d="M350 352 L350 392" stroke="var(--ink2)" stroke-width="1.3" fill="none" marker-end="url(#ad-a)"/>
+<text class="svglab" x="362" y="376.0" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">1.0032 × 10²</text>
+<path d="M350 432 L350 466" stroke="var(--ink2)" stroke-width="1.3" fill="none" marker-end="url(#ad-a)"/>
+<text class="svglab" x="362" y="453.0" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">1.003 × 10²</text>
+<text class="svglab" x="222" y="176" text-anchor="end" style="font-size:9.5px;fill:var(--amber)">digit 1 of 3.141 falls off</text>
+<rect x="290" y="466" width="120" height="26" rx="13" fill="rgba(var(--green-rgb),.12)" stroke="var(--green)" stroke-width="1.3"/>
+<text class="svglab" x="350" y="483" text-anchor="middle" style="font-size:10.5px;fill:var(--green);font-weight:700">result</text>
+<path d="M470 332 L556 332" stroke="var(--amber)" stroke-width="1.4" fill="none" marker-end="url(#ad-m)"/>
+<text class="svglab" x="513" y="325" text-anchor="middle" style="font-size:9px;fill:var(--amber)">out of range</text>
+<rect x="560" y="314" width="124" height="36" rx="6" fill="var(--amber-bg)" stroke="var(--amber)" stroke-width="1.3"/>
+<text class="svglab" x="622" y="330" text-anchor="middle" style="font-size:10.5px;fill:var(--amber);font-weight:700">Exception</text>
+<text class="svglab" x="622" y="343" text-anchor="middle" style="font-size:8.5px;fill:var(--amber)">overflow / underflow</text>
+<path d="M230 412 L196 412 L196 332 L224 332" stroke="var(--amber)" stroke-width="1.4" fill="none" marker-end="url(#ad-m)"/>
+<text class="svglab" x="188" y="366" text-anchor="end" style="font-size:9.5px;fill:var(--amber)">rounding broke</text>
+<text class="svglab" x="188" y="379" text-anchor="end" style="font-size:9.5px;fill:var(--amber)">normalization</text>
+</svg>
+    <figcaption lang="ko">슬라이드 23&ndash;26쪽을 한 장으로 묶었다. 단계 이름은 슬라이드 25쪽 블록도 오른쪽 여백의 다섯 줄 (Compare exponents, Shift smaller number right, Add, Normalize, Round) 이고, 각 상자 둘째 줄은 슬라이드 26쪽의 sub-block 이름이다. 화살표 옆 값은 슬라이드 23쪽 예제가 그 단계를 지난 모습이다.</figcaption>
+    <figcaption lang="en">Slides 23 to 26 in one picture. The stage names are the five labels down the right margin of slide 25's block diagram (Compare exponents, Shift smaller number right, Add, Normalize, Round); the second line in each box is the sub-block name from slide 26. The values beside the arrows are slide 23's example after each stage.</figcaption>
+  </figure>
+
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko">
+      <p>슬라이드의 예는 십진수 4자리 significand 다. 2진 회로와 원리는 같고 자리가 10 진수일 뿐이다.</p>
+      <table><thead><tr><th>단계</th><th>들어오는 것</th><th>하는 일</th><th>나가는 것</th></tr></thead><tbody>
+        <tr><td>1. Compare exponents</td><td>A 의 exponent 0, B 의 exponent 1</td><td>차를 구한다. 1 &minus; 0 = 1. A 가 작다</td><td><code>diff = 1</code>, A 를 1칸 밀어라</td></tr>
+        <tr><td>2. Shift smaller right</td><td>A = 3.141 &times; 10<sup>0</sup></td><td>significand 를 오른쪽으로 1칸, exponent 를 1 올린다. 3.141 &rarr; 0.3141 인데 4자리만 남기므로 <strong>끝의 1 이 떨어져 나간다</strong> (주황 글씨)</td><td>0.314 &times; 10<sup>1</sup>, 9.718 &times; 10<sup>1</sup></td></tr>
+        <tr><td>3. Add significands</td><td>0.314 와 9.718</td><td>0.314 + 9.718 = 10.032</td><td>10.032 &times; 10<sup>1</sup></td></tr>
+        <tr><td>4. Normalize</td><td>10.032 &times; 10<sup>1</sup></td><td>앞자리가 10 이라 <code>1 &le; d<sub>0</sub> &lt; 10</code> 을 어긴다. 오른쪽으로 1칸, exponent +1</td><td>1.0032 &times; 10<sup>2</sup></td></tr>
+        <tr><td>5. Round</td><td>1.0032</td><td>4자리로 반올림. 버리는 2 는 절반 (5) 미만이라 내린다</td><td><strong>1.003 &times; 10<sup>2</sup></strong></td></tr>
+      </tbody></table>
+      <p>참값은 3.141 + 97.18 = 100.321 이고 결과는 100.3 이다. 오차는 두 군데서 났다. 2단계에서 정렬하며 떨어진 0.0001 &times; 10<sup>1</sup>, 5단계에서 반올림으로 버린 0.0002 &times; 10<sup>2</sup>. 09절의 guard, round, sticky 가 바로 <strong>2단계에서 떨어지는 자리를 기억해 두려고</strong> 있는 것이다.</p>
+      <p><strong>주황 둘.</strong> 4단계 오른쪽 <code>out of range</code> 화살표는 normalize 하다가 exponent 가 E<sub>max</sub> 를 넘거나 E<sub>min</sub> 아래로 내려가면 Exception (overflow / underflow) 으로 빠지는 길이다. 슬라이드 23, 24쪽 흐름도의 <code>Overflow or underflow? &rarr; Yes &rarr; Exception</code> 이다. 왼쪽의 되돌이 화살표는 5단계 뒤의 <code>Still normalized?</code> 가 No 일 때 4단계로 돌아가는 길이다. 언제 그런지는 아래 현장 감각에 있다.</p>
+    </div>
+    <div lang="en">
+      <p>The slide's example uses 4 digit decimal significands. Same principle as the binary circuit, just in base 10.</p>
+      <table><thead><tr><th>Stage</th><th>In</th><th>What it does</th><th>Out</th></tr></thead><tbody>
+        <tr><td>1. Compare exponents</td><td>A's exponent 0, B's exponent 1</td><td>take the difference: 1 &minus; 0 = 1, A is smaller</td><td><code>diff = 1</code>: shift A by 1</td></tr>
+        <tr><td>2. Shift smaller right</td><td>A = 3.141 &times; 10<sup>0</sup></td><td>significand right one place, exponent up one. 3.141 &rarr; 0.3141, but only 4 digits are kept, so <strong>the trailing 1 falls off</strong> (amber text)</td><td>0.314 &times; 10<sup>1</sup>, 9.718 &times; 10<sup>1</sup></td></tr>
+        <tr><td>3. Add significands</td><td>0.314 and 9.718</td><td>0.314 + 9.718 = 10.032</td><td>10.032 &times; 10<sup>1</sup></td></tr>
+        <tr><td>4. Normalize</td><td>10.032 &times; 10<sup>1</sup></td><td>the leading part is 10, breaking <code>1 &le; d<sub>0</sub> &lt; 10</code>: shift right one, exponent +1</td><td>1.0032 &times; 10<sup>2</sup></td></tr>
+        <tr><td>5. Round</td><td>1.0032</td><td>round to 4 digits; the dropped 2 is under half (5), so round down</td><td><strong>1.003 &times; 10<sup>2</sup></strong></td></tr>
+      </tbody></table>
+      <p>The true sum is 3.141 + 97.18 = 100.321 and the result is 100.3. Error crept in twice: the 0.0001 &times; 10<sup>1</sup> that fell off during alignment in stage 2, and the 0.0002 &times; 10<sup>2</sup> discarded by rounding in stage 5. Section 09's guard, round and sticky bits exist precisely <strong>to remember what falls off in stage 2.</strong></p>
+      <p><strong>The two amber paths.</strong> The <code>out of range</code> arrow from stage 4 is the exit to Exception (overflow / underflow) when normalizing pushes the exponent above E<sub>max</sub> or below E<sub>min</sub>: the flowcharts' <code>Overflow or underflow? &rarr; Yes &rarr; Exception</code> on slides 23 and 24. The loop on the left is the way back to stage 4 when <code>Still normalized?</code> after stage 5 says No. When that happens is the on-the-job item below.</p>
+    </div>
+  </div>
+
+  <p lang="ko">이 다섯 단계를 네 단으로 <strong>pipeline</strong> 하면 (슬라이드 27쪽) 덧셈 하나는 여전히 4 사이클이지만 4 사이클 이후 매 사이클 결과가 하나씩 나온다. 다만 다음 덧셈이 앞 덧셈의 결과를 쓰면 기다려야 한다. <a href="L06-pipelined-cpu-design.html#s7">Lecture 6 의 data hazard</a> 와 같다.</p>
+  <p lang="en">Pipeline those stages into four (slide 27) and one addition still takes 4 cycles, but after cycle 4 a result leaves every cycle. If the next addition needs the previous result, though, it waits: <a href="L06-pipelined-cpu-design.html#s7">Lecture 6's data hazard</a> again.</p>
+
+  <p lang="ko"><strong>곱셈은 정렬이 없다.</strong> sign 은 XOR, exponent 는 더하고 biased 면 bias 를 한 번 빼고 (두 번 세었으니), significand 는 곱한다. 곱은 [1, 4) 라 normalize 는 오른쪽 최대 한 칸. 대신 <strong>24 &times; 24 significand 곱셈기가 크다.</strong> 안쪽은 shift-and-add (작고 느림) 부터 adder tree, Wallace tree (크고 빠름) 까지 고를 수 있고, 슬라이드는 이를 <strong>Cost/Performance tradeoff</strong> 라 부른다. <a href="L07-efficient-design.html#s4">Lecture 7 의 building block 선택</a>이 이것이다.</p>
+  <p lang="en"><strong>Multiplication has no alignment.</strong> Sign is XOR; exponents add, and with biased exponents one bias comes off (it was counted twice); significands multiply. The product is in [1, 4), so normalizing is at most one right shift. The price is that <strong>the 24 &times; 24 significand multiplier is big.</strong> Inside it you choose from shift-and-add (small, slow) to adder trees and Wallace trees (big, fast), which the slide calls a <strong>Cost/Performance tradeoff</strong>: <a href="L07-efficient-design.html#s4">Lecture 7's building block selection</a> in the flesh.</p>
+
+  <div class="trap">
+    <p lang="ko"><strong>FP 덧셈은 결합법칙이 안 맞는다 (보충).</strong> 4자리 십진수로 <code>(10000 + 1) &minus; 10000 = 0</code> 이지만 <code>(10000 &minus; 10000) + 1 = 1</code>. 직렬 accumulator 와 adder tree 는 둘 다 맞아도 결과 비트가 다를 수 있다. 다음 강의의 행렬 곱셈기에서 reference model 을 짤 때 정확히 걸리는 자리다.</p>
+    <p lang="en"><strong>FP addition isn't associative (supplementary).</strong> With 4 decimal digits, <code>(10000 + 1) &minus; 10000 = 0</code> but <code>(10000 &minus; 10000) + 1 = 1</code>. A serial accumulator and an adder tree can both be right and still give different bits, which is exactly what bites when writing the reference model for next lecture's matrix multiplier.</p>
+  </div>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+
+  <table>
+    <thead><tr>
+      <th><span lang="ko">문제 모양</span><span lang="en">Shape of the question</span></th>
+      <th><span lang="ko">구별 기준 한 줄</span><span lang="en">The one line that decides it</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">FP32 비트열 &harr; 값</span><span lang="en">FP32 pattern &harr; value</span></td><td><span lang="ko">sign, exponent &minus; 127, 앞에 1 붙인 fraction. &minus;5.5 = <code>0xC0B00000</code>, 0.1 = <code>0x3DCCCCCD</code></span><span lang="en">sign, exponent &minus; 127, fraction with a 1 in front. &minus;5.5 = <code>0xC0B00000</code>, 0.1 = <code>0x3DCCCCCD</code></span></td></tr>
+      <tr><td><span lang="ko"><code>q</code>, <code>p</code> 에서 bias, E<sub>min</sub>, E<sub>max</sub>, &epsilon;</span><span lang="en">bias, E<sub>min</sub>, E<sub>max</sub>, &epsilon; from <code>q</code>, <code>p</code></span></td><td><code>2<sup>q&minus;1</sup> &minus; 1</code>, <code>1 &minus; bias</code>, <code>bias</code>, <code>2<sup>&minus;(p&minus;1)</sup></code></td></tr>
+      <tr><td><span lang="ko">패턴 분류</span><span lang="en">Classify a pattern</span></td><td><span lang="ko">exponent 가 전부 0 이냐 전부 1 이냐, 그다음 fraction 이 0 이냐</span><span lang="en">exponent all 0 or all 1, then whether the fraction is 0</span></td></tr>
+      <tr><td><span lang="ko">subnormal 의 exponent</span><span lang="en">A subnormal's exponent</span></td><td><span lang="ko"><strong>E<sub>min</sub></strong>, hidden bit 0</span><span lang="en"><strong>E<sub>min</sub></strong>, hidden bit 0</span></td></tr>
+      <tr><td>RD / RTZ</td><td><span lang="ko"><strong>음수에서만 갈린다</strong></span><span lang="en"><strong>they split only on negatives</strong></span></td></tr>
+      <tr><td><span lang="ko">RTE 와 학교 반올림</span><span lang="en">RTE versus school rounding</span></td><td><span lang="ko"><strong>tie 일 때만</strong> 갈린다</span><span lang="en">they differ <strong>only on ties</strong></span></td></tr>
+      <tr><td><span lang="ko">덧셈 대 곱셈</span><span lang="en">Add versus multiply</span></td><td><span lang="ko">정렬은 덧셈에만, bias 한 번 빼기는 곱셈에만</span><span lang="en">alignment only in add, subtracting one bias only in multiply</span></td></tr>
+      <tr><td><span lang="ko">pipelined adder</span><span lang="en">Pipelined adder</span></td><td><span lang="ko">latency 는 그대로, throughput 이 는다</span><span lang="en">latency unchanged, throughput up</span></td></tr>
+      <tr><td><span lang="ko">mantissa 23 / 24</span><span lang="en">Mantissa 23 / 24</span></td><td><span lang="ko"><strong>hidden bit 를 붙였는가</strong></span><span lang="en"><strong>is the hidden bit attached</strong></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p lang="ko"><strong>Lab 과의 연결.</strong> 다음은 <strong>Lab 3 (Systolic Matmul)</strong> 이다. systolic array 는 곱하고 더하는 칸을 격자로 늘어놓은 것이라 오늘의 곱셈기와 덧셈기가 칸 하나의 내용물이다. 정수를 쓰는지 FP 를 쓰는지는 Lab 문서를 봐야 한다.</p>
+    <p lang="en"><strong>How it connects to the labs.</strong> Next is <strong>Lab 3 (Systolic Matmul).</strong> A systolic array is a grid of multiply-and-add cells, and today's multiplier and adder are what goes in one cell. Whether it uses integers or FP is for the lab document to say.</p>
+  </div>
+
+  <p lang="ko"><strong>다음 강의는 <a href="L09-matmul-accelerator.html">Lecture 9, Matrix multiplication accelerator design</a></strong> (9/30, Aman Arora). 오늘 하나씩 뜯어본 연산기가 거기서는 수백 개로 복제되고, 질문이 "어떻게 만드나" 에서 "어떻게 데이터를 먹이나" 로 옮겨 간다.</p>
+  <p lang="en"><strong>Next is <a href="L09-matmul-accelerator.html">Lecture 9, Matrix multiplication accelerator design</a></strong> (9/30, Aman Arora). The units taken apart one at a time today get replicated by the hundred there, and the question shifts from "how do you build it" to "how do you feed it."</p>
+</section>
+
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 8 개인 학습 노트 (빠른 읽기 판)<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; 이 강의의 발표자: Prashant D. Joshi (UT Computer Science, The University of Texas at Austin) &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다. 슬라이드 3쪽은 일부 슬라이드가 The University of Texas at Austin 의 강의 자료를 바탕으로 한다고 밝히며, 슬라이드 24쪽의 흐름도는 Dr. Lizy John (UT Austin), 29쪽의 블록도는 researchgate.net, 32쪽의 Wallace tree 그림은 Wikipedia 를 출처로 적고 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 8 personal study notes (quick read)<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; guest speaker for this lecture: Prashant D. Joshi (UT Computer Science, The University of Texas at Austin) &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University. Slide 3 states that some slides are adapted from course materials developed at The University of Texas at Austin; the flowchart on slide 24 is credited to Dr. Lizy John (UT Austin), the block diagram on slide 29 to researchgate.net, and the Wallace tree figure on slide 32 to Wikipedia.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<script src="../anim.js"></script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
