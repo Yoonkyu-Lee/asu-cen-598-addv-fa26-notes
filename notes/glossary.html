@@ -434,6 +434,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">AMBA</div>
+  <div class="f">Advanced Microcontroller Bus Architecture</div>
+  <div class="d" lang="ko">Arm 이 공개한 on-chip 버스와 인터페이스 규격의 <strong>가족 이름</strong>. APB, AHB, AXI, ACE, CHI 가 식구다. <strong>버스 하나의 이름이 아니다.</strong></div>
+  <div class="d" lang="en">Arm's family of on-chip bus and interface specifications: APB, AHB, AXI, ACE, CHI. <strong>Not the name of one bus.</strong></div>
+  <div class="src"><a href="L10-soc-architecture.html#s11">Lecture 10 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Analysis · vlogan · vhdlan · syscan</div>
   <div class="d" lang="ko">시뮬레이터 compile 의 첫 단계. 소스 파일을 <strong>하나씩 읽어 문법을 검사하고 결과를 logical library 에 넣는다.</strong> 언어마다 분석기가 다르다. Verilog 는 <code>vlogan</code>, VHDL 은 <code>vhdlan</code>, SystemC 는 <code>syscan</code>. <strong>순수 Verilog / SystemVerilog 면 이 단계를 따로 부르지 않는다.</strong> 그래서 2-step flow 가 성립한다.</div>
   <div class="d" lang="en">The first compile phase. It reads the source files <strong>one at a time, checks their syntax and files the result into a logical library.</strong> Each language has its own analyser: <code>vlogan</code> for Verilog, <code>vhdlan</code> for VHDL, <code>syscan</code> for SystemC. <strong>Pure Verilog or SystemVerilog never invokes this stage separately</strong>, which is what makes the 2-step flow possible.</div>
@@ -446,6 +454,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">Standard cell library에 들어 있는 복합 논리 cell. AND와 OR와 반전을 한 cell 안에서 처리한다. 게이트를 따로 쓰는 것보다 작고 빠른 경우가 많아 합성 도구가 즐겨 쓴다.</div>
   <div class="d" lang="en">A compound logic cell found in standard cell libraries, doing AND, OR and inversion inside one cell. It is often smaller and faster than separate gates, so synthesis tools reach for it.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s6">Lecture 2 · 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">APB</div>
+  <div class="f">Advanced Peripheral Bus</div>
+  <div class="d" lang="ko">AMBA 에서 가장 단순한 버스. IDLE, SETUP, ACCESS 세 상태, 전송 하나에 최소 2 cycle, non-pipelined. UART, timer, CSR 같은 느린 peripheral 용이다. Lab 6 의 APB agent 가 이것을 흉내 낸다.</div>
+  <div class="d" lang="en">The simplest AMBA bus: three states (IDLE, SETUP, ACCESS), at least two cycles per transfer, non-pipelined. For slow peripherals such as UARTs, timers and CSRs. Lab 6's APB agent mimics it.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s12">Lecture 10 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Arbitration</div>
+  <div class="d" lang="ko">여러 master 가 같은 자원(버스, slave, 메모리)을 동시에 원할 때 <strong>누구를 먼저 보낼지 정하는 것.</strong> 하는 블록은 arbiter. 공짜가 아니라 트랜잭션 경로에 지연으로 들어간다.</div>
+  <div class="d" lang="en">Deciding <strong>who goes first</strong> when several masters want the same resource at once; done by an arbiter. Not free: it adds delay on the transaction path.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s7">Lecture 10 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -477,6 +500,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">AXI</div>
+  <div class="f">Advanced eXtensible Interface</div>
+  <div class="d" lang="ko">주소, 데이터, 응답을 <strong>독립 채널 다섯</strong>(AW, W, B, AR, R)으로 나누고 채널마다 valid/ready handshake 를 하는 고성능 인터페이스. multiple outstanding, out-of-order, burst 를 지원한다. 읽기 응답 채널은 따로 없다.</div>
+  <div class="d" lang="en">A high-performance interface splitting address, data and response into <strong>five independent channels</strong> (AW, W, B, AR, R), each with a valid/ready handshake. Supports multiple outstanding transactions, out-of-order completion and bursts. No separate read response channel.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a></div>
+</div>
+
 <h2 class="gletter" id="gB">B</h2>
 
 <div class="gterm">
@@ -484,6 +515,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">설계 흐름에서 <strong>모양과 물성을 다루는 구간.</strong> Place and Route, Fabrication, Board/Product. 구별 기준은 <strong>산출물이 파일이면 front-end, 모양이면 back-end.</strong> Synthesis는 경계에 걸쳐 있다.</div>
   <div class="d" lang="en">The part of the flow that <strong>deals in shapes and physics</strong>: place and route, fabrication, board and product. The test is simple: <strong>file output means front end, shape output means back end.</strong> Synthesis straddles the line.</div>
   <div class="src"><a href="L01-course-intro.html#s3">Lecture 1 · 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Backpressure</div>
+  <div class="d" lang="ko">뒤 단계가 막혀서 <strong>앞 단계들이 멈춰야 하는 것.</strong> 압력이 데이터 흐름의 반대 방향으로 전해진다. Lab 2 릴리스 덱은 cache miss 로 명령어가 MEM 에서 기다리는 경우를 예로 들고, 이를 단계 사이의 <strong>valid-ready handshake</strong>(valid 는 앞에서 뒤로, ready 는 뒤에서 앞으로, 둘 다 1 일 때만 넘어감)로 다룬다고 소개한다. load-use stall 과 결과는 같지만 원인이 반대다. 앞 값이 없어서가 아니라 뒤가 받을 수 없어서다.</div>
+  <div class="d" lang="en">A blocked later stage <strong>forcing the earlier stages to pause</strong>; the pressure travels against the data flow. The Lab 2 release deck's example is an instruction waiting in MEM on a cache miss, handled with a <strong>valid-ready handshake</strong> between stages (valid flows forward, ready flows back, a transfer happens only when both are 1). Same effect as a load-use stall, opposite cause: not an earlier value missing, but the back unable to accept.</div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s15">Lab 2 · 15</a></div>
 </div>
 
 <div class="gterm">
@@ -495,11 +533,25 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Beat</div>
+  <div class="d" lang="ko">버스 폭만큼의 데이터가 <strong>한 번 넘어가는 것.</strong> burst 는 주소 하나에 딸린 beat 들의 묶음이고, burst length 는 beat 의 개수다.</div>
+  <div class="d" lang="en"><strong>One transfer of bus-width data.</strong> A burst is the run of beats tied to one address; burst length counts beats.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s7">Lecture 10 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">BFM</div>
   <div class="f">Bus Functional Model</div>
   <div class="d" lang="ko">Agent와 같은 것. Driver와 Monitor를 묶은 testbench 부품을 부르는 다른 이름이다. 회사와 팀마다 Agent, BFM, Transactor 중 아무거나 쓴다.</div>
   <div class="d" lang="en">The same thing as an agent: another name for the testbench component that bundles a driver and a monitor. Companies and teams use agent, BFM and transactor interchangeably.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Bias (biased / excess representation)</div>
+  <div class="d" lang="ko">FP 의 exponent 를 저장하는 방식. 실제 exponent 에 <strong><code>bias = 2<sup>q&minus;1</sup> &minus; 1</code></strong> 을 더해 부호 없는 정수로 담는다. FP32 는 127, FP64 는 1023. 비트 패턴과 값이 다른 수라는 것 (FP32 의 1.0 은 필드 127, E = 0) 과, 곱셈에서 두 exponent 를 더하면 bias 가 두 번 들어가 <strong>한 번 빼야 한다</strong>는 것이 요점이다.</div>
+  <div class="d" lang="en">How an FP exponent is stored: add <strong><code>bias = 2<sup>q&minus;1</sup> &minus; 1</code></strong> and keep it as an unsigned integer. 127 for FP32, 1023 for FP64. The pattern and the value are different numbers (FP32 1.0 has field 127, E = 0), and multiplying adds two exponents, counting the bias twice, so <strong>one copy must come off.</strong></div>
+  <div class="src"><a href="L08-floating-point.html#s5">Lecture 8 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -532,6 +584,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Bridge</div>
+  <div class="d" lang="ko">서로 다른 두 버스 사이에서 트랜잭션을 번역해 넘기는 블록. 예: AXI to APB bridge. 슬라이드는 <strong>gasket, converter</strong> 라고도 부른다. 한쪽에서는 slave, 다른 쪽에서는 master 다.</div>
+  <div class="d" lang="en">A block that translates transactions between two different buses, e.g. an AXI to APB bridge; the slide also calls it a <strong>gasket or converter</strong>. A slave on one side, a master on the other.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s2">Lecture 10 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Bring-up</div>
   <div class="d" lang="ko">새 칩이 처음 도착했을 때 <strong>동작하게 만들어가는 과정.</strong> 전원을 넣고 클럭이 도는지부터 확인한다. NVIDIA에는 이 단계에 붙는 고유 이름이 없어서 그냥 bringup이라고 부른다고 슬라이드가 적어놨다. Testbench 쪽에서도 "testbench and DUT bringup"이라는 표현을 같은 뜻으로 쓴다.</div>
   <div class="d" lang="en">The process of <strong>getting a brand new chip to do anything at all</strong>, starting from whether the clock runs when power goes in. The slides note that NVIDIA has no specific name for this stage and just calls it bringup. The same word is used on the testbench side, as in "testbench and DUT bringup".</div>
@@ -546,10 +605,17 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Bubble</div>
+  <div class="d" lang="ko">앞 명령어가 <strong>못 넘어와서</strong> 어떤 pipeline 단계가 이번 사이클에 빈 채로 도는 것. 그 빈 칸이 뒤 단계로 흘러간다. stall 이 걸리면 멈춘 단계 바로 뒤에 생긴다. register 에는 <code>valid &larr; 0</code> 이라 <strong>flush 와 회로가 같고 원인이 다르다.</strong> flush 는 들어와 있던 명령어를 지우는 것이다. L06 슬라이드의 <code>FlushE</code> 는 이 구별로는 bubble 이다. 프로그램에 실제로 들어 있는 nop 과도 다르다.</div>
+  <div class="d" lang="en">A pipeline stage running empty this cycle because <strong>nothing could move into it</strong>; the empty slot then flows downstream. It appears right behind a stalled stage. The register gets <code>valid &larr; 0</code>, so <strong>same circuit as a flush, different cause</strong>: a flush wipes an instruction that was already there. By that distinction, L06's <code>FlushE</code> is a bubble. Not a nop either, which is a real instruction in the program.</div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s4">Lab 2 · 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Burst</div>
   <div class="d" lang="ko">짧은 시간에 몰려 들어오는 데이터 한 덩어리. FIFO 깊이는 평균 속도가 아니라 <strong>burst 동안 못 빠져나간 양</strong>으로 정한다. 평균 속도가 같아도 burst 가 있으면 깊이가 필요하다.</div>
   <div class="d" lang="en">A clump of data arriving in a short window. FIFO depth is sized not by average rate but by <strong>what cannot drain during the burst.</strong> Equal average rates still need depth if the traffic is bursty.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a> · <a href="L10-soc-architecture.html#s7">Lecture 10 · 07</a></div>
 </div>
 
 <div class="gterm">
@@ -595,6 +661,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">DUT가 제대로 동작하는지 확인하고 <strong>불법적인 일이 벌어지면 오류를 띄우는</strong> testbench 부품. 두 층이 있다. 신호 수준(assertion)과 동작 수준(scoreboard). 검증의 세 기둥 중 하나.</div>
   <div class="d" lang="en">The testbench component that confirms the DUT behaves correctly and <strong>raises an error when something illegal happens.</strong> It has two layers: signal level, meaning assertions, and behavioural, meaning scoreboards. One of the three pillars of verification.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Chiplet</div>
+  <div class="d" lang="ko">다른 die 들과 <strong>한 패키지 안에서</strong> 합쳐지도록 설계한 작은 실리콘 die. 여럿을 묶은 것을 슬라이드는 System-on-Package (SoP) 라고 부른다. die 사이는 UCIe 같은 규격으로 잇는다.</div>
+  <div class="d" lang="en">A small die designed to be integrated with others <strong>in one package</strong>; the slide calls the assembly a System-on-Package (SoP). Dies talk over standards such as UCIe.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s16">Lecture 10 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
@@ -676,6 +749,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">CSR</div>
+  <div class="f">Control and Status Register</div>
+  <div class="d" lang="ko">IP 안에서 <strong>소프트웨어가 MMIO 로 읽고 쓰는</strong> 설정과 상태 레지스터. RISC-V 코어 안의 CSR 과 이름만 같다.</div>
+  <div class="d" lang="en">Configuration and status registers inside an IP that <strong>software reads and writes via MMIO.</strong> Same name as, but different from, RISC-V's in-core CSRs.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">CTL · LTL</div>
   <div class="f">Computation Tree Logic · Linear Temporal Logic</div>
   <div class="d" lang="ko">Temporal logic의 종류. <strong>순차적 동작을 분석 가능한 형태로 표현</strong>하려고 쓴다. <code>AG(req &rarr; F ack)</code>는 "어떤 경로에서든(A), 언제나(G), req가 뜨면 언젠가(F) ack가 뜬다", 즉 <strong>요청은 반드시 응답받는다</strong>는 뜻이다.</div>
@@ -721,6 +802,29 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">지연 소자로 입력 클럭의 <strong>위상만 맞추는</strong> 회로. <strong>주파수는 바꾸지 않는다.</strong> DDR 메모리 인터페이스처럼 위상 정렬만 필요할 때 쓴다.</div>
   <div class="d" lang="en">A loop of delay elements that aligns only <strong>the phase</strong> of an input clock. <strong>It never changes the frequency.</strong> Used where only phase alignment is needed, such as DDR memory interfaces.</div>
   <div class="src"><a href="L04-clock-and-reset.html#s2">Lecture 4 · 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DMA</div>
+  <div class="f">Direct Memory Access</div>
+  <div class="d" lang="ko">CPU 대신 데이터를 옮기는 블록. 버스에서는 CPU 와 같은 <strong>master</strong> 다. master 가 둘 이상이 되면 arbitration 이 필요해진다.</div>
+  <div class="d" lang="en">A block that moves data instead of the CPU. On the bus it is a <strong>master</strong>, so two masters means arbitration.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s2">Lecture 10 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DNN</div>
+  <div class="f">Deep Neural Network</div>
+  <div class="d" lang="ko">층이 여러 개인 신경망. 슬라이드 9쪽: 계산 대부분이 <strong>matrix-matrix multiplication</strong> 이다. 그래서 ML 가속기는 곧 행렬곱 가속기다.</div>
+  <div class="d" lang="en">A neural network with many layers. Slide 9: most of its compute is <strong>matrix-matrix multiplication</strong>, which is why an ML accelerator is mostly a matmul accelerator.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s4">Lecture 9 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Dot Product Unit</div>
+  <div class="d" lang="ko">벡터 둘을 받아 곱셈기 여러 개로 동시에 곱하고 adder tree 로 합쳐 스칼라 하나를 내는 블록. 슬라이드 10쪽의 PE 사다리에서 MAC 다음 칸이다. 여러 개를 쌓고 벡터를 broadcast 하면 MVM 이 된다.</div>
+  <div class="d" lang="en">A block that multiplies two vectors pairwise with several multipliers at once and sums them through an adder tree into one scalar. The rung after MAC on slide 10's PE ladder; stack several and broadcast the vector to get an MVM.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -877,6 +981,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Fixed point</div>
+  <div class="d" lang="ko">정수부와 소수부에 비트를 <strong>미리 정한 개수만큼</strong> 나눠 주는 수 표현. 소수점은 저장하지 않고 약속으로만 있다. 연산은 정수 회로 그대로이고, <strong>간격이 어디서나 같아서</strong> 아주 작은 수와 아주 큰 수를 함께 담지 못한다. 그 한계가 floating point 의 출발점이다.</div>
+  <div class="d" lang="en">A number format that splits bits between integer and fraction <strong>in counts fixed up front</strong>; the point is never stored, only agreed on. The arithmetic is plain integer hardware, and <strong>the spacing is the same everywhere</strong>, so tiny and huge numbers can't coexist. That limit is where floating point starts.</div>
+  <div class="src"><a href="L08-floating-point.html#s2">Lecture 8 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Flush</div>
   <div class="d" lang="ko">이미 파이프라인에 들어온 명령어를 <strong>지워버리는 것.</strong> 없던 일로 만든다. 주로 <strong>control hazard</strong> 에서 쓴다. 분기가 성립해서 뒤따라 들어온 명령어들이 <strong>애초에 실행되면 안 되는 것</strong>이었을 때다. stall 과 다르다. stall 은 기다리면 쓸 수 있는 값을 기다리는 것이고, flush 는 기다려도 쓸모가 없는 것을 버리는 것이다.</div>
   <div class="d" lang="en"><strong>Discarding</strong> an instruction already in the pipeline, as if it never happened. Mostly used for <strong>control hazards</strong>, when a taken branch means the instructions behind it <strong>should never have run.</strong> Not the same as a stall: a stall waits for a value that will become usable, a flush throws away something that will never be useful.</div>
@@ -895,6 +1006,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">아직 register file 에 안 적힌 결과를 <strong>뒤쪽 파이프라인 단계에서 앞쪽 단계로 직접 넘기는 경로.</strong> <strong>bypassing</strong> 이라고도 한다. EX 단계로는 Memory 단계와 Writeback 단계 두 곳에서 받을 수 있다. <strong>모든 data hazard 를 없애지는 못한다.</strong> <code>lw</code> 바로 뒤의 사용은 값이 아직 존재하지 않아서 stall 이 먼저 필요하다.</div>
   <div class="d" lang="en">A path handing a <strong>not yet written back result from a later pipeline stage to an earlier one.</strong> Also called <strong>bypassing</strong>. Into EX it can come from the Memory stage or the Writeback stage. <strong>It does not cover every data hazard:</strong> a use right after an <code>lw</code> needs a stall first, because the value does not exist yet.</div>
   <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">FP32 · FP64 (single · double precision)</div>
+  <div class="d" lang="ko">IEEE 754 의 32비트와 64비트 2진 FP 형식. 배치는 <code>(1, 8, 23)</code> 과 <code>(1, 11, 52)</code>, 정밀도는 hidden bit 을 더해 24 와 53. C 의 <code>float</code> 과 <code>double</code>, IEEE 754-2008 의 <code>binary32</code> 와 <code>binary64</code> 가 같은 것이다. FP32 의 범위는 대략 1.2 &times; 10<sup>&minus;38</sup> 부터 3.4 &times; 10<sup>38</sup>.</div>
+  <div class="d" lang="en">IEEE 754's 32 and 64 bit binary FP formats, laid out <code>(1, 8, 23)</code> and <code>(1, 11, 52)</code>, with precision 24 and 53 once the hidden bit is counted. The same thing as C's <code>float</code> and <code>double</code> and IEEE 754-2008's <code>binary32</code> and <code>binary64</code>. FP32 spans roughly 1.2 &times; 10<sup>&minus;38</sup> to 3.4 &times; 10<sup>38</sup>.</div>
+  <div class="src"><a href="L08-floating-point.html#s6">Lecture 8 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">FPGA</div>
+  <div class="f">Field-Programmable Gate Array</div>
+  <div class="d" lang="ko">만든 뒤에도 <strong>회로 자체</strong>를 다시 짤 수 있는 칩. 슬라이드 5쪽의 축에서 GPU 와 ASIC 사이, 유연성과 효율의 중간이다. Microsoft Brainwave 가 FPGA 위의 가속기다.</div>
+  <div class="d" lang="en">A chip whose <strong>circuit itself</strong> can be reconfigured after manufacture. On slide 5's axis it sits between GPU and ASIC, midway on flexibility versus efficiency. Microsoft Brainwave is an accelerator built on FPGAs.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s2">Lecture 9 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -929,10 +1055,25 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">GEMM</div>
+  <div class="f">General Matrix Multiply</div>
+  <div class="d" lang="ko">행렬곱을 부르는 흔한 이름. 수치 라이브러리 BLAS 의 함수 이름에서 왔다. <strong>이 강의 슬라이드에는 안 나오고</strong>, 슬라이드는 MatMul, MMM 이라고 쓴다. 같은 것이다.</div>
+  <div class="d" lang="en">The usual name for matrix multiplication, from the BLAS routine name. <strong>Not used on this course's slides</strong>, which say MatMul or MMM. Same thing.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s0">Lecture 9 &middot; 00</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">generate · genvar</div>
   <div class="d" lang="ko"><strong>하드웨어를 복사해서 여러 벌 만드는 반복문</strong>과 그 반복 변수. 실행되는 루프가 아니라 <strong>elaboration 때 한 번 펼쳐진다.</strong> 슬라이드 주석이 정확하다. <em>"creates 16 assign statements"</em>, 즉 16번 도는 게 아니라 16개를 만든다. <code>genvar</code>는 회로를 펼칠 때만 쓰이고 실물에는 남지 않는다. SV부터 <code>generate</code> 키워드는 선택사항이다.</div>
   <div class="d" lang="en"><strong>A loop that copies hardware</strong>, and its loop variable. It does not run; it <strong>unrolls once at elaboration.</strong> The slide comment says it exactly: <em>"creates 16 assign statements"</em>. Sixteen things built, not sixteen iterations. A <code>genvar</code> exists only while the circuit is unrolled and leaves nothing behind. Since SV the <code>generate</code> keyword is optional.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s15">Lecture 3 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Glue Logic</div>
+  <div class="d" lang="ko">IP 와 IP 사이의 이름, 폭, 타이밍 차이를 맞추는 작은 회로. 슬라이드는 <strong>shim logic</strong> 이라고도 한다. 우리 팀이 방금 짠 것이라 버그가 모이기 쉽다.</div>
+  <div class="d" lang="en">Small circuits reconciling names, widths and timing between IPs; the slide also says <strong>shim logic</strong>. Freshly written by your team, so bugs gather there.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -942,7 +1083,28 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L04-clock-and-reset.html#s7">Lecture 4 · 07</a> · <a href="L05-fifo-design.html#s15">Lecture 5 · 15</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">Guard · Round · Sticky (GRS)</div>
+  <div class="d" lang="ko">반올림을 제대로 하려고 계산 중에 결과 뒤에 더 들고 다니는 비트 셋. G 는 남길 칸 바로 다음, R 은 그 다음, S 는 나머지 전부의 OR. <strong>G = 0 이면 내림, G = 1 이고 R | S = 1 이면 올림, G = 1 이고 R = S = 0 이면 tie</strong> 라 짝수 쪽. 강의는 이름만 들고, 동작은 노트의 보충이다.</div>
+  <div class="d" lang="en">Three extra bits carried behind a result so rounding comes out right. G is the bit after the kept ones, R the next, S the OR of everything below. <strong>G = 0 rounds down; G = 1 with R | S = 1 rounds up; G = 1 with R = S = 0 is a tie</strong>, going to even. The lecture only names them; the mechanism is the note's supplement.</div>
+  <div class="src"><a href="L08-floating-point.html#s9">Lecture 8 &middot; 09</a></div>
+</div>
+
 <h2 class="gletter" id="gH">H</h2>
+
+<div class="gterm">
+  <div class="t">Hard · Firm · Soft IP</div>
+  <div class="d" lang="ko">IP 를 무엇으로 받느냐에 따른 구분. Hard 는 <strong>layout</strong>(못 바꾸고 공정 전용), Firm 은 <strong>netlist</strong>, Soft 는 <strong>RTL</strong>(자유롭지만 synthesis 와 layout 은 받는 쪽 몫).</div>
+  <div class="d" lang="en">Classified by deliverable: hard is a <strong>layout</strong> (fixed, process-specific), firm a <strong>netlist</strong>, soft <strong>RTL</strong> (flexible, but synthesis and layout are yours).</div>
+  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Hardware Accelerator</div>
+  <div class="d" lang="ko">CPU 가 하던 특정 일 하나를 <strong>offload</strong> 받아 처리하는 전용 회로. 슬라이드 4쪽의 목적은 lower power, lower time, lower energy 셋이다. <strong>구현 방식이 아니라 역할의 이름</strong>이라 GPU, FPGA 위 회로, ASIC 모두 가속기가 될 수 있다.</div>
+  <div class="d" lang="en">A dedicated circuit that takes one specific job <strong>offloaded</strong> from the CPU. Slide 4 gives the goals as lower power, lower time and lower energy. <strong>It names a role, not an implementation</strong>: a GPU, an FPGA circuit or an ASIC can all be one.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s1">Lecture 9 &middot; 01</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">Hazard</div>
@@ -957,6 +1119,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">하드웨어를 기술하는 언어. Verilog와 VHDL이 대표적이다. <strong>HDL만으로는 검증에 부족하다.</strong> class와 enum 같은 프로그래밍 기능이 없고, assertion·randomization·coverage에 대한 native 지원이 없기 때문이다. 그래서 SystemVerilog가 생겼다.</div>
   <div class="d" lang="en">A language for describing hardware, chiefly Verilog and VHDL. <strong>An HDL alone is not enough for verification:</strong> it lacks programming features such as classes and enums, and it has no native support for assertions, randomisation or coverage. Hence SystemVerilog.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s1">Lecture 2 · 01</a> · <a href="L02-design-and-verification-overview.html#s22">22</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Hidden bit (implied bit)</div>
+  <div class="d" lang="ko">normalized significand 의 맨 앞 1. 언제나 1 이라 <strong>저장하지 않고</strong> unpack 할 때 회로가 붙인다. 그래서 FP32 는 23비트를 저장하고 정밀도는 24다. exponent 필드가 0 이면 (subnormal) 1 이 아니라 <strong>0 을</strong> 붙인다.</div>
+  <div class="d" lang="en">The leading 1 of a normalized significand. Always 1, so <strong>it isn't stored</strong>; the circuit attaches it at unpack. That's why FP32 stores 23 bits but has 24 of precision. With a zero exponent field (a subnormal) the attached bit is <strong>0</strong>, not 1.</div>
+  <div class="src"><a href="L08-floating-point.html#s6">Lecture 8 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">HMMA</div>
+  <div class="d" lang="ko">NVIDIA GPU 에 Tensor Core 와 함께 추가된 행렬곱 명령어(슬라이드 11쪽). <strong>슬라이드에 풀네임이 없다.</strong> 그림의 <code>D = A &times; B + C</code> 와 FP16 표기로 보아 half precision matrix multiply-accumulate 로 읽히지만 확인한 풀이는 아니다.</div>
+  <div class="d" lang="en">The matrix multiply instruction NVIDIA added to its GPUs alongside Tensor Cores (slide 11). <strong>Not expanded on the slide.</strong> Given <code>D = A &times; B + C</code> and the FP16 labels it reads as half precision matrix multiply-accumulate, but that's an inference.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -985,6 +1161,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">IEEE 754</div>
+  <div class="d" lang="ko">IEEE Standard for Floating-Point Arithmetic. FP 의 비트 배치뿐 아니라 <strong>연산이 어떤 결과를 내야 하는지</strong> (correctly rounded, 특수값의 처리) 까지 정한 표준이다. 1985 년판이 처음이고 2008 년과 2019 년에 개정됐다. FP 유닛을 설계하고 검증할 때의 spec 이다.</div>
+  <div class="d" lang="en">IEEE Standard for Floating-Point Arithmetic. It fixes not only FP bit layouts but <strong>what operations must return</strong> (correct rounding, special values). First published 1985, revised 2008 and 2019. It's the spec when you design or verify an FP unit.</div>
+  <div class="src"><a href="L08-floating-point.html#s6">Lecture 8 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Inference</div>
   <div class="d" lang="ko">합성 도구가 <strong>RTL을 읽고 "이건 flip-flop이겠군" 하고 판단해서 그 하드웨어를 만들어내는 것.</strong> 코드 어디에도 "flip-flop을 만들어라"라고 적혀 있지 않다. <code>@(posedge clk)</code>와 <code>&lt;=</code>라는 <strong>모양</strong>을 보고 짐작한다. <strong>시뮬레이터는 추론하지 않고 그냥 실행한다.</strong> 그래서 simulation/synthesis mismatch가 생긴다.</div>
   <div class="d" lang="en">The synthesis tool <strong>reading your RTL, deciding "that must be a flip-flop", and building it.</strong> Nowhere does the code say "build a flip-flop"; the tool guesses from <strong>the shape</strong> of <code>@(posedge clk)</code> and <code>&lt;=</code>. <strong>A simulator infers nothing, it just runs the code</strong>, which is how simulation/synthesis mismatches happen.</div>
@@ -999,6 +1182,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Interconnect · Crossbar · NoC</div>
+  <div class="f">NoC = Network on Chip</div>
+  <div class="d" lang="ko">interconnect 는 SoC 블록을 잇는 것 전부. crossbar 는 여러 경로를 동시에 잇는 방식, NoC 는 router 와 link 로 packet 을 보내는 방식이다. 슬라이드 말대로 NoC 와 interconnect 를 섞어 쓰기도 한다.</div>
+  <div class="d" lang="en">Interconnect is whatever joins an SoC's blocks; a crossbar connects several paths at once; a NoC sends packets over routers and links. As the slide notes, NoC and interconnect are sometimes used interchangeably.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s10">Lecture 10 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">interface</div>
   <div class="d" lang="ko">여러 신호를 <strong>한 덩어리로 묶어 module 포트에 통째로 꽂을 수 있게 하는</strong> SystemVerilog 구조물. <code>module</code>과 나란한 급의 키워드다. 신호를 하나 추가할 때 고칠 곳이 여러 module에서 한 군데로 줄어든다. <strong>설계와 검증이 같은 것을 공유한다.</strong> UVM에서는 <strong>virtual interface</strong>로 다시 나온다. 소프트웨어의 "interface"와는 전혀 다른 것이다.</div>
   <div class="d" lang="en">A SystemVerilog construct that <strong>bundles signals so the bundle plugs into a module port as one thing.</strong> It is a keyword of the same rank as <code>module</code>. Adding a signal goes from editing many modules to editing one, and <strong>design and verification share the same one.</strong> In UVM it returns as a <strong>virtual interface.</strong> Nothing to do with a software "interface".</div>
@@ -1006,11 +1197,18 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">I/O Pad · Padring</div>
+  <div class="d" lang="ko">칩 안 신호와 패키지 핀 사이의 입출력 회로(level shifter, buffer, ESD 보호, slew rate, pull-up/down, output enable)와, 그것들이 칩 가장자리를 두른 줄. <strong>RTL 선을 바깥에 바로 이을 수 없다.</strong></div>
+  <div class="d" lang="en">The I/O circuit between an on-chip signal and a package pin (level shifters, buffers, ESD protection, slew control, pull-up/down, output enable), and the ring of them around the die. <strong>RTL wires cannot go straight outside.</strong></div>
+  <div class="src"><a href="L10-soc-architecture.html#s8">Lecture 10 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">IP</div>
   <div class="f">Intellectual Property</div>
   <div class="d" lang="ko">이 분야에서는 <strong>이미 만들어지고 검증된 설계 블록</strong>을 가리키는 말로 쓴다. 사 오거나 재사용한다. 검증 쪽 대응물이 <strong>VIP</strong>(Verification IP)로, 예를 들어 EDA 벤더에게서 checker를 사서 testbench에 끼워 넣는다.</div>
   <div class="d" lang="en">In this field the word means <strong>an already built and verified design block</strong>, bought in or reused. Its verification counterpart is <strong>VIP</strong>, verification IP: buying a checker from an EDA vendor and plugging it into your testbench.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s7">Lecture 2 · 07</a> · <a href="L02-design-and-verification-overview.html#s22">22</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s7">Lecture 2 · 07</a> · <a href="L02-design-and-verification-overview.html#s22">22</a> · <a href="L10-soc-architecture.html#s6">Lecture 10 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1118,10 +1316,25 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gM">M</h2>
 
 <div class="gterm">
+  <div class="t">MAC</div>
+  <div class="f">Multiply-Accumulate</div>
+  <div class="d" lang="ko">두 수를 곱해 누적 register 에 더하는 연산. <code>Y = A*B + Y_prev</code> (슬라이드 29쪽). 이 강의의 systolic array 에서 PE 하나가 매 사이클 하는 일이다. <strong>같은 말이 하드웨어 칸의 개수와 연산 횟수를 둘 다 가리킨다.</strong> 네트워크의 MAC 주소와는 무관하다.</div>
+  <div class="d" lang="en">Multiply two numbers and add into an accumulating register: <code>Y = A*B + Y_prev</code> (slide 29). What one PE does every cycle in this lecture's systolic array. <strong>The word counts both hardware cells and operations.</strong> Unrelated to a network MAC address.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Machine epsilon (&epsilon;)</div>
+  <div class="d" lang="ko">1 과, 1 보다 큰 가장 작은 FP 수 사이의 간격. 강의의 정의는 <strong><code>&epsilon; = 2<sup>&minus;(p&minus;1)</sup></code></strong>, FP32 에서 2<sup>&minus;23</sup> &asymp; 1.19 &times; 10<sup>&minus;7</sup> (C 의 <code>FLT_EPSILON</code>). 그 절반 <code>2<sup>&minus;p</sup></code> 를 unit roundoff 라 부르며 쓰는 문헌도 있다. fixed point 의 한 칸과는 다르다.</div>
+  <div class="d" lang="en">The gap between 1 and the smallest FP number above it. The lecture defines <strong><code>&epsilon; = 2<sup>&minus;(p&minus;1)</sup></code></strong>: 2<sup>&minus;23</sup> &asymp; 1.19 &times; 10<sup>&minus;7</sup> in FP32 (C's <code>FLT_EPSILON</code>). Some texts use half of it, <code>2<sup>&minus;p</sup></code>, as the unit roundoff. Not the same as one fixed point step.</div>
+  <div class="src"><a href="L08-floating-point.html#s4">Lecture 8 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Manager · Subordinate</div>
   <div class="d" lang="ko">AMBA 스펙이 <strong><code>master</code>와 <code>slave</code>를 대체하려고 쓰는 용어.</strong> 뜻은 완전히 같다. 트랜잭션을 <strong>시작하는 쪽</strong>이 Manager(=master), <strong>응답하는 쪽</strong>이 Subordinate(=slave)다. <strong>기존 코드와 툴 옵션에는 여전히 master/slave가 남아 있으므로 둘 다 알아야 한다.</strong> 강의 슬라이드는 벤더 트레이닝 자료라 옛 이름을 쓴다.</div>
   <div class="d" lang="en">The terms recent AMBA specifications use <strong>in place of <code>master</code> and <code>slave</code>.</strong> The meaning is identical: the side that <strong>starts a transaction</strong> is the Manager, the side that <strong>responds</strong> is the Subordinate. <strong>Existing code and tool options still say master and slave, so you need both.</strong> The lecture slides come from vendor training and use the older names.</div>
-  <div class="src"><a href="L03-system-verilog-for-design.html#s10">Lecture 3 · 10</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s10">Lecture 3 · 10</a> · <a href="L10-soc-architecture.html#s3">Lecture 10 · 03</a></div>
 </div>
 
 <div class="gterm">
@@ -1132,10 +1345,32 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Master · Slave</div>
+  <div class="d" lang="ko">트랜잭션을 <strong>시작하는 쪽</strong>과 <strong>응답하는 쪽.</strong> 데이터 방향과 무관하고 port 단위다. 같은 짝을 initiator/target, manager/subordinate, requester/responder 로도 부른다.</div>
+  <div class="d" lang="en">The side that <strong>starts</strong> a transaction and the side that <strong>answers.</strong> Independent of data direction, defined per port. Also initiator/target, manager/subordinate, requester/responder.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s3">Lecture 10 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">MCU</div>
+  <div class="f">Microcontroller Unit</div>
+  <div class="d" lang="ko">코어 하나에 메모리와 기본 peripheral 을 넣은 작은 칩. 슬라이드는 "A simpler SoC" 라고 부른다. 혼자서는 못 도는 CPU 와 다르다.</div>
+  <div class="d" lang="en">One core plus memory and basic peripherals; "a simpler SoC" on the slide. Unlike a bare CPU, it runs on its own.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s1">Lecture 10 &middot; 01</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Mealy · Moore</div>
   <div class="d" lang="ko">출력이 <strong>지금의 입력을 직접 보면</strong> Mealy, <strong>상태만 보면</strong> Moore. 다음 상태가 입력에 걸리는 것은 둘 다 같다. 기준은 조합이냐 등록이냐가 아니라 입력을 보느냐다. 등록된 출력은 항상 Moore 다.</div>
   <div class="d" lang="en">An output that <strong>looks at the present input directly</strong> is Mealy; one that <strong>looks only at state</strong> is Moore. Both have next-state logic that depends on inputs. The test is not combinational versus registered but whether an input is looked at. A registered output is always Moore.</div>
   <div class="src"><a href="LAB1-fifo-design.html#s8">Lab 1 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Mesh &middot; Daisy Chain</div>
+  <div class="d" lang="ko">PE 를 잇는 모양 두 가지. <strong>daisy chain</strong> 은 앞 칸의 출력이 다음 칸의 입력이 되도록 한 줄로 엮은 것(1D, 슬라이드 12쪽), <strong>mesh</strong> 는 격자로 놓고 상하좌우 이웃끼리만 잇는 것(2D, 13쪽). 둘 다 systolic array 다.</div>
+  <div class="d" lang="en">Two ways to connect PEs. A <strong>daisy chain</strong> strings them in a line, each output feeding the next input (1D, slide 12); a <strong>mesh</strong> lays them in a grid wired only to adjacent neighbours (2D, slide 13). Both are systolic arrays.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s6">Lecture 9 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1150,6 +1385,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">Architecture가 정의한 동작을 <strong>register, memory, gate, control path, data path로 구현한 구체적 형태.</strong> Architecture가 "무엇을"이라면 microarchitecture는 "어떻게"다. <strong>같은 architecture를 여러 microarchitecture로 만들 수 있다.</strong> x86 하나에 Intel과 AMD의 서로 다른 microarchitecture가 붙는 것이 그 예다.</div>
   <div class="d" lang="en">The behaviour defined by an architecture, <strong>made concrete with registers, memories, gates, control paths and data paths.</strong> Architecture says what; microarchitecture says how. <strong>One architecture can carry many microarchitectures</strong>, as x86 carries quite different ones at Intel and AMD.</div>
   <div class="src"><a href="L01-course-intro.html#s8">Lecture 1 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Microcode · Control Store</div>
+  <div class="d" lang="ko">control 신호 묶음(control word)을 <strong>ROM 에 적어두고 차례로 읽어</strong> datapath 를 움직이는 방식. 그 ROM 이 control store 다. Lab 2 릴리스 덱은 microprogramming, microsequencing 을 같은 말로 묶고, 한 줄에 micro-opcode 와 다음 micro-opcode, 그 밖의 control 비트가 있다고 그린다. 반대편은 <strong>hardwired control</strong>, 즉 opcode 를 조합 로직으로 바로 control 로 푸는 방식이다.</div>
+  <div class="d" lang="en">Driving the datapath by <strong>storing control words in a ROM and stepping through them</strong>; that ROM is the control store. The Lab 2 release deck groups microprogramming and microsequencing with it and draws each entry as a micro-opcode, the next micro-opcode and other control bits. The alternative is <strong>hardwired control</strong>, which turns the opcode straight into control signals with combinational logic.</div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s15">Lab 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">MMIO</div>
+  <div class="f">Memory-Mapped I/O</div>
+  <div class="d" lang="ko">레지스터에 메모리 주소를 붙여 <strong>보통의 load/store 로</strong> 읽고 쓰게 하는 방식. 메모리처럼 보이지만 읽을 때마다 값이 바뀌거나 쓰는 순간 하드웨어가 움직인다.</div>
+  <div class="d" lang="en">Giving registers memory addresses so <strong>ordinary loads and stores</strong> reach them. Looks like memory, but values can change on each read and writes can trigger hardware.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s4">Lecture 10 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -1181,7 +1431,29 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L02-design-and-verification-overview.html#s5">Lecture 2 · 05</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">Multiplicand · Multiplier · Partial product</div>
+  <div class="d" lang="ko"><code>A &times; B</code> 에서 비트 단위로 훑어지는 쪽이 multiplier, 통째로 더해지는 쪽이 multiplicand, multiplier 비트 하나와 multiplicand 의 곱 한 줄이 partial product 다. <strong>"multiplier" 는 곱셈 회로 전체를 가리키기도 해서</strong> 문맥으로 갈라야 한다.</div>
+  <div class="d" lang="en">In <code>A &times; B</code>, the multiplier is scanned bit by bit, the multiplicand is added whole, and one multiplier bit times the multiplicand is a partial product. <strong>"Multiplier" also names the whole multiplying circuit</strong>, so context decides.</div>
+  <div class="src"><a href="L08-floating-point.html#s13">Lecture 8 &middot; 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">MVM &middot; MMM</div>
+  <div class="f">Matrix-Vector Multiplication &middot; Matrix-Matrix Multiplication</div>
+  <div class="d" lang="ko">슬라이드 10쪽 PE 사다리의 셋째와 넷째 칸. MVM 은 Dot Product Unit 여럿에 벡터를 broadcast 해 벡터를 내고, MMM 은 MAC 격자로 행렬을 낸다. <strong>슬라이드는 약어로만 쓴다.</strong> broadcast 는 fanout 이 크고, MMM 격자는 이웃끼리만 넘긴다.</div>
+  <div class="d" lang="en">The third and fourth rungs of slide 10's PE ladder. MVM broadcasts a vector to several dot product units and outputs a vector; MMM is a grid of MACs outputting a matrix. <strong>The slide only uses the abbreviations.</strong> Broadcast has high fanout; the MMM grid passes only between neighbours.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
+</div>
+
 <h2 class="gletter" id="gN">N</h2>
+
+<div class="gterm">
+  <div class="t">NaN</div>
+  <div class="d" lang="ko">Not a Number. <code>0/0</code>, <code>0 &times; ∞</code>, <code>∞ &minus; ∞</code>, 음수의 제곱근처럼 답이 없는 연산의 결과. exponent 전부 1, fraction 0 아님이라 패턴이 여럿이다. <strong>이후 연산으로 전파되고</strong>, unordered 라 어떤 값과도, 자기 자신과도 같지 않다. checker 에서 비트 비교도 값 비교도 그대로는 틀린다.</div>
+  <div class="d" lang="en">Not a Number: the result of operations with no answer, like <code>0/0</code>, <code>0 &times; ∞</code>, <code>∞ &minus; ∞</code>, or the square root of a negative. Exponent all ones, fraction nonzero, so there are many patterns. It <strong>propagates through later operations</strong> and is unordered: equal to nothing, itself included. Both bit and value comparison in a checker get it wrong as is.</div>
+  <div class="src"><a href="L08-floating-point.html#s7">Lecture 8 &middot; 07</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">NBA</div>
@@ -1205,6 +1477,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-course-intro.html#s2">Lecture 1 · 02</a> · <a href="L02-design-and-verification-overview.html#s4">Lecture 2 · 04</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">Normalize · Alignment</div>
+  <div class="d" lang="ko">FP 연산의 두 shift. <strong>alignment 는 덧셈 전</strong>에 exponent 가 작은 쪽 significand 를 오른쪽으로 밀어 exponent 를 맞추는 것, <strong>normalize 는 연산 후</strong>에 결과를 <code>1.xxx</code> 꼴로 되돌리고 exponent 를 그만큼 고치는 것. 곱셈에는 alignment 가 없다.</div>
+  <div class="d" lang="en">The two shifts of FP arithmetic. <strong>Alignment comes before an addition</strong>, shifting the smaller-exponent significand right until the exponents match; <strong>normalize comes after</strong>, bringing the result back to <code>1.xxx</code> and adjusting the exponent to match. Multiplication has no alignment.</div>
+  <div class="src"><a href="L08-floating-point.html#s10">Lecture 8 &middot; 10</a></div>
+</div>
+
 <h2 class="gletter" id="gO">O</h2>
 
 <div class="gterm">
@@ -1219,6 +1498,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">비싼 연산을 싼 연산으로 바꾸는 것. 강의 예가 <strong>곱셈을 shift 로</strong> 바꾸는 것이다. 2 의 거듭제곱 곱셈은 배선만으로 되므로 곱셈기가 통째로 사라진다. 내주는 것은 <strong>일반성</strong>이다.</div>
   <div class="d" lang="en">Swapping an expensive operator for a cheap one. The lecture’s example is <strong>multiplication into shifts</strong>: multiplying by a power of two is just wiring, so the multiplier disappears. What it costs is <strong>generality.</strong></div>
   <div class="src"><a href="L07-efficient-design.html#s6">Lecture 7 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Outstanding · Out-of-Order</div>
+  <div class="d" lang="ko">주소는 보냈지만 답을 아직 못 받은 트랜잭션을 <strong>여러 개 걸어두는 것</strong>과, 그 답이 <strong>보낸 순서와 다르게</strong> 와도 되는 것. AXI 는 ID 로 짝을 맞춘다. APB 에는 둘 다 없다.</div>
+  <div class="d" lang="en">Keeping <strong>several transactions in flight</strong> (address sent, answer pending), and letting answers return <strong>in a different order.</strong> AXI matches them by ID; APB has neither.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -1243,6 +1529,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">배열 차원의 두 종류. <strong>packed는 변수 이름 왼쪽</strong>에 오고 비트들을 <strong>하나의 워드</strong>로 다룬다. <strong>unpacked는 이름 오른쪽</strong>에 오고 원소를 <strong>독립된 변수</strong>로 다룬다. <code>logic [3:0] t[6];</code>은 4비트짜리 원소 6개다. <strong>접근은 순서가 뒤집혀서</strong> <code>t[원소][비트]</code>로 쓴다. 설계에서는 각각 하나씩만 쓰는 것이 관행이다.</div>
   <div class="d" lang="en">The two kinds of array dimension. <strong>Packed goes to the left of the name</strong> and treats the bits as <strong>one word</strong>; <strong>unpacked goes to the right</strong> and treats elements as <strong>independent variables.</strong> <code>logic [3:0] t[6];</code> is six four-bit elements. <strong>Access reverses the order:</strong> <code>t[element][bit]</code>. Designs conventionally use one of each and no more.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s8">Lecture 3 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">PE</div>
+  <div class="f">Processing Element</div>
+  <div class="d" lang="ko">배열 안에서 똑같이 반복되는 계산 칸 하나. 이 강의의 PE 는 명령어를 읽지 않고 MAC 와 데이터 전달만 한다. <strong>크기가 정해져 있지 않다.</strong> TPU 는 MAC 하나, Brainwave 는 MVM, GPU Tensor Core 는 4&times;4 행렬곱이다(슬라이드 11쪽).</div>
+  <div class="d" lang="en">One compute cell repeated identically across an array. This lecture's PE reads no instructions; it does a MAC and passes data on. <strong>Its size isn't fixed</strong>: one MAC in the TPU, an MVM in Brainwave, a 4&times;4 matmul in a GPU Tensor Core (slide 11).</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Pinmux</div>
+  <div class="f">pin multiplexing</div>
+  <div class="d" lang="ko">핀 하나를 여러 블록이 나눠 쓰고 <strong>CSR 이 지금 누가 쓸지 고르는</strong> 회로. 설정을 안 하면 블록이 멀쩡해도 핀이 조용하다.</div>
+  <div class="d" lang="en">A circuit letting several blocks share a pin, with <strong>a CSR choosing the current user.</strong> Unconfigured, the pin stays silent even with a working block.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s8">Lecture 10 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -1282,6 +1584,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">PMU &middot; Performance Monitoring Unit</div>
+  <div class="d" lang="ko">프로세서 안의 이벤트(사이클, 끝난 명령어, cache miss 등)를 <strong>세는 카운터 묶음</strong>과, 그 값을 소프트웨어가 읽는 통로. Lab 2 릴리스 덱은 ARM PMU 를 예로 들고 instructions retired 같은 지표를 적는다. Lab 2 Part 2 의 perfmon 이 사이클과 명령어 카운터 두 개짜리 축소판이다. "끝난" 명령어는 retire 한 것이지 fetch 한 것이 아니다. bubble 과 flush 된 것은 세지 않는다.</div>
+  <div class="d" lang="en">A bank of <strong>counters for events inside a processor</strong> (cycles, finished instructions, cache misses) plus a way for software to read them. The Lab 2 release deck cites the ARM PMU and lists metrics such as instructions retired. Lab 2 Part 2's perfmon is a two-counter version, cycles and instructions. "Finished" means retired, not fetched: bubbles and flushed slots don't count.</div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s14">Lab 2 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Power Domain · Always-On</div>
+  <div class="d" lang="ko">함께 켜고 끄는 회로 묶음과, 칩이 살아 있는 동안 <strong>절대 끄지 않는</strong> 묶음. 경계에는 isolation cell 을 둔다. 다른 domain 을 깨우는 회로는 Always-On 에 있어야 한다.</div>
+  <div class="d" lang="en">A group of circuits switched together, and the group <strong>never switched off</strong>. Boundaries need isolation cells; wake-up logic must live in the Always-On domain.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s8">Lecture 10 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Power Gating</div>
   <div class="d" lang="ko">쓰지 않는 <strong>블록 전체의 전원을 내리는 것.</strong> <a href="L02-design-and-verification-overview.html#s10">clock gating</a> 과 다르다. clock 을 끊으면 flip-flop 이 값을 들고 있지만, <strong>전원을 내리면 상태가 날아간다.</strong> 다시 켤 때 복원 비용이 크므로 <strong>오래 쉴 때만</strong> 쓴다.</div>
   <div class="d" lang="en">Shutting down <strong>the supply to a whole block.</strong> Not the same as <a href="L02-design-and-verification-overview.html#s10">clock gating</a>: cutting the clock leaves the flip-flops holding their values, while <strong>cutting the power loses the state.</strong> Waking costs enough that it is <strong>for long idles only.</strong></div>
@@ -1293,6 +1609,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">칩 설계에서 <strong>거의 모든 판단의 기준이 되는 세 축.</strong> 슬라이드가 셋을 다 잡는 것을 <strong>The Holy Grail</strong> 이라 부른다. 대개 하나를 얻으면 하나를 내준다. synthesis 가 끝날 때마다 이 세 가지 리포트가 나온다. <strong>Performance 자리에 Delay 를 쓰면 방향이 반대가 된다.</strong> delay 는 작을수록, performance 는 클수록 좋다.</div>
   <div class="d" lang="en"><strong>The three axes behind nearly every decision</strong> in chip design. The slide calls getting all three <strong>The Holy Grail.</strong> Usually one gain costs another, and synthesis reports all three every run. <strong>Putting Delay in the Performance column flips the direction:</strong> smaller delay is better, larger performance is better.</div>
   <div class="src"><a href="L07-efficient-design.html#s2">Lecture 7 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">PSELx · PENABLE · PREADY</div>
+  <div class="f">Peripheral SELect, ENABLE, READY</div>
+  <div class="d" lang="ko">APB 의 핵심 세 선. PSELx 는 slave 마다 하나인 선택선, PENABLE 은 전송의 둘째 cycle 이후, PREADY 는 slave 가 "끝낼 수 있다" 고 답하는 선. PREADY 는 ACCESS 에서만 의미가 있다.</div>
+  <div class="d" lang="en">APB's three key lines: PSELx, one select per slave; PENABLE, the second and later cycles of a transfer; PREADY, the slave saying "I can finish". PREADY only counts during ACCESS.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s12">Lecture 10 &middot; 12</a></div>
 </div>
 
 <h2 class="gletter" id="gR">R</h2>
@@ -1346,6 +1670,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">회로의 기능을 바꾸지 않고 <strong>register의 위치를 옮겨</strong> 단 사이 지연을 고르게 만드는 최적화. Timing 목표에 대응하는 수단이다.</div>
   <div class="d" lang="en">An optimisation that <strong>moves registers</strong> without changing what the circuit does, evening out the delay per stage. It is a lever for the timing goal.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Rounding mode (RD · RU · RTZ · RTE)</div>
+  <div class="d" lang="ko">참값이 표현 가능한 두 수 사이에 떨어졌을 때 어느 쪽을 고를지 정한 <strong>설정</strong>. Round down, Round up, Round to zero, Round to nearest ties to even. 기본은 <strong>RTE</strong> 이고 가운데면 lsb 가 0 인 쪽이다 (학교 반올림과 다르다). RD 와 RTZ 는 음수에서만 갈린다.</div>
+  <div class="d" lang="en">The <strong>setting</strong> that decides which neighbour to pick when a true value falls between two representable numbers: round down, round up, round to zero, round to nearest with ties to even. The default is <strong>RTE</strong>, which sends ties to lsb 0 (unlike school rounding). RD and RTZ differ only on negatives.</div>
+  <div class="src"><a href="L08-floating-point.html#s9">Lecture 8 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Row Major &middot; Column Major</div>
+  <div class="d" lang="ko">2차원 행렬을 1차원 주소에 펼치는 순서. 행을 먼저 훑으면 row major, 열을 먼저면 column major. 이 강의 설계는 주소 하나에 숫자 N 개를 넣어서, <strong>A 는 row major 인데 주소 하나에 A 의 열 하나</strong>가, B 는 column major 인데 B 의 행 하나가 들어간다(슬라이드 43쪽). 발표자 노트는 시험에 안 나온다고 적었다.</div>
+  <div class="d" lang="en">The order in which a 2D matrix is laid over 1D addresses: rows first for row major, columns first for column major. This lecture's design packs N numbers per address, so <strong>A is row major yet one address holds a column of A</strong>, and B, column major, holds a row of B per address (slide 43). The speaker notes say it won't be on the exam.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s13">Lecture 9 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -1409,6 +1747,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Significand · Mantissa</div>
+  <div class="d" lang="ko">FP 수 <code>&plusmn;S &times; 2<sup>E</sup></code> 의 <code>S</code>, 유효숫자 부분. 표준 문서는 significand, 의사코드와 RTL 은 흔히 mantissa (<code>mant</code>) 라 쓴다. <strong>저장된 23비트 (fraction) 를 가리키는지 hidden bit 를 붙인 24비트를 가리키는지</strong>가 문맥마다 다르다.</div>
+  <div class="d" lang="en">The <code>S</code> in an FP number <code>&plusmn;S &times; 2<sup>E</sup></code>, the significant digits. The standard says significand; pseudocode and RTL often say mantissa (<code>mant</code>). <strong>Whether it means the 23 stored bits (the fraction) or the 24 bits with the hidden bit</strong> varies by context.</div>
+  <div class="src"><a href="L08-floating-point.html#s3">Lecture 8 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">simv</div>
   <div class="d" lang="ko">VCS 의 elaboration 이 만들어내는 <strong>실행 파일</strong>. 이것을 실행하면 시뮬레이션이 돈다. 한 번 구워두면 옵션만 바꿔 몇 번이고 재사용할 수 있어서 <strong>compile once, run multiple times</strong> 라고 부른다. <strong>runtime 옵션 상당수는 compile time 에 짝이 켜져 있어야 산다.</strong> 짝이 없으면 에러가 아니라 빈 결과가 나온다.</div>
   <div class="d" lang="en">The <strong>executable</strong> that VCS elaboration produces. Running it runs the simulation. Bake it once and you can reuse it with different options as often as you like, which is why this is called <strong>compile once, run multiple times</strong>. <strong>Many runtime options only live if their compile-time counterpart exists</strong>; without it you get an empty result rather than an error.</div>
@@ -1427,7 +1772,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">System on Chip</div>
   <div class="d" lang="ko">예전에 보드 위에 여러 칩으로 흩어져 있던 것을 <strong>칩 하나에 다 넣은 것.</strong> CPU, accelerator, interconnect, I/O와 memory controller, clock과 reset 같은 globals가 들어간다. <strong>특정 제품 이름이 아니라 구조를 부르는 말이다.</strong> 이 과목의 뼈대이기도 하다.</div>
   <div class="d" lang="en">Everything that used to sit as separate chips on a board, <strong>pulled onto one die</strong>: a CPU, accelerators, an interconnect, I/O and memory controllers, and globals such as clock and reset. <strong>It names a shape, not a product</strong>, and it is the skeleton of this course.</div>
-  <div class="src"><a href="L01-course-intro.html#s1">Lecture 1 · 01</a></div>
+  <div class="src"><a href="L01-course-intro.html#s1">Lecture 1 · 01</a> · <a href="L10-soc-architecture.html#s1">Lecture 10 · 01</a></div>
 </div>
 
 <div class="gterm">
@@ -1435,6 +1780,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">사양을 더 이상 바꾸지 않기로 못 박는 시점. Logic Freeze와 Tapeout 앞에 온다.</div>
   <div class="d" lang="en">The milestone at which the specification stops changing. It comes before logic freeze and tapeout.</div>
   <div class="src"><a href="L01-course-intro.html#s7">Lecture 1 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">SRAM Macro</div>
+  <div class="d" lang="ko">정해진 크기의 메모리 한 덩어리를 <strong>미리 설계해둔 부품.</strong> 합성 도구는 안을 모르고 크기, 핀, 타이밍만 아는 상자로 다룬다. 합성용 <code>.db</code> 와 시뮬레이션용 behavioral <code>.v</code> 가 같이 오는데, <strong><code>.v</code> 는 시뮬레이션 전용</strong>이다. Lab 2 과제 문서는 "memory cells" 라고 부른다. 이름의 <code>1rw</code> 는 보통 읽기와 쓰기를 같이 하는 포트 하나라는 뜻이라, 동시에 읽기 둘이 필요한 register file 에는 못 쓴다.</div>
+  <div class="d" lang="en">A <strong>pre-designed block of memory</strong> of fixed size. Synthesis can't see inside; it knows only size, pins and timing. It ships as a <code>.db</code> for synthesis and a behavioural <code>.v</code> for simulation, and <strong>the <code>.v</code> is simulation only</strong>. The Lab 2 handout calls them "memory cells". A <code>1rw</code> in the name usually means one port shared by reads and writes, so it can't serve a register file that needs two reads at once.</div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s12">Lab 2 · 12</a></div>
 </div>
 
 <div class="gterm">
@@ -1488,6 +1840,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Subnormal (denormal)</div>
+  <div class="d" lang="ko">exponent 필드가 0 이고 fraction 이 0 이 아닌 FP 수. hidden bit 을 0 으로 보고 <strong><code>0.f &times; 2<sup>E<sub>min</sub></sup></code></strong> 로 읽어서 0 과 N<sub>min</sub> 사이의 구멍을 같은 간격으로 메운다. exponent 는 E<sub>min</sub> 이지 E<sub>min</sub> &minus; 1 이 아니다. denormal 은 예전 이름이고 같은 것이다. FPU 에서는 비싼 경우라 flush to zero 모드를 두기도 한다.</div>
+  <div class="d" lang="en">An FP number with a zero exponent field and a nonzero fraction. Read with a hidden bit of 0 as <strong><code>0.f &times; 2<sup>E<sub>min</sub></sup></code></strong>, it fills the gap between 0 and N<sub>min</sub> at even spacing. The exponent is E<sub>min</sub>, not E<sub>min</sub> &minus; 1. Denormal is the older name for the same thing. Expensive for an FPU, which is why some offer a flush-to-zero mode.</div>
+  <div class="src"><a href="L08-floating-point.html#s7">Lecture 8 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Synthesis</div>
   <div class="d" lang="ko">상위 수준 HDL 코드를 <strong>netlist로 바꾸는 것.</strong> 입력이 셋(RTL, constraint, tech library)이고 출력이 둘(netlist, area/timing/power 리포트)이다. <strong>입력 하나만 바뀌어도 결과 netlist가 달라진다.</strong> 그래서 ECO가 필요하다. 도구는 Synopsys Design Compiler, Cadence Genus.</div>
   <div class="d" lang="en">Turning higher level HDL into <strong>a netlist.</strong> Three inputs, RTL, constraints and a tech library; two outputs, the netlist and reports on area, timing and power. <strong>Change any one input and the netlist comes out different</strong>, which is why ECOs exist. Tools: Synopsys Design Compiler, Cadence Genus.</div>
@@ -1495,10 +1854,32 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">System Address Map</div>
+  <div class="f">SAM</div>
+  <div class="d" lang="ko">주소 구간마다 어느 블록이 응답하는지 정한 표. interconnect 의 decoder 와 소프트웨어 헤더가 같은 표를 따라야 한다. address map, memory map 이라고도 한다.</div>
+  <div class="d" lang="en">The table of which block answers each address range. The interconnect decoder and software headers must agree on it. Also address map or memory map.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s4">Lecture 10 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">SystemVerilog</div>
   <div class="d" lang="ko">설계와 검증에 모두 쓰는 언어. 슬라이드가 <strong>"Verilog++"</strong>라고 부르고, 표준은 <strong>IEEE 1800</strong>이다. HDL에 없던 class와 enum 같은 프로그래밍 기능, 그리고 assertion·randomization·coverage에 대한 native 지원이 들어 있다. <strong>UVM은 SystemVerilog로 쓰인 class 라이브러리이므로 SystemVerilog 없이 UVM만 배울 수 없다.</strong></div>
   <div class="d" lang="en">The language used for both design and verification. The slides call it <strong>"Verilog++"</strong> and the standard is <strong>IEEE 1800.</strong> It adds programming features an HDL lacked, such as classes and enums, plus native support for assertions, randomisation and coverage. <strong>UVM is a class library written in it, so there is no learning UVM without it.</strong></div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Systolic Array</div>
+  <div class="d" lang="ko">슬라이드 12쪽 정의: <strong>a network of processors that rhythmically compute and pass data through the system.</strong> 이웃끼리만 연결된 PE 가 클럭마다 계산하고 옆으로 넘기며, 데이터는 가장자리로만 출입하고 지나가며 재사용된다. global wire 가 없어 배열을 키워도 클럭이 안 느려진다. 이름은 심장 수축기(systole) 비유에서 왔다.</div>
+  <div class="d" lang="en">Slide 12: <strong>a network of processors that rhythmically compute and pass data through the system.</strong> Neighbour-connected PEs compute and pass sideways every clock; data enters and leaves only at the edges and is reused on the way. No global wires, so a bigger array doesn't slow the clock. Named after systole, the heart's contraction.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s6">Lecture 9 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Systolic Data Setup</div>
+  <div class="d" lang="ko">systolic array 가장자리에서 입력을 계단 모양으로 늦추는 회로(슬라이드 35, 41쪽). RAM 한 주소에서 숫자 N 개가 동시에 나오면, 행 r 앞에 register r 개를 두어 r 사이클 늦춘다. 한쪽에 N(N &#8722; 1)/2 개. TPU 블록도에도 같은 이름의 블록이 있다.</div>
+  <div class="d" lang="en">The edge circuit that delays a systolic array's inputs into a staircase (slides 35, 41). One RAM address delivers N numbers together, so row r gets r registers, delaying it r cycles: N(N &#8722; 1)/2 per side. The TPU block diagram has a block of the same name.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s13">Lecture 9 &middot; 13</a></div>
 </div>
 
 <h2 class="gletter" id="gT">T</h2>
@@ -1532,6 +1913,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Tensor Core</div>
+  <div class="d" lang="ko">NVIDIA GPU 의 SM 안에 있는 행렬곱 유닛. 슬라이드 11쪽 그림에서 한 개가 4&times;4 행렬로 <code>D = A &times; B + C</code> 를 한다(A, B 는 FP16, C, D 는 FP16 이나 FP32). PE 사다리로 보면 작은 MMM 이다.</div>
+  <div class="d" lang="en">The matrix multiply unit inside an NVIDIA GPU SM. On slide 11 one computes <code>D = A &times; B + C</code> on 4&times;4 matrices (A, B in FP16; C, D in FP16 or FP32). On the PE ladder, a small MMM.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Testbench</div>
   <div class="d" lang="ko">DUT를 둘러싸고 자극하고 관측하고 판정하는 코드 전체. 구성은 <strong>Stimulus → Driver → DUT → Monitor → Checker와 Coverage</strong>, 그리고 DUT 안에 박히는 <strong>Assertions</strong>. Driver와 Monitor를 묶으면 Agent다. <strong>부품이 하나씩 빠지면 무엇을 못 하는지가 이 구조의 설명이다.</strong></div>
   <div class="d" lang="en">All the code that surrounds, drives, observes and judges a DUT: <strong>stimulus, driver, DUT, monitor, then checker and coverage</strong>, with <strong>assertions</strong> bound inside the DUT. Driver plus monitor makes an agent. <strong>The structure is best explained by what stops working when each piece is removed.</strong></div>
@@ -1558,6 +1946,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">사양과 구현의 관계를 <strong>정리(theorem)로 보고</strong> 기호 표현·수리 논리·귀납 증명으로 증명하는 formal 기법. 도구가 대부분 <strong>학술용</strong>이다. 대신 무한 상태 시스템도 다룰 수 있다.</div>
   <div class="d" lang="en">A formal technique that <strong>treats the relation between specification and implementation as a theorem</strong> and proves it with symbolic representations, mathematical logic and inductive proofs. The tools are <strong>mostly academic</strong>, but it can handle infinite state systems.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Tie Off</div>
+  <div class="d" lang="ko">쓰지 않는 <strong>입력</strong> 포트를 상수(0 이나 1)에 묶어두는 것. 슬라이드 39쪽: dual-port RAM 의 port 1 에서 <strong>Signals not needed are tied off.</strong> 그냥 비워두면 <code>z</code> 가 떠서 시뮬레이션에 <code>x</code> 가 퍼지고 lint 가 경고한다.</div>
+  <div class="d" lang="en">Pinning an unused <strong>input</strong> port to a constant, 0 or 1. Slide 39, on port 1 of the dual-port RAMs: <strong>signals not needed are tied off.</strong> Left open, the input floats at <code>z</code>, <code>x</code> spreads in simulation and lint complains.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s12">Lecture 9 &middot; 12</a></div>
 </div>
 
 <div class="gterm">
@@ -1598,6 +1993,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">TPU</div>
+  <div class="f">Tensor Processing Unit</div>
+  <div class="d" lang="ko">Google 의 ML 가속기 ASIC. 슬라이드 11쪽 블록도의 중심이 <strong>Matrix Multiply Unit (64K per cycle)</strong> 와 그 옆의 Systolic Data Setup 이다. 64K 는 첫 세대 논문의 256 &times; 256 systolic array 와 맞는다(슬라이드 밖 보충).</div>
+  <div class="d" lang="en">Google's ML accelerator ASIC. The heart of slide 11's block diagram is the <strong>Matrix Multiply Unit (64K per cycle)</strong> with Systolic Data Setup beside it. 64K matches the first-generation paper's 256 &times; 256 systolic array (supplementary).</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Transactor</div>
   <div class="d" lang="ko">Agent, BFM과 같은 것. Driver와 Monitor를 묶은 testbench 부품의 또 다른 이름이다.</div>
   <div class="d" lang="en">The same thing as an agent or BFM: another name for the testbench component bundling a driver and a monitor.</div>
@@ -1621,11 +2024,26 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gU">U</h2>
 
 <div class="gterm">
+  <div class="t">UCIe</div>
+  <div class="f">Universal Chiplet Interconnect Express</div>
+  <div class="d" lang="ko">chiplet 의 die 끼리 잇는 공개 규격. 슬라이드에는 약어만 나온다.</div>
+  <div class="d" lang="en">An open standard for die-to-die links between chiplets; the slide gives only the acronym.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s16">Lecture 10 &middot; 16</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">UCLI</div>
   <div class="f">Unified Command Line Interface</div>
   <div class="d" lang="ko">시뮬레이션을 <strong>세워놓고 값을 물어보는 Tcl 프롬프트</strong>. <code>simv</code> 에 <code>-ucli</code> 를 주면 뜨고, <code>-i</code> 로 미리 쓴 스크립트를 먹일 수도 있다. 설계에 dump 호출이 없을 때 여기서 직접 덤프를 시작시킬 수도 있다.</div>
   <div class="d" lang="en">A <strong>Tcl prompt where you halt the simulation and ask for values.</strong> Pass <code>-ucli</code> to <code>simv</code> to get it, and <code>-i</code> to feed it a prewritten script. When the design has no dumping calls of its own, you can start a dump from here.</div>
   <div class="src"><a href="LAB0-tools-tutorial.html#s6">Lab 0 · 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">ulp</div>
+  <div class="d" lang="ko">unit in the last place. 어떤 FP 수와 바로 옆 수 사이의 간격, 즉 마지막 비트 하나가 그 수에서 얼마짜리인가. <strong><code>ulp(x) = &epsilon; &times; 2<sup>E</sup></code></strong> 라 exponent 가 하나 오를 때마다 두 배가 된다. FP 결과의 정확도를 "몇 ulp 이내" 로 말한다.</div>
+  <div class="d" lang="en">Unit in the last place: the gap between an FP number and its neighbour, i.e. what the last bit is worth at that number. <strong><code>ulp(x) = &epsilon; &times; 2<sup>E</sup></code></strong>, doubling with each exponent step. FP accuracy is stated as "within so many ulps."</div>
+  <div class="src"><a href="L08-floating-point.html#s4">Lecture 8 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -1650,6 +2068,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko"><strong>"살아 있는" 실리콘에서 하는 일.</strong> manufacturing test를 통과한 물건으로 한다. EVB를 만들고, 간단한 기능 확인부터 시작해 OS를 부팅하고 실제 테스트나 벤치마크를 돌리고, 전력과 전기적 특성을 실측한다. <strong>순서상 Testing 다음이다.</strong> 제조 결함이 있는 칩으로 OS를 부팅해봐야 뭐가 문제인지 알 수 없기 때문이다.</div>
   <div class="d" lang="en">The work done on <strong>silicon that is already alive</strong>, meaning parts that passed manufacturing test. You build an EVB, start with simple functional checks, go as far as booting an OS and running real benchmarks, and measure power and electrical characteristics for real. <strong>It comes after testing</strong>, because booting an OS on a defective part tells you nothing about where the problem is.</div>
   <div class="src"><a href="L01-course-intro.html#s10">Lecture 1 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Valid/Ready Handshake</div>
+  <div class="d" lang="ko">보내는 쪽이 VALID, 받는 쪽이 READY 를 올리고 <strong>둘이 같은 상승 엣지에서 1 이면 한 번 넘어가는</strong> 약속. AXI 의 모든 채널이 쓴다. 한 번 올린 VALID 는 넘어갈 때까지 내리면 안 된다.</div>
+  <div class="d" lang="en">The sender raises VALID, the receiver raises READY, and <strong>one item moves when both are 1 on the same rising edge.</strong> Every AXI channel uses it; a raised VALID must stay up until the transfer.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -1692,10 +2117,33 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gW">W</h2>
 
 <div class="gterm">
+  <div class="t">Wait State</div>
+  <div class="d" lang="ko">slave 가 아직 못 끝내서 <strong>전송이 한 cycle 늘어나는 것.</strong> APB 에서는 ACCESS 에서 PREADY=0 인 cycle 하나. 에러가 아니다.</div>
+  <div class="d" lang="en"><strong>A transfer stretched one cycle</strong> because the slave is not done; in APB, an ACCESS cycle with PREADY=0. Not an error.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s12">Lecture 10 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Wallace tree</div>
+  <div class="d" lang="ko">partial product 들을 carry 를 끝까지 전파하지 않는 adder 들의 tree 로 줄여 나가는 빠른 곱셈기 구조. full adder 가 같은 자리의 비트 셋을 합과 carry 두 비트로 줄인다. 강의의 그림은 8x8 partial product 를 4 layer 에 half adder 15개, full adder 38개로 줄인다. 면적을 내고 속도를 사는 쪽이다.</div>
+  <div class="d" lang="en">A fast multiplier structure that reduces partial products through a tree of adders that don't propagate carries all the way; each full adder turns three same-weight bits into a sum and a carry. The lecture's figure reduces an 8x8 partial product matrix in 4 layers with 15 half adders and 38 full adders. It buys speed with area.</div>
+  <div class="src"><a href="L08-floating-point.html#s14">Lecture 8 &middot; 14</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Wrap Bit</div>
   <div class="d" lang="ko">FIFO 포인터에서 <strong>주소로 쓰이지 않는 맨 위 한 비트.</strong> 주소부가 한 바퀴 돌 때마다 저절로 뒤집혀서 <strong>"몇 바퀴째인가" 를 기록한다.</strong> 이것 덕분에 두 포인터가 같은 주소에 있을 때 <strong>전부 같으면 empty, wrap bit 만 다르면 full</strong> 로 가를 수 있다. 주소가 <code>ADDR_WIDTH</code> 비트면 포인터는 <code>ADDR_WIDTH+1</code> 비트다. <strong>슬라이드는 이 비트를 숫자로만 보여주고 이름을 붙이지 않는다.</strong> 업계에서 쓰는 이름이다.</div>
   <div class="d" lang="en">The <strong>top bit of a FIFO pointer that is never used as an address.</strong> It flips by itself each time the address part wraps, so it <strong>records which lap you are on.</strong> That is what lets two pointers sitting on the same address be told apart: <strong>all bits equal means empty, wrap bits differing means full.</strong> If the address is <code>ADDR_WIDTH</code> bits, the pointer is <code>ADDR_WIDTH+1</code>. <strong>The slides only ever show it as a number and never name it</strong>; this is the industry name.</div>
   <div class="src"><a href="L05-fifo-design.html#s8">Lecture 5 · 08</a></div>
+</div>
+
+<h2 class="gletter" id="gX">X</h2>
+
+<div class="gterm">
+  <div class="t">XMR &middot; Cross-Module Reference</div>
+  <div class="d" lang="ko">포트를 거치지 않고 <code>top.mips.dp.rf...</code> 같은 <strong>계층 경로로 다른 모듈 안쪽 신호를 직접 읽는 것.</strong> SystemVerilog 표준은 hierarchical reference 라고 부른다. testbench 가 register file 이나 메모리 내용을 확인할 때 쓰고, 설계 코드에는 쓰지 않는다. 편하지만 인스턴스 이름에 묶여서 설계자가 이름을 바꾸면 testbench 가 깨진다. Lab 2 릴리스 덱은 프로세서 검증 방법 둘 중 하나로 소개하고, 다른 하나는 store 를 interface 신호에서 보는 것이다.</div>
+  <div class="d" lang="en">Reading a signal inside another module <strong>directly by hierarchical path</strong>, like <code>top.mips.dp.rf...</code>, without going through ports. The SystemVerilog standard calls it a hierarchical reference. Testbenches use it to check register file or memory contents; design code never does. Handy, but tied to instance names: rename an instance and the testbench breaks. The Lab 2 release deck gives it as one of two ways to verify a processor; the other watches stores on the interface signals.</div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s9">Lab 2 · 09</a></div>
 </div>
 
 </div>
