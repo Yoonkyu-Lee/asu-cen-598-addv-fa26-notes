@@ -11,6 +11,8 @@ Thumbs.db
 # Drive 미러에서 아무 PDF 나 루트로 복사해도 딸려 들어가지 않게 하는 방어다.
 *.pdf
 !slides/*.pdf
+# L08 게스트 덱은 슬라이드 3쪽이 청중 외 배포를 금한다. 2026-10-05 결정, CLAUDE.md 참조
+slides/L08-floating-point.pdf
 
 # PPTX 원본은 올리지 않는다. 발표자 노트가 딸려 들어간다.
 *.pptx

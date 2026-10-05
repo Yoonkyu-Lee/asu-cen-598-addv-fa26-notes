@@ -18,9 +18,13 @@ description: 강의 PPTX 를 slides/*.pdf 로 변환해 저장소에 넣을 때 
 | 용도 | 경로 |
 |---|---|
 | 강의 자료 원본 (스테이징) | `lecture/` (저장소 안, `.gitignore` 로 통째로 제외) |
+| Drive 미러 | `Y:\FA26\CEN 598 ADDV` (2026-10-04 복구) |
 
-**예전에는 Drive 미러가 원본이었으나 머신 초기화로 사라졌다.** 이제 강의 사이트에서
-`lecture/` 로 직접 받는다. 파일명은 강사가 올린 그대로 둔다 (`07_Pipelined CPU Design.pptx`).
+**Drive 미러가 `Y:` 로 돌아왔다.** 사용자가 받은 PPTX 를 여기 올리므로 새 강의는 여기부터 본다.
+미러에서 `lecture/` 로 복사하고, 미러에 없으면 강의 사이트에서 직접 받는다.
+Drive 커넥터는 파일을 base64 로 돌려줘서 수 MB 짜리 PPTX 에는 못 쓴다. 목록 확인용으로만 쓴다.
+**미러의 같은 이름 파일이 `lecture/` 보다 크기가 다르면 강사가 고친 것일 수 있다.**
+`pptx-text.py` 로 둘을 뽑아 diff 한다 (2026-10-04 의 `09_Floating Point` 는 메타데이터만 달랐다). 파일명은 강사가 올린 그대로 둔다 (`07_Pipelined CPU Design.pptx`).
 
 `lecture/` 는 **하나도 커밋되지 않는다.** PDF로 변환할 때도 원본을 건드리지 않고
 스크래치패드로 복사해서 사본에서만 작업한다.
@@ -152,7 +156,10 @@ node scripts/render-slides.mjs slides/L01-course-intro.pdf 12-18
 3. **두 가지를 확인한다. 둘 다 통과해야 한다.**
    - `node scripts/pagecount.mjs` : PPTX 장수 = PDF 쪽 수. 다르면 숨김 슬라이드가 빠진 것이다
    - `python scripts/clipcheck.py "<pptx>" "<pdf>"` : 잘린 글자. 걸린 쪽은 렌더해서 눈으로 본다
-4. **슬라이드 본문과 발표자 노트를 뽑아 읽는다.**
+4. **게스트 덱이면 배포 고지를 찾는다.** `pptx-text.py` 출력에서 `reproduce`, `distribut`, `permission` 을 grep 한다.
+   L08 (Prashant Joshi) 슬라이드 3쪽이 청중 외 배포를 금해서 그 PDF 만 `.gitignore` 에 넣었다 (CLAUDE.md 참조).
+   **고지가 있으면 커밋 전에 사용자에게 묻는다.**
+5. **슬라이드 본문과 발표자 노트를 뽑아 읽는다.**
    `python scripts/pptx-text.py "<pptx>"`. 필요하면 강의 사이트의 Material 링크도 확인한다.
    **노트에 옮길 문구는 PDF 가 아니라 이 XML 추출을 원본으로 삼는다.** 변환기가 무엇이든
    PDF 텍스트 층은 렌더 결과물이라 믿을 것이 못 된다.

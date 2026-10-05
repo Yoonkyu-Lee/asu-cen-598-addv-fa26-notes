@@ -18,6 +18,10 @@
 | `06_Lab1_Release` | 강의 아님 (Lab 1) |
 | `07_Pipelined CPU Design` | **6 강** |
 | `08_Efficient Design` | **7 강** |
+| `09_Floating Point Formats and Designs_Prashant` | **8 강** |
+| `10_Lab2_Release` | 강의 아님 (Lab 2) |
+| `11_Matrix Multiplier Accelerator Design` | **9 강** |
+| `12_SoC Architecture and Interfaces` | **10 강** |
 
 강의 사이트의 Schedule 번호는 Lab 을 함께 세므로 여기 번호와 다르다.
 아래 표의 `site` 열이 그 번호다. **강의 사이트와 대조할 때만 쓴다.**
@@ -38,7 +42,7 @@
 | 9 | 13 | 9/30 | Matrix multiplication accelerator design | Aman Arora |
 | 10 | 14 | 10/5 | SoC architecture and on-chip interfaces | Aman Arora |
 | 11 | 15 | 10/7 | Case study: SoC interconnect design | Eric Taylor |
-| 12 | 17 | 10/14 | System Verilog for Verification | Aman Arora |
+| 12 | 17 | 미정 | System Verilog for Verification | Aman Arora | (10/14 를 Lab 3 overview 에 내줌) |
 | 13 | 10 | 10/19 | Assertion Based Verification | Aman Arora |
 | 14 | 18 | 10/21 | Case study: CPU verification | Aman Arora |
 | 15 | 20 | 10/28 | UVM 1 | Joel Feldman |
@@ -60,7 +64,7 @@ Lab overview 강의는 별도 노트를 만들지 않고 `LAB{N}` 공략 페이�
 | 0 | 3 | 8/31 | EDA Tools |
 | 1 | 7 | 9/14 | FIFO |
 | 2 | 12 | 9/28 | Pipelined MIPS |
-| 3 | 16 | 10/12 | Systolic Matmul |
+| 3 | 16 | 10/14 | Systolic Matmul |
 | 4 | 19 | 10/26 | FIFO Checker, DPI |
 | 5 | 23 | 11/9 | MIPS Random Stimulus, Coverage |
 | 6 | 27 | 11/23 | Systolic Matmul, APB agent, Assertions |
@@ -70,6 +74,15 @@ Lab overview 강의는 별도 노트를 만들지 않고 `LAB{N}` 공략 페이�
 | site | 날짜 | |
 |---|---|---|
 | 31 | 12/7 (월) | Final exam |
+
+## 2026-10-04 에 고친 것
+
+강의 사이트 Schedule 을 다시 긁었다.
+
+- **10/12 (월) 이 Fall Break 로 표시됐다.** Lab 3 overview 가 10/12 에서 10/14 (수) 로 밀렸다
+- **12강 System Verilog for Verification 은 날짜 칸이 비었다.** 원래 10/14 였던 자리를 Lab 3 이 가져갔다.
+  다음 Schedule 갱신 때 다시 확인한다
+- **8강 Floating point 는 이제 사이트도 9/25 (금) 다.** 9/22 의 슬라이드 근거와 일치한다
 
 ## 2026-09-22 에 고친 것
 

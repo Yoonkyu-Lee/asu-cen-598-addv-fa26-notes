@@ -12,6 +12,8 @@ import sys
 import zipfile
 from xml.etree import ElementTree as ET
 
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 if len(sys.argv) < 2:
     sys.exit('사용법: python scripts/hidden-slides.py "<pptx 경로>" [...]')
 

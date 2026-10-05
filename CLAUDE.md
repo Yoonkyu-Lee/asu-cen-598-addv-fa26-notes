@@ -39,10 +39,12 @@ GitHub Pages로 배포된다: https://yoonkyu-lee.github.io/asu-cen-598-addv-fa2
 |---|---|
 | 저장소 | `D:\Engineering\asu-cen-598-addv-fa26-notes` |
 | 강의 자료 원본 (스테이징) | `lecture/` (저장소 안, `.gitignore` 로 제외) |
+| Drive 미러 (2026-10-04 복구) | `Y:\FA26\CEN 598 ADDV` |
 | 강의 사이트 (원천) | https://adventlab.notion.site/addv-fall2026-website |
 
-**예전에는 Drive 미러가 원본이었으나 머신 초기화로 사라졌다.** 이제 강의 사이트에서
-`lecture/` 로 직접 받는다. 여기 있는 것은 **하나도 커밋되지 않는다.** 원본 PPTX,
+**Drive 미러가 2026-10-04 에 `Y:` 로 돌아왔다.** 사용자가 강의 사이트에서 받은 PPTX 를 여기 올린다.
+"새 강의 올라왔다" 고 하면 여기부터 본다. Drive 커넥터는 파일을 base64 로 돌려줘서 큰 PPTX 에는 못 쓴다.
+미러에서 `lecture/` 로 **복사**해서 쓰고 미러는 건드리지 않는다. 미러에 없으면 강의 사이트에서 직접 받는다. 여기 있는 것은 **하나도 커밋되지 않는다.** 원본 PPTX,
 Lab 문제지, 폰트 zip 이 전부 여기 남고, 저장소에 올라가는 것은 변환된 `slides/*.pdf` 뿐이다.
 변환과 쪽수 대조 절차는 `convert-slides` 참조.
 
@@ -113,6 +115,11 @@ repo는 **Public**이고 GitHub Pages로 서빙된다. 여기 올리는 건 인�
 사용자가 그것을 알고 게시하기로 했다. **이 결정도 조용히 뒤집지 않는다.**
 내려달라고 하면 `code/` 커밋을 지우고 `.gitignore` 에 넣은 뒤 기록 페이지의 링크를 발췌로 되돌린다.
 
+**2026-10-05. 예외 하나. L08 (Prashant Joshi 게스트 강의) 슬라이드 PDF 는 올리지 않는다.**
+그 덱의 슬라이드 3쪽 Slide Use Notice 가 청중 외의 복제·배포·재사용을 명시적으로 금한다.
+다른 덱에는 이런 문구가 없다. 사용자가 노트만 게시하고 PDF 는 로컬에 두기로 했다.
+`.gitignore` 에 `slides/L08-floating-point.pdf` 가 있다. **새 게스트 덱은 커밋 전에 이런 고지가 있는지 본다.**
+
 **그래도 안 올리는 것이 있다. Lab 문제지 원문과 Quiz · Exam 문제다.**
 그건 우리 저작물이 아니고 위 Student Copyright 조항에 정면으로 걸린다.
 
@@ -128,7 +135,7 @@ repo는 **Public**이고 GitHub Pages로 서빙된다. 여기 올리는 건 인�
 
 | 파일 | 커밋 |
 |---|---|
-| `slides/L{NN}-*.pdf` (강의 슬라이드) | O |
+| `slides/L{NN}-*.pdf` (강의 슬라이드) | O. **L08 만 X** (게스트 덱의 배포 금지 고지) |
 | `vendor/pdf.js/` | O |
 | `*.pptx` 원본 | **X.** PDF만 올린다. 발표자 노트가 딸려 들어간다 |
 | `lecture/` 전체 | **X.** 원본 스테이징 폴더다. 폰트 zip 은 재배포 금지 자산이다 |

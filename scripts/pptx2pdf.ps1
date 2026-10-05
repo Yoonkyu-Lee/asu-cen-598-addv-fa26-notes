@@ -39,6 +39,9 @@ $map = [ordered]@{
   '04_Clock_Reset_Chetan.pptx'               = 'L04-clock-and-reset.pdf'
   '07_Pipelined CPU Design.pptx'             = 'L06-pipelined-cpu-design.pdf'
   '08_Efficient Design.pptx'                 = 'L07-efficient-design.pdf'
+  '09_Floating Point Formats and Designs_Prashant.pptx' = 'L08-floating-point.pdf'
+  '11_Matrix Multiplier Accelerator Design.pptx'        = 'L09-matmul-accelerator.pdf'
+  '12_SoC Architecture and Interfaces.pptx'             = 'L10-soc-architecture.pdf'
 }
 
 New-Item -ItemType Directory -Force $work | Out-Null
