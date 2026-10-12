@@ -27,6 +27,7 @@ GitHub Pages로 배포된다: https://yoonkyu-lee.github.io/asu-cen-598-addv-fa2
 | Synopsys 트레이닝을 수집한다 | `synopsys-training` (또는 `-chrome`) |
 | `index.html` 허브를 고친다 (카드·chip·공지 배너) | `note-html`, 노트를 새로 올리는 경우는 `write-note` 도 |
 | `glossary.html` 에 용어를 추가한다 | `write-note` |
+| **Lab 제출물**(리포트, 코드 zip)을 만들거나 고친다. 파트너 초안 마무리, 남은 Part 구현 | `lab-submission`. 작업은 labs 저장소에서, 기준은 `lab{N}/spec/handout.txt` |
 
 강의 번호·날짜·강사는 `docs/schedule.md` 가 단일 출처다.
 
