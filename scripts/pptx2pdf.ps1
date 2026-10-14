@@ -42,6 +42,8 @@ $map = [ordered]@{
   '09_Floating Point Formats and Designs_Prashant.pptx' = 'L08-floating-point.pdf'
   '11_Matrix Multiplier Accelerator Design.pptx'        = 'L09-matmul-accelerator.pdf'
   '12_SoC Architecture and Interfaces.pptx'             = 'L10-soc-architecture.pdf'
+  '13 SoC Interconnect Design Eric.pptx'                = 'L11-soc-interconnect.pdf'
+  '15_System Verilog for Verification.pptx'             = 'L12-sv-for-verification.pdf'
 }
 
 New-Item -ItemType Directory -Force $work | Out-Null

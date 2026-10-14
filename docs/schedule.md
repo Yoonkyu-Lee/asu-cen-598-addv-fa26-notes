@@ -22,6 +22,9 @@
 | `10_Lab2_Release` | 강의 아님 (Lab 2) |
 | `11_Matrix Multiplier Accelerator Design` | **9 강** |
 | `12_SoC Architecture and Interfaces` | **10 강** |
+| `13 SoC Interconnect Design Eric` | **11 강** |
+| `14_Lab3_Release` | 강의 아님 (Lab 3) |
+| `15_System Verilog for Verification` | **12 강** (녹화 강의) |
 
 강의 사이트의 Schedule 번호는 Lab 을 함께 세므로 여기 번호와 다르다.
 아래 표의 `site` 열이 그 번호다. **강의 사이트와 대조할 때만 쓴다.**
@@ -42,7 +45,7 @@
 | 9 | 13 | 9/30 | Matrix multiplication accelerator design | Aman Arora |
 | 10 | 14 | 10/5 | SoC architecture and on-chip interfaces | Aman Arora |
 | 11 | 15 | 10/7 | Case study: SoC interconnect design | Eric Taylor |
-| 12 | 17 | 미정 | System Verilog for Verification | Aman Arora | (10/14 를 Lab 3 overview 에 내줌) |
+| 12 | 17 | 녹화 | System Verilog for Verification | Aman Arora | (Dropbox 영상, 00:15~1:43. 10/19 수업에 참여 quiz) |
 | 13 | 10 | 10/19 | Assertion Based Verification | Aman Arora |
 | 14 | 18 | 10/21 | Case study: CPU verification | Aman Arora |
 | 15 | 20 | 10/28 | UVM 1 | Joel Feldman |
@@ -74,6 +77,15 @@ Lab overview 강의는 별도 노트를 만들지 않고 `LAB{N}` 공략 페이�
 | site | 날짜 | |
 |---|---|---|
 | 31 | 12/7 (월) | Final exam |
+
+## 2026-10-14 에 고친 것
+
+- **12강은 수업일이 없는 녹화 강의다.** Schedule 의 Material 칸이 Dropbox 영상 (00:15 부터 1:43 까지 보라) 이다.
+  Lab 3 릴리스 덱 2쪽: "이번 주 두 번째 강의 영상" 이 금요일에 올라오고 **월요일 (10/19) 수업에 그 영상 기반 짧은 참여 quiz** 가 있다.
+  **그 영상이 12강 영상인지 또 다른 영상인지는 덱만으로 확실하지 않다.** 금요일에 강의 사이트를 다시 볼 것
+- **Lab 은 다음 Lab 릴리스 전날 밤이 마감이다** (Lab Assignments 페이지). Lab 2 는 Lab 3 덱 2쪽 기준 10/14 정오 마감이었다
+- **Lab 3 는 4 인 1 조다** (Lab 3 덱 2쪽). Lab Assignments 페이지는 아직 "Lab 1~6 은 2 인 1 조" 라고 적혀 있다
+- 개별 Lab 설명서 페이지는 Lab Assignments 에서 링크가 사라졌다. Lab 3 공략은 릴리스 덱만으로 썼다
 
 ## 2026-10-04 에 고친 것
 
