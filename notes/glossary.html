@@ -397,6 +397,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gNum">#</h2>
 
 <div class="gterm">
+  <div class="t">|-> · |=></div>
+  <div class="f">overlapping implication · non-overlapping implication</div>
+  <div class="d" lang="ko">assertion 의 implication 연산자. 왼쪽(antecedent)이 참이면 오른쪽(consequent)을 검사한다. <code>|-&gt;</code> 는 <strong>같은 clock tick 부터</strong>, <code>|=&gt;</code> 는 <strong>다음 tick 부터</strong> 오른쪽을 시작한다. <code>$rose(Req) |-&gt; ##[2:20] Ready</code> 는 Req 가 오른 tick 의 2~20 tick 뒤 사이에 Ready 를 요구한다.</div>
+  <div class="d" lang="en">The implication operators of assertions: if the left side (antecedent) holds, check the right side (consequent). <code>|-&gt;</code> starts the right side <strong>at the same clock tick</strong>, <code>|=&gt;</code> <strong>at the next tick.</strong> <code>$rose(Req) |-&gt; ##[2:20] Ready</code> requires Ready between 2 and 20 ticks after the tick Req rose.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s11">Lecture 12 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">2-state · 4-state</div>
   <div class="d" lang="ko">자료형이 가질 수 있는 값의 가짓수. <strong>4-state는 <code>0 1 x z</code></strong>, <strong>2-state는 <code>0 1</code></strong>뿐이다. <code>logic</code>·<code>wire</code>·<code>reg</code>가 4-state, <code>bit</code>·<code>int</code>가 2-state다. 설계에 2-state를 쓰면 리셋 안 된 flop이 <code>x</code> 대신 <code>0</code>으로 보여서 <strong>버그가 시뮬레이션을 통과한다.</strong></div>
   <div class="d" lang="en">How many values a type can take. <strong>Four-state is <code>0 1 x z</code></strong>; <strong>two-state is just <code>0 1</code></strong>. <code>logic</code>, <code>wire</code> and <code>reg</code> are four-state; <code>bit</code> and <code>int</code> are two-state. Use two-state in a design and an unreset flop reads <code>0</code> instead of <code>x</code>, so <strong>the bug passes simulation.</strong></div>
@@ -404,6 +412,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <h2 class="gletter" id="gA">A</h2>
+
+<div class="gterm">
+  <div class="t">Abstract Class · virtual class</div>
+  <div class="d" lang="ko"><strong>object 를 직접 만들 수 없고 상속받으라고만 있는 class.</strong> SV 에서는 <code>virtual class</code> 로 쓰고, 본문 없는 method 를 <code>pure virtual</code> 로 선언해 자식이 반드시 채우게 한다. 슬라이드 표현으로 "Used to define API". <strong>virtual interface 와는 관계가 없다.</strong></div>
+  <div class="d" lang="en"><strong>A class you cannot build objects from, existing only to be inherited.</strong> In SV it is a <code>virtual class</code>, with body-less <code>pure virtual</code> methods every child must fill in. In the slide's words, "used to define API". <strong>Unrelated to virtual interfaces.</strong></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s18">Lecture 12 &middot; 18</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">Activity Factor</div>
@@ -423,7 +438,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">almost_full · almost_empty</div>
   <div class="d" lang="ko">FIFO 가 <strong>가득 차기 전에, 비기 전에</strong> 미리 알려주는 플래그. 문턱은 설계가 정한다. Lab 1 은 3/4 로 정했다. 포인터 비교만으로는 못 만들고 <strong>점유량을 세야</strong> 해서 gray code 포인터를 binary 로 되돌리는 계산이 붙는다.</div>
   <div class="d" lang="en">Flags that warn <strong>before</strong> a FIFO is actually full or empty. The threshold is a design choice; Lab 1 puts it at 3/4. Pointer comparison alone cannot produce them: you have to <strong>count occupancy</strong>, which means turning gray-coded pointers back into binary.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s4">Lab 1 · 04</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s4">Lab 1 · 04</a> · <a href="L11-soc-interconnect.html#s12">Lecture 11 · 12</a></div>
 </div>
 
 <div class="gterm">
@@ -468,7 +483,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Arbitration</div>
   <div class="d" lang="ko">여러 master 가 같은 자원(버스, slave, 메모리)을 동시에 원할 때 <strong>누구를 먼저 보낼지 정하는 것.</strong> 하는 블록은 arbiter. 공짜가 아니라 트랜잭션 경로에 지연으로 들어간다.</div>
   <div class="d" lang="en">Deciding <strong>who goes first</strong> when several masters want the same resource at once; done by an arbiter. Not free: it adds delay on the transaction path.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s7">Lecture 10 &middot; 07</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s7">Lecture 10 &middot; 07</a> · <a href="L11-soc-interconnect.html#s14">Lecture 11 · 14</a></div>
 </div>
 
 <div class="gterm">
@@ -483,7 +498,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Assertion</div>
   <div class="d" lang="ko">설계가 <strong>반드시 보여야 하거나 절대 보이면 안 되는 동작</strong>을 코드로 명시한 것. 결정적인 성질은 <strong>"항상 켜져 있다"</strong>는 것이다. 어떤 테스트를 돌리든 계속 감시한다. 예: <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
   <div class="d" lang="en">Code that states behaviour the design <strong>must, or must never, exhibit.</strong> The decisive property is that it is <strong>always on</strong>: it keeps watching no matter which test is running. For example <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 13 전체</span><span lang="en">all of Lecture 13</span></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 13 전체</span><span lang="en">all of Lecture 13</span> · <a href="L12-sv-for-verification.html#s11">Lecture 12 · 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Associative Array</div>
+  <div class="d" lang="ko"><code>int grades[string];</code> 처럼 <strong>key 로 찾는 배열.</strong> 쓴 칸만 생기므로 넓은 주소 공간에서 건드린 주소만 저장하는 메모리 모델에 맞는다. 있는지는 <code>exists(key)</code> 로 본다(괄호다).</div>
+  <div class="d" lang="en">An array <strong>looked up by key</strong>, as in <code>int grades[string];</code>. Only written entries exist, which suits memory models that store just the touched addresses of a huge space. Test membership with <code>exists(key)</code> (parentheses).</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s3">Lecture 12 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -521,7 +543,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Backpressure</div>
   <div class="d" lang="ko">뒤 단계가 막혀서 <strong>앞 단계들이 멈춰야 하는 것.</strong> 압력이 데이터 흐름의 반대 방향으로 전해진다. Lab 2 릴리스 덱은 cache miss 로 명령어가 MEM 에서 기다리는 경우를 예로 들고, 이를 단계 사이의 <strong>valid-ready handshake</strong>(valid 는 앞에서 뒤로, ready 는 뒤에서 앞으로, 둘 다 1 일 때만 넘어감)로 다룬다고 소개한다. load-use stall 과 결과는 같지만 원인이 반대다. 앞 값이 없어서가 아니라 뒤가 받을 수 없어서다.</div>
   <div class="d" lang="en">A blocked later stage <strong>forcing the earlier stages to pause</strong>; the pressure travels against the data flow. The Lab 2 release deck's example is an instruction waiting in MEM on a cache miss, handled with a <strong>valid-ready handshake</strong> between stages (valid flows forward, ready flows back, a transfer happens only when both are 1). Same effect as a load-use stall, opposite cause: not an earlier value missing, but the back unable to accept.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s15">Lab 2 · 15</a></div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s15">Lab 2 · 15</a> · <a href="L11-soc-interconnect.html#s12">Lecture 11 · 12</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Bandwidth · Throughput</div>
+  <div class="d" lang="ko">초당 옮기는 데이터의 양. 슬라이드는 <strong>peak capacity 와 sustained useful data</strong> 를 대비시키고, <strong>어느 link 나 끝점을 쟀는지</strong> 밝히라고 한다. header 와 빈 cycle 을 빼면 같은 link 도 숫자가 크게 준다.</div>
+  <div class="d" lang="en">Data moved per second. The slide contrasts <strong>peak capacity with sustained useful data</strong> and says to <strong>state which link or endpoint was measured.</strong> Take out headers and idle cycles and the same link's number drops a lot.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s4">Lecture 11 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -536,7 +565,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Beat</div>
   <div class="d" lang="ko">버스 폭만큼의 데이터가 <strong>한 번 넘어가는 것.</strong> burst 는 주소 하나에 딸린 beat 들의 묶음이고, burst length 는 beat 의 개수다.</div>
   <div class="d" lang="en"><strong>One transfer of bus-width data.</strong> A burst is the run of beats tied to one address; burst length counts beats.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s7">Lecture 10 &middot; 07</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s7">Lecture 10 &middot; 07</a> · <a href="L11-soc-interconnect.html#s20">Lecture 11 · 20</a></div>
 </div>
 
 <div class="gterm">
@@ -552,6 +581,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">FP 의 exponent 를 저장하는 방식. 실제 exponent 에 <strong><code>bias = 2<sup>q&minus;1</sup> &minus; 1</code></strong> 을 더해 부호 없는 정수로 담는다. FP32 는 127, FP64 는 1023. 비트 패턴과 값이 다른 수라는 것 (FP32 의 1.0 은 필드 127, E = 0) 과, 곱셈에서 두 exponent 를 더하면 bias 가 두 번 들어가 <strong>한 번 빼야 한다</strong>는 것이 요점이다.</div>
   <div class="d" lang="en">How an FP exponent is stored: add <strong><code>bias = 2<sup>q&minus;1</sup> &minus; 1</code></strong> and keep it as an unsigned integer. 127 for FP32, 1023 for FP64. The pattern and the value are different numbers (FP32 1.0 has field 127, E = 0), and multiplying adds two exponents, counting the bias twice, so <strong>one copy must come off.</strong></div>
   <div class="src"><a href="L08-floating-point.html#s5">Lecture 8 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Bisection Bandwidth</div>
+  <div class="d" lang="ko">network 를 node 가 반씩 되게 둘로 가를 때 <strong>그 단면을 지나갈 수 있는 bandwidth</strong>. 잘리는 link 수로 센다. 4 &times; 4 mesh 는 4, ring 은 크기와 상관없이 2. link 하나의 bandwidth 와 섞으면 안 된다.</div>
+  <div class="d" lang="en">Split the network into two equal halves: <strong>the bandwidth that can cross the cut</strong>, counted in links cut. A 4 &times; 4 mesh gives 4; a ring gives 2 at any size. Don't confuse it with one link's bandwidth.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s10">Lecture 11 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -587,7 +623,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Bridge</div>
   <div class="d" lang="ko">서로 다른 두 버스 사이에서 트랜잭션을 번역해 넘기는 블록. 예: AXI to APB bridge. 슬라이드는 <strong>gasket, converter</strong> 라고도 부른다. 한쪽에서는 slave, 다른 쪽에서는 master 다.</div>
   <div class="d" lang="en">A block that translates transactions between two different buses, e.g. an AXI to APB bridge; the slide also calls it a <strong>gasket or converter</strong>. A slave on one side, a master on the other.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s2">Lecture 10 &middot; 02</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s2">Lecture 10 &middot; 02</a> · <a href="L11-soc-interconnect.html#s2">Lecture 11 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -653,14 +689,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Clock Domain Crossing</div>
   <div class="d" lang="ko">한 클럭 도메인의 신호가 <strong>비동기인 다른 도메인의 flip-flop에서 샘플링되는</strong> 지점. 설계할 때 이미 생기고 실리콘에서만 실패로 드러나며, <strong>STA는 이 경계를 아예 보지 않는다.</strong></div>
   <div class="d" lang="en">The point where a signal from one clock domain <strong>is sampled by a flop in a different, asynchronous domain.</strong> It is created at design time but only fails in silicon, and <strong>STA never looks here at all.</strong></div>
-  <div class="src"><a href="L04-clock-and-reset.html#s6">Lecture 4 · 06</a></div>
+  <div class="src"><a href="L04-clock-and-reset.html#s6">Lecture 4 · 06</a> · <a href="L11-soc-interconnect.html#s9">Lecture 11 · 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Channel Dependency Graph</div>
+  <div class="d" lang="ko">채널을 점으로, "어떤 packet 이 X 를 쥔 채 Y 를 기다릴 수 있다" 를 화살표 X → Y 로 그린 그래프. <strong>고리가 있으면 deadlock 이 생길 수 있고, 없으면 생길 수 없다.</strong> XY routing 이 deadlock 없음을 보이는 도구다.</div>
+  <div class="d" lang="en">Channels as points, and "a packet may hold X while waiting for Y" as an arrow X → Y. <strong>A cycle means deadlock is possible; no cycle means it isn't.</strong> The tool for showing XY routing is deadlock free.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s17">Lecture 11 &middot; 17</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Checker</div>
   <div class="d" lang="ko">DUT가 제대로 동작하는지 확인하고 <strong>불법적인 일이 벌어지면 오류를 띄우는</strong> testbench 부품. 두 층이 있다. 신호 수준(assertion)과 동작 수준(scoreboard). 검증의 세 기둥 중 하나.</div>
   <div class="d" lang="en">The testbench component that confirms the DUT behaves correctly and <strong>raises an error when something illegal happens.</strong> It has two layers: signal level, meaning assertions, and behavioural, meaning scoreboards. One of the three pillars of verification.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s11">Lecture 12 · 11</a></div>
 </div>
 
 <div class="gterm">
@@ -671,10 +714,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Circuit Switching · Packet Switching</div>
+  <div class="d" lang="ko">circuit switching 은 데이터를 보내기 전에 <strong>경로 전체의 자원을 미리 잡는다.</strong> latency 는 낮지만 확장이 안 된다. packet switching 은 미리 잡지 않고 router 마다 그때그때 넘긴다(store-and-forward, virtual cut-through, wormhole). virtual circuit switching 의 VC 는 virtual channel 의 VC 와 다르다.</div>
+  <div class="d" lang="en">Circuit switching <strong>reserves resources along the whole path before sending</strong>: low latency, poor scaling. Packet switching reserves nothing and forwards router by router (store-and-forward, virtual cut-through, wormhole). The VC of virtual circuit switching is not the VC of virtual channels.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s15">Lecture 11 &middot; 15</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Circular Buffer</div>
   <div class="d" lang="ko">끝에 닿으면 처음으로 되돌아오는 고정 크기 저장소. FIFO 의 알맹이다. <strong>되돌아오는 데 별도 로직이 필요 없다는 것</strong>이 요점으로, 주소 비트 수만큼만 남기고 자르면 덧셈이 저절로 wrap 한다. 대신 <strong>가득 참과 비어 있음이 같은 주소에서 만나는</strong> 문제가 생기고, 그 답이 <a href="L05-fifo-design.html#s8">wrap bit</a> 다.</div>
   <div class="d" lang="en">A fixed-size store whose addresses run back to the start at the end. It is the core of a FIFO. The point is that <strong>wrapping needs no logic of its own</strong>: truncate to the address width and the arithmetic wraps by itself. The cost is that <strong>full and empty meet at the same address</strong>, which is what the <a href="L05-fifo-design.html#s8">wrap bit</a> exists to resolve.</div>
   <div class="src"><a href="L05-fifo-design.html#s6">Lecture 5 · 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Class · Object</div>
+  <div class="d" lang="ko">class 는 <strong>property(변수)와 method(task, function)를 가진 type</strong>, object 는 그것으로 <code>new()</code> 가 <strong>실행 중에</strong> 찍어낸 실체다(instance 라고도 한다). transaction, driver, monitor 가 다 class 다. <strong>module instance 와 달리 시뮬레이션 도중에 생기고 사라진다.</strong></div>
+  <div class="d" lang="en">A class is <strong>a type with properties (variables) and methods (tasks, functions)</strong>; an object is one stamped out from it by <code>new()</code> <strong>at run time</strong> (also called an instance). Transactions, drivers and monitors are all classes. <strong>Unlike module instances, objects appear and vanish during simulation.</strong></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s4">Lecture 12 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -710,21 +767,35 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Code Coverage</div>
   <div class="d" lang="ko">코드의 줄·분기·상태·신호가 <strong>실행되거나 바뀌었다</strong>는 것을 세는 커버리지. Line, Branch, State Machine, Toggle coverage가 있다. <strong>한계:</strong> 실행된 것과 옳은 것은 다르고, 코드 줄에 대응하지 않는 시나리오는 셀 수 없다. Functional coverage가 뒤쪽을 보완한다.</div>
   <div class="d" lang="en">Coverage that counts whether lines, branches, states and signals <strong>were executed or toggled.</strong> Line, branch, state machine and toggle coverage. <strong>Its limits:</strong> executed is not correct, and scenarios that correspond to no single line cannot be counted. Functional coverage covers the latter.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s21">Lecture 12 · 21</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Concurrency</div>
   <div class="d" lang="ko">일감을 나눠 <strong>여러 유닛이 동시에</strong> 처리하는 것. <strong>Pipelining 과 다르다.</strong> 강의 표현으로 <em>concurrency does things side-by-side; pipelining instead uses stages</em>. concurrency 는 같은 유닛을 여러 개 두고, pipelining 은 유닛 하나씩을 register 로 이어 붙인다. 둘을 같이 쓸 수도 있다.</div>
   <div class="d" lang="en">Splitting the work so <strong>several units run at the same time.</strong> <strong>Not the same as pipelining:</strong> in the lecture’s words, <em>concurrency does things side-by-side; pipelining instead uses stages</em>. Concurrency duplicates the unit, pipelining chains one of each through registers. You can do both.</div>
-  <div class="src"><a href="L07-efficient-design.html#s6">Lecture 7 &middot; 06</a></div>
+  <div class="src"><a href="L07-efficient-design.html#s6">Lecture 7 &middot; 06</a> · <a href="L11-soc-interconnect.html#s4">Lecture 11 · 04</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Constrained Random</div>
   <div class="d" lang="ko">랜덤 자극을 넣되 <strong>constraint로 불법 입력을 걸러내는</strong> 방식. 아무 값이나 넣으면 설계가 애초에 대응할 필요 없는 상황에서 실패하고, 그건 버그가 아니다. 값뿐 아니라 <strong>타이밍과 순서</strong>도 randomize 하는 것이 핵심이다.</div>
   <div class="d" lang="en">Random stimulus with <strong>constraints filtering out illegal inputs.</strong> Throw anything in and the design fails in a situation it was never required to handle, which is not a bug. The important part is randomising <strong>timing and ordering</strong>, not just values.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s9">Lecture 12 · 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Constraint</div>
+  <div class="d" lang="ko">class 의 <code>rand</code> 변수가 가질 수 있는 값의 규칙. <code>constraint addr_c { ... }</code> 블록에 쓴다. 모양은 셋이다: <code>inside</code>(집합), <code>dist</code>(가중치), implication(<code>if</code>/<code>-&gt;</code>). 서로 모순이면 <code>randomize()</code> 가 0 을 돌려준다.</div>
+  <div class="d" lang="en">Rules on the values a class's <code>rand</code> variables may take, written in a <code>constraint addr_c { ... }</code> block. Three shapes: <code>inside</code> (a set), <code>dist</code> (weights) and implication (<code>if</code>/<code>-&gt;</code>). If they contradict, <code>randomize()</code> returns 0.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s9">Lecture 12 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Constraint Solver</div>
+  <div class="d" lang="ko"><code>randomize()</code> 가 불리면 <strong>모든 constraint 를 만족하는 값을 찾는</strong> 시뮬레이터 안의 엔진. LRM 상 가능한 해 전체에서 고르게 고르므로, implication 이 있으면 한쪽 값이 거의 안 나올 수 있다(<code>solve ... before</code> 로 고친다). 실패하면 디버깅 창에서 모순된 constraint 를 보여준다.</div>
+  <div class="d" lang="en">The engine inside the simulator that, when <code>randomize()</code> is called, <strong>finds values satisfying every constraint.</strong> Per the LRM it picks uniformly over all solutions, so with an implication one side can almost never appear (fixed with <code>solve ... before</code>). On failure, a debugging window shows the contradicting constraints.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s10">Lecture 12 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -735,6 +806,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Covergroup · Coverpoint · Bin</div>
+  <div class="d" lang="ko">functional coverage 를 짜는 세 단위. <strong>covergroup</strong> 은 셀 것의 묶음, <strong>coverpoint</strong> 는 값을 셀 변수나 식, <strong>bin</strong> 은 그 값을 나눠 담는 칸이다. bin 을 안 적으면 도구가 auto bin 을 만든다. covergroup 은 <code>new</code> 로 만들고 <strong><code>sample()</code> 을 불러야만 센다.</strong></div>
+  <div class="d" lang="en">The three units of written functional coverage: a <strong>covergroup</strong> bundles what to count, a <strong>coverpoint</strong> is a variable or expression whose values are counted, and a <strong>bin</strong> is a slot those values fall into. Write no bins and the tool makes auto bins. A covergroup is built with <code>new</code> and <strong>counts only when <code>sample()</code> is called.</strong></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">cover property</div>
+  <div class="d" lang="ko">functional coverage 를 <strong>assertion 과 같은 문법</strong>으로 쓰는 것. <code>assert</code> 대신 <code>cover</code> 를 붙이면 성질이 깨질 때 오류를 내는 대신 <strong>성립한 횟수를 센다.</strong> 신호 수준 상황에 쓰고 보통 interface 안에 둔다.</div>
+  <div class="d" lang="en">Functional coverage written in <strong>assertion syntax.</strong> Say <code>cover</code> instead of <code>assert</code> and, instead of erroring when the property breaks, it <strong>counts how often it held.</strong> Used for signal-level situations, usually inside interfaces.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s21">Lecture 12 &middot; 21</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">CPI &middot; Cycles Per Instruction</div>
   <div class="d" lang="ko">명령어 하나당 몇 사이클이 드는가. <strong>IPC 의 역수다.</strong> microarchitecture 를 비교할 때 쓴다. <strong>CPI 만으로 속도를 말할 수 없다.</strong> 클럭 주파수와 같이 봐야 한다.</div>
   <div class="d" lang="en">How many cycles one instruction costs. <strong>The reciprocal of IPC.</strong> Used to compare microarchitectures. <strong>CPI alone does not tell you speed</strong>, you need the clock frequency with it.</div>
@@ -742,10 +827,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Credit (Credit-Based Flow Control)</div>
+  <div class="d" lang="ko">받는 쪽에 <strong>빈자리가 있다는 것을 미리 받아 둔 표.</strong> flit 을 보내면 하나 줄고 받는 쪽이 칸을 비우면 하나 돌아온다. 0 이면 멈춘다. credit 수가 곧 buffer 깊이이고, 매 cycle 보내려면 credit 왕복 시간 이상이어야 한다. reset 때 고정하면 static, 돌리는 중 바꾸면 dynamic(절차가 틀리면 deadlock).</div>
+  <div class="d" lang="en">A <strong>ticket, received in advance, saying the receiver has a free slot.</strong> Sending a flit spends one; the receiver freeing a slot returns one; at zero you stop. The credit count is the buffer depth, and full rate needs at least the credit round trip. Fixed at reset is static; changed while running is dynamic (deadlock if the procedure is wrong).</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s12">Lecture 11 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Critical Path</div>
   <div class="d" lang="ko">register 에서 register 까지 가는 경로 중 <strong>가장 오래 걸리는 것.</strong> 클럭 주기가 이것보다 짧으면 회로가 틀린다. <strong>고치면 두 번째로 길던 경로가 새 critical path 가 된다.</strong> 그래서 timing 작업은 한 번에 끝나지 않는다.</div>
   <div class="d" lang="en">The <strong>slowest register to register path.</strong> A clock period shorter than this makes the circuit wrong. <strong>Fix it and the runner-up becomes the new critical path</strong>, which is why timing work never finishes in one pass.</div>
   <div class="src"><a href="L07-efficient-design.html#s4">Lecture 7 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Cross Coverage</div>
+  <div class="d" lang="ko">covergroup 안에서 <code>cross a_cp, b_cp;</code> 로 <strong>두 coverpoint 의 조합</strong>을 세는 것. bin 수는 각 coverpoint 의 bin 수의 곱이다(3 &times; 3 = 9). 각 coverpoint 가 100% 여도 cross 는 비어 있을 수 있다.</div>
+  <div class="d" lang="en">Counting <strong>combinations of two coverpoints</strong> inside a covergroup with <code>cross a_cp, b_cp;</code>. The bin count is the product of the coverpoints' bin counts (3 &times; 3 = 9). The cross can be sparse even when each coverpoint is at 100%.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a></div>
 </div>
 
 <div class="gterm">
@@ -774,10 +873,31 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">$cast</div>
+  <div class="d" lang="ko"><strong>부모 type 의 handle 을 자식 type 의 handle 에 넣을 때</strong> 쓰는 실행 중 type 확인. <code>child = parent;</code> 는 컴파일되지 않고, <code>$cast(child, parent)</code> 는 parent 가 실제로 자식 object 를 가리킬 때만 대입한다. function 으로 부르면 성공 여부를 1/0 으로 돌려주므로 <code>if (!$cast(...)) $fatal(...)</code> 이 권장형이다.</div>
+  <div class="d" lang="en">A run-time type check used <strong>to put a parent-type handle into a child-type handle.</strong> <code>child = parent;</code> will not compile; <code>$cast(child, parent)</code> assigns only if parent really points at a child object. Called as a function it returns 1 or 0, so <code>if (!$cast(...)) $fatal(...)</code> is the recommended form.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s5">Lecture 12 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">.ddc · .db · .lib</div>
   <div class="d" lang="ko">DC 주변 확장자 셋. <strong>계보가 둘로 갈린다.</strong> <code>.lib</code> 은 technology library 의 사람이 읽는 ASCII 원본이고, <strong>Library Compiler</strong> 가 그것을 컴파일하면 DC 가 실제로 읽는 <code>.db</code> 가 된다. 여기까지가 library 계보다. <code>.ddc</code> 는 완전히 다른 것으로, <strong>DC 메모리 안의 설계</strong>를 저장하는 형식이다. 예전에는 설계도 <code>db</code> 로 저장했기 때문에 오래된 스크립트에서는 <code>.db</code> 가 설계 자리에 나온다. <strong>확장자만 보고 판단하지 말고 그 줄이 무엇을 읽고 쓰는지를 볼 것.</strong></div>
   <div class="d" lang="en">Three extensions that live around DC, in <strong>two separate lineages.</strong> <code>.lib</code> is the human-readable ASCII source of a technology library, and <strong>Library Compiler</strong> turns it into the <code>.db</code> that DC actually reads. That is the library lineage. <code>.ddc</code> is something else entirely: the format for saving <strong>the design</strong> held in DC memory. Designs used to be saved as <code>db</code> too, so in older scripts you will find <code>.db</code> where a design belongs. <strong>Do not judge by the extension; read what the line is loading or writing.</strong></div>
   <div class="src"><a href="LAB0-tools-tutorial.html#s11">Lab 0 · 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Deadlock</div>
+  <div class="d" lang="ko">packet 들이 <strong>각자 자원을 쥔 채 서로가 쥔 것을 기다려 아무도 못 움직이는</strong> 상태. channel dependency graph 의 고리가 그 모양이다. wormhole switching 과 잘못된 routing 에서 생기고, XY routing 이나 virtual channel 로 막는다. livelock(움직이지만 도착 못 함), starvation(하나만 못 감)과 구별한다.</div>
+  <div class="d" lang="en">Packets <strong>each holding a resource and waiting for what another holds, so none can move.</strong> A cycle in the channel dependency graph is its shape. Arises with wormhole switching and bad routing; prevented with XY routing or virtual channels. Distinct from livelock (moving but never arriving) and starvation (one party never served).</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s17">Lecture 11 &middot; 17</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">De-pipelining</div>
+  <div class="d" lang="ko">pipeline 단계 사이의 register 를 선으로 바꿔 <strong>여러 사이클짜리 연산기를 한 사이클짜리 조합 회로로</strong> 만드는 것. Lab 3 릴리스 덱 15쪽 제목의 표현이고, 업계 표준 용어라기보다 서술로 읽는 게 안전하다. Lab 3 에서는 PE 의 누적이 매 사이클 새 항을 받으므로 결과가 자기 다음 입력이 되는 FP 덧셈기 고리 안에 사이클이 있으면 안 된다. 대가는 긴 critical path 다. register 와 같이 단계를 따라가던 valid 같은 control 신호도 같이 정리해야 한다.</div>
+  <div class="d" lang="en">Turning the registers between pipeline stages into wires so <strong>a multi-cycle unit becomes one cycle of combinational logic.</strong> The phrase is the title of slide 15 in the Lab 3 release deck; read it as a description rather than a fixed industry term. In Lab 3 the PE's accumulator takes a new term every cycle, so the FP adder loop that feeds its own next input can't have extra cycles in it. The price is a longer critical path. Control that travelled down the stages with the registers, such as valid bits, needs cleaning up too.</div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s5">Lab 3 · 05</a></div>
 </div>
 
 <div class="gterm">
@@ -789,11 +909,32 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Deterministic · Oblivious · Adaptive Routing</div>
+  <div class="d" lang="ko">같은 출발지와 목적지면 늘 같은 경로(deterministic, 슬라이드의 static), 정해 둔 경로 여럿을 상태와 무관하게 돌려 씀(oblivious), 지금 붐비는 곳을 보고 고름(adaptive, 슬라이드의 dynamic). oblivious 는 random 이어도 adaptive 가 아니다.</div>
+  <div class="d" lang="en">Same source and destination always take the same path (deterministic, the slide's static); rotate among preset paths regardless of state (oblivious); pick by current congestion (adaptive, the slide's dynamic). Oblivious isn't adaptive even when random.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s16">Lecture 11 &middot; 16</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">DFx · DFT · DFM · DFD</div>
   <div class="f">Design For Testability / Manufacturability / Debuggability</div>
   <div class="d" lang="ko">"Design For __"의 총칭. 전부 <strong>본래 기능과 무관한데 나중을 위해 미리 넣어두는 것</strong>이고, 그래서 전부 면적과 타이밍을 잡아먹는다. 나중에는 못 넣기 때문에 미리 넣는다. <strong>DFT의 T는 Testability이지 Test가 아니다.</strong> 다만 Freescale/NXP와 NVIDIA에서는 manufacturing test 조직 전체를 DFT라고 부른다.</div>
   <div class="d" lang="en">An umbrella for "design for __". All of them are <strong>things unrelated to the function, put in now for later</strong>, and all of them cost area and timing. They go in early because later is not an option. <strong>The T in DFT is testability, not test</strong>, although Freescale, NXP and NVIDIA use DFT for the whole manufacturing test organisation.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a> · <a href="L01-course-intro.html#s13">Lecture 1 · 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">disable fork · wait fork</div>
+  <div class="d" lang="ko"><code>wait fork</code> 는 이 process 가 띄운 자식 thread 가 다 끝날 때까지 기다리고, <code>disable fork</code> 는 <strong>이 process 의 살아 있는 자손 전부</strong>를 끝낸다. <code>join_any</code> 뒤에 붙여 "제일 먼저 끝난 것만 받고 나머지를 죽인다" 를 만든다. 범위가 넓어서 먼저 띄운 monitor 까지 죽일 수 있다.</div>
+  <div class="d" lang="en"><code>wait fork</code> waits until every child thread this process launched has finished; <code>disable fork</code> ends <strong>every live descendant of this process.</strong> After <code>join_any</code> it gives "take the first finisher, kill the rest". Its reach is wide enough to kill a monitor launched earlier.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s6">Lecture 12 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">dist</div>
+  <div class="d" lang="ko">constraint 에서 값마다 <strong>가중치</strong>를 주는 연산자. <code>:=</code> 는 범위 안의 <strong>값 하나하나</strong>에 가중치를 주고, <code>:/</code> 는 그 가중치를 <strong>범위 전체에 나눈다.</strong> <code>[100:200] := 20</code> 이면 101 개 값이 각각 20 이라 범위가 압도적으로 자주 나온다.</div>
+  <div class="d" lang="en">The constraint operator that gives values <strong>weights.</strong> <code>:=</code> gives the weight to <strong>each value</strong> in a range; <code>:/</code> <strong>splits it across the range.</strong> With <code>[100:200] := 20</code>, each of 101 values weighs 20, so the range comes up overwhelmingly often.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s10">Lecture 12 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -832,7 +973,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Direct Programming Interface</div>
   <div class="d" lang="ko">SystemVerilog에서 <strong>C/C++ 함수를 직접 부르고 반대로 불리게 하는</strong> 인터페이스. 검증에서 <strong>C로 짠 참조 모델(golden model)을 testbench에 붙일 때</strong> 쓴다. 강의계획서가 "model based verification (C model integration using PLI/DPI)"으로 적어둔 것이 이것이고, Lab 4의 주제 중 하나다.</div>
   <div class="d" lang="en">The SystemVerilog interface for <strong>calling C and C++ functions directly, and being called back.</strong> In verification it is how <strong>a reference model written in C gets attached to a testbench.</strong> The syllabus lists it as "model based verification, C model integration using PLI/DPI", and it is one of the topics in Lab 4.</div>
-  <div class="src"><span lang="ko">Lecture 12 · Lab 4에서 다룬다</span><span lang="en">covered in Lecture 12 and Lab 4</span></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s15">Lecture 12 · 15</a> · Lab 4</div>
 </div>
 
 <div class="gterm">
@@ -853,7 +994,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Driver</div>
   <div class="d" lang="ko">Testbench에서 transaction을 받아 <strong>실제 신호로 번역해 DUT에 밀어 넣는</strong> 부품. 프로토콜을 아는 쪽이고 <strong>능동</strong>이다. Monitor와 짝을 이루며, 둘을 묶으면 Agent가 된다.</div>
   <div class="d" lang="en">The testbench component that takes a transaction and <strong>translates it into real signals pushed into the DUT.</strong> It knows the protocol and it is <strong>active.</strong> It pairs with the monitor, and the two bundled make an agent.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L12-sv-for-verification.html#s14">Lecture 12 · 14</a></div>
 </div>
 
 <div class="gterm">
@@ -884,6 +1025,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">부하에 맞춰 <strong>전압과 주파수를 함께 조절</strong>해 전력을 아끼는 것. 노트북이 한가할 때 팬이 조용해지는 것이 이것이다.</div>
   <div class="d" lang="en">Saving power by <strong>scaling voltage and frequency together</strong> with the workload. It is why a laptop fan goes quiet when nothing is happening.</div>
   <div class="src"><a href="L07-efficient-design.html#s5">Lecture 7 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Dynamic Array</div>
+  <div class="d" lang="ko"><code>bit [7:0] dvals[];</code> 처럼 <strong>크기를 실행 중에 <code>new[N]</code> 으로 정하는</strong> 배열. 크기를 바꾸려면 다시 <code>new</code> 한다. 대괄호 <code>new[N]</code> 은 배열, 소괄호 <code>new()</code> 는 object 다.</div>
+  <div class="d" lang="en">An array <strong>sized at run time with <code>new[N]</code></strong>, as in <code>bit [7:0] dvals[];</code>. To resize, call <code>new</code> again. Square-bracket <code>new[N]</code> is for arrays, parenthesised <code>new()</code> for objects.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s3">Lecture 12 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -956,6 +1104,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L01-course-intro.html#s10">Lecture 1 · 10</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">event</div>
+  <div class="d" lang="ko">thread 사이의 <strong>신호.</strong> <code>-&gt;ev;</code> 로 울리고 <code>@ev;</code> 로 기다린다. <code>@ev</code> 는 기다리기 시작한 뒤의 울림만 보므로 같은 시각에 먼저 울리면 놓친다. 그럴 때는 <code>wait (ev.triggered);</code>.</div>
+  <div class="d" lang="en">A <strong>signal</strong> between threads: trigger with <code>-&gt;ev;</code>, wait with <code>@ev;</code>. <code>@ev</code> only sees triggers after it starts waiting, so one fired earlier in the same time step is missed; use <code>wait (ev.triggered);</code> then.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s7">Lecture 12 &middot; 07</a></div>
+</div>
+
 <h2 class="gletter" id="gF">F</h2>
 
 <div class="gterm">
@@ -981,6 +1136,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">final block</div>
+  <div class="d" lang="ko">시뮬레이션이 <strong>끝날 때</strong> 한 번 도는 블록. <code>initial</code> 의 반대편이다. 여러 개면 순서는 보장되지 않고, <strong>시간을 쓸 수 없다</strong>(<code>#</code>, <code>@</code>, <code>wait</code> 금지). 남은 scoreboard 항목이나 통계를 찍는 자리다.</div>
+  <div class="d" lang="en">A block that runs once <strong>when simulation ends</strong>, the counterpart of <code>initial</code>. With several, order is not guaranteed, and it <strong>cannot consume time</strong> (no <code>#</code>, <code>@</code> or <code>wait</code>). The place to print leftover scoreboard entries or statistics.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s17">Lecture 12 &middot; 17</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Fixed point</div>
   <div class="d" lang="ko">정수부와 소수부에 비트를 <strong>미리 정한 개수만큼</strong> 나눠 주는 수 표현. 소수점은 저장하지 않고 약속으로만 있다. 연산은 정수 회로 그대로이고, <strong>간격이 어디서나 같아서</strong> 아주 작은 수와 아주 큰 수를 함께 담지 못한다. 그 한계가 floating point 의 출발점이다.</div>
   <div class="d" lang="en">A number format that splits bits between integer and fraction <strong>in counts fixed up front</strong>; the point is never stored, only agreed on. The arithmetic is plain integer hardware, and <strong>the spacing is the same everywhere</strong>, so tiny and huge numbers can't coexist. That limit is where floating point starts.</div>
@@ -988,10 +1150,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Flow Control</div>
+  <div class="d" lang="ko">받는 쪽이 받을 수 있을 때만 보내게 하는 link 단위의 약속. 강의의 셋은 <strong>valid only</strong>(받는 쪽이 못 멈춤, backpressure 없음), <strong>valid/ready</strong>(지금 대답), <strong>credit</strong>(미리 허락). 결과로 생기는 것이 backpressure 다.</div>
+  <div class="d" lang="en">The per-link agreement to send only when the receiver can take it. The lecture's three: <strong>valid only</strong> (receiver can't say stop, no backpressure), <strong>valid/ready</strong> (answers now), <strong>credit</strong> (permits in advance). Backpressure is what it produces.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s12">Lecture 11 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Flush</div>
   <div class="d" lang="ko">이미 파이프라인에 들어온 명령어를 <strong>지워버리는 것.</strong> 없던 일로 만든다. 주로 <strong>control hazard</strong> 에서 쓴다. 분기가 성립해서 뒤따라 들어온 명령어들이 <strong>애초에 실행되면 안 되는 것</strong>이었을 때다. stall 과 다르다. stall 은 기다리면 쓸 수 있는 값을 기다리는 것이고, flush 는 기다려도 쓸모가 없는 것을 버리는 것이다.</div>
   <div class="d" lang="en"><strong>Discarding</strong> an instruction already in the pipeline, as if it never happened. Mostly used for <strong>control hazards</strong>, when a taken branch means the instructions behind it <strong>should never have run.</strong> Not the same as a stall: a stall waits for a value that will become usable, a flush throws away something that will never be useful.</div>
   <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">fork · join · join_any · join_none</div>
+  <div class="d" lang="ko"><code>fork</code> 안의 문장마다 thread 를 띄우고, 끝을 무엇으로 닫느냐가 부모가 언제 다시 움직이는지를 정한다. <code>join</code> 은 <strong>전부</strong>, <code>join_any</code> 는 <strong>아무 하나</strong>가 끝날 때까지 기다리고, <code>join_none</code> 은 <strong>기다리지 않는다.</strong> join_any 뒤에도 나머지는 계속 돈다.</div>
+  <div class="d" lang="en"><code>fork</code> launches a thread per statement, and the closing keyword decides when the parent moves on: <code>join</code> waits for <strong>all</strong>, <code>join_any</code> for <strong>any one</strong>, <code>join_none</code> for <strong>none.</strong> After join_any the others keep running.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s6">Lecture 12 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1013,6 +1189,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">IEEE 754 의 32비트와 64비트 2진 FP 형식. 배치는 <code>(1, 8, 23)</code> 과 <code>(1, 11, 52)</code>, 정밀도는 hidden bit 을 더해 24 와 53. C 의 <code>float</code> 과 <code>double</code>, IEEE 754-2008 의 <code>binary32</code> 와 <code>binary64</code> 가 같은 것이다. FP32 의 범위는 대략 1.2 &times; 10<sup>&minus;38</sup> 부터 3.4 &times; 10<sup>38</sup>.</div>
   <div class="d" lang="en">IEEE 754's 32 and 64 bit binary FP formats, laid out <code>(1, 8, 23)</code> and <code>(1, 11, 52)</code>, with precision 24 and 53 once the hidden bit is counted. The same thing as C's <code>float</code> and <code>double</code> and IEEE 754-2008's <code>binary32</code> and <code>binary64</code>. FP32 spans roughly 1.2 &times; 10<sup>&minus;38</sup> to 3.4 &times; 10<sup>38</sup>.</div>
   <div class="src"><a href="L08-floating-point.html#s6">Lecture 8 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">FP8 · E3M4 (ExMy)</div>
+  <div class="f">8-bit floating point · 3 exponent bits, 4 mantissa bits</div>
+  <div class="d" lang="ko">sign 1 + exponent 3 + mantissa 4 = 8 bit 짜리 FP 수. Lab 3 이 int8 대신 쓰는 형식이다. bias 는 2<sup>3−1</sup> − 1 = 3. exponent <code>000</code> 과 <code>111</code> 을 IEEE 754 식(0·subnormal, ∞·NaN)으로 읽으면 최댓값은 15.5, 가장 작은 normal 은 0.25 다. <strong>ExMy 라는 이름은 bit 수만 정한다.</strong> 특수값, subnormal, rounding 은 따로 정해야 하고 Lab 3 덱은 정하지 않는다. 업계에서 흔한 FP8 은 E4M3 와 E5M2 이고(OCP 8-bit floating point 스펙), 그 E4M3 는 exponent 전부 1 인 줄을 ∞ 대신 숫자에 쓴다.</div>
+  <div class="d" lang="en">An FP number with sign 1 + exponent 3 + mantissa 4 = 8 bits; Lab 3 uses it instead of int8. The bias is 2<sup>3−1</sup> − 1 = 3. Reading exponents <code>000</code> and <code>111</code> IEEE 754 style (zero and subnormals, ∞ and NaN), the maximum is 15.5 and the smallest normal 0.25. <strong>The ExMy name only fixes bit counts</strong>: special values, subnormals and rounding are separate decisions, and the Lab 3 deck doesn't make them. The FP8 formats common in industry are E4M3 and E5M2 (OCP's 8-bit floating point specification), and that E4M3 spends its all-ones exponent on numbers rather than ∞.</div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s3">Lab 3 · 03</a></div>
 </div>
 
 <div class="gterm">
@@ -1042,10 +1226,17 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Functional Coverage</div>
   <div class="d" lang="ko"><strong>보고 싶은 시나리오를 코드로 직접 적어두고</strong> 그 상황이 실제로 벌어졌는지 세는 것. Code coverage가 못 세는 <strong>조합 상황</strong>("FIFO가 가득 찬 상태에서 write가 들어왔다")을 잡아낸다. 대신 사람이 무엇을 볼지 미리 정해야 하므로 상상력의 한계가 다시 들어온다.</div>
   <div class="d" lang="en"><strong>Writing the scenarios you want to see as code</strong> and counting whether they actually occurred. It catches the <strong>combinations</strong> code coverage cannot, such as "a write arrived while the FIFO was full". The cost is that a person must decide in advance what to look for, so the imagination limit returns.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s12">Lecture 12 · 12</a></div>
 </div>
 
 <h2 class="gletter" id="gG">G</h2>
+
+<div class="gterm">
+  <div class="t">Gasket · Adapter</div>
+  <div class="d" lang="ko">IP 의 인터페이스를 fabric 에 붙이면서 <strong>protocol 이나 packet 형식을 맞춰 주는</strong> 블록. AXI 를 쓰는 IP 를 NoC 에 붙이면 AXI 를 flit 으로 바꾸는 일을 한다. bridge 와 거의 같은 자리인데, bridge 는 버스와 버스 사이, 이 덱의 gasket 은 IP 와 fabric 사이다.</div>
+  <div class="d" lang="en">A block attaching an IP interface to the fabric, <strong>adapting protocol or packet format.</strong> On a NoC it turns an IP's AXI into flits. Nearly the same slot as a bridge, which sits between two buses, while this deck's gasket sits between an IP and the fabric.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s2">Lecture 11 &middot; 02</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">GDSII · <code>.gds</code></div>
@@ -1093,6 +1284,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gH">H</h2>
 
 <div class="gterm">
+  <div class="t">Handle</div>
+  <div class="d" lang="ko"><strong>object 를 가리키는 값.</strong> class type 의 변수에는 object 가 아니라 handle 이 들어간다. 아무것도 안 가리키면 <code>null</code> 이다. <strong>handle 을 복사해도(<code>b = a;</code>) object 는 하나</strong>라 b 로 고치면 a 에서도 보인다. virtual interface 도 handle 이다.</div>
+  <div class="d" lang="en"><strong>A value that points at an object.</strong> A class-type variable holds a handle, not the object; pointing at nothing, it is <code>null</code>. <strong>Copying a handle (<code>b = a;</code>) leaves one object</strong>, so a change through b shows through a. A virtual interface is a handle too.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s4">Lecture 12 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Hard · Firm · Soft IP</div>
   <div class="d" lang="ko">IP 를 무엇으로 받느냐에 따른 구분. Hard 는 <strong>layout</strong>(못 바꾸고 공정 전용), Firm 은 <strong>netlist</strong>, Soft 는 <strong>RTL</strong>(자유롭지만 synthesis 와 layout 은 받는 쪽 몫).</div>
   <div class="d" lang="en">Classified by deliverable: hard is a <strong>layout</strong> (fixed, process-specific), firm a <strong>netlist</strong>, soft <strong>RTL</strong> (flexible, but synthesis and layout are yours).</div>
@@ -1122,6 +1320,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">HDVL</div>
+  <div class="f">Hardware Description and Verification Language</div>
+  <div class="d" lang="ko">설계(HDL)와 검증(HVL)을 <strong>한 언어로</strong> 하는 언어. 슬라이드가 SystemVerilog 를 이렇게 부른다. 설계자는 합성되는 절반, 검증 엔지니어는 합성되지 않는 절반을 쓴다.</div>
+  <div class="d" lang="en">A language doing both design (HDL) and verification (HVL) <strong>in one.</strong> The slide's label for SystemVerilog. Designers use the synthesizable half, verification engineers the rest.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s1">Lecture 12 &middot; 01</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Hidden bit (implied bit)</div>
   <div class="d" lang="ko">normalized significand 의 맨 앞 1. 언제나 1 이라 <strong>저장하지 않고</strong> unpack 할 때 회로가 붙인다. 그래서 FP32 는 23비트를 저장하고 정밀도는 24다. exponent 필드가 0 이면 (subnormal) 1 이 아니라 <strong>0 을</strong> 붙인다.</div>
   <div class="d" lang="en">The leading 1 of a normalized significand. Always 1, so <strong>it isn't stored</strong>; the circuit attaches it at unpack. That's why FP32 stores 23 bits but has 24 of precision. With a zero exponent field (a subnormal) the attached bit is <strong>0</strong>, not 1.</div>
@@ -1143,6 +1349,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Hop</div>
+  <div class="d" lang="ko">packet 이 <strong>router 하나에서 이웃 router 로 한 번 건너가는 것.</strong> 경로 길이와 최악 latency 를 hop 수로 센다. hop 수는 cycle 수가 아니다. router 하나에 몇 cycle 이 걸리는지는 router 설계에 달렸다.</div>
+  <div class="d" lang="en">One step of a packet <strong>from a router to a neighbouring router.</strong> Path length and worst-case latency are counted in hops. Hops aren't cycles; cycles per router depend on the router design.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s5">Lecture 11 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">HVT · LVT · SVT</div>
   <div class="f">High / Low / Standard Threshold Voltage</div>
   <div class="d" lang="ko">Standard cell library의 변형들. VT는 트랜지스터가 켜지는 문턱 전압이다. <strong>HVT는 느리지만 누설이 적고, LVT는 빠르지만 누설이 많다.</strong> HP(High Performance)와 LP(Low Power)도 같은 축의 다른 이름이다. 도구가 <strong>급한 경로에만 LVT를 쓰고 나머지는 HVT로 채우는</strong> 식으로 트레이드오프를 실행한다.</div>
@@ -1161,6 +1374,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Idle · Loaded Latency</div>
+  <div class="d" lang="ko">요청에서 첫 응답(또는 완료)까지의 시간을 <strong>network 가 비었을 때</strong>와 <strong>붐빌 때</strong> 따로 잰 것. 슬라이드는 둘 다 재라고 한다. unloaded latency 는 idle latency 와 같은 말이고, 조건 없이 적힌 latency 는 대개 idle 이다.</div>
+  <div class="d" lang="en">Request-to-first-response (or completion) time measured <strong>with the network empty</strong> and <strong>with it busy.</strong> The slide says to measure both. Unloaded latency means idle latency, and a latency quoted without a condition is usually idle.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s4">Lecture 11 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">IEEE 754</div>
   <div class="d" lang="ko">IEEE Standard for Floating-Point Arithmetic. FP 의 비트 배치뿐 아니라 <strong>연산이 어떤 결과를 내야 하는지</strong> (correctly rounded, 특수값의 처리) 까지 정한 표준이다. 1985 년판이 처음이고 2008 년과 2019 년에 개정됐다. FP 유닛을 설계하고 검증할 때의 spec 이다.</div>
   <div class="d" lang="en">IEEE Standard for Floating-Point Arithmetic. It fixes not only FP bit layouts but <strong>what operations must return</strong> (correct rounding, special values). First published 1985, revised 2008 and 2019. It's the spec when you design or verify an FP unit.</div>
@@ -1168,10 +1388,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">ignore_bins · illegal_bins</div>
+  <div class="d" lang="ko">coverpoint 에서 <strong>세지 않을 값</strong>(<code>ignore_bins</code>)과 <strong>나오면 오류인 값</strong>(<code>illegal_bins</code>)을 정하는 것. 둘 다 coverage 점수의 분모에서 빠진다. illegal_bins 는 sample 시점에 시뮬레이터가 오류를 내므로 coverage 가 작은 checker 노릇도 한다.</div>
+  <div class="d" lang="en">Coverpoint declarations for <strong>values not to count</strong> (<code>ignore_bins</code>) and <strong>values that are an error if seen</strong> (<code>illegal_bins</code>). Both drop out of the coverage denominator. illegal_bins makes the simulator raise an error at sample time, so coverage doubles as a small checker.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Inference</div>
   <div class="d" lang="ko">합성 도구가 <strong>RTL을 읽고 "이건 flip-flop이겠군" 하고 판단해서 그 하드웨어를 만들어내는 것.</strong> 코드 어디에도 "flip-flop을 만들어라"라고 적혀 있지 않다. <code>@(posedge clk)</code>와 <code>&lt;=</code>라는 <strong>모양</strong>을 보고 짐작한다. <strong>시뮬레이터는 추론하지 않고 그냥 실행한다.</strong> 그래서 simulation/synthesis mismatch가 생긴다.</div>
   <div class="d" lang="en">The synthesis tool <strong>reading your RTL, deciding "that must be a flip-flop", and building it.</strong> Nowhere does the code say "build a flip-flop"; the tool guesses from <strong>the shape</strong> of <code>@(posedge clk)</code> and <code>&lt;=</code>. <strong>A simulator infers nothing, it just runs the code</strong>, which is how simulation/synthesis mismatches happen.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s3">Lecture 3 · 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Inheritance · extends</div>
+  <div class="d" lang="ko"><code>class ErrPkt extends Packet;</code> 처럼 <strong>부모 class 의 property 와 method 를 물려받아</strong> 자식 class 를 만드는 것. 슬라이드 표현으로 검증된 부모를 깨거나 다시 쓰지 않고 고치는 방법이다. SV 는 부모를 하나만 허용한다.</div>
+  <div class="d" lang="en">Building a child class that <strong>inherits a parent's properties and methods</strong>, as in <code>class ErrPkt extends Packet;</code>. Per the slide, a way to customise without breaking or rewriting a known-good parent. SV allows only one parent.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s5">Lecture 12 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -1186,14 +1420,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">NoC = Network on Chip</div>
   <div class="d" lang="ko">interconnect 는 SoC 블록을 잇는 것 전부. crossbar 는 여러 경로를 동시에 잇는 방식, NoC 는 router 와 link 로 packet 을 보내는 방식이다. 슬라이드 말대로 NoC 와 interconnect 를 섞어 쓰기도 한다.</div>
   <div class="d" lang="en">Interconnect is whatever joins an SoC's blocks; a crossbar connects several paths at once; a NoC sends packets over routers and links. As the slide notes, NoC and interconnect are sometimes used interchangeably.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s10">Lecture 10 &middot; 10</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s10">Lecture 10 &middot; 10</a> · <a href="L11-soc-interconnect.html#s8">Lecture 11 · 08</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">interface</div>
   <div class="d" lang="ko">여러 신호를 <strong>한 덩어리로 묶어 module 포트에 통째로 꽂을 수 있게 하는</strong> SystemVerilog 구조물. <code>module</code>과 나란한 급의 키워드다. 신호를 하나 추가할 때 고칠 곳이 여러 module에서 한 군데로 줄어든다. <strong>설계와 검증이 같은 것을 공유한다.</strong> UVM에서는 <strong>virtual interface</strong>로 다시 나온다. 소프트웨어의 "interface"와는 전혀 다른 것이다.</div>
   <div class="d" lang="en">A SystemVerilog construct that <strong>bundles signals so the bundle plugs into a module port as one thing.</strong> It is a keyword of the same rank as <code>module</code>. Adding a signal goes from editing many modules to editing one, and <strong>design and verification share the same one.</strong> In UVM it returns as a <strong>virtual interface.</strong> Nothing to do with a software "interface".</div>
-  <div class="src"><a href="L03-system-verilog-for-design.html#s9">Lecture 3 · 09</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s9">Lecture 3 · 09</a> · <a href="L12-sv-for-verification.html#s8">Lecture 12 · 08</a></div>
 </div>
 
 <div class="gterm">
@@ -1250,6 +1484,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">$rose · $fell · $onehot</div>
+  <div class="d" lang="ko">assertion 에서 쓰는 system function. <code>$rose</code> 는 직전 clock 표본이 0 이고 이번이 1 일 때, <code>$fell</code> 은 그 반대일 때, <code>$onehot</code> 은 <strong>정확히 한 비트만 1</strong> 일 때 참이다. 엣지마다 찍은 표본으로 판단하므로 엣지 사이의 변화는 다음 엣지에서야 보인다.</div>
+  <div class="d" lang="en">System functions used in assertions. <code>$rose</code> is true when the previous clock sample was 0 and this one is 1, <code>$fell</code> the reverse, and <code>$onehot</code> when <strong>exactly one bit is 1.</strong> They judge on per-edge samples, so a change between edges only shows at the next edge.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s11">Lecture 12 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">$urandom · $urandom_range · $random</div>
+  <div class="d" lang="ko">난수 system function. <code>$urandom</code> 은 32 비트 unsigned, <code>$urandom_range(max, min)</code> 은 그 범위(인자 순서가 <strong>최대, 최소</strong>), <code>$random</code> 은 Verilog 시절의 32 비트 <strong>signed</strong> 난수다. <code>$random</code> 은 음수가 나오고 thread 마다 따로 도는 난수 생성기(random stability) 규칙 밖에 있어서 강사가 쓰지 말라고 한다.</div>
+  <div class="d" lang="en">Random-number system functions. <code>$urandom</code> is 32-bit unsigned, <code>$urandom_range(max, min)</code> stays in range (argument order <strong>max, min</strong>), and <code>$random</code> is the Verilog-era 32-bit <strong>signed</strong> one. <code>$random</code> can go negative and sits outside the per-thread generator rules (random stability), which is why the instructor says not to use it.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s9">Lecture 12 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Lint</div>
   <div class="d" lang="ko">코드를 돌리지 않고 읽어서 <strong>가이드라인 위반을 찾는</strong> 정적 분석. 도구는 Synopsys Spyglass. 잡는 것: 도달할 수 없는 코드, 명명 규칙, blocking과 non-blocking 혼용, 합성 불가 구문, 다중 driver, <strong>의도치 않은 latch.</strong> <strong>스타일 지적이 아니다.</strong> 절반 이상이 실물이 코드와 다르게 동작하게 만드는 원인이다. 다만 lint는 verification이 아니다. "규칙을 지키는가"만 볼 뿐 "사양대로인가"는 못 본다.</div>
   <div class="d" lang="en">Static analysis that reads the code without running it and <strong>finds guideline violations.</strong> The tool named is Synopsys Spyglass. It catches unreachable code, naming conventions, mixed blocking and non-blocking assignments, un-synthesisable constructs, multiple drivers and <strong>unintended latches.</strong> <strong>These are not style nits:</strong> more than half of them cause the physical part to behave differently from the code. But lint is not verification; it only asks whether rules are followed, never whether the design matches the spec.</div>
@@ -1257,10 +1505,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Livelock</div>
+  <div class="d" lang="ko">packet 들이 <strong>계속 움직이는데 아무도 목적지에 도착하지 못하는</strong> 상태. non-minimal 경로에서 맴도는 packet 이 예다. 아무도 안 움직이는 deadlock, 하나만 못 가는 starvation 과 구별한다. 슬라이드 45쪽은 starvation 대책이 livelock 을 막는다고 적어 셋을 섞어 쓴다.</div>
+  <div class="d" lang="en">Packets <strong>keep moving but never reach their destinations</strong>, such as a packet circling on non-minimal paths. Distinct from deadlock (nobody moves) and starvation (one party never served); slide 45 mixes them by saying starvation mechanisms mitigate livelock.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s17">Lecture 11 &middot; 17</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Load-Use Hazard</div>
   <div class="d" lang="ko"><code>lw</code> 바로 뒤의 명령어가 그 결과를 쓰는 경우. <strong>forwarding 으로 못 막는 유일한 data hazard 다.</strong> <code>lw</code> 의 값은 메모리를 읽어야 나오므로 MEM 끝에야 존재하는데 뒤 명령어는 그것을 EX 에서 원한다. <strong>한 사이클 stall 이 반드시 필요하고 그 다음에 forwarding 한다.</strong></div>
   <div class="d" lang="en">When the instruction right after an <code>lw</code> uses its result. <strong>The one data hazard forwarding cannot fix.</strong> The load value only exists at the end of MEM, and the next instruction wants it in EX. <strong>One stall cycle is mandatory, then you forward.</strong></div>
   <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">local · protected · super</div>
+  <div class="d" lang="ko">class member 의 공개 범위와 부모 접근. <code>local</code> 은 <strong>그 class 안에서만</strong>, <code>protected</code> 는 <strong>그 class 와 자식 안에서만</strong> 보이고, 아무것도 안 붙이면 누구나 본다. <code>super.</code> 는 자식에서 부모의 member 나 method 를 가리킨다.</div>
+  <div class="d" lang="en">Member visibility and parent access in classes. <code>local</code> is visible <strong>only inside that class</strong>, <code>protected</code> <strong>inside that class and its children</strong>, and no qualifier means everyone. <code>super.</code> reaches the parent's member or method from a child.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s18">Lecture 12 &middot; 18</a></div>
 </div>
 
 <div class="gterm">
@@ -1303,7 +1565,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Language Reference Manual</div>
   <div class="d" lang="ko">언어의 <strong>표준 문서.</strong> SystemVerilog의 것은 IEEE 1800이다. 시뮬레이터 벤더는 구현을 마음대로 해도 되지만 LRM은 지켜야 한다. <strong>도구마다 결과가 갈릴 때 최종 심판이다.</strong> 단, LRM이 정하지 않은 구간에서는 도구마다 달라도 둘 다 맞다. 그래서 그런 코드는 안 쓰는 게 관행이고 lint가 잡아준다.</div>
   <div class="d" lang="en">The <strong>standard document</strong> for a language; for SystemVerilog it is IEEE 1800. A vendor may implement the simulator however it likes but must obey the LRM. <strong>It is the final referee when tools disagree.</strong> Where the LRM deliberately leaves things undefined, though, two tools can differ and both be right, which is why nobody writes such code on purpose and lint flags it.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s14">Lecture 2 · 14</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s14">Lecture 2 · 14</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a></div>
 </div>
 
 <div class="gterm">
@@ -1331,6 +1593,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">mailbox</div>
+  <div class="d" lang="ko">thread 사이에 <strong>자료를 넘기는 우편함.</strong> 슬라이드 표현으로 "FIFO + Event". <code>put</code> 은 가득 차면, <code>get</code> 은 비면 기다리고, <code>try_</code> 가 붙은 것은 기다리지 않는다. <code>mailbox #(packet_t)</code> 로 담을 type 을 정한다.</div>
+  <div class="d" lang="en">A <strong>postbox for passing data between threads</strong>, "FIFO + Event" in the slide's words. <code>put</code> waits when full, <code>get</code> when empty, and the <code>try_</code> versions never wait. <code>mailbox #(packet_t)</code> fixes the type it holds.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s7">Lecture 12 &middot; 07</a> &middot; <a href="L12-sv-for-verification.html#s17">17</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Manager · Subordinate</div>
   <div class="d" lang="ko">AMBA 스펙이 <strong><code>master</code>와 <code>slave</code>를 대체하려고 쓰는 용어.</strong> 뜻은 완전히 같다. 트랜잭션을 <strong>시작하는 쪽</strong>이 Manager(=master), <strong>응답하는 쪽</strong>이 Subordinate(=slave)다. <strong>기존 코드와 툴 옵션에는 여전히 master/slave가 남아 있으므로 둘 다 알아야 한다.</strong> 강의 슬라이드는 벤더 트레이닝 자료라 옛 이름을 쓴다.</div>
   <div class="d" lang="en">The terms recent AMBA specifications use <strong>in place of <code>master</code> and <code>slave</code>.</strong> The meaning is identical: the side that <strong>starts a transaction</strong> is the Manager, the side that <strong>responds</strong> is the Subordinate. <strong>Existing code and tool options still say master and slave, so you need both.</strong> The lecture slides come from vendor training and use the older names.</div>
@@ -1348,7 +1617,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Master · Slave</div>
   <div class="d" lang="ko">트랜잭션을 <strong>시작하는 쪽</strong>과 <strong>응답하는 쪽.</strong> 데이터 방향과 무관하고 port 단위다. 같은 짝을 initiator/target, manager/subordinate, requester/responder 로도 부른다.</div>
   <div class="d" lang="en">The side that <strong>starts</strong> a transaction and the side that <strong>answers.</strong> Independent of data direction, defined per port. Also initiator/target, manager/subordinate, requester/responder.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s3">Lecture 10 &middot; 03</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s3">Lecture 10 &middot; 03</a> · <a href="L11-soc-interconnect.html#s2">Lecture 11 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -1374,6 +1643,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Mesh · Torus (NoC topology)</div>
+  <div class="d" lang="ko">router 를 격자로 놓고 상하좌우 이웃끼리만 잇는 것이 mesh, 줄과 열의 끝과 끝을 잇는 wrap link 를 더한 것이 torus(2D torus 는 k-ary 2-cube). 4 &times; 4 에서 최악 hop 은 mesh 6, torus 4. Lecture 9 의 systolic array mesh 와 모양은 같지만 하는 일이 다르다.</div>
+  <div class="d" lang="en">Routers in a grid wired only to up, down, left and right neighbours make a mesh; add wrap links joining the ends of every row and column for a torus (a 2D torus is a k-ary 2-cube). Worst case on a 4 &times; 4: mesh 6 hops, torus 4. Same shape as Lecture 9's systolic mesh, different job.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s9">Lecture 11 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Metastability</div>
   <div class="d" lang="ko">flip-flop의 D 입력이 <strong>setup/hold 윈도우 안에서 바뀌어</strong> Q가 0도 1도 아닌 불확정 상태로 한동안 머무는 현상. <strong>같은 클럭 도메인 안에서는 안 생기고</strong>, 동기화 없이 넘어온 비동기 신호에서만 생긴다. glitch와는 다른 현상이다.</div>
   <div class="d" lang="en">A flop's D input <strong>changes inside the setup/hold window</strong>, and Q sits undecided, neither 0 nor 1, for a while. <strong>It cannot happen inside one clock domain</strong>, only where an unsynchronised asynchronous signal walks straight in. Not the same thing as a glitch.</div>
@@ -1392,6 +1668,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">control 신호 묶음(control word)을 <strong>ROM 에 적어두고 차례로 읽어</strong> datapath 를 움직이는 방식. 그 ROM 이 control store 다. Lab 2 릴리스 덱은 microprogramming, microsequencing 을 같은 말로 묶고, 한 줄에 micro-opcode 와 다음 micro-opcode, 그 밖의 control 비트가 있다고 그린다. 반대편은 <strong>hardwired control</strong>, 즉 opcode 를 조합 로직으로 바로 control 로 푸는 방식이다.</div>
   <div class="d" lang="en">Driving the datapath by <strong>storing control words in a ROM and stepping through them</strong>; that ROM is the control store. The Lab 2 release deck groups microprogramming and microsequencing with it and draws each entry as a micro-opcode, the next micro-opcode and other control bits. The alternative is <strong>hardwired control</strong>, which turns the opcode straight into control signals with combinational logic.</div>
   <div class="src"><a href="LAB2-mips-processor-design.html#s15">Lab 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Minimal · Non-Minimal Routing</div>
+  <div class="d" lang="ko">가장 짧은 경로로만 가면 minimal, 아니면 non-minimal. non-minimal 은 붐빌 때 돌아가거나 죽은 link 를 피할 때 adaptive 와 같이 쓴다. 슬라이드는 SoC 에서 link 가 죽었으면 칩이 이미 죽은 것일 가능성이 높다고 덧붙인다.</div>
+  <div class="d" lang="en">Minimal routing takes only shortest paths; non-minimal doesn't, and is paired with adaptive routing to detour around congestion or a dead link. The slide adds that on an SoC a dead link most likely means a dead chip.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s16">Lecture 11 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
@@ -1421,7 +1704,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Monitor</div>
   <div class="d" lang="ko">Testbench에서 인터페이스 신호를 <strong>읽어서 transaction으로 되돌리는</strong> 부품. DUT를 건드리지 않는 <strong>수동</strong> 부품이다. <strong>Checker와 Coverage는 Monitor 없이 붙을 수 없다.</strong> 관측을 안 하는데 판정하거나 셀 수 없기 때문이다. Driver가 없는 곳에도 붙일 수 있다.</div>
   <div class="d" lang="en">The testbench component that <strong>reads interface signals back into transactions.</strong> It never touches the DUT and is <strong>passive.</strong> <strong>Neither a checker nor coverage can attach without one</strong>, because nothing can be judged or counted that was never observed. It can be placed where no driver exists.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L12-sv-for-verification.html#s14">Lecture 12 · 14</a></div>
 </div>
 
 <div class="gterm">
@@ -1484,7 +1767,30 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L08-floating-point.html#s10">Lecture 8 &middot; 10</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">NPU</div>
+  <div class="f">Neural Processing Unit</div>
+  <div class="d" lang="ko">신경망 추론 같은 행렬 연산을 떼어 맡는 가속기. 중심에 MAC 배열이 있다. Lab 3 릴리스 덱은 Intel Core Ultra 의 NPU 와 Qualcomm Hexagon NPU 를 예로 들고, Lab 3 의 systolic matmul 이 그것과 다른 점(작은 크기, 행렬곱만, 결과는 메모리로, on-chip RAM 만, int8 만)을 나열한다. Lecture 9 의 TPU 도 같은 계열이고 회사마다 이름이 다르다.</div>
+  <div class="d" lang="en">An accelerator that takes matrix work such as neural network inference off the CPU, built around a MAC array. The Lab 3 release deck shows the Intel Core Ultra NPU and the Qualcomm Hexagon NPU, and lists how Lab 3's systolic matmul differs (smaller, matmul only, results to memory, on-chip RAM only, int8 only). Lecture 9's TPU is the same family; the name varies by company.</div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s2">Lab 3 · 02</a></div>
+</div>
+
 <h2 class="gletter" id="gO">O</h2>
+
+<div class="gterm">
+  <div class="t">OCN</div>
+  <div class="f">On-Chip Network</div>
+  <div class="d" lang="ko">Oracle 자료가 쓰는 NoC 의 이름. 강의의 예에서는 request(ring 넷), data(mesh), response(point to point) <strong>network 셋</strong>으로 되어 있다. AXI 가 채널을 나누듯 network 를 나눴다.</div>
+  <div class="d" lang="en">The name Oracle's material uses for its NoC. The lecture's example is <strong>three networks</strong>: request (four rings), data (a mesh) and response (point to point), split the way AXI splits channels.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s3">Lecture 11 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">OpenVera</div>
+  <div class="d" lang="ko">Synopsys 의 검증 언어. SystemVerilog 의 <strong>class</strong> 가 여기서 왔다(슬라이드 5쪽). <a href="L02-design-and-verification-overview.html#s22">Lecture 2</a> 에서 SpecMan e 와 함께 검증 전용 언어로 소개됐다.</div>
+  <div class="d" lang="en">Synopsys's verification language, where SystemVerilog's <strong>classes</strong> came from (slide 5). Introduced in <a href="L02-design-and-verification-overview.html#s22">Lecture 2</a> alongside SpecMan e as a verification-only language.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s1">Lecture 12 &middot; 01</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">Operand Isolation</div>
@@ -1504,7 +1810,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Outstanding · Out-of-Order</div>
   <div class="d" lang="ko">주소는 보냈지만 답을 아직 못 받은 트랜잭션을 <strong>여러 개 걸어두는 것</strong>과, 그 답이 <strong>보낸 순서와 다르게</strong> 와도 되는 것. AXI 는 ID 로 짝을 맞춘다. APB 에는 둘 다 없다.</div>
   <div class="d" lang="en">Keeping <strong>several transactions in flight</strong> (address sent, answer pending), and letting answers return <strong>in a different order.</strong> AXI matches them by ID; APB has neither.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a> · <a href="L11-soc-interconnect.html#s4">Lecture 11 · 04</a></div>
 </div>
 
 <div class="gterm">
@@ -1512,7 +1818,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Open Verification Methodology · Verification Methodology Manual</div>
   <div class="d" lang="ko">UVM 이전의 검증 방법론들. <strong>UVM이 이 둘을 합쳐 표준이 됐다.</strong> 지금 새로 배우는 건 UVM이고, 이 둘은 예전 코드에서 마주칠 이름이다.</div>
   <div class="d" lang="en">Verification methodologies that predate UVM. <strong>UVM merged them into the standard.</strong> UVM is what you learn now; these two are names you meet in older code.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a></div>
 </div>
 
 <h2 class="gletter" id="gP">P</h2>
@@ -1529,6 +1835,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">배열 차원의 두 종류. <strong>packed는 변수 이름 왼쪽</strong>에 오고 비트들을 <strong>하나의 워드</strong>로 다룬다. <strong>unpacked는 이름 오른쪽</strong>에 오고 원소를 <strong>독립된 변수</strong>로 다룬다. <code>logic [3:0] t[6];</code>은 4비트짜리 원소 6개다. <strong>접근은 순서가 뒤집혀서</strong> <code>t[원소][비트]</code>로 쓴다. 설계에서는 각각 하나씩만 쓰는 것이 관행이다.</div>
   <div class="d" lang="en">The two kinds of array dimension. <strong>Packed goes to the left of the name</strong> and treats the bits as <strong>one word</strong>; <strong>unpacked goes to the right</strong> and treats elements as <strong>independent variables.</strong> <code>logic [3:0] t[6];</code> is six four-bit elements. <strong>Access reverses the order:</strong> <code>t[element][bit]</code>. Designs conventionally use one of each and no more.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s8">Lecture 3 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Packet · Flit · Phit</div>
+  <div class="f">flit = flow control digit &middot; phit = physical control digit (slide's wording)</div>
+  <div class="d" lang="ko">message 를 쪼갠 것이 packet, packet 을 쪼갠 <strong>switching 과 flow control 의 단위</strong>가 flit(head, body, tail), link 가 <strong>한 cycle 에 옮기는 단위</strong>가 phit. 보통 phit 과 flit 의 크기가 같다. head flit 만 경로를 알고 나머지는 따라간다.</div>
+  <div class="d" lang="en">A message is cut into packets; a packet into flits (head, body, tail), <strong>the unit of switching and flow control</strong>; a phit is <strong>what a link moves in one cycle.</strong> Usually phit size equals flit size. Only the head flit knows the route; the rest follow.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s11">Lecture 11 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -1569,6 +1883,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">PLI</div>
+  <div class="f">Programming Language Interface</div>
+  <div class="d" lang="ko">Verilog 시절 C 와 시뮬레이터를 잇던 통로. 세 세대다: PLI 1.0 tf routines(1985), 2.0 acc routines(1989), 3.0 vpi routines(1995). 시뮬레이터 내부를 들여다보는 도구 제작자용에 가깝고, 함수를 그냥 주고받는 일은 SV 의 <strong>DPI</strong> 가 맡는다.</div>
+  <div class="d" lang="en">The Verilog-era channel between C and the simulator, in three generations: PLI 1.0 tf routines (1985), 2.0 acc routines (1989), 3.0 vpi routines (1995). Closer to a tool builder's view into the simulator; simply calling functions both ways is SV's <strong>DPI.</strong></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s15">Lecture 12 &middot; 15</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">PLL</div>
   <div class="f">Phase-Locked Loop</div>
   <div class="d" lang="ko">내부 오실레이터를 외부 reference 클럭에 <strong>피드백으로 고정</strong>시켜 <strong>주파수를 곱하거나 나누는</strong> 회로. 아날로그 설계자가 만들고 디지털 쪽은 IP로 받아 쓴다. DLL과 달리 오실레이터가 있어 주파수를 바꿀 수 있다.</div>
@@ -1588,6 +1910,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">프로세서 안의 이벤트(사이클, 끝난 명령어, cache miss 등)를 <strong>세는 카운터 묶음</strong>과, 그 값을 소프트웨어가 읽는 통로. Lab 2 릴리스 덱은 ARM PMU 를 예로 들고 instructions retired 같은 지표를 적는다. Lab 2 Part 2 의 perfmon 이 사이클과 명령어 카운터 두 개짜리 축소판이다. "끝난" 명령어는 retire 한 것이지 fetch 한 것이 아니다. bubble 과 flush 된 것은 세지 않는다.</div>
   <div class="d" lang="en">A bank of <strong>counters for events inside a processor</strong> (cycles, finished instructions, cache misses) plus a way for software to read them. The Lab 2 release deck cites the ARM PMU and lists metrics such as instructions retired. Lab 2 Part 2's perfmon is a two-counter version, cycles and instructions. "Finished" means retired, not fetched: bubbles and flushed slots don't count.</div>
   <div class="src"><a href="LAB2-mips-processor-design.html#s14">Lab 2 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Polling</div>
+  <div class="d" lang="ko">상태 레지스터를 <strong>될 때까지 되풀이해 읽으며</strong> 기다리는 것. Lab 3 에서 testbench 가 APB 로 done 을 읽어 가속기가 끝났는지 보는 4 단계가 이것이다. 반대편은 interrupt, 즉 블록이 선을 올려 CPU 를 부르는 방식이다. polling 은 단순하지만 그동안 버스를 쓴다. 그리고 읽는 쪽이 놓치지 않게 상태가 유지되어야 한다. done 이 한 사이클짜리 펄스면 두 사이클 걸리는 APB 읽기로 놓칠 수 있다. 끝없이 기다리지 않게 시간 제한을 둔다.</div>
+  <div class="d" lang="en">Waiting by <strong>reading a status register over and over</strong> until it says yes. In Lab 3 it's step 4: the testbench reads done over APB to see whether the accelerator has finished. The alternative is an interrupt, where the block raises a line to call the CPU. Polling is simple but keeps the bus busy, and the status must be held so the reader can't miss it: a one-cycle done pulse can slip past two-cycle APB reads. Put a timeout on it so it can't wait forever.</div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s8">Lab 3 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Polymorphism · virtual method</div>
+  <div class="d" lang="ko"><strong>부모 type 의 handle 로 자식의 method 를 부르는 것.</strong> 부모에서 <code>virtual</code> 로 선언한 method 는 handle 의 type 이 아니라 <strong>가리키는 object 의 type</strong> 으로 판을 고른다. virtual 이 없으면 handle 의 type 으로 정해져 부모 판이 돈다.</div>
+  <div class="d" lang="en"><strong>Calling a child's method through a parent-type handle.</strong> A method declared <code>virtual</code> in the parent picks its version by <strong>the type of the object pointed at</strong>, not the handle's. Without virtual, the handle's type decides and the parent's version runs.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s5">Lecture 12 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -1619,7 +1955,46 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L10-soc-architecture.html#s12">Lecture 10 &middot; 12</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">PSL</div>
+  <div class="f">Property Specification Language</div>
+  <div class="d" lang="ko">설계의 성질을 시간 논리로 적는 언어. 슬라이드 5쪽은 SystemVerilog 의 <strong>assertion</strong> 이 PSL 에서 왔다고 적는다.</div>
+  <div class="d" lang="en">A language for stating design properties in temporal logic. Slide 5 credits SystemVerilog's <strong>assertions</strong> to PSL.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s1">Lecture 12 &middot; 01</a></div>
+</div>
+
+<h2 class="gletter" id="gQ">Q</h2>
+
+<div class="gterm">
+  <div class="t">QoS</div>
+  <div class="f">Quality of Service</div>
+  <div class="d" lang="ko">트래픽이 다툴 때 <strong>client 마다</strong> bandwidth, latency, 공정성을 얼마나 보장하는가. 슬라이드 말대로 <strong>priority 표시만으로는 보장이 없다.</strong> 그 표시를 따르는 arbiter 와 낮은 쪽이 굶지 않게 하는 starvation 대책이 같이 있어야 한다.</div>
+  <div class="d" lang="en">How much bandwidth, latency and fairness each <strong>client</strong> is guaranteed when traffic competes. As the slide says, <strong>a priority tag alone guarantees nothing</strong>; it needs an arbiter that honours it and a starvation remedy for the low end.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s4">Lecture 11 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Queue</div>
+  <div class="d" lang="ko"><code>byte myqueue[$];</code> 처럼 <strong>앞뒤로 넣고 빼는 길이가 변하는 배열.</strong> <code>push_back</code> 과 <code>pop_front</code> 로 FIFO 가 된다. scoreboard 의 기대값 줄에 쓰고, RTL FIFO 를 검증할 때 정답 모델이 된다. 합성되지 않는다.</div>
+  <div class="d" lang="en">A <strong>variable-length array you push to and pop from at either end</strong>, as in <code>byte myqueue[$];</code>. <code>push_back</code> plus <code>pop_front</code> makes a FIFO. Used for a scoreboard's expected values and as the reference model when verifying an RTL FIFO. Not synthesizable.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s3">Lecture 12 &middot; 03</a></div>
+</div>
+
 <h2 class="gletter" id="gR">R</h2>
+
+<div class="gterm">
+  <div class="t">randomize()</div>
+  <div class="d" lang="ko">object 의 <code>rand</code> 변수를 constraint 안에서 무작위로 채우는 method. <strong>성공하면 1, 실패하면 0</strong> 을 돌려주고, 실패하면 변수는 이전 값 그대로다. <code>with { ... }</code> 로 그 자리에서 constraint 를 더할 수 있고, class 밖에서는 <code>randomize(x, y)</code>(LRM 의 <code>std::randomize</code>)로 변수를 직접 채운다.</div>
+  <div class="d" lang="en">The method that fills an object's <code>rand</code> variables at random within the constraints. It <strong>returns 1 on success, 0 on failure</strong>, and on failure the variables keep their old values. <code>with { ... }</code> adds constraints on the spot; outside a class, <code>randomize(x, y)</code> (the LRM's <code>std::randomize</code>) fills variables directly.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s9">Lecture 12 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">rand · randc</div>
+  <div class="d" lang="ko"><code>randomize()</code> 가 값을 고를 class property 에 붙이는 수식어. <code>rand</code> 는 매번 독립적으로, <code>randc</code> 는 <strong>가능한 값을 한 바퀴 다 돌기 전에는 반복하지 않게</strong> 고른다. 둘 다 안 붙은 property 는 randomize() 가 건드리지 않는다.</div>
+  <div class="d" lang="en">Modifiers marking class properties for <code>randomize()</code>. <code>rand</code> picks independently each time; <code>randc</code> <strong>never repeats until every possible value has come up once.</strong> randomize() leaves properties with neither alone.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s9">Lecture 12 &middot; 09</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">RDC</div>
@@ -1652,6 +2027,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Register Map</div>
+  <div class="d" lang="ko">IP 의 CSR 마다 <strong>주소, 폭, 비트 배치, 접근 방식(읽기 쓰기 / 읽기만), reset 값</strong>을 적은 표. RTL, testbench, driver 소프트웨어가 전부 이 표 하나를 보고 만들어지고, 실제로는 spec 문서에 들어간다. Lab 3 릴리스 덱 24쪽은 학생이 직접 register map 을 만들고 testbench 에서 맞는 주소에 쓰라고 한다. SoC 전체의 address map 과 층이 다르다. address map 은 어느 IP 인지, register map 은 그 IP 안의 어느 레지스터인지다.</div>
+  <div class="d" lang="en">A table giving each of an IP's CSRs its <strong>address, width, bit layout, access (read-write or read-only) and reset value.</strong> RTL, testbench and driver software are all built from it; in practice it lives in the spec. Slide 24 of the Lab 3 release deck has students create their own and write to the right addresses from the testbench. It sits a level below the SoC's address map: the address map says which IP, the register map says which register inside it.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a> · <a href="LAB3-systolic-matmul.html#s7">Lab 3 · 07</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Reset Synchronizer</div>
   <div class="d" lang="ko">비동기 reset의 <strong>assert는 그대로 두고 de-assert만</strong> 목적지 클럭에 맞춰 내보내는 회로. <strong>Double-FF synchronizer와 회로 모양이 똑같지만</strong>, 통과시키는 게 데이터가 아니라 reset이라는 게 다르다.</div>
   <div class="d" lang="en">A circuit that <strong>leaves the assertion alone and aligns only the de-assertion</strong> of an asynchronous reset to the destination clock. <strong>Drawn identically to a double-FF synchroniser</strong>, but what passes through it is a reset, not data.</div>
@@ -1666,6 +2048,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Retained · Non-Retained</div>
+  <div class="d" lang="ko">강의에서 valid/ready 인터페이스를 나누는 말. valid 를 올린 뒤 ready 를 기다리는 동안 <strong>내용을 붙들고 있어야 하면 retained, 더 급한 요청으로 바꿔도 되면 non-retained.</strong> AXI 는 retained 쪽이다. 특정 표준 문서의 용어인지는 확인하지 못했다.</div>
+  <div class="d" lang="en">The lecture's split of valid/ready interfaces: while waiting for ready after raising valid, <strong>holding the contents is retained; swapping in a more urgent request is non-retained.</strong> AXI is retained. Not confirmed as a term from a particular standard.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s12">Lecture 11 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Retiming</div>
   <div class="d" lang="ko">회로의 기능을 바꾸지 않고 <strong>register의 위치를 옮겨</strong> 단 사이 지연을 고르게 만드는 최적화. Timing 목표에 대응하는 수단이다.</div>
   <div class="d" lang="en">An optimisation that <strong>moves registers</strong> without changing what the circuit does, evening out the delay per stage. It is a lever for the timing goal.</div>
@@ -1673,10 +2062,31 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Ring</div>
+  <div class="d" lang="ko">정류장(router)을 고리로 이은 topology. 강의 그림에서 initiator 자리에는 arbiter, target 자리에는 router 가 있다. 단면이 늘 link 2 개이고 한 방향 ring 의 최악 latency 는 N hop 이다. 두 겹이면 double ring. 모양 자체가 고리라 deadlock 을 virtual channel 로 끊는다.</div>
+  <div class="d" lang="en">A topology of stops (routers) joined in a loop. In the lecture's figure, initiator stops have arbiters and target stops have routers. Its cross-section is always 2 links and a one-way ring's worst case is N hops; two loops make a double ring. Being a loop by shape, it breaks deadlock with virtual channels.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s8">Lecture 11 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Rounding mode (RD · RU · RTZ · RTE)</div>
   <div class="d" lang="ko">참값이 표현 가능한 두 수 사이에 떨어졌을 때 어느 쪽을 고를지 정한 <strong>설정</strong>. Round down, Round up, Round to zero, Round to nearest ties to even. 기본은 <strong>RTE</strong> 이고 가운데면 lsb 가 0 인 쪽이다 (학교 반올림과 다르다). RD 와 RTZ 는 음수에서만 갈린다.</div>
   <div class="d" lang="en">The <strong>setting</strong> that decides which neighbour to pick when a true value falls between two representable numbers: round down, round up, round to zero, round to nearest with ties to even. The default is <strong>RTE</strong>, which sends ties to lsb 0 (unlike school rounding). RD and RTZ differ only on negatives.</div>
   <div class="src"><a href="L08-floating-point.html#s9">Lecture 8 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Round Robin · Work Conserving</div>
+  <div class="d" lang="ko">round robin(RR)은 <strong>돌아가며</strong> 출구를 준다. 모두에게 차례를 보장하지만 flow 마다 요구가 다르면 맞추기 어렵다. work conserving 은 <strong>보낼 것이 있는 flow 가 있으면 출구를 놀리지 않는</strong> 성질이다. 빈 flow 차례를 건너뛰면 work conserving, 비워 두면 non-work conserving.</div>
+  <div class="d" lang="en">Round robin (RR) grants the exit <strong>in turn</strong>: everyone is guaranteed a turn, though differing needs are hard to meet. Work conserving means <strong>never idling the exit while any flow has something to send</strong>; skipping an empty flow's turn is work conserving, leaving it empty is not.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s14">Lecture 11 &middot; 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Router</div>
+  <div class="d" lang="ko">들어온 packet 을 <strong>목적지 쪽 출구(output link)로 넘기는</strong> NoC 의 교차점. 이 덱은 switch 와 같은 뜻으로 쓴다. 입력 하나를 여러 출구 중 하나로 보내므로 방향이 arbiter 와 반대이고, 그래서 router 안에는 출구마다 arbiter 가 하나씩 있다.</div>
+  <div class="d" lang="en">A NoC crossing point that <strong>passes an incoming packet to the output link toward its destination</strong>; the deck uses it interchangeably with switch. It sends one input to one of many exits, the opposite of an arbiter, which is why a router holds one arbiter per exit.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s2">Lecture 11 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -1722,7 +2132,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Scoreboard</div>
   <div class="d" lang="ko">동작 수준 checker. <strong>DUT에 들어간 transaction과 나온 transaction을 맞춰본다.</strong> "데이터 X를 담은 transaction을 넣었으니 응답은 데이터 Y여야 한다" 같은 검사다. 신호 수준의 assertion과 층이 다르다.</div>
   <div class="d" lang="en">A behavioural checker that <strong>matches transactions going into the DUT against those coming out</strong>, as in "a transaction carrying X went in, so the response should carry Y". It sits at a different layer from signal level assertions.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s20">Lecture 12 · 20</a></div>
 </div>
 
 <div class="gterm">
@@ -1733,10 +2143,31 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">semaphore</div>
+  <div class="d" lang="ko">thread 사이의 <strong>열쇠 꾸러미.</strong> <code>new(N)</code> 으로 열쇠 N 개를 두고, <code>get</code> 으로 가져가고(없으면 기다린다) <code>put</code> 으로 돌려준다. 버스나 공유 object 를 한 번에 한 thread 만 쓰게 한다. put 을 빠뜨리면 다음 thread 가 영원히 멈춘다.</div>
+  <div class="d" lang="en">A <strong>bunch of keys</strong> between threads. <code>new(N)</code> makes N keys, <code>get</code> takes one (waiting if none), <code>put</code> returns it. Keeps a bus or shared object to one thread at a time. Forget a put and the next thread stalls forever.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s7">Lecture 12 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Sequence · Property</div>
+  <div class="d" lang="ko">assertion 을 나눠 쓰는 단위. <strong>sequence</strong> 는 <code>##[2:20] (ready == 1)</code> 같은 시간 패턴 조각에 이름을 붙인 것, <strong>property</strong> 는 sequence 를 implication 으로 엮은 주장이다. <code>assert property</code> 로 검사하고 <code>cover property</code> 로 센다.</div>
+  <div class="d" lang="en">The units assertions are split into. A <strong>sequence</strong> names a piece of temporal pattern such as <code>##[2:20] (ready == 1)</code>; a <strong>property</strong> is a claim built from sequences with implications. <code>assert property</code> checks it, <code>cover property</code> counts it.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s19">Lecture 12 &middot; 19</a> &middot; <span lang="ko">Lecture 13 에서 본격적으로</span><span lang="en">in depth in Lecture 13</span></div>
+</div>
+
+<div class="gterm">
   <div class="t">Setup Time</div>
   <div class="d" lang="ko">클럭 엣지가 오기 <strong>전에</strong> 데이터가 미리 안정돼 있어야 하는 최소 시간(<code>tSetUp</code>). flip-flop 셀의 물리적 특성치이고 라이브러리(<code>.lib</code>)에 들어 있으며, <strong>STA가 이 값을 읽어서 검사한다.</strong> hold time과 방향이 반대다.</div>
   <div class="d" lang="en">The minimum time data must already be stable <strong>before</strong> a clock edge (<code>tSetUp</code>). A physical property of the flip-flop cell, stored in the library and <strong>read by STA to check it.</strong> Points the opposite way from hold time.</div>
   <div class="src"><a href="L04-clock-and-reset.html#s1">Lecture 4 · 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Shallow Copy</div>
+  <div class="d" lang="ko"><code>c = new a;</code> 로 object 의 property 를 <strong>한 단계만</strong> 복사한 새 object 를 만드는 것. property 중 다른 object 의 handle 은 handle 만 복사되어 안쪽 object 를 원본과 공유한다. 끝까지 따로 만들려면(deep copy) <code>copy()</code> 같은 method 를 직접 짠다.</div>
+  <div class="d" lang="en">Making a new object with <code>c = new a;</code>, copying properties <strong>one level deep.</strong> A property that is a handle to another object copies only the handle, so the inner object is shared with the original. A fully separate copy (deep copy) needs a hand-written method such as <code>copy()</code>.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s4">Lecture 12 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -1773,6 +2204,20 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">예전에 보드 위에 여러 칩으로 흩어져 있던 것을 <strong>칩 하나에 다 넣은 것.</strong> CPU, accelerator, interconnect, I/O와 memory controller, clock과 reset 같은 globals가 들어간다. <strong>특정 제품 이름이 아니라 구조를 부르는 말이다.</strong> 이 과목의 뼈대이기도 하다.</div>
   <div class="d" lang="en">Everything that used to sit as separate chips on a board, <strong>pulled onto one die</strong>: a CPU, accelerators, an interconnect, I/O and memory controllers, and globals such as clock and reset. <strong>It names a shape, not a product</strong>, and it is the skeleton of this course.</div>
   <div class="src"><a href="L01-course-intro.html#s1">Lecture 1 · 01</a> · <a href="L10-soc-architecture.html#s1">Lecture 10 · 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">solve ... before</div>
+  <div class="d" lang="ko">constraint 의 <strong>풀이 순서</strong>를 정하는 문법. 해의 집합은 그대로이고 <strong>확률 분포만</strong> 바뀐다. <code>if (Command == WRITE) Addr &gt; 32'h8000; else Addr == ...;</code> 처럼 한쪽 해가 압도적으로 많으면 다른 쪽 Command 가 거의 안 나오는데, <code>solve Command before Addr;</code> 로 고친다.</div>
+  <div class="d" lang="en">Syntax that sets the <strong>solving order</strong> of constraints. The set of solutions is unchanged; <strong>only the probability distribution</strong> moves. When one branch has overwhelmingly more solutions, as in <code>if (Command == WRITE) Addr &gt; 32'h8000; else Addr == ...;</code>, the other commands almost never appear; <code>solve Command before Addr;</code> fixes it.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s19">Lecture 12 &middot; 19</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Source · Destination Routing</div>
+  <div class="d" lang="ko">경로를 <strong>출발지가 미리 적어 보내면</strong> source routing, <strong>router 마다 목적지 주소나 target id 를 보고 정하면</strong> destination routing. 강의의 router RTL 예제는 header 의 Route 16 bit 에 hop 마다 2 bit 씩 출구를 적는 source routing 이다. header 의 Source ID 칸과는 상관없다.</div>
+  <div class="d" lang="en">If <strong>the source writes the route into the packet</strong>, source routing; if <strong>each router decides from the destination address or target id</strong>, destination routing. The lecture's router RTL uses source routing, 2 bits of exit per hop in a 16-bit Route field. Unrelated to the header's Source ID field.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s16">Lecture 11 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
@@ -1826,10 +2271,46 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Starvation</div>
+  <div class="d" lang="ko">network 는 잘 도는데 <strong>특정 요청자 하나가 오래도록, 또는 영영 차례를 못 받는</strong> 것. static priority 와 QoS 에서 생긴다. 슬라이드 45쪽은 QoS 를 쓰면 반드시 대책(낮은 class 에 bandwidth 예약, 또는 갇힌 트랜잭션 감지 후 그것만 진행)을 두라고 한다.</div>
+  <div class="d" lang="en">The network runs fine but <strong>one requester goes a long time, or forever, without a turn.</strong> Comes with static priority and QoS. Slide 45 says any QoS needs a remedy: reserve bandwidth for lower classes, or detect stuck transactions and let only those progress.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s19">Lecture 11 &middot; 19</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Static Priority · Preemption</div>
+  <div class="d" lang="ko">우선순위를 고정해 두고 <strong>요청한 것 중 가장 높은 것을 늘 고르는</strong> arbitration. preemption 은 높은 것이 오면 <strong>진행 중인 낮은 것을 끊는</strong> 것이다. 높은 쪽이 끊이지 않으면 낮은 쪽이 굶는다. 슬라이드는 이것을 deadlock 이라 적지만 보통은 starvation 이라 부른다.</div>
+  <div class="d" lang="en">Arbitration with fixed priorities that <strong>always picks the highest requester.</strong> Preemption means a higher one arriving <strong>cuts off a lower one in progress.</strong> With a steady stream from the top, the bottom starves; the slide calls this deadlock, though it's usually called starvation.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s14">Lecture 11 &middot; 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Status Flag (FP exception)</div>
+  <div class="d" lang="ko">FP 연산 결과가 정상이 아니었다는 표시로, 결과 값과 따로 나오는 1 bit 신호. IEEE 754 는 예외 다섯(invalid operation, division by zero, overflow, underflow, inexact)마다 flag 하나를 둔다. 소프트웨어가 여러 연산 뒤에 모아 읽으므로 한 번 켜지면 지울 때까지 남는 방식이 흔하다. Lab 3 덱은 PE 의 FP 곱셈기와 덧셈기가 <code>flag[3:0]</code> 를 내고 그것을 OR 로 모은다고만 그리고, 4 bit 의 뜻은 적지 않는다. 4 bit 를 합칠 때는 <code>||</code> 가 아니라 <code>|</code> 다.</div>
+  <div class="d" lang="en">A 1-bit signal, separate from the result, saying an FP operation didn't go normally. IEEE 754 keeps one flag per exception (invalid operation, division by zero, overflow, underflow, inexact). Software reads them after many operations, so flags commonly stay set until cleared. The Lab 3 deck only draws the PE's FP multiplier and adder each putting out <code>flag[3:0]</code>, merged with an OR; it doesn't say what the 4 bits mean. Merge 4 bits with <code>|</code>, not <code>||</code>.</div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s6">Lab 3 · 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Stimulus</div>
   <div class="d" lang="ko">DUT를 자극하려고 넣는 입력. <strong>Active</strong>는 값을 밀어 넣는 것, <strong>Reactive</strong>는 DUT에서 벌어진 일에 반응하는 것이다. 검증의 세 기둥 중 하나이고, <strong>이것만 있으면 시뮬레이션이 항상 통과한다.</strong> 결과를 보는 사람이 없기 때문이다.</div>
   <div class="d" lang="en">The inputs applied to stimulate the DUT. <strong>Active</strong> means driving values in; <strong>reactive</strong> means responding to something that happened inside. One of the three pillars, and <strong>on its own it makes every simulation pass</strong>, because nobody is looking at the result.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s9">Lecture 12 · 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Store-and-Forward · Virtual Cut-Through · Wormhole</div>
+  <div class="f">SAF = Store-and-Forward</div>
+  <div class="d" lang="ko">packet switching 셋. 다음 router 로 넘기기 시작하는 조건이 SAF 는 <strong>packet 을 다 받고 + 다음에 packet 자리</strong>, cut-through 는 <strong>첫 flit + 다음에 packet 자리</strong>, wormhole 은 <strong>첫 flit + 다음에 flit 자리.</strong> node H 개, flit L 개면 SAF 는 H &times; L, 나머지 둘은 막힘이 없을 때 H + L &minus; 1 cycle. wormhole 은 buffer 가 flit 하나라 작지만 packet 이 여러 router 에 걸쳐 deadlock 에 약하다.</div>
+  <div class="d" lang="en">The three packet switching methods. Start forwarding when: SAF, <strong>whole packet received + packet room next</strong>; cut-through, <strong>first flit + packet room next</strong>; wormhole, <strong>first flit + flit room next.</strong> With H nodes and L flits, SAF takes H &times; L cycles, the other two H + L &minus; 1 when unblocked. Wormhole needs only a one-flit buffer, but a packet straddling several routers makes it more deadlock prone.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s15">Lecture 11 &middot; 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Stride (address stride)</div>
+  <div class="d" lang="ko">다음 원소(Lab 3 에서는 RAM 의 다음 줄)를 읽으려면 <strong>주소를 얼마씩 건너뛰는지.</strong> 시작 주소와 함께 CSR 로 설정하고, 가속기는 k 번째 주소를 시작 주소 + k × stride 로 센다. Lab 3 릴리스 덱 12쪽 그림은 시작 0xF0, stride 4 로 0xF0, 0xF4, 0xF8, 0xFC 를 읽는다. 단위(바이트인지 RAM 한 줄인지)를 testbench 와 RTL 이 같게 정해야 한다. 다르면 주소가 4 배씩 어긋난다.</div>
+  <div class="d" lang="en">How far <strong>to jump in the address</strong> to read the next element (in Lab 3, the next RAM row). It's set as a CSR alongside the start address, and the accelerator computes the k-th address as start + k × stride. The figure on slide 12 of the Lab 3 release deck starts at 0xF0 with stride 4 and reads 0xF0, 0xF4, 0xF8, 0xFC. Testbench and RTL must agree on the unit (bytes or RAM rows), or addresses come out off by a factor of four.</div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s2">Lab 3 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -1865,7 +2346,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">SystemVerilog</div>
   <div class="d" lang="ko">설계와 검증에 모두 쓰는 언어. 슬라이드가 <strong>"Verilog++"</strong>라고 부르고, 표준은 <strong>IEEE 1800</strong>이다. HDL에 없던 class와 enum 같은 프로그래밍 기능, 그리고 assertion·randomization·coverage에 대한 native 지원이 들어 있다. <strong>UVM은 SystemVerilog로 쓰인 class 라이브러리이므로 SystemVerilog 없이 UVM만 배울 수 없다.</strong></div>
   <div class="d" lang="en">The language used for both design and verification. The slides call it <strong>"Verilog++"</strong> and the standard is <strong>IEEE 1800.</strong> It adds programming features an HDL lacked, such as classes and enums, plus native support for assertions, randomisation and coverage. <strong>UVM is a class library written in it, so there is no learning UVM without it.</strong></div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a></div>
 </div>
 
 <div class="gterm">
@@ -1903,6 +2384,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko"><strong>구별 기준은 하나다: 시간을 쓰는가.</strong> <code>function</code>은 <code>#</code>, <code>wait</code>, <code>@</code>를 못 쓰고 호출한 시점에 <strong>즉시</strong> 끝나며 그래서 조합 논리로 <strong>합성된다.</strong> <code>task</code>는 여러 클럭에 걸쳐 돌 수 있고 그래서 대개 <strong>합성되지 않는다.</strong> SystemVerilog가 <code>function</code>에 <code>return</code>과 <code>output</code> 인자를 추가했다.</div>
   <div class="d" lang="en"><strong>One criterion separates them: does it consume time.</strong> A <code>function</code> cannot use <code>#</code>, <code>wait</code> or <code>@</code>, finishes <strong>instantly</strong> at the point of call, and therefore <strong>synthesises</strong> into combinational logic. A <code>task</code> can run across many clocks and therefore usually <strong>does not synthesise.</strong> SystemVerilog gave functions a <code>return</code> and <code>output</code> arguments.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">TDMA</div>
+  <div class="f">Time Division Multiple Access</div>
+  <div class="d" lang="ko">시간을 창(slot)으로 나눠 <strong>flow 마다 보낼 수 있는 창을 미리 정해 주는</strong> arbitration. 창 길이를 필요한 bandwidth 에 맞춰 보장한다. single level 은 창 하나에 flow 하나, two level 은 창 하나에 flow 여럿을 넣고 창 안에서 다시 골라 활용도를 높인다.</div>
+  <div class="d" lang="en">Arbitration that cuts time into slots and <strong>assigns each flow the windows it may send in</strong>, sized to guarantee bandwidth. Single level puts one flow per window; two level puts several and picks again inside the window for better utilisation.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s14">Lecture 11 &middot; 14</a></div>
 </div>
 
 <div class="gterm">
@@ -1946,6 +2435,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">사양과 구현의 관계를 <strong>정리(theorem)로 보고</strong> 기호 표현·수리 논리·귀납 증명으로 증명하는 formal 기법. 도구가 대부분 <strong>학술용</strong>이다. 대신 무한 상태 시스템도 다룰 수 있다.</div>
   <div class="d" lang="en">A formal technique that <strong>treats the relation between specification and implementation as a theorem</strong> and proves it with symbolic representations, mathematical logic and inductive proofs. The tools are <strong>mostly academic</strong>, but it can handle infinite state systems.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Thread (process)</div>
+  <div class="d" lang="ko">시뮬레이션 시간 위에서 <strong>다른 것과 나란히 진행되는 실행 흐름.</strong> 슬라이드는 thread, LRM 은 process 라고 부른다. <code>initial</code>, <code>always</code>, <code>fork</code> 가 띄운 문장이 각각 하나다. 운영체제 thread 가 아니라 시뮬레이터가 번갈아 돌리는 것이라 같은 시각의 실행 순서는 보장되지 않는다.</div>
+  <div class="d" lang="en">A <strong>line of execution running alongside others</strong> in simulation time; the slides say thread, the LRM says process. Each <code>initial</code>, <code>always</code> and statement launched by <code>fork</code> is one. Not an OS thread but a turn the simulator takes, so order within one time step is not guaranteed.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s6">Lecture 12 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1993,11 +2489,25 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Topology</div>
+  <div class="d" lang="ko">router 와 link 가 <strong>누가 누구와 직접 이어져 있는가</strong>의 모양. 강의의 다섯은 bus, crossbar, ring, mesh, custom(irregular). 연결 그래프이지 칩 위 배치가 아니다. 성능(bisection BW, 최악 latency)과 비용(port 수, link 수)을 맞바꾼다.</div>
+  <div class="d" lang="en">The shape of <strong>which routers and links connect directly to which.</strong> The lecture's five: bus, crossbar, ring, mesh, custom (irregular). A connection graph, not the floorplan; it trades performance (bisection BW, worst-case latency) against cost (ports, links).</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s6">Lecture 11 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">TPU</div>
   <div class="f">Tensor Processing Unit</div>
   <div class="d" lang="ko">Google 의 ML 가속기 ASIC. 슬라이드 11쪽 블록도의 중심이 <strong>Matrix Multiply Unit (64K per cycle)</strong> 와 그 옆의 Systolic Data Setup 이다. 64K 는 첫 세대 논문의 256 &times; 256 systolic array 와 맞는다(슬라이드 밖 보충).</div>
   <div class="d" lang="en">Google's ML accelerator ASIC. The heart of slide 11's block diagram is the <strong>Matrix Multiply Unit (64K per cycle)</strong> with Systolic Data Setup beside it. 64K matches the first-generation paper's 256 &times; 256 systolic array (supplementary).</div>
   <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Traffic Class</div>
+  <div class="d" lang="ko">트래픽을 <strong>요구하는 것</strong>으로 묶은 무리. 강의의 넷은 CC(Cache Coherent, compute cluster 안), LL(Low Latency, SRAM 으로), HB(High Bandwidth, DRAM 과 cache fill), BE(Best Effort, peripheral 과 DMA). 이름이 우선순위 순서는 아니고, BE 는 보장이 없다는 뜻이지 막 다뤄도 된다는 뜻이 아니다.</div>
+  <div class="d" lang="en">Traffic grouped by <strong>what it needs.</strong> The lecture's four: CC (Cache Coherent, within the compute cluster), LL (Low Latency, to SRAM), HB (High Bandwidth, DRAM and cache fill), BE (Best Effort, peripherals and DMA). The names aren't a priority order, and BE means "no guarantee", not "anything goes".</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s19">Lecture 11 &middot; 19</a></div>
 </div>
 
 <div class="gterm">
@@ -2054,11 +2564,18 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Upstream · Downstream</div>
+  <div class="d" lang="ko">트랜잭션 하나를 기준으로 <strong>initiator 쪽이 upstream, target 쪽이 downstream.</strong> 응답이 돌아오는 것도 upstream 으로 가는 것이다. 다만 flow control 설명에서 downstream 은 그 link 의 받는 쪽을 뜻하기도 하니 어느 기준인지 먼저 본다.</div>
+  <div class="d" lang="en">Relative to one transaction, <strong>the initiator side is upstream and the target side downstream</strong>; a returning response travels upstream. In flow control descriptions, though, downstream can mean the receiving end of a link, so check the frame first.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s2">Lecture 11 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">UVM</div>
   <div class="f">Universal Verification Methodology</div>
   <div class="d" lang="ko">검증 방법론의 사실상 표준. <strong>언어가 아니라 SystemVerilog로 쓰인 class 라이브러리 + 관행의 묶음이다.</strong> testbench 부품의 이름과 모양과 붙이는 방법을 정해두어 <strong>남이 만든 것(VIP)을 가져다 쓸 수 있게</strong> 한다. VMM과 OVM을 합친 것이다. 이 과목에서는 Lecture 15~22와 Lab 6에서 다룬다.</div>
   <div class="d" lang="en">The de facto standard verification methodology. <strong>Not a language but a class library written in SystemVerilog, plus a set of conventions.</strong> By fixing the names, shapes and connection rules of testbench components it makes it possible <strong>to use what somebody else built</strong>, that is, VIP. It merged VMM and OVM. This course covers it in lectures 20 to 22 and Lab 6.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a></div>
 </div>
 
 <h2 class="gletter" id="gV">V</h2>
@@ -2071,10 +2588,17 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Validity Mask</div>
+  <div class="d" lang="ko">bit 하나가 lane(또는 행, 열) 하나에 대응해서 <strong>"이 칸의 값은 진짜다 / 무시하라"</strong> 를 표시하는 비트 묶음. Lecture 9 슬라이드 44쪽과 Lab 3 릴리스 덱 21쪽에 이름만 나오고, 무엇을 가리는지는 정의되지 않았다. 배열보다 작은 행렬을 넣을 때 쓰는 읽기와, systolic 계단 앞뒤의 빈 사이클을 가리는 읽기가 있다. 1 이 유효인지 무효인지(극성)도 정해야 한다.</div>
+  <div class="d" lang="en">A set of bits, one per lane (or row, or column), marking <strong>"this value is real / ignore it".</strong> Lecture 9's slide 44 and slide 21 of the Lab 3 release deck only name it; what it masks isn't defined. One reading is for matrices smaller than the array, another for blanking the empty cycles around the systolic staircase. The polarity (does 1 mean valid?) has to be fixed too.</div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s14">Lecture 9 &middot; 14</a> · <a href="LAB3-systolic-matmul.html#s7">Lab 3 · 07</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Valid/Ready Handshake</div>
   <div class="d" lang="ko">보내는 쪽이 VALID, 받는 쪽이 READY 를 올리고 <strong>둘이 같은 상승 엣지에서 1 이면 한 번 넘어가는</strong> 약속. AXI 의 모든 채널이 쓴다. 한 번 올린 VALID 는 넘어갈 때까지 내리면 안 된다.</div>
   <div class="d" lang="en">The sender raises VALID, the receiver raises READY, and <strong>one item moves when both are 1 on the same rising edge.</strong> Every AXI channel uses it; a raised VALID must stay up until the transfer.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a> · <a href="L11-soc-interconnect.html#s12">Lecture 11 · 12</a></div>
 </div>
 
 <div class="gterm">
@@ -2114,6 +2638,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">Virtual Channel</div>
+  <div class="f">VC</div>
+  <div class="d" lang="ko">물리 link 하나에 <strong>buffer 를 여러 벌</strong> 두고 서로 독립된 채널처럼 쓰는 것. deadlock 고리를 논리적으로 끊거나(ring 의 VC0/VC1) 막힌 packet 옆으로 다른 packet 을 보낼 때 쓴다. VC 마다 buffer 와 credit 이 따로 든다. 약어가 같은 virtual circuit 과 다르다.</div>
+  <div class="d" lang="en">Several <strong>sets of buffers</strong> on one physical link, each used as an independent channel. Used to break deadlock loops logically (a ring's VC0/VC1) and to let packets pass a blocked one. Each VC needs its own buffers and credits. Not the same as a virtual circuit, despite the shared abbreviation.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s17">Lecture 11 &middot; 17</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Virtual Interface</div>
+  <div class="f">vif</div>
+  <div class="d" lang="ko"><strong>interface instance 를 가리키는 handle.</strong> class 는 시뮬레이션 전에 정해지는 interface 를 품을 수 없어서 이것으로 DUT 의 신호를 만진다(<code>virtual dut_if vif;</code>). top 이 실제 instance 를 넘겨주지 않으면 null 이다. virtual method, virtual class 와는 다른 뜻의 virtual 이다.</div>
+  <div class="d" lang="en"><strong>A handle pointing at an interface instance.</strong> A class cannot contain an interface, which is fixed before simulation, so it touches the DUT's signals through this (<code>virtual dut_if vif;</code>). Null unless top hands over a real instance. A different virtual from virtual methods and virtual classes.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s8">Lecture 12 &middot; 08</a></div>
+</div>
+
 <h2 class="gletter" id="gW">W</h2>
 
 <div class="gterm">
@@ -2137,6 +2677,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L05-fifo-design.html#s8">Lecture 5 · 08</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">Wrapper</div>
+  <div class="d" lang="ko">IP 의 제멋대로인 포트 앞에 <strong>표준 버스 인터페이스와 CSR 을 세워</strong> 바깥에는 표준 인터페이스만 보이게 감싼 껍데기 모듈. 잘 돌던 IP 를 SoC 에 붙일 때 안쪽을 고치지 않고 바깥만 바꾼다. Lab 3 에서는 systolic matmul 앞에 APB slave 와 CSR 을 세운 것이 wrapper 다. 릴리스 덱 23쪽은 그 부품을 "APB protocol converter or APB slave interface" 라고 부른다. wrapper 는 계산을 하지 않는다.</div>
+  <div class="d" lang="en">A shell module that <strong>puts a standard bus interface and CSRs</strong> in front of an IP's ad hoc ports, so the outside sees only the standard interface. A working IP goes into an SoC this way, with the inside untouched. In Lab 3 the APB slave and CSRs in front of the systolic matmul are the wrapper; slide 23 of the release deck calls that part "APB protocol converter or APB slave interface". A wrapper computes nothing.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a> · <a href="LAB3-systolic-matmul.html#s7">Lab 3 · 07</a></div>
+</div>
+
 <h2 class="gletter" id="gX">X</h2>
 
 <div class="gterm">
@@ -2144,6 +2691,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">포트를 거치지 않고 <code>top.mips.dp.rf...</code> 같은 <strong>계층 경로로 다른 모듈 안쪽 신호를 직접 읽는 것.</strong> SystemVerilog 표준은 hierarchical reference 라고 부른다. testbench 가 register file 이나 메모리 내용을 확인할 때 쓰고, 설계 코드에는 쓰지 않는다. 편하지만 인스턴스 이름에 묶여서 설계자가 이름을 바꾸면 testbench 가 깨진다. Lab 2 릴리스 덱은 프로세서 검증 방법 둘 중 하나로 소개하고, 다른 하나는 store 를 interface 신호에서 보는 것이다.</div>
   <div class="d" lang="en">Reading a signal inside another module <strong>directly by hierarchical path</strong>, like <code>top.mips.dp.rf...</code>, without going through ports. The SystemVerilog standard calls it a hierarchical reference. Testbenches use it to check register file or memory contents; design code never does. Handy, but tied to instance names: rename an instance and the testbench breaks. The Lab 2 release deck gives it as one of two ways to verify a processor; the other watches stores on the interface signals.</div>
   <div class="src"><a href="LAB2-mips-processor-design.html#s9">Lab 2 · 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">XY Routing</div>
+  <div class="d" lang="ko">2D mesh 에서 <strong>X(가로)로 목적지 열까지 먼저 다 간 뒤 Y(세로)로</strong> 가는 routing. Y 에서 X 로 꺾는 일이 없어 channel dependency graph 에 고리가 생기지 않으므로 deadlock 이 없다. 단순하고 deterministic 이며 minimal 이지만 붐비는 곳을 피하지는 못한다. YX 도 같은 성질이고, 문제는 packet 마다 섞어 쓰는 것이다.</div>
+  <div class="d" lang="en">Routing on a 2D mesh that <strong>goes all the way in X (across) to the destination column first, then in Y.</strong> It never turns from Y to X, so the channel dependency graph has no cycle and there's no deadlock. Simple, deterministic and minimal, but blind to congestion. YX has the same property; mixing the two across packets is the problem.</div>
+  <div class="src"><a href="L11-soc-interconnect.html#s17">Lecture 11 &middot; 17</a></div>
 </div>
 
 </div>
