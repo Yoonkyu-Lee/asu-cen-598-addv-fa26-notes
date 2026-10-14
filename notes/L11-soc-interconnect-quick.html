@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 11 빠른 읽기 &middot; SoC Interconnect Design &middot; CEN 598 ADDV</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+/* 애니메이션 슬라이더. 덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간을 한 자리에서 밟아본다. */
+/* 마크업 규약과 동작은 anim.js 가 단일 출처다. 스크립트가 없으면 첫 프레임만 보이고 막대가 안 생긴다. */
+.anim [data-f]{display:none}
+.anim [data-f~="0"]{display:revert}
+.anim.js-anim [data-f]{display:none}
+.anim.js-anim [data-f].on{display:revert}
+.anim:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.animbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--rule)}
+.animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.animbar button:disabled{opacity:.35;cursor:default}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
+.animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
+.animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
+@media(prefers-reduced-motion:reduce){.animbar button{transition:none}}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Eric Taylor (Baud)</div>
+  <h1 class="title">Lecture 11<br>SoC Interconnect Design</h1>
+  <p class="subtitle" lang="ko">칩 안의 network 는 <strong>모양, 쪼개는 단위, 보내도 되는지, 누가 먼저, 언제 넘기나, 어느 길로</strong>를 정하는 일이고, 그 결정들이 고리를 만들면 <strong>deadlock</strong> 이다.</p>
+  <p class="subtitle" lang="en">An on-chip network is a set of decisions, <strong>shape, unit, permission to send, who goes first, when to forward, which way</strong>, and when they form a loop you get <strong>deadlock.</strong></p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L11-soc-interconnect.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L11-soc-interconnect.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 11</div>
+    <div class="name">SoC Interconnect Design</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">왜 network 이고 어떤 모양인가</span><span lang="en">Why a network, and what shape</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">Flit 과 flow control</span><span lang="en">Flits and flow control</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">Arbitration</span><span lang="en">Arbitration</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">Switching 과 routing</span><span lang="en">Switching and routing</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">Deadlock</span><span lang="en">Deadlock</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+  <p lang="ko">외부 강사 Eric Taylor 의 강의다. Lecture 10 이 이름만 걸어둔 shared bus, crossbar, NoC 를 열어서, NoC 를 설계할 때 정하는 것들을 하나씩 본다. 슬라이드 9쪽이 네모 친 여섯 결정이 뼈대다.</p>
+  <p lang="en">A guest lecture by Eric Taylor. It opens up the shared bus, crossbar and NoC that Lecture 10 only named, and walks through what you decide when designing a NoC. The six decisions boxed on slide 9 are the skeleton.</p>
+  <table>
+    <thead><tr><th><span lang="ko">한 줄로</span><span lang="en">In one line</span></th><th><span lang="ko">내용</span><span lang="en">What it says</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">왜</span><span lang="en">Why</span></td><td><span lang="ko">게이트는 빨라지고 <strong>멀리 가는 선이 비싸졌다</strong>. 짧은 선과 router 로 잇는다</span><span lang="en">gates got faster and <strong>long wires expensive</strong>; connect with short wires and routers</span></td></tr>
+      <tr><td><span lang="ko">재는 법</span><span lang="en">Measuring</span></td><td><span lang="ko">peak 와 sustained, idle 과 loaded latency. <strong>priority 표시만으로는 QoS 보장이 없다</strong></span><span lang="en">peak vs sustained, idle vs loaded latency. <strong>A priority tag alone guarantees no QoS</strong></span></td></tr>
+      <tr><td>topology</td><td><span lang="ko">bus, crossbar, ring, mesh/torus, custom. mesh 는 성능과 비용이 sqrt(N) 으로 자란다</span><span lang="en">bus, crossbar, ring, mesh/torus, custom; a mesh's performance and cost grow as sqrt(N)</span></td></tr>
+      <tr><td><span lang="ko">단위</span><span lang="en">Units</span></td><td><span lang="ko">packet &gt; flit(switching 과 flow control 의 단위) &gt; phit(link 의 한 cycle)</span><span lang="en">packet &gt; flit (the unit of switching and flow control) &gt; phit (one link cycle)</span></td></tr>
+      <tr><td><span lang="ko">핵심 위험</span><span lang="en">The core risk</span></td><td><span lang="ko"><strong>channel dependency graph 에 고리가 있으면 deadlock.</strong> XY routing 이나 virtual channel 로 끊는다</span><span lang="en"><strong>A loop in the channel dependency graph means deadlock.</strong> Break it with XY routing or virtual channels</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">왜 network 이고 어떤 모양인가</h2><h2 lang="en">Why a network, and what shape</h2></div>
+  <p lang="ko">슬라이드 3쪽의 그래프가 이유다. 250 nm 에서 32 nm 로 오는 동안 게이트 지연은 약 0.14 배가 됐는데 repeater 없는 긴 선의 지연은 약 45 배가 됐다(로그 눈금을 눈으로 읽은 값). 업계의 답은 4쪽처럼 custom 배선, shared bus, hierarchical bus, crossbar 를 거쳐 NoC 로 왔다.</p>
+  <p lang="en">Slide 3's graphs give the reason. From 250 nm to 32 nm, gate delay fell to about 0.14x while unrepeated long-wire delay rose to about 45x (read by eye off a log scale). The industry's answer, per slide 4, went from custom wiring through the shared bus, hierarchical bus and crossbar to the NoC.</p>
+  <figure>
+    <svg viewBox="0 0 700 204" role="img" aria-label="1990 년 custom 배선에서 shared bus, hierarchical bus, crossbar 를 거쳐 2010 년 network on chip 으로 가는 흐름">
+<defs><marker id="m1-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink2)"/></marker></defs>
+<line x1="24" y1="166" x2="674" y2="166" stroke="var(--ink2)" stroke-width="1.4" marker-end="url(#m1-ar)"/>
+<text class="svglab" x="672" y="156" text-anchor="end" style="font-size:10px;fill:var(--ink2)">Time</text>
+<line x1="84" y1="161" x2="84" y2="171" stroke="var(--ink2)" stroke-width="1.2"/>
+<line x1="222" y1="161" x2="222" y2="171" stroke="var(--ink2)" stroke-width="1.2"/>
+<line x1="360" y1="161" x2="360" y2="171" stroke="var(--ink2)" stroke-width="1.2"/>
+<line x1="498" y1="161" x2="498" y2="171" stroke="var(--ink2)" stroke-width="1.2"/>
+<line x1="636" y1="161" x2="636" y2="171" stroke="var(--ink2)" stroke-width="1.2"/>
+<text class="svgnum" x="84" y="188" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">1990</text>
+<text class="svgnum" x="222" y="188" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">1995</text>
+<text class="svgnum" x="360" y="188" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">2000</text>
+<text class="svgnum" x="498" y="188" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">2005</text>
+<text class="svgnum" x="636" y="188" text-anchor="middle" style="font-size:11px;fill:var(--ink2)">2010</text>
+<line x1="58" y1="112" x2="112" y2="108" stroke="var(--blue)" stroke-width="1.4"/>
+<line x1="58" y1="112" x2="64" y2="80" stroke="var(--blue)" stroke-width="1.4"/>
+<line x1="64" y1="80" x2="100" y2="56" stroke="var(--blue)" stroke-width="1.4"/>
+<line x1="64" y1="80" x2="100" y2="88" stroke="var(--blue)" stroke-width="1.4"/>
+<line x1="100" y1="88" x2="112" y2="108" stroke="var(--blue)" stroke-width="1.4"/>
+<circle cx="58" cy="112" r="5" fill="var(--blue)"/><circle cx="64" cy="80" r="5" fill="var(--blue)"/><circle cx="100" cy="56" r="5" fill="var(--blue)"/><circle cx="100" cy="88" r="5" fill="var(--blue)"/><circle cx="112" cy="108" r="5" fill="var(--blue)"/>
+<text class="svgtxt" x="84" y="140" text-anchor="middle" style="font-size:11px;fill:var(--ink)">Custom</text>
+<line x1="186" y1="112" x2="258" y2="112" stroke="var(--blue)" stroke-width="2.4"/>
+<line x1="192" y1="88" x2="192" y2="112" stroke="var(--blue)" stroke-width="1.3"/><line x1="212" y1="88" x2="212" y2="112" stroke="var(--blue)" stroke-width="1.3"/><line x1="232" y1="88" x2="232" y2="112" stroke="var(--blue)" stroke-width="1.3"/><line x1="252" y1="88" x2="252" y2="112" stroke="var(--blue)" stroke-width="1.3"/>
+<circle cx="192" cy="84" r="5" fill="var(--blue)"/><circle cx="212" cy="84" r="5" fill="var(--blue)"/><circle cx="232" cy="84" r="5" fill="var(--blue)"/><circle cx="252" cy="84" r="5" fill="var(--blue)"/>
+<text class="svgtxt" x="222" y="140" text-anchor="middle" style="font-size:11px;fill:var(--ink)">Shared bus</text>
+<line x1="318" y1="72" x2="398" y2="72" stroke="var(--blue)" stroke-width="2.4"/>
+<line x1="330" y1="56" x2="330" y2="72" stroke="var(--blue)" stroke-width="1.3"/><line x1="358" y1="56" x2="358" y2="72" stroke="var(--blue)" stroke-width="1.3"/><line x1="386" y1="56" x2="386" y2="72" stroke="var(--blue)" stroke-width="1.3"/>
+<circle cx="330" cy="52" r="5" fill="var(--blue)"/><circle cx="358" cy="52" r="5" fill="var(--blue)"/><circle cx="386" cy="52" r="5" fill="var(--blue)"/>
+<rect x="331" y="78" width="12" height="18" rx="1.5" fill="rgba(var(--blue-rgb),.18)" stroke="var(--blue)" stroke-width="1.2"/>
+<line x1="337" y1="72" x2="337" y2="78" stroke="var(--blue)" stroke-width="1.2"/><line x1="337" y1="96" x2="337" y2="102" stroke="var(--blue)" stroke-width="1.2"/>
+<line x1="324" y1="102" x2="400" y2="102" stroke="var(--blue)" stroke-width="2.4"/>
+<line x1="356" y1="102" x2="356" y2="113" stroke="var(--blue)" stroke-width="1.3"/><line x1="376" y1="102" x2="376" y2="113" stroke="var(--blue)" stroke-width="1.3"/><line x1="396" y1="102" x2="396" y2="113" stroke="var(--blue)" stroke-width="1.3"/>
+<circle cx="356" cy="118" r="5" fill="var(--blue)"/><circle cx="376" cy="118" r="5" fill="var(--blue)"/><circle cx="396" cy="118" r="5" fill="var(--blue)"/>
+<text class="svgtxt" x="360" y="140" text-anchor="middle" style="font-size:11px;fill:var(--ink)">Hierarchical bus</text>
+<rect x="476" y="58" width="44" height="58" rx="2" fill="rgba(var(--blue-rgb),.06)" stroke="var(--blue)" stroke-width="1.3"/>
+<line x1="476" y1="66" x2="520" y2="70" stroke="var(--blue)" stroke-width=".7"/><line x1="476" y1="66" x2="520" y2="87" stroke="var(--blue)" stroke-width=".7"/><line x1="476" y1="66" x2="520" y2="104" stroke="var(--blue)" stroke-width=".7"/>
+<line x1="476" y1="81" x2="520" y2="70" stroke="var(--blue)" stroke-width=".7"/><line x1="476" y1="81" x2="520" y2="87" stroke="var(--blue)" stroke-width=".7"/><line x1="476" y1="81" x2="520" y2="104" stroke="var(--blue)" stroke-width=".7"/>
+<line x1="476" y1="96" x2="520" y2="70" stroke="var(--blue)" stroke-width=".7"/><line x1="476" y1="96" x2="520" y2="87" stroke="var(--blue)" stroke-width=".7"/><line x1="476" y1="96" x2="520" y2="104" stroke="var(--blue)" stroke-width=".7"/>
+<line x1="476" y1="110" x2="520" y2="70" stroke="var(--blue)" stroke-width=".7"/><line x1="476" y1="110" x2="520" y2="87" stroke="var(--blue)" stroke-width=".7"/><line x1="476" y1="110" x2="520" y2="104" stroke="var(--blue)" stroke-width=".7"/>
+<line x1="465" y1="66" x2="476" y2="66" stroke="var(--blue)" stroke-width="1.2"/><line x1="465" y1="81" x2="476" y2="81" stroke="var(--blue)" stroke-width="1.2"/><line x1="465" y1="96" x2="476" y2="96" stroke="var(--blue)" stroke-width="1.2"/><line x1="465" y1="110" x2="476" y2="110" stroke="var(--blue)" stroke-width="1.2"/>
+<circle cx="460" cy="66" r="5" fill="var(--blue)"/><circle cx="460" cy="81" r="5" fill="var(--blue)"/><circle cx="460" cy="96" r="5" fill="var(--blue)"/><circle cx="460" cy="110" r="5" fill="var(--blue)"/>
+<line x1="520" y1="70" x2="531" y2="70" stroke="var(--blue)" stroke-width="1.2"/><line x1="520" y1="87" x2="531" y2="87" stroke="var(--blue)" stroke-width="1.2"/><line x1="520" y1="104" x2="531" y2="104" stroke="var(--blue)" stroke-width="1.2"/>
+<circle cx="536" cy="70" r="5" fill="var(--blue)"/><circle cx="536" cy="87" r="5" fill="var(--blue)"/><circle cx="536" cy="104" r="5" fill="var(--blue)"/>
+<text class="svgtxt" x="498" y="140" text-anchor="middle" style="font-size:11px;fill:var(--ink)">Crossbar</text>
+<line x1="612" y1="60" x2="660" y2="60" stroke="var(--blue)" stroke-width="1.3"/><line x1="612" y1="84" x2="660" y2="84" stroke="var(--blue)" stroke-width="1.3"/><line x1="612" y1="108" x2="660" y2="108" stroke="var(--blue)" stroke-width="1.3"/>
+<line x1="612" y1="60" x2="612" y2="108" stroke="var(--blue)" stroke-width="1.3"/><line x1="636" y1="60" x2="636" y2="108" stroke="var(--blue)" stroke-width="1.3"/><line x1="660" y1="60" x2="660" y2="108" stroke="var(--blue)" stroke-width="1.3"/>
+<rect x="607" y="55" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/><rect x="631" y="55" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/><rect x="655" y="55" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/>
+<rect x="607" y="79" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/><rect x="631" y="79" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/><rect x="655" y="79" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/>
+<rect x="607" y="103" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/><rect x="631" y="103" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/><rect x="655" y="103" width="10" height="10" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svgtxt" x="636" y="140" text-anchor="middle" style="font-size:11px;fill:var(--ink)">Networks on chips</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 4쪽을 다시 그렸다. 연도 눈금은 슬라이드의 위치를 따랐고, 정확한 출시 연도라기보다 흐름을 보여준다. 슬라이드 원본의 crossbar 출력선 세 개에 빨간 펜 표시가 있는데 뜻은 읽히지 않아 옮기지 않았다.</figcaption>
+    <figcaption lang="en">Slide 4 redrawn. The year ticks follow the slide's placement and show a trend rather than exact dates. The original has red pen marks on the crossbar's three output lines; their meaning is not legible, so they are left out.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>아래 화살표가 <strong>Time</strong>, 눈금 다섯이 1990 년부터 5 년 간격이다. 동그라미는 IP 블록 하나, 선은 배선이다.</p><ol><li><strong>Custom (1990)</strong>: 블록 다섯이 필요한 쌍끼리만 제각각 이어져 있다. 쓰는 선은 최소지만 <strong>블록 하나를 더 붙이면 배선을 다시 설계</strong>해야 한다. 재사용이 안 된다</li><li><strong>Shared bus (1995)</strong>: 굵은 가로선 하나에 블록 넷이 매달린다. 누구든 같은 규칙으로 붙일 수 있지만 <strong>한 번에 하나만</strong> 쓴다. <a href="L10-soc-architecture.html#s10">Lecture 10 의 10절</a> 그림의 waits 가 이 한계다</li><li><strong>Hierarchical bus (2000)</strong>: bus 두 개를 작은 네모 하나가 잇는다. 네모가 <strong>bridge</strong> 다. 빠른 bus 와 느린 bus 를 나눠서 느린 peripheral 이 빠른 쪽을 막지 않게 한다. <a href="L10-soc-architecture.html#s2">Lecture 10 의 02절</a>의 AXI to APB bridge 가 이 모양이다</li><li><strong>Crossbar (2005)</strong>: 왼쪽 넷, 오른쪽 셋이 상자 안에서 <strong>모든 쌍</strong>(4 &times; 3 = 12 개)으로 이어진다. 서로 다른 목적지끼리는 동시에 간다. 대신 선 수가 양쪽 개수의 곱으로 는다</li><li><strong>Networks on chips (2010)</strong>: 3 &times; 3 격자의 교차점마다 작은 네모(router)가 있다. 블록은 가까운 router 에만 붙고, 데이터는 router 에서 router 로 <strong>짧은 선만 타고</strong> 건너간다. 슬라이드 3쪽의 "멀리 가는 선이 비싸다" 에 대한 답이다</li></ol><p>모든 블록이 파랑인 것은 이 노트에서 interconnect 를 <strong>설계 쪽</strong>의 일로 칠하기 때문이다.</p></div>
+    <div lang="en"><p>The arrow along the bottom is <strong>time</strong>, with five ticks five years apart from 1990. Each dot is an IP block and each line a wire.</p><ol><li><strong>Custom (1990)</strong>: five blocks wired pair by pair, only where needed. Minimal wire, but <strong>adding one block means redesigning the wiring.</strong> Nothing is reusable</li><li><strong>Shared bus (1995)</strong>: four blocks hang off one thick line. Anyone can attach by the same rules, but <strong>only one uses it at a time</strong>: the "waits" in <a href="L10-soc-architecture.html#s10">Lecture 10, §10</a></li><li><strong>Hierarchical bus (2000)</strong>: two buses joined by a small box, which is a <strong>bridge.</strong> Splitting fast and slow buses keeps slow peripherals from holding up the fast side. The AXI to APB bridge in <a href="L10-soc-architecture.html#s2">Lecture 10, §02</a> has this shape</li><li><strong>Crossbar (2005)</strong>: four on the left and three on the right, connected inside the box <strong>pair by pair</strong> (4 &times; 3 = 12 paths). Different destinations go at the same time, but the wire count grows as the product of the two sides</li><li><strong>Networks on chips (2010)</strong>: a 3 &times; 3 grid with a small box (a router) at each crossing. Blocks attach to a nearby router and data hops router to router <strong>over short wires only.</strong> This is the answer to slide 3's "wires that go far are expensive"</li></ol><p>Every block is blue because this note colours the interconnect as <strong>design</strong> work.</p></div>
+  </div>
+  <p lang="ko">모양마다 arbiter 자리가 다르다(11, 14, 15쪽).</p>
+  <p lang="en">Each shape puts its arbiters somewhere different (slides 11, 14, 15).</p>
+  <figure>
+    <svg viewBox="0 0 700 212" role="img" aria-label="bus 는 arbiter 하나, crossbar 는 target 마다 arbiter 하나, ring 은 initiator 자리에 arbiter, target 자리에 router">
+<defs><marker id="m8-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/></marker></defs>
+<text class="svglab" x="110" y="16" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">Bus (slide 11)</text>
+<rect x="20" y="30" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.2)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="42" y="46" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">M1</text>
+<rect x="100" y="30" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.2)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="122" y="46" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">M2</text>
+<line x1="42" y1="54" x2="42" y2="96" stroke="var(--blue)" stroke-width="1.2"/><line x1="122" y1="54" x2="122" y2="96" stroke="var(--blue)" stroke-width="1.2"/>
+<rect x="14" y="96" width="168" height="8" rx="2" fill="rgba(var(--blue-rgb),.3)" stroke="var(--blue)" stroke-width="1"/>
+<line x1="62" y1="104" x2="62" y2="140" stroke="var(--blue)" stroke-width="1.2"/><line x1="142" y1="104" x2="142" y2="140" stroke="var(--blue)" stroke-width="1.2"/>
+<rect x="40" y="140" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="62" y="156" text-anchor="middle" style="font-size:10px;fill:var(--blue)">S1</text>
+<rect x="120" y="140" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="142" y="156" text-anchor="middle" style="font-size:10px;fill:var(--blue)">S2</text>
+<rect x="186" y="86" width="30" height="28" rx="3" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="201" y="104" text-anchor="middle" style="font-size:9px;fill:var(--blue);font-weight:700">Arb</text>
+<line x1="182" y1="100" x2="186" y2="100" stroke="var(--blue)" stroke-width="1.2"/>
+<text class="svglab" x="110" y="196" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">one arbiter for the whole bus</text>
+<line x1="230" y1="10" x2="230" y2="204" stroke="var(--rule)" stroke-width="1"/>
+<text class="svglab" x="350" y="16" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">Crossbar (slide 14)</text>
+<rect x="256" y="30" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.2)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="278" y="46" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">M1</text>
+<rect x="328" y="30" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.2)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="350" y="46" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">M2</text>
+<rect x="400" y="30" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.2)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="422" y="46" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">M3</text>
+<line x1="278" y1="54" x2="278" y2="118" stroke="var(--blue)" stroke-width=".9"/><line x1="278" y1="54" x2="350" y2="118" stroke="var(--blue)" stroke-width=".9"/><line x1="278" y1="54" x2="422" y2="118" stroke="var(--blue)" stroke-width=".9"/>
+<line x1="350" y1="54" x2="278" y2="118" stroke="var(--blue)" stroke-width=".9"/><line x1="350" y1="54" x2="350" y2="118" stroke="var(--blue)" stroke-width=".9"/><line x1="350" y1="54" x2="422" y2="118" stroke="var(--blue)" stroke-width=".9"/>
+<line x1="422" y1="54" x2="278" y2="118" stroke="var(--blue)" stroke-width=".9"/><line x1="422" y1="54" x2="350" y2="118" stroke="var(--blue)" stroke-width=".9"/><line x1="422" y1="54" x2="422" y2="118" stroke="var(--blue)" stroke-width=".9"/>
+<rect x="256" y="118" width="44" height="18" rx="3" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="278" y="131" text-anchor="middle" style="font-size:9px;fill:var(--blue);font-weight:700">Arb</text>
+<rect x="328" y="118" width="44" height="18" rx="3" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="350" y="131" text-anchor="middle" style="font-size:9px;fill:var(--blue);font-weight:700">Arb</text>
+<rect x="400" y="118" width="44" height="18" rx="3" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="422" y="131" text-anchor="middle" style="font-size:9px;fill:var(--blue);font-weight:700">Arb</text>
+<rect x="256" y="140" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="278" y="156" text-anchor="middle" style="font-size:10px;fill:var(--blue)">S1</text>
+<rect x="328" y="140" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="350" y="156" text-anchor="middle" style="font-size:10px;fill:var(--blue)">S2</text>
+<rect x="400" y="140" width="44" height="24" rx="4" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="422" y="156" text-anchor="middle" style="font-size:10px;fill:var(--blue)">S3</text>
+<text class="svglab" x="350" y="196" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">one arbiter per target</text>
+<line x1="470" y1="10" x2="470" y2="204" stroke="var(--rule)" stroke-width="1"/>
+<text class="svglab" x="595" y="16" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">Ring (slide 15)</text>
+<rect x="540" y="70" width="140" height="60" rx="30" fill="none" stroke="var(--blue)" stroke-width="3"/>
+<path d="M540 112 L540 92" fill="none" stroke="var(--blue)" stroke-width="1.6" marker-end="url(#m8-ar)"/>
+<text class="svglab" x="532" y="104" text-anchor="end" style="font-size:9px;fill:var(--ink2)">flow</text>
+<rect x="563" y="62" width="26" height="16" rx="3" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="576" y="74" text-anchor="middle" style="font-size:8.5px;fill:var(--blue);font-weight:700">Arb</text>
+<rect x="631" y="62" width="26" height="16" rx="3" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="644" y="74" text-anchor="middle" style="font-size:8.5px;fill:var(--blue);font-weight:700">Rtr</text>
+<rect x="563" y="122" width="26" height="16" rx="3" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="576" y="134" text-anchor="middle" style="font-size:8.5px;fill:var(--blue);font-weight:700">Arb</text>
+<rect x="631" y="122" width="26" height="16" rx="3" fill="var(--card)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="644" y="134" text-anchor="middle" style="font-size:8.5px;fill:var(--blue);font-weight:700">Rtr</text>
+<rect x="554" y="28" width="44" height="20" rx="4" fill="rgba(var(--blue-rgb),.2)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="576" y="42" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">M1</text>
+<rect x="622" y="28" width="44" height="20" rx="4" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="644" y="42" text-anchor="middle" style="font-size:10px;fill:var(--blue)">S1</text>
+<line x1="576" y1="48" x2="576" y2="62" stroke="var(--blue)" stroke-width="1.2"/><line x1="644" y1="48" x2="644" y2="62" stroke="var(--blue)" stroke-width="1.2"/>
+<rect x="554" y="152" width="44" height="20" rx="4" fill="rgba(var(--blue-rgb),.2)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="576" y="166" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">M2</text>
+<rect x="622" y="152" width="44" height="20" rx="4" fill="rgba(var(--blue-rgb),.07)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="644" y="166" text-anchor="middle" style="font-size:10px;fill:var(--blue)">S2</text>
+<line x1="576" y1="138" x2="576" y2="152" stroke="var(--blue)" stroke-width="1.2"/><line x1="644" y1="138" x2="644" y2="152" stroke="var(--blue)" stroke-width="1.2"/>
+<text class="svglab" x="595" y="190" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">Arb: traffic joins the ring</text>
+<text class="svglab" x="595" y="205" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">Rtr: traffic leaves it</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 11, 14, 15쪽을 줄여서 나란히 놓았다. 원본은 master 넷, slave 넷이고 ring 은 두 겹이다. 여기서는 개수를 줄이고 ring 을 한 겹으로 그렸다.</figcaption>
+    <figcaption lang="en">Slides 11, 14 and 15 shrunk and placed side by side. The originals have four masters and four slaves, and the ring is double; here the counts are reduced and the ring drawn single.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>세 칸 모두 진한 파랑 <code>M</code> 이 master(initiator), 연한 파랑 <code>S</code> 가 slave(target), 흰 칸 <code>Arb</code> 가 arbiter, <code>Rtr</code> 가 router 다.</p><ol><li><strong>Bus</strong>: <code>M1</code>, <code>M2</code> 와 <code>S1</code>, <code>S2</code> 가 막대 하나에 붙고 오른쪽 끝의 <code>Arb</code> <strong>하나</strong>가 막대 전체를 누구에게 줄지 정한다</li><li><strong>Crossbar</strong>: master 셋에서 가는 선 아홉 개(3 &times; 3)가 target 셋 위의 <code>Arb</code> 로 모인다. <strong>target 마다 arbiter 하나</strong>다. <code>M1</code> 이 <code>S1</code> 을, <code>M2</code> 가 <code>S3</code> 를 원하면 서로 다른 arbiter 라 둘 다 바로 간다. 둘이 같은 <code>S2</code> 를 원할 때만 <code>S2</code> 의 arbiter 가 하나를 고른다. 슬라이드 14쪽도 Slave 1~4 위에 Arbiter 가 하나씩 붙어 있다</li><li><strong>Ring</strong>: 굵은 고리 위에 정류장이 넷이다. master 가 붙은 자리(<code>M1</code>, <code>M2</code>)에는 <code>Arb</code>, slave 가 붙은 자리(<code>S1</code>, <code>S2</code>)에는 <code>Rtr</code> 가 있다. 슬라이드 15쪽도 Master 자리에 Arbiter, Slave 자리에 Router 를 단다. 왼쪽의 작은 화살표 <code>flow</code> 는 고리 위 트래픽이 한 방향(여기서는 시계 방향)으로 돈다는 표시다</li></ol><p>ring 에서 왜 그렇게 나뉘는지는 슬라이드가 적지 않는다. 읽으면 이렇다. master 자리에서는 <strong>새 트래픽이 이미 돌고 있는 트래픽 사이에 끼어들어야</strong> 하니 둘 중 누구를 먼저 보낼지 고르는 arbiter 가 필요하다. slave 자리에서는 지나가는 packet 이 <strong>여기서 내릴지 계속 돌지</strong>를 정해야 하니 router 가 필요하다.</p></div>
+    <div lang="en"><p>In all three panels, darker blue <code>M</code> is a master (initiator), lighter blue <code>S</code> a slave (target), the white <code>Arb</code> an arbiter and <code>Rtr</code> a router.</p><ol><li><strong>Bus</strong>: <code>M1</code>, <code>M2</code>, <code>S1</code> and <code>S2</code> on one bar, with <strong>one</strong> <code>Arb</code> at the right end deciding who gets the whole bar</li><li><strong>Crossbar</strong>: nine wires (3 &times; 3) from the three masters converge on the <code>Arb</code> boxes above the three targets: <strong>one arbiter per target.</strong> If <code>M1</code> wants <code>S1</code> and <code>M2</code> wants <code>S3</code>, different arbiters handle them and both go at once. Only when two want the same <code>S2</code> does <code>S2</code>'s arbiter have to pick. Slide 14 likewise puts an Arbiter on top of each of Slave 1 to 4</li><li><strong>Ring</strong>: four stops on the thick loop. Where a master attaches (<code>M1</code>, <code>M2</code>) there is an <code>Arb</code>; where a slave attaches (<code>S1</code>, <code>S2</code>) a <code>Rtr</code>. Slide 15 does the same, Arbiter at Master stops and Router at Slave stops. The small <code>flow</code> arrow on the left marks traffic going one way round (clockwise here)</li></ol><p>The slide does not say why the ring splits that way. One reading: at a master's stop, <strong>new traffic has to merge between traffic already circulating</strong>, so something must pick which goes first, an arbiter. At a slave's stop, each passing packet must be told <strong>whether to get off here or keep going</strong>, a router.</p></div>
+  </div>
+  <p lang="ko">슬라이드 18쪽 표에 N = 16 을 넣으면 이렇다(대입은 이 노트의 계산). 위 두 줄이 성능, 아래 두 줄이 비용이다.</p>
+  <p lang="en">Slide 18's table with N = 16 substituted (the arithmetic is this note's). Top two rows performance, bottom two cost.</p>
+  <table>
+    <thead><tr><th></th><th>Bus</th><th>Ring</th><th>Double Ring</th><th>Mesh</th><th>Crossbar</th></tr></thead>
+    <tbody>
+      <tr><td class="hd">Bisection BW</td><td>1</td><td>2</td><td>4</td><td>sqrt(N) = 4</td><td>N*N = 256</td></tr>
+      <tr><td class="hd">WC Latency</td><td>1</td><td>N = 16</td><td>N/2 = 8</td><td>2(sqrt(N)&minus;1) = 6</td><td>1</td></tr>
+      <tr><td class="hd">Ports/Switch</td><td>1 Overall</td><td>3</td><td>5</td><td>5*</td><td>N = 16</td></tr>
+      <tr><td class="hd">Total Links</td><td>1</td><td>N = 16</td><td>2N = 32</td><td>2&middot;sqrt(N)(sqrt(N)&minus;1) = 24</td><td>N*N = 256</td></tr>
+    </tbody>
+  </table>
+  <div class="trap">
+  <p lang="ko"><strong>표 머리는 "Mesh (NxN)" 인데 식은 N 을 node 총수로 쓴다.</strong> 한 변이 sqrt(N) 이어야 식이 맞는다. mesh 값을 물으면 N 이 무엇인지부터 정한다. 그리고 <strong>mesh 라는 말이 Lecture 9 와 다르다</strong>. 거기서는 PE 가 값을 넘기는 계산 배열, 여기서는 router 가 packet 을 넘기는 통신망이다.</p>
+  <p lang="en"><strong>The header says "Mesh (NxN)" but the formulas treat N as the total node count</strong>, with sqrt(N) on a side. Settle what N means first. Also, <strong>"mesh" differs from Lecture 9</strong>: there a compute array where PEs pass values, here a network where routers pass packets.</p>
+  </div>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">Flit 과 flow control</h2><h2 lang="en">Flits and flow control</h2></div>
+  <p lang="ko">슬라이드 20쪽의 정의. <strong>phit</strong> 은 link 가 한 cycle 에 옮기는 단위, <strong>flit</strong> 은 switching 의 단위, 보통 둘은 같은 크기다. 21쪽은 AXI 의 채널 묶음 하나가 message 하나로 묶인다는 그림이다.</p>
+  <p lang="en">Slide 20's definitions: a <strong>phit</strong> is what a link moves in one cycle, a <strong>flit</strong> is the unit of switching, and they're usually the same size. Slide 21 shows one group of AXI channel traffic packed into one message.</p>
+  <figure>
+    <svg viewBox="0 0 700 248" role="img" aria-label="AXI 쓰기 하나(AW 와 W 넷)가 head flit, body flit 셋, tail flit 인 packet 이 되고, 128 bit flit 하나는 32 bit link 위에서 phit 넷이 된다">
+<defs><marker id="m11-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink2)"/></marker></defs>
+<text class="svglab" x="145" y="16" text-anchor="middle" style="font-size:9px;fill:var(--ink3)">address + control</text>
+<text class="svglab" x="312" y="16" text-anchor="middle" style="font-size:9px;fill:var(--ink3)">4 data beats, 128 b each</text>
+<text class="svgtxt" x="10" y="42" text-anchor="start" style="font-size:11px;fill:var(--ink);font-weight:700">AXI write</text>
+<rect x="110" y="24" width="70" height="26" rx="3" fill="rgba(var(--blue-rgb),.28)" stroke="var(--blue)" stroke-width="1.2"/><text class="svglab" x="145" y="41" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">AW</text>
+<rect x="190" y="24" width="58" height="26" rx="3" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.2"/><text class="svglab" x="219" y="41" text-anchor="middle" style="font-size:10px;fill:var(--blue)">W1</text>
+<rect x="252" y="24" width="58" height="26" rx="3" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.2"/><text class="svglab" x="281" y="41" text-anchor="middle" style="font-size:10px;fill:var(--blue)">W2</text>
+<rect x="314" y="24" width="58" height="26" rx="3" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.2"/><text class="svglab" x="343" y="41" text-anchor="middle" style="font-size:10px;fill:var(--blue)">W3</text>
+<rect x="376" y="24" width="58" height="26" rx="3" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.2"/><text class="svglab" x="405" y="41" text-anchor="middle" style="font-size:10px;fill:var(--blue)">W4</text>
+<line x1="300" y1="56" x2="300" y2="84" stroke="var(--ink2)" stroke-width="1.3" marker-end="url(#m11-ar)"/>
+<text class="svglab" x="310" y="74" text-anchor="start" style="font-size:9.5px;fill:var(--ink2)">packetize (in the gasket)</text>
+<text class="svgtxt" x="10" y="108" text-anchor="start" style="font-size:11px;fill:var(--ink);font-weight:700">packet</text>
+<rect x="110" y="90" width="90" height="26" rx="3" fill="rgba(var(--blue-rgb),.36)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="155" y="107" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">head flit</text>
+<rect x="206" y="90" width="90" height="26" rx="3" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="251" y="107" text-anchor="middle" style="font-size:10px;fill:var(--blue)">body (W1)</text>
+<rect x="302" y="90" width="90" height="26" rx="3" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="347" y="107" text-anchor="middle" style="font-size:10px;fill:var(--blue)">body (W2)</text>
+<rect x="398" y="90" width="90" height="26" rx="3" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="443" y="107" text-anchor="middle" style="font-size:10px;fill:var(--blue)">body (W3)</text>
+<rect x="494" y="90" width="90" height="26" rx="3" fill="rgba(var(--blue-rgb),.24)" stroke="var(--blue)" stroke-width="1.3"/><text class="svglab" x="539" y="107" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">tail (W4)</text>
+<text class="svglab" x="148" y="132" text-anchor="middle" style="font-size:9px;fill:var(--ink3)">route, IDs, address</text>
+<text class="svglab" x="539" y="132" text-anchor="middle" style="font-size:9px;fill:var(--ink3)">marks the end</text>
+<line x1="206" y1="116" x2="206" y2="170" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3"/>
+<line x1="296" y1="116" x2="584" y2="170" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3"/>
+<text class="svglab" x="20" y="160" text-anchor="start" style="font-size:9.5px;fill:var(--ink2)">one flit on a 32-bit link:</text>
+<text class="svgtxt" x="10" y="188" text-anchor="start" style="font-size:11px;fill:var(--ink);font-weight:700">phits</text>
+<rect x="206" y="172" width="90" height="26" rx="3" fill="rgba(var(--ink-rgb),.08)" stroke="var(--ink2)" stroke-width="1.1"/><text class="svglab" x="251" y="189" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">phit 0 [31:0]</text>
+<rect x="302" y="172" width="90" height="26" rx="3" fill="rgba(var(--ink-rgb),.08)" stroke="var(--ink2)" stroke-width="1.1"/><text class="svglab" x="347" y="189" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">phit 1 [63:32]</text>
+<rect x="398" y="172" width="90" height="26" rx="3" fill="rgba(var(--ink-rgb),.08)" stroke="var(--ink2)" stroke-width="1.1"/><text class="svglab" x="443" y="189" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">phit 2 [95:64]</text>
+<rect x="494" y="172" width="90" height="26" rx="3" fill="rgba(var(--ink-rgb),.08)" stroke="var(--ink2)" stroke-width="1.1"/><text class="svglab" x="539" y="189" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">phit 3 [127:96]</text>
+<text class="svglab" x="395" y="218" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">1 flit = 4 phits = 4 cycles on this link</text>
+<text class="svglab" x="395" y="238" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">usual case: the link is as wide as a flit, so 1 flit = 1 phit</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 20, 21쪽의 쪼개기를 AXI 쓰기 하나로 따라갔다. 128 bit 데이터, flit 하나에 beat 하나, 32 bit link 는 설명용 가정이다. 실제 header 배치의 예는 <a href="L11-soc-interconnect.html#s20">20절</a>의 슬라이드 47쪽에 있다.</figcaption>
+    <figcaption lang="en">Slides 20 and 21's breakdown followed through for one AXI write. 128-bit data, one beat per flit and a 32-bit link are illustrative assumptions. A real header layout is on slide 47, in <a href="L11-soc-interconnect.html#s20">§20</a>.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>위에서 아래로 세 줄이다.</p><ol><li><strong>AXI write</strong>: 주소와 제어 정보를 실은 <code>AW</code> 하나, 128 bit 데이터 beat <code>W1</code>~<code>W4</code> 넷. 슬라이드 21쪽에서 굵은 네모 하나로 묶인 쓰기 묶음이다</li><li>가운데 화살표 <strong>packetize (in the gasket)</strong>: <a href="L11-soc-interconnect.html#s2">02절</a>의 gasket 이 이 묶음을 packet 하나로 바꾼다</li><li><strong>packet</strong>: <code>head flit</code> 이 맨 앞에서 <strong>경로, ID, 주소</strong>를 싣는다(아래 회색 글씨). 그 뒤로 <code>body (W1)</code>~<code>body (W3)</code> 셋, 마지막 <code>tail (W4)</code> 가 <strong>packet 의 끝</strong>을 알린다. 이 예에서는 데이터 beat 하나가 flit 하나라 flit 이 다섯이다. 슬라이드 20쪽 그림(head, body 둘, tail)과 개수만 다르다</li><li>점선 두 개는 <strong>body (W1) 하나를 확대</strong>한다는 표시다. link 폭이 32 bit 라면 128 bit flit 하나가 <code>phit 0 [31:0]</code>, <code>phit 1 [63:32]</code>, <code>phit 2 [95:64]</code>, <code>phit 3 [127:96]</code> 넷으로 나뉘어 4 cycle 에 걸쳐 건너간다. 128 / 32 = 4</li></ol><p>맨 아래 회색 줄이 슬라이드의 <strong>"Typically, phitsize = flit size"</strong> 다. 보통은 link 를 flit 만큼 넓게 만들어 phit 과 flit 이 같아진다. 그래서 실무 대화에서 phit 이라는 말은 드물고 flit 이 주로 쓰인다. 슬라이드 그림은 flit 하나를 phit 셋으로 그려 <strong>일반적인 경우</strong>를 보여준다.</p></div>
+    <div lang="en"><p>Three rows, top to bottom.</p><ol><li><strong>AXI write</strong>: one <code>AW</code> carrying address and control, and four 128-bit data beats <code>W1</code> to <code>W4</code>. This is the write group boxed together on slide 21</li><li>The arrow, <strong>packetize (in the gasket)</strong>: the gasket from <a href="L11-soc-interconnect.html#s2">§02</a> turns that group into one packet</li><li><strong>Packet</strong>: the <code>head flit</code> goes first and carries <strong>route, IDs and address</strong> (grey text below). Then three body flits, <code>body (W1)</code> to <code>body (W3)</code>, and finally <code>tail (W4)</code>, which <strong>marks the end of the packet.</strong> Here one data beat fills one flit, so there are five flits; slide 20's picture (head, two bodies, tail) differs only in count</li><li>The two dashed lines <strong>zoom into body (W1).</strong> On a 32-bit link the 128-bit flit goes over as four phits, <code>phit 0 [31:0]</code>, <code>phit 1 [63:32]</code>, <code>phit 2 [95:64]</code>, <code>phit 3 [127:96]</code>, taking four cycles: 128 / 32 = 4</li></ol><p>The grey line at the bottom is the slide's <strong>"Typically, phitsize = flit size"</strong>: links are usually built as wide as a flit, so phit and flit coincide. That's why you rarely hear "phit" in practice and mostly hear "flit". The slide's own picture draws one flit as three phits to show <strong>the general case.</strong></p></div>
+  </div>
+  <p lang="ko">flow control 은 "지금 보내도 되나" 의 약속이다(22~25쪽).</p>
+  <p lang="en">Flow control is the agreement on "may I send now" (slides 22 to 25).</p>
+  <figure>
+    <svg viewBox="0 0 700 196" role="img" aria-label="세 방식. valid only 는 앞으로 가는 선만, valid/ready 는 ready 가 거꾸로, credit 은 credit 이 거꾸로 돌아온다">
+<defs><marker id="m12-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/></marker></defs>
+<text class="svglab" x="114" y="18" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">(a) valid only</text>
+<rect x="10" y="40" width="64" height="104" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="42" y="96" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">sender</text>
+<rect x="154" y="40" width="64" height="104" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="186" y="96" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">receiver</text>
+<line x1="74" y1="76" x2="152" y2="76" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#m12-ar)"/><text class="svglab" x="114" y="70" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">valid</text>
+<line x1="74" y1="112" x2="152" y2="112" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#m12-ar)"/><text class="svglab" x="114" y="106" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">data</text>
+<text class="svglab" x="114" y="168" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">no wire back:</text>
+<text class="svglab" x="114" y="184" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">receiver must take all</text>
+<line x1="232" y1="10" x2="232" y2="190" stroke="var(--rule)" stroke-width="1"/>
+<text class="svglab" x="350" y="18" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">(b) valid/ready</text>
+<rect x="246" y="40" width="64" height="104" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="278" y="96" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">sender</text>
+<rect x="390" y="40" width="64" height="104" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="422" y="96" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">receiver</text>
+<line x1="310" y1="66" x2="388" y2="66" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#m12-ar)"/><text class="svglab" x="350" y="60" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">valid</text>
+<line x1="310" y1="98" x2="388" y2="98" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#m12-ar)"/><text class="svglab" x="350" y="92" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">data</text>
+<line x1="390" y1="130" x2="312" y2="130" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#m12-ar)"/><text class="svglab" x="350" y="124" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">ready</text>
+<text class="svglab" x="350" y="168" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">ready = 0 holds the sender</text>
+<text class="svglab" x="350" y="184" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">this cycle</text>
+<line x1="468" y1="10" x2="468" y2="190" stroke="var(--rule)" stroke-width="1"/>
+<text class="svglab" x="586" y="18" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">(c) credit based</text>
+<rect x="482" y="40" width="64" height="104" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="514" y="90" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">sender</text>
+<text class="svglab" x="514" y="108" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">count = 3</text>
+<rect x="626" y="40" width="64" height="104" rx="6" fill="rgba(var(--blue-rgb),.16)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="658" y="90" text-anchor="middle" style="font-size:10px;fill:var(--blue);font-weight:700">receiver</text>
+<rect x="636" y="100" width="14" height="18" fill="var(--card)" stroke="var(--blue)" stroke-width="1"/><rect x="651" y="100" width="14" height="18" fill="var(--card)" stroke="var(--blue)" stroke-width="1"/><rect x="666" y="100" width="14" height="18" fill="var(--card)" stroke="var(--blue)" stroke-width="1"/>
+<line x1="546" y1="76" x2="624" y2="76" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#m12-ar)"/><text class="svglab" x="586" y="70" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">flit</text>
+<line x1="626" y1="124" x2="548" y2="124" stroke="var(--blue)" stroke-width="1.5" marker-end="url(#m12-ar)"/><text class="svglab" x="586" y="118" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">credit</text>
+<text class="svglab" x="586" y="168" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">send only while</text>
+<text class="svglab" x="586" y="184" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">count &gt; 0</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 22~25쪽의 세 방식을 같은 모양으로 나란히 그렸다. 슬라이드에는 이렇게 모은 그림이 없다.</figcaption>
+    <figcaption lang="en">Slides 22 to 25's three methods drawn the same way side by side. The slides have no such combined picture.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>세 칸 모두 왼쪽이 보내는 쪽, 오른쪽이 받는 쪽이고 화살표는 <strong>그 선의 신호가 흐르는 방향</strong>이다.</p><ol><li><strong>(a) valid only</strong>: 선이 둘 다 오른쪽으로만 간다. <code>valid</code> 는 "지금 <code>data</code> 위의 값이 진짜다" 라는 표시다. <strong>받는 쪽이 "멈춰" 라고 말할 선이 없다.</strong> 그래서 받는 쪽은 매 cycle 들어오는 것을 다 받을 수 있게 만들어져 있어야 한다</li><li><strong>(b) valid/ready</strong>: 셋째 선 <code>ready</code> 가 왼쪽으로 돌아온다. 받는 쪽이 <code>ready</code>=0 을 걸면 그 cycle 에는 넘어가지 않는다. <a href="L10-soc-architecture.html#s13">Lecture 10 의 13절</a>의 그 handshake 다</li><li><strong>(c) credit based</strong>: 보내는 쪽 안에 <code>count = 3</code>, 받는 쪽 안에 빈칸 셋이 있다. 받는 쪽 buffer 가 세 칸이라 보내는 쪽은 <strong>세 번까지는 묻지 않고</strong> 보낼 수 있다. <code>flit</code> 을 하나 보낼 때마다 count 가 1 줄고, 받는 쪽이 칸을 하나 비울 때마다 <code>credit</code> 하나가 돌아와 count 가 1 는다. count 가 0 이면 멈춘다</li></ol><p>(b) 와 (c) 의 차이는 <strong>정보가 얼마나 앞서 오나</strong>다. ready 는 "이번 cycle 에 받을 수 있다" 는 지금의 대답이고, credit 은 "앞으로 몇 개까지 받을 수 있다" 는 미리 준 허락이다.</p></div>
+    <div lang="en"><p>In all three panels the sender is on the left and the receiver on the right; arrows point the way <strong>each wire's signal flows.</strong></p><ol><li><strong>(a) valid only</strong>: both wires point right. <code>valid</code> says "the value on <code>data</code> is real right now". <strong>The receiver has no wire to say stop</strong>, so it has to be built to take whatever arrives every cycle</li><li><strong>(b) valid/ready</strong>: a third wire, <code>ready</code>, comes back left. If the receiver drives <code>ready</code>=0, nothing moves that cycle. The handshake from <a href="L10-soc-architecture.html#s13">Lecture 10, §13</a></li><li><strong>(c) credit based</strong>: the sender holds <code>count = 3</code> and the receiver has three empty slots. With a three-slot buffer, the sender may send <strong>up to three without asking.</strong> Each <code>flit</code> sent takes one off the count; each slot the receiver frees sends one <code>credit</code> back and adds one. At zero, the sender stops</li></ol><p>The difference between (b) and (c) is <strong>how far ahead the information comes.</strong> Ready is a present-tense answer, "I can take one this cycle"; a credit is permission given in advance, "I can take this many".</p></div>
+  </div>
+  <div class="trap">
+  <p lang="ko"><strong>non-retained 는 AXI 가 아니다.</strong> 24쪽은 valid 를 올린 뒤 내용을 바꿀 수 있는 non-retained 인터페이스를 소개하지만(강의에서 쓰는 이름), AXI 는 올린 VALID 와 값을 넘어갈 때까지 그대로 둬야 한다. 그리고 credit 은 두 번 나온다. 25쪽의 credit 은 <strong>받는 쪽 buffer 의 빈칸</strong>, 30쪽 그림의 credit 은 <strong>보내는 쪽의 속도 예산</strong>이다.</p>
+  <p lang="en"><strong>Non-retained isn't AXI.</strong> Slide 24 introduces non-retained interfaces that may change contents after raising valid (the lecture's term), but AXI requires a raised VALID and its value to hold until the transfer. And "credit" appears twice: slide 25's credits are <strong>free slots in the receiver's buffer</strong>, slide 30's figure's credit is <strong>the sender's rate budget.</strong></p>
+  </div>
+  <p lang="ko">credit 수는 곧 buffer 깊이다. 매 cycle 보내려면 <strong>credit 이 왕복 시간 이상</strong>이어야 한다. 26쪽은 transaction 단위로, CPU 가 CSR 로 initiator 넷에 credit 을 나눠 주고 그 합(2+1+0+1 = 4, 2+1+1+0 = 4)이 target buffer 의 칸 수와 같게 맞춘다.</p>
+  <p lang="en">The credit count is the buffer depth; to send every cycle you need <strong>at least the round-trip time in credits.</strong> Slide 26 does it per transaction: the CPU hands four initiators credits over CSRs, summing (2+1+0+1 = 4, 2+1+1+0 = 4) to exactly each target buffer's slot count.</p>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">Arbitration</h2><h2 lang="en">Arbitration</h2></div>
+  <p lang="ko">27쪽의 여섯 방식 중 넷을 28, 29쪽이 출력 순서로 보여준다.</p>
+  <p lang="en">Of slide 27's six methods, slides 28 and 29 show four as output orders.</p>
+  <figure>
+    <svg viewBox="0 0 700 264" role="img" aria-label="flow A, B, C, D 가 출구를 쓰는 순서. random, static priority 선점 없음과 있음, round robin, TDMA 두 gate">
+<defs><marker id="m14-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink2)"/></marker></defs>
+<line x1="212" y1="16" x2="620" y2="16" stroke="var(--ink2)" stroke-width="1.2" marker-end="url(#m14-ar)"/><text class="svglab" x="628" y="20" text-anchor="start" style="font-size:10px;fill:var(--ink2)">time</text>
+<text class="svglab" x="8" y="47" text-anchor="start" style="font-size:10px;fill:var(--ink)">random</text>
+<text class="svglab" x="8" y="97" text-anchor="start" style="font-size:10px;fill:var(--ink)">static, no preemption</text>
+<text class="svglab" x="8" y="135" text-anchor="start" style="font-size:10px;fill:var(--ink)">static, preemption</text>
+<text class="svglab" x="8" y="181" text-anchor="start" style="font-size:10px;fill:var(--ink)">round robin</text>
+<text class="svglab" x="8" y="221" text-anchor="start" style="font-size:10px;fill:var(--ink)">TDMA gate 0</text>
+<text class="svglab" x="8" y="247" text-anchor="start" style="font-size:10px;fill:var(--ink)">TDMA gate 1</text>
+<rect x="212" y="30" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="236" y="47" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">D</text>
+<rect x="264" y="30" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="288" y="47" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="316" y="30" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="340" y="47" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="368" y="30" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="392" y="47" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="420" y="30" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="444" y="47" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="472" y="30" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="496" y="47" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">D</text>
+<rect x="524" y="30" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="548" y="47" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="576" y="30" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="600" y="47" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">C</text>
+<rect x="212" y="80" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="236" y="97" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="264" y="80" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="288" y="97" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="316" y="80" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="340" y="97" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="368" y="80" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="392" y="97" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="420" y="80" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="444" y="97" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="472" y="80" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="496" y="97" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">D</text>
+<rect x="524" y="80" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="548" y="97" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">C</text>
+<rect x="576" y="80" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="600" y="97" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">C</text>
+<rect x="212" y="118" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="236" y="135" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="264" y="118" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="288" y="135" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="316" y="118" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="340" y="135" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="368" y="118" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="392" y="135" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="420" y="118" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="444" y="135" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="472" y="118" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="496" y="135" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">D</text>
+<rect x="524" y="118" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="548" y="135" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">C</text>
+<rect x="576" y="118" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="600" y="135" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">C</text>
+<rect x="212" y="164" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="236" y="181" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="264" y="164" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="288" y="181" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="316" y="164" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="340" y="181" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">C</text>
+<rect x="368" y="164" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="392" y="181" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">D</text>
+<rect x="420" y="164" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="444" y="181" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="472" y="164" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="496" y="181" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">C</text>
+<rect x="524" y="164" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="548" y="181" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">D</text>
+<rect x="576" y="164" width="48" height="26" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="600" y="181" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="212" y="206" width="48" height="22" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="236" y="221" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="264" y="206" width="48" height="22" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="288" y="221" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="368" y="206" width="48" height="22" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="392" y="221" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="420" y="206" width="48" height="22" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="444" y="221" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="524" y="206" width="48" height="22" rx="3" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="548" y="221" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">A</text>
+<rect x="576" y="206" width="48" height="22" rx="3" fill="rgba(var(--blue-rgb),0.27)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="600" y="221" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">B</text>
+<rect x="316" y="232" width="48" height="22" rx="3" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="340" y="247" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">C</text>
+<rect x="472" y="232" width="48" height="22" rx="3" fill="rgba(var(--blue-rgb),0.05)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="496" y="247" text-anchor="middle" style="font-size:11px;fill:var(--ink);font-weight:700">D</text>
+<line x1="262" y1="76" x2="262" y2="148" stroke="var(--ink2)" stroke-width="1.2" stroke-dasharray="3 3"/>
+<text class="svglab" x="266" y="72" text-anchor="start" style="font-size:9.5px;fill:var(--ink2)">A arrives</text>
+<line x1="212" y1="230" x2="628" y2="230" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="2 3"/>
+    </svg>
+    <figcaption lang="ko">슬라이드 28쪽과 29쪽의 출력 순서를 옮겼다. A, B, C, D 는 슬라이드의 주황, 노랑, 빨강, 보라 flow 이고, static priority 에서는 A 가 가장 높고 D 가 가장 낮다(슬라이드의 High Priority 가 위, Low Priority 가 아래). 진할수록 우선순위가 높은 flow 다.</figcaption>
+    <figcaption lang="en">The output orders from slides 28 and 29. A, B, C and D are the slides' orange, yellow, red and purple flows; under static priority A is highest and D lowest (the slide's High Priority at the top, Low Priority at the bottom). Darker means higher priority.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>줄마다 칸 여덟 개가 <strong>출구를 지나간 순서</strong>이고 왼쪽이 먼저다. 칸 안의 글자가 그 cycle 에 출구를 쓴 flow 다.</p><ol><li><strong>random</strong> (28쪽 위): D A B A A D B C. 규칙이 보이지 않는다. 슬라이드 정의는 "Randomly select among the available flows", 순수한 random 일 수도 있고 어떤 통계적 분포를 따를 수도 있다</li><li><strong>static, no preemption</strong> (28쪽 아래 "w/o Pre"): B 가 세 칸짜리 전송을 시작했는데 첫 칸 직후 점선 위치에서 <strong>A 가 도착</strong>한다(슬라이드의 "Orange Arrives" 화살표). A 가 가장 높지만 선점이 없으니 B 가 셋째 칸까지 끝내고, 그다음 A A, 그리고 D, C C 다. B B B A A D C C</li><li><strong>static, preemption</strong> (28쪽 "w/ Pre"): 같은 상황에서 A 가 <strong>B 를 끊고</strong> 바로 들어간다. B A A B B D C C. B 는 남은 두 칸을 A 뒤에 마저 보낸다. A 는 두 칸 일찍 끝나고 B 는 두 칸 늦게 끝난다</li><li><strong>round robin</strong> (29쪽 위): A B C D 로 한 바퀴, 다음 바퀴는 A C D 다. <strong>둘째 바퀴에 B 가 빠졌다.</strong> 그때 B 에 보낼 것이 없었다고 읽으면, 빈 flow 를 건너뛰고 다음에게 바로 준 것이다. 슬라이드 29쪽의 "Work Conserving" 이 이것이다. 마지막 A 는 셋째 바퀴의 시작이다</li><li><strong>TDMA, 두 줄</strong> (29쪽 아래): 시간이 gate 0 의 창과 gate 1 의 창으로 번갈아 나뉜다. gate 0 창(1~2, 4~5, 7~8 번째 칸)에서는 A 와 B, gate 1 창(3, 6 번째 칸)에서는 C 와 D 만 보낼 수 있다. 그래서 A A, C, B A, D, A B. 슬라이드 그림에서 A 와 B 는 작은 사다리꼴 하나로, C 와 D 는 또 하나로 먼저 묶인 뒤 큰 사다리꼴로 들어간다. <strong>창마다 안에서 한 번 더 고르는 것</strong>이 "two level" 이다</li></ol><p>슬라이드 그림에서 한 군데가 설명되지 않는다. static priority 두 줄 모두 <strong>가장 낮은 D 가 C 보다 먼저</strong> 나간다. 그 시점에 C 가 아직 도착하지 않았다면 맞는 순서인데, 그림이 C 와 D 의 도착 시각을 그리지 않았다.</p></div>
+    <div lang="en"><p>Each row's eight cells are <strong>the order things went through the exit</strong>, earliest on the left. The letter is the flow that used the exit that cycle.</p><ol><li><strong>random</strong> (top of slide 28): D A B A A D B C, no visible pattern. The slide: "randomly select among the available flows", either pure random or some statistical distribution</li><li><strong>static, no preemption</strong> (slide 28's "w/o Pre"): B has started a three-cycle transfer when, right after its first cycle at the dashed line, <strong>A arrives</strong> (the slide's "Orange Arrives" arrow). A is highest, but with no preemption B finishes all three, then A A, then D, C C: B B B A A D C C</li><li><strong>static, preemption</strong> (slide 28's "w/ Pre"): same situation, but A <strong>cuts B off</strong> and goes at once: B A A B B D C C. B finishes its last two after A. A ends two cycles sooner, B two cycles later</li><li><strong>round robin</strong> (top of slide 29): one lap A B C D, then A C D. <strong>B is missing from the second lap.</strong> Read it as B having nothing to send then, so the arbiter skipped it and moved on, which is the "work conserving" on slide 29. The final A starts the third lap</li><li><strong>TDMA, two rows</strong> (bottom of slide 29): time alternates between gate 0 windows and gate 1 windows. In gate 0 windows (cells 1 to 2, 4 to 5, 7 to 8) only A and B may send; in gate 1 windows (cells 3 and 6) only C and D. Hence A A, C, B A, D, A B. In the slide, A and B are first merged by one small trapezoid and C and D by another before the big one: <strong>picking again inside each window</strong> is the "two level"</li></ol><p>One thing in the slide's picture goes unexplained: in both static priority rows <strong>D, the lowest, goes before C.</strong> That's correct if C hadn't arrived yet at that point, but the picture doesn't show when C and D arrive.</p></div>
+  </div>
+  <p lang="ko"><strong>dynamic</strong> 은 최근에 얼마나 보냈는지(30쪽의 credit-based shaping)로, <strong>programmable</strong> 은 바깥 카운터나 소프트웨어가 우선순위를 바꾼다.</p>
+  <p lang="en"><strong>Dynamic</strong> decides by how much was sent recently (slide 30's credit-based shaping); <strong>programmable</strong> lets an outside counter or software change priorities.</p>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">Switching 과 routing</h2><h2 lang="en">Switching and routing</h2></div>
+  <p lang="ko">switching 은 "다음 router 로 언제 넘기기 시작하나" 다. circuit switching 은 경로 전체를 미리 잡고, packet switching 셋은 router 마다 그때그때 넘긴다.</p>
+  <p lang="en">Switching is "when do I start forwarding to the next router". Circuit switching reserves the whole path ahead; the three packet-switched methods forward router by router.</p>
+  <figure>
+    <svg viewBox="0 0 700 236" role="img" aria-label="flit 다섯짜리 packet 이 node 셋을 지나는 시간. store-and-forward 는 15 cycle, cut-through 는 7 cycle">
+<text class="svglab" x="10" y="18" text-anchor="start" style="font-size:11px;fill:var(--ink);font-weight:700">store-and-forward (slide 33)</text>
+<text class="svglab" x="132" y="39" text-anchor="end" style="font-size:10px;fill:var(--ink2)">Node 0</text>
+<rect x="140" y="26" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="154" y="39" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">H</text>
+<rect x="170" y="26" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="184" y="39" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="200" y="26" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="214" y="39" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="230" y="26" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="244" y="39" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="260" y="26" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.28)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="274" y="39" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">T</text>
+<text class="svglab" x="132" y="59" text-anchor="end" style="font-size:10px;fill:var(--ink2)">Node 1</text>
+<rect x="290" y="46" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="304" y="59" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">H</text>
+<rect x="320" y="46" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="334" y="59" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="350" y="46" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="364" y="59" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="380" y="46" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="394" y="59" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="410" y="46" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.28)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="424" y="59" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">T</text>
+<text class="svglab" x="132" y="79" text-anchor="end" style="font-size:10px;fill:var(--ink2)">Node 2</text>
+<rect x="440" y="66" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="454" y="79" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">H</text>
+<rect x="470" y="66" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="484" y="79" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="500" y="66" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="514" y="79" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="530" y="66" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="544" y="79" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="560" y="66" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.28)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="574" y="79" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">T</text>
+<text class="svglab" x="132" y="139" text-anchor="end" style="font-size:10px;fill:var(--ink2)">Node 0</text>
+<rect x="140" y="126" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="154" y="139" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">H</text>
+<rect x="170" y="126" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="184" y="139" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="200" y="126" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="214" y="139" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="230" y="126" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="244" y="139" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="260" y="126" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.28)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="274" y="139" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">T</text>
+<text class="svglab" x="132" y="159" text-anchor="end" style="font-size:10px;fill:var(--ink2)">Node 1</text>
+<rect x="170" y="146" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="184" y="159" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">H</text>
+<rect x="200" y="146" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="214" y="159" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="230" y="146" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="244" y="159" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="260" y="146" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="274" y="159" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="290" y="146" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.28)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="304" y="159" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">T</text>
+<text class="svglab" x="132" y="179" text-anchor="end" style="font-size:10px;fill:var(--ink2)">Node 2</text>
+<rect x="200" y="166" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.42)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="214" y="179" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">H</text>
+<rect x="230" y="166" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="244" y="179" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="260" y="166" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="274" y="179" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="290" y="166" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.14)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="304" y="179" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">B</text>
+<rect x="320" y="166" width="28" height="18" rx="2" fill="rgba(var(--blue-rgb),0.28)" stroke="var(--blue)" stroke-width="1"/>
+<text class="svglab" x="334" y="179" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">T</text>
+<text class="svgnum" x="154" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">0</text>
+<text class="svgnum" x="184" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">1</text>
+<text class="svgnum" x="214" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">2</text>
+<text class="svgnum" x="244" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">3</text>
+<text class="svgnum" x="274" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">4</text>
+<text class="svgnum" x="304" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">5</text>
+<text class="svgnum" x="334" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">6</text>
+<text class="svgnum" x="364" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">7</text>
+<text class="svgnum" x="394" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">8</text>
+<text class="svgnum" x="424" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">9</text>
+<text class="svgnum" x="454" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">10</text>
+<text class="svgnum" x="484" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">11</text>
+<text class="svgnum" x="514" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">12</text>
+<text class="svgnum" x="544" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">13</text>
+<text class="svgnum" x="574" y="206" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">14</text>
+<text class="svglab" x="10" y="118" text-anchor="start" style="font-size:11px;fill:var(--ink);font-weight:700">cut-through (slide 34)</text>
+<text class="svglab" x="598" y="79" text-anchor="start" style="font-size:10px;fill:var(--ink2);font-weight:700">15 cycles</text>
+<text class="svglab" x="358" y="179" text-anchor="start" style="font-size:10px;fill:var(--ink2);font-weight:700">7 cycles</text>
+<text class="svglab" x="132" y="206" text-anchor="end" style="font-size:9.5px;fill:var(--ink3)">cycle</text>
+<text class="svglab" x="350" y="228" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">wormhole has the same timing as cut-through when nothing blocks; only the buffer size differs</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 33쪽과 34쪽 오른쪽 아래의 시간표를 한데 모았다. 칸 하나가 1 cycle 이고 H, B, T 는 head, body, tail flit 이다. 슬라이드 원본은 tail 을 초록으로 칠했는데, 이 노트에서 초록은 통과를 뜻하므로 여기서는 파랑의 농도로만 구별했다.</figcaption>
+    <figcaption lang="en">The timing charts from the bottom right of slides 33 and 34, combined. Each cell is one cycle; H, B and T are head, body and tail flits. The originals colour the tail green, but green means "pass" in this note, so here the flits differ only in shades of blue.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>flit 다섯(H B B B T)짜리 packet 하나가 Node 0, Node 1, Node 2 를 차례로 지난다. 줄 하나가 node 하나이고, 칸이 그 node 가 그 flit 을 다음으로 내보내는 cycle 이다. 아래 숫자 0~14 가 cycle 번호다. 슬라이드 원본의 칸 배치를 그대로 따랐다.</p><ol><li><strong>store-and-forward</strong>: Node 0 이 cycle 0~4 에 다섯 flit 을 보낸다. Node 1 은 <strong>다섯이 다 도착한 뒤</strong>인 cycle 5~9 에, Node 2 는 cycle 10~14 에 보낸다. 끝나는 데 <strong>15 cycle</strong>. node 하나마다 packet 길이만큼 기다리니 node 3 개 &times; flit 5 개 = 15</li><li><strong>cut-through</strong>: Node 1 이 head 를 받은 바로 다음 cycle(1)에 넘기기 시작한다. Node 2 는 cycle 2 부터. 줄마다 <strong>한 칸씩만</strong> 밀려서 대각선 계단이 된다. 끝나는 데 <strong>7 cycle</strong>. node 3 개 + flit 5 개 &minus; 1 = 7</li></ol><p>일반식으로 쓰면 node 를 H 개, flit 을 L 개라 할 때 store-and-forward 는 <strong>H &times; L</strong>, cut-through 는 <strong>H + L &minus; 1</strong> 이다(hop 당 1 cycle, 막힘 없음을 가정. 이 식은 슬라이드 밖이다). packet 이 길수록, 경로가 길수록 차이가 벌어진다. 마지막 회색 줄대로 wormhole 은 막히지 않을 때 cut-through 와 시간표가 같고, 다른 것은 <strong>buffer 크기</strong>와 막혔을 때의 모습이다.</p></div>
+    <div lang="en"><p>One five-flit packet (H B B B T) passes Node 0, Node 1 and Node 2 in turn. Each row is a node, and each cell is the cycle in which that node sends that flit onward; the numbers 0 to 14 below are cycles. The layout follows the original charts.</p><ol><li><strong>Store-and-forward</strong>: Node 0 sends the five flits in cycles 0 to 4. Node 1 sends in cycles 5 to 9, <strong>after all five have arrived</strong>, and Node 2 in cycles 10 to 14. Total <strong>15 cycles</strong>: every node waits a full packet length, 3 nodes &times; 5 flits = 15</li><li><strong>Cut-through</strong>: Node 1 starts forwarding the cycle after the head arrives (cycle 1), Node 2 from cycle 2. Each row shifts <strong>by only one cell</strong>, giving a diagonal staircase. Total <strong>7 cycles</strong>: 3 nodes + 5 flits &minus; 1 = 7</li></ol><p>In general, with H nodes and L flits, store-and-forward takes <strong>H &times; L</strong> and cut-through <strong>H + L &minus; 1</strong> (assuming one cycle per hop and no blocking; the formula isn't on the slide). The longer the packet and the path, the wider the gap. As the grey line says, wormhole has the same timing as cut-through when nothing blocks; what differs is <strong>buffer size</strong> and what happens when it does block.</p></div>
+  </div>
+  <table>
+    <thead><tr><th></th><th><span lang="ko">시작 조건</span><span lang="en">Starts when</span></th><th><span lang="ko">buffer</span><span lang="en">Buffer</span></th></tr></thead>
+    <tbody>
+      <tr><td>Store-and-forward</td><td><span lang="ko">packet 을 다 받고, 다음에 packet 자리</span><span lang="en">whole packet received, packet room next</span></td><td><span lang="ko">packet 하나</span><span lang="en">one packet</span></td></tr>
+      <tr><td>Virtual cut-through</td><td><span lang="ko">첫 flit, 다음에 packet 자리</span><span lang="en">first flit, packet room next</span></td><td><span lang="ko">packet 하나</span><span lang="en">one packet</span></td></tr>
+      <tr><td>Wormhole</td><td><span lang="ko">첫 flit, 다음에 flit 자리</span><span lang="en">first flit, flit room next</span></td><td><span lang="ko">flit 하나. 대신 deadlock 에 약하다</span><span lang="en">one flit, but more deadlock prone</span></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">routing 은 세 축이다(36~39쪽). source 냐 destination 이냐, static(deterministic), oblivious, dynamic(adaptive) 중 무엇이냐, minimal 이냐 아니냐.</p>
+  <p lang="en">Routing has three axes (slides 36 to 39): source or destination, static (deterministic) vs oblivious vs dynamic (adaptive), and minimal or not.</p>
+  <figure>
+    <svg viewBox="0 0 700 214" role="img" aria-label="왼쪽 위에서 오른쪽 아래로 가는 세 경로. static 경로는 혼잡 구역을 지나고 adaptive 경로 둘은 피한다. 셋 다 6 hop">
+<defs><marker id="m16-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--blue)"/></marker></defs>
+<text class="svglab" x="106" y="16" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700">static (deterministic)</text>
+<line x1="40" y1="40" x2="172" y2="40" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="40" y1="84" x2="172" y2="84" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="40" y1="128" x2="172" y2="128" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="40" y1="172" x2="172" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="40" y1="40" x2="40" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="84" y1="40" x2="84" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="128" y1="40" x2="128" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="172" y1="40" x2="172" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<ellipse cx="128" cy="106" rx="20" ry="38" fill="rgba(var(--amber-rgb),.2)" stroke="var(--amber)" stroke-width="1.2"/>
+<path d="M40 40 L128 40 L128 172 L163 172" fill="none" stroke="var(--blue)" stroke-width="2.8" marker-end="url(#m16-ar)"/>
+<rect x="33" y="33" width="14" height="14" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1.1"/>
+<rect x="77" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="121" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="165" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="33" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="77" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="121" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="165" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="33" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="77" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="121" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="165" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="33" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="77" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="121" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="165" y="165" width="14" height="14" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="106" y="200" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">6 hops, through the cloud</text>
+<text class="svglab" x="336" y="16" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700">adaptive (slide's green)</text>
+<line x1="270" y1="40" x2="402" y2="40" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="270" y1="84" x2="402" y2="84" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="270" y1="128" x2="402" y2="128" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="270" y1="172" x2="402" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="270" y1="40" x2="270" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="314" y1="40" x2="314" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="358" y1="40" x2="358" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="402" y1="40" x2="402" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<ellipse cx="358" cy="106" rx="20" ry="38" fill="rgba(var(--amber-rgb),.2)" stroke="var(--amber)" stroke-width="1.2"/>
+<path d="M270 40 L314 40 L314 172 L393 172" fill="none" stroke="var(--blue)" stroke-width="2.8" marker-end="url(#m16-ar)"/>
+<rect x="263" y="33" width="14" height="14" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1.1"/>
+<rect x="307" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="351" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="395" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="263" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="307" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="351" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="395" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="263" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="307" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="351" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="395" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="263" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="307" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="351" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="395" y="165" width="14" height="14" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="336" y="200" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">6 hops, avoids it</text>
+<text class="svglab" x="566" y="16" text-anchor="middle" style="font-size:10.5px;fill:var(--ink);font-weight:700">adaptive (slide's red)</text>
+<line x1="500" y1="40" x2="632" y2="40" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="500" y1="84" x2="632" y2="84" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="500" y1="128" x2="632" y2="128" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="500" y1="172" x2="632" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="500" y1="40" x2="500" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="544" y1="40" x2="544" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="588" y1="40" x2="588" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<line x1="632" y1="40" x2="632" y2="172" stroke="var(--ink3)" stroke-width="1"/>
+<ellipse cx="588" cy="106" rx="20" ry="38" fill="rgba(var(--amber-rgb),.2)" stroke="var(--amber)" stroke-width="1.2"/>
+<path d="M500 40 L588 40 L588 84 L632 84 L632 163" fill="none" stroke="var(--blue)" stroke-width="2.8" marker-end="url(#m16-ar)"/>
+<rect x="493" y="33" width="14" height="14" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1.1"/>
+<rect x="537" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="581" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="625" y="33" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="493" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="537" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="581" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="625" y="77" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="493" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="537" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="581" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="625" y="121" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="493" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="537" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="581" y="165" width="14" height="14" fill="var(--card)" stroke="var(--ink2)" stroke-width="1.1"/>
+<rect x="625" y="165" width="14" height="14" fill="rgba(var(--blue-rgb),.35)" stroke="var(--blue)" stroke-width="1.1"/>
+<text class="svglab" x="566" y="200" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">6 hops, leaves it early</text>
+<line x1="235" y1="10" x2="235" y2="206" stroke="var(--rule)" stroke-width="1"/>
+<line x1="465" y1="10" x2="465" y2="206" stroke="var(--rule)" stroke-width="1"/>
+    </svg>
+    <figcaption lang="ko">슬라이드 38쪽의 그림을 경로 하나씩 셋으로 갈라 그렸다. 원본은 한 mesh 위에 검정, 초록, 빨강 화살표를 겹쳐 그리고 주황 구름으로 혼잡 구역을 표시한다. 주황 구름은 이 노트에서도 문제가 되는 곳의 색이라 그대로 두었다.</figcaption>
+    <figcaption lang="en">Slide 38's picture split into three, one route each. The original overlays black, green and red arrows on one mesh, with an orange cloud marking congestion. The amber cloud is kept, since that's this note's colour for trouble too.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>세 칸 모두 같은 4 &times; 4 mesh 이고 출발은 왼쪽 위, 도착은 오른쪽 아래다. 주황 구름이 셋째 열의 둘째, 셋째 줄 router 를 덮는다. 슬라이드의 orange 구름 자리, 곧 <strong>지금 붐비는 곳</strong>이다.</p><ol><li><strong>static (deterministic)</strong>, 슬라이드의 검은 화살표: 오른쪽으로 2, 아래로 3, 오른쪽으로 1. 정해진 길이라 <strong>구름 한가운데를 지난다</strong></li><li><strong>adaptive</strong>, 슬라이드의 초록 화살표: 오른쪽으로 1, 아래로 3, 오른쪽으로 2. 구름 왼쪽 열로 내려가 <strong>구름을 아예 피한다</strong></li><li><strong>adaptive</strong>, 슬라이드의 빨간 화살표: 오른쪽으로 2, 아래로 1, 오른쪽으로 1, 아래로 2. 구름 위쪽 router 까지는 static 과 같다가 <strong>구름 안으로 들어가기 전에 오른쪽으로 빠진다</strong></li></ol><p>세 경로를 세어 보면 <strong>모두 6 hop</strong> 이다. 오른쪽으로 3, 아래로 3 을 순서만 바꿔 섞었을 뿐이다. 그래서 셋 다 <strong>minimal</strong>(다음 h3)이고, 여기서 static 과 dynamic 을 가르는 것은 길이가 아니라 <strong>지금 상태를 보고 고르느냐</strong>다. 빨간 필기는 출발점에서 시작해 맨 위를 돌아 오른쪽 열로 내려가는 큰 곡선과, 구름 안 router 를 맴도는 동그라미다. 막힌 router 에서 맴도는 것과 둘러 가는 것을 대비시킨 것으로 읽힌다.</p></div>
+    <div lang="en"><p>All three panels are the same 4 &times; 4 mesh, source at the top left and destination at the bottom right. An amber cloud covers the routers in the third column, second and third rows, where the slide's orange cloud is: <strong>the busy area right now.</strong></p><ol><li><strong>Static (deterministic)</strong>, the slide's black arrow: right 2, down 3, right 1. A fixed path, so it <strong>goes straight through the cloud</strong></li><li><strong>Adaptive</strong>, the slide's green arrow: right 1, down 3, right 2. It drops down the column left of the cloud and <strong>avoids it entirely</strong></li><li><strong>Adaptive</strong>, the slide's red arrow: right 2, down 1, right 1, down 2. Same as static as far as the router at the top of the cloud, then <strong>turns right before entering it</strong></li></ol><p>Count them and <strong>all three are 6 hops</strong>: three right and three down, just in different orders. So all three are <strong>minimal</strong> (next heading), and what separates static from dynamic here is not length but <strong>whether the current state is looked at.</strong> The red ink is a large curve from the source over the top and down the right column, and a scribbled circle around a router inside the cloud: circling at a blocked router versus going around.</p></div>
+  </div>
+  <div class="trap">
+  <p lang="ko"><strong>VC 가 둘이다.</strong> 32쪽의 virtual <strong>circuit</strong> 은 경로를 미리 잡는 것, 42쪽의 VC 는 virtual <strong>channel</strong>, link 하나에 buffer 를 여러 벌 두는 것이다. 그리고 <strong>"static" 이 세 번 다른 뜻</strong>이다. static routing(경로 고정), static priority(우선순위 고정), static credits(reset 때 나눈 credit 고정).</p>
+  <p lang="en"><strong>Two VCs.</strong> Slide 32's virtual <strong>circuit</strong> reserves a path; slide 42's VC is a virtual <strong>channel</strong>, several buffer sets on one link. And <strong>"static" means three things</strong>: static routing (fixed path), static priority (fixed order), static credits (fixed at reset).</p>
+  </div>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">Deadlock</h2><h2 lang="en">Deadlock</h2></div>
+  <p lang="ko">40쪽: "Incorrect routing schemes can cause deadlock." packet 넷이 각자 채널 하나를 쥔 채 다음 packet 이 쥔 채널을 기다리면 아무도 못 움직인다.</p>
+  <p lang="en">Slide 40: "Incorrect routing schemes can cause deadlock." Four packets each holding a channel and waiting on the next one's, and nobody can move.</p>
+  <figure>
+    <svg viewBox="0 0 700 262" role="img" aria-label="가운데 네 node 에서 P1~P4 가 각자 채널 하나를 쥐고 다음 채널을 기다려 고리가 생긴다. 오른쪽은 그 channel dependency graph 의 고리 C2 C5 C8 C11">
+<defs><marker id="m17-am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--amber)"/></marker><marker id="m17-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink2)"/></marker></defs>
+<text class="svglab" x="10" y="16" text-anchor="start" style="font-size:10px;fill:var(--ink2)">centre of slide 40's mesh</text>
+<rect x="80" y="50" width="40" height="40" rx="4" fill="rgba(var(--blue-rgb),.1)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="100" y="74" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">d3</text>
+<rect x="240" y="50" width="40" height="40" rx="4" fill="rgba(var(--blue-rgb),.1)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="260" y="74" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">d4</text>
+<rect x="240" y="180" width="40" height="40" rx="4" fill="rgba(var(--blue-rgb),.1)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="260" y="204" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">d1</text>
+<rect x="80" y="180" width="40" height="40" rx="4" fill="rgba(var(--blue-rgb),.1)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="100" y="204" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">d2</text>
+<line x1="122" y1="70" x2="236" y2="70" stroke="var(--amber)" stroke-width="2.6" marker-end="url(#m17-am)"/>
+<line x1="260" y1="92" x2="260" y2="176" stroke="var(--amber)" stroke-width="2.6" marker-end="url(#m17-am)"/>
+<line x1="238" y1="200" x2="124" y2="200" stroke="var(--amber)" stroke-width="2.6" marker-end="url(#m17-am)"/>
+<line x1="100" y1="178" x2="100" y2="94" stroke="var(--amber)" stroke-width="2.6" marker-end="url(#m17-am)"/>
+<text class="svglab" x="180" y="62" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">c2 · P1 holds</text>
+<text class="svglab" x="268" y="138" text-anchor="start" style="font-size:9.5px;fill:var(--amber);font-weight:700">c5 · P2 holds</text>
+<text class="svglab" x="180" y="216" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">c8 · P3 holds</text>
+<text class="svglab" x="92" y="138" text-anchor="end" style="font-size:9.5px;fill:var(--amber);font-weight:700">c11 · P4 holds</text>
+<line x1="20" y1="70" x2="76" y2="70" stroke="var(--ink2)" stroke-width="1.2" marker-end="url(#m17-ink)"/><text class="svglab" x="46" y="62" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">P1 in</text>
+<line x1="260" y1="24" x2="260" y2="46" stroke="var(--ink2)" stroke-width="1.2" marker-end="url(#m17-ink)"/><text class="svglab" x="270" y="36" text-anchor="start" style="font-size:9px;fill:var(--ink2)">P2 in</text>
+<line x1="336" y1="200" x2="284" y2="200" stroke="var(--ink2)" stroke-width="1.2" marker-end="url(#m17-ink)"/><text class="svglab" x="312" y="192" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">P3 in</text>
+<line x1="100" y1="250" x2="100" y2="224" stroke="var(--ink2)" stroke-width="1.2" marker-end="url(#m17-ink)"/><text class="svglab" x="110" y="242" text-anchor="start" style="font-size:9px;fill:var(--ink2)">P4 in</text>
+<line x1="360" y1="10" x2="360" y2="256" stroke="var(--rule)" stroke-width="1"/>
+<text class="svglab" x="560" y="16" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">channel dependency graph</text>
+<circle cx="480" cy="70" r="20" fill="var(--card)" stroke="var(--amber)" stroke-width="1.6"/><text class="svglab" x="480" y="74" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">C2</text>
+<circle cx="640" cy="70" r="20" fill="var(--card)" stroke="var(--amber)" stroke-width="1.6"/><text class="svglab" x="640" y="74" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">C5</text>
+<circle cx="640" cy="200" r="20" fill="var(--card)" stroke="var(--amber)" stroke-width="1.6"/><text class="svglab" x="640" y="204" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">C8</text>
+<circle cx="480" cy="200" r="20" fill="var(--card)" stroke="var(--amber)" stroke-width="1.6"/><text class="svglab" x="480" y="204" text-anchor="middle" style="font-size:10px;fill:var(--ink);font-weight:700">C11</text>
+<line x1="502" y1="70" x2="614" y2="70" stroke="var(--amber)" stroke-width="2" marker-end="url(#m17-am)"/><text class="svglab" x="559" y="62" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700">P1</text>
+<line x1="640" y1="92" x2="640" y2="174" stroke="var(--amber)" stroke-width="2" marker-end="url(#m17-am)"/><text class="svglab" x="652" y="138" text-anchor="start" style="font-size:10px;fill:var(--amber);font-weight:700">P2</text>
+<line x1="618" y1="200" x2="506" y2="200" stroke="var(--amber)" stroke-width="2" marker-end="url(#m17-am)"/><text class="svglab" x="561" y="218" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700">P3</text>
+<line x1="480" y1="178" x2="480" y2="96" stroke="var(--amber)" stroke-width="2" marker-end="url(#m17-am)"/><text class="svglab" x="468" y="138" text-anchor="end" style="font-size:10px;fill:var(--amber);font-weight:700">P4</text>
+<text class="svglab" x="560" y="250" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">X → Y: a packet holds X and waits for Y</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 40쪽 그림의 가운데 네 node 와 dependency graph 의 고리 부분만 다시 그렸다. node 와 채널 이름은 슬라이드 그대로다. 주황은 이 노트에서 실패의 색이다.</figcaption>
+    <figcaption lang="en">Only the middle four nodes of slide 40's figure and the loop in its dependency graph, redrawn. Node and channel names are the slide's. Amber is this note's failure colour.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>슬라이드 원본 (a) 에서 packet 넷의 경로</strong>를 먼저 적는다. 4 &times; 4 mesh 의 왼쪽 위가 s1, 오른쪽 위가 s2, 오른쪽 아래가 s3, 왼쪽 아래가 s4 이고, 가운데 네 node 가 d3(왼쪽 위), d4(오른쪽 위), d1(오른쪽 아래), d2(왼쪽 아래)다.</p><table><tr><th>packet</th><th>경로 (채널 순서)</th><th>목적지</th><th>쥔 채널 → 기다리는 채널</th></tr><tr><td>P1</td><td>s1 에서 c0 아래, c1 오른쪽, <strong>c2</strong> 오른쪽, c5 아래</td><td>d1</td><td>c2 → c5</td></tr><tr><td>P2</td><td>s2 에서 c3 왼쪽, c4 아래, <strong>c5</strong> 아래, c8 왼쪽</td><td>d2</td><td>c5 → c8</td></tr><tr><td>P3</td><td>s3 에서 c6 위, c7 왼쪽, <strong>c8</strong> 왼쪽, c11 위</td><td>d3</td><td>c8 → c11</td></tr><tr><td>P4</td><td>s4 에서 c9 오른쪽, c10 위, <strong>c11</strong> 위, c2 오른쪽</td><td>d4</td><td>c11 → c2</td></tr></table><p><strong>왼쪽 그림.</strong> 가운데 네 node 사이의 주황 화살표 넷이 채널 c2, c5, c8, c11 이고 시계 방향 고리를 이룬다. 회색 <code>P1 in</code>~<code>P4 in</code> 은 packet 이 바깥에서 들어온 쪽이다. wormhole 이라서 P1 의 앞부분은 c2 에 들어와 있고 뒷부분은 c1 과 c0 에 걸쳐 있다. P1 은 c2 를 쥔 채 c5 를 원하는데 c5 는 P2 가 쥐고 있다. P2 는 c8 을, P3 은 c11 을, P4 는 c2 를 원한다. <strong>넷 다 다음 사람이 쥔 것을 기다린다.</strong> 아무도 먼저 놓지 않으니 영영 안 움직인다.</p><p><strong>오른쪽 그림</strong>이 슬라이드 (b) 의 channel dependency graph 에서 고리 부분이다. 동그라미가 채널, 화살표 X → Y 가 "어떤 packet 이 X 를 쥐고 Y 를 기다린다" 이고 화살표의 글자가 그 packet 이다. C2 → C5 (P1), C5 → C8 (P2), C8 → C11 (P3), C11 → C2 (P4) 로 <strong>고리가 닫힌다.</strong> 이 그래프에 고리가 있으면 deadlock 이 생길 수 있고, 고리가 없으면 생길 수 없다.</p><p>원본 (b) 에는 고리에 들어오는 꼬리도 있다. C0 → C1 → C2 (P1), C3 → C4 → C5 (P2), C6 → C7 → C8 (P3), C9 → C10 → C11 (P4), 그리고 고리 밖의 P5 가 C12 → C6 으로 그려져 있다. P5 는 s5 에서 c12 로 내려와 d5 로 가는 packet 인데, (a) 그림에서 c12 다음 채널은 c6 이 아니라 c7 로 보여서 이 화살표는 그림과 맞지 않는다. 어느 쪽이든 P5 는 고리 밖에서 기다리기만 한다.</p></div>
+    <div lang="en"><p>First, <strong>the four packets' paths in the slide's original (a).</strong> On the 4 &times; 4 mesh, s1 is top left, s2 top right, s3 bottom right and s4 bottom left; the middle four nodes are d3 (top left), d4 (top right), d1 (bottom right) and d2 (bottom left).</p><table><tr><th>Packet</th><th>Path (channels in order)</th><th>Destination</th><th>Holds → waits for</th></tr><tr><td>P1</td><td>from s1: c0 down, c1 right, <strong>c2</strong> right, c5 down</td><td>d1</td><td>c2 → c5</td></tr><tr><td>P2</td><td>from s2: c3 left, c4 down, <strong>c5</strong> down, c8 left</td><td>d2</td><td>c5 → c8</td></tr><tr><td>P3</td><td>from s3: c6 up, c7 left, <strong>c8</strong> left, c11 up</td><td>d3</td><td>c8 → c11</td></tr><tr><td>P4</td><td>from s4: c9 right, c10 up, <strong>c11</strong> up, c2 right</td><td>d4</td><td>c11 → c2</td></tr></table><p><strong>Left.</strong> The four amber arrows between the middle nodes are channels c2, c5, c8 and c11, forming a clockwise loop. The grey <code>P1 in</code> to <code>P4 in</code> mark where each packet came from. With wormhole switching, P1's front is in c2 and its rear still stretches over c1 and c0. P1 holds c2 and wants c5, which P2 holds; P2 wants c8, P3 wants c11, P4 wants c2. <strong>Each is waiting for what the next one holds.</strong> Nobody lets go first, so nothing ever moves.</p><p><strong>Right</strong> is the loop from the slide's channel dependency graph (b). Circles are channels; an arrow X → Y means "some packet holds X and waits for Y", labelled with that packet. C2 → C5 (P1), C5 → C8 (P2), C8 → C11 (P3), C11 → C2 (P4): <strong>the loop closes.</strong> If this graph has a cycle, deadlock is possible; if it has none, deadlock can't happen.</p><p>The original (b) also has tails feeding the loop: C0 → C1 → C2 (P1), C3 → C4 → C5 (P2), C6 → C7 → C8 (P3), C9 → C10 → C11 (P4), and outside the loop P5 drawn as C12 → C6. P5 comes down c12 from s5 heading for d5, but in picture (a) the channel after c12 looks like c7, not c6, so that arrow doesn't match the picture. Either way, P5 just waits outside the loop.</p></div>
+  </div>
+  <p lang="ko"><strong>XY routing</strong>(41쪽)은 X 를 다 간 뒤에 Y 로 가므로 Y 에서 X 로 꺾는 일이 없다. 위 고리에서 P2 와 P4 가 바로 그 꺾기를 하므로 XY 아래서는 고리가 닫히지 않는다. ring 은 모양 자체가 고리라서 <strong>virtual channel</strong> 둘로 나눠 논리적으로 끊는다(42쪽). <a href="L11-soc-interconnect.html#s18">자세한 판의 18절</a>에서 경로를 바꿔가며 deadlock 을 직접 만들어볼 수 있다.</p>
+  <p lang="en"><strong>XY routing</strong> (slide 41) finishes X before Y, so it never turns from Y to X. In the loop above, P2 and P4 make exactly that turn, so under XY the loop can't close. A ring is a loop by shape, so it's cut logically with two <strong>virtual channels</strong> (slide 42). <a href="L11-soc-interconnect.html#s18">§18 of the full version</a> lets you switch routes and build a deadlock yourself.</p>
+  <div class="trap">
+  <p lang="ko"><strong>"누가 움직이나" 로 셋을 가른다.</strong> deadlock 은 아무도 안 움직인다. livelock 은 움직이는데 아무도 도착 못 한다. starvation 은 대부분 가는데 하나가 영영 차례를 못 받는다. 슬라이드 28쪽과 45쪽은 이 셋을 섞어 쓴다.</p>
+  <p lang="en"><strong>Sort the three by "who moves".</strong> Deadlock: nobody. Livelock: everyone moves, nobody arrives. Starvation: most get through, one never gets a turn. Slides 28 and 45 mix these words.</p>
+  </div>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+  <table>
+    <thead><tr><th><span lang="ko">문제 모양</span><span lang="en">Shape of the question</span></th><th><span lang="ko">구별 기준 한 줄</span><span lang="en">The one line that decides it</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">router 와 arbiter</span><span lang="en">router vs arbiter</span></td><td><span lang="ko">router 는 <strong>입력 하나를 여러 출구 중 하나로</strong>, arbiter 는 <strong>출구 하나를 여러 입력 중 하나에게</strong></span><span lang="en">a router sends <strong>one input to one of many exits</strong>; an arbiter gives <strong>one exit to one of many inputs</strong></span></td></tr>
+      <tr><td><span lang="ko">upstream / downstream</span><span lang="en">upstream / downstream</span></td><td><span lang="ko">트랜잭션 기준으로 <strong>initiator 쪽이 upstream</strong>. 응답이 돌아오는 것도 upstream</span><span lang="en">relative to the transaction, <strong>the initiator side is upstream</strong>, returning responses included</span></td></tr>
+      <tr><td><span lang="ko">18쪽 표 계산</span><span lang="en">slide 18's table</span></td><td><span lang="ko">mesh 는 bisection sqrt(N), 최악 hop 2(sqrt(N)&minus;1)</span><span lang="en">mesh: bisection sqrt(N), worst case 2(sqrt(N)&minus;1) hops</span></td></tr>
+      <tr><td><span lang="ko">phit 과 flit</span><span lang="en">phit vs flit</span></td><td><span lang="ko">flit 은 <strong>switching 의 단위</strong>, phit 은 <strong>link 가 한 cycle 에 옮기는 단위</strong></span><span lang="en">a flit is <strong>the unit of switching</strong>, a phit <strong>what a link moves per cycle</strong></span></td></tr>
+      <tr><td><span lang="ko">flow control 셋</span><span lang="en">three flow controls</span></td><td><span lang="ko">받는 쪽이 <strong>못 멈춘다</strong>(valid only), <strong>지금 대답한다</strong>(valid/ready), <strong>미리 허락한다</strong>(credit)</span><span lang="en">receiver <strong>can't say stop</strong> (valid only), <strong>answers now</strong> (valid/ready), <strong>permits in advance</strong> (credit)</span></td></tr>
+      <tr><td><span lang="ko">arbitration 순서 읽기</span><span lang="en">reading an arbitration order</span></td><td><span lang="ko">선점이 있으면 높은 쪽이 <strong>진행 중인 것을 끊는다</strong>. work conserving 은 빈 flow 를 건너뛴다</span><span lang="en">with preemption the higher one <strong>cuts in</strong>; work conserving skips empty flows</span></td></tr>
+      <tr><td><span lang="ko">switching 시간</span><span lang="en">switching timing</span></td><td><span lang="ko">node H, flit L 이면 SAF 는 <strong>H &times; L</strong>, cut-through 는 <strong>H + L &minus; 1</strong></span><span lang="en">with H nodes and L flits, SAF takes <strong>H &times; L</strong>, cut-through <strong>H + L &minus; 1</strong></span></td></tr>
+      <tr><td><span lang="ko">deadlock 이 나는가</span><span lang="en">will it deadlock</span></td><td><span lang="ko">channel dependency graph 에 <strong>고리가 있나</strong></span><span lang="en">does the channel dependency graph <strong>have a loop</strong></span></td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+  <p lang="ko"><strong>Lab 과의 연결.</strong> Lab 3 은 systolic matmul 을 APB slave 와 CSR 로 감싼다(<a href="LAB3-systolic-matmul.html">Lab 3 공략</a>). 그 APB 레지스터 쓰기가 실제 SoC 에서 지나가는 그물이 이 강의다. 슬라이드 46쪽 network 의 Acc 자리가 그 가속기의 자리다.</p>
+  <p lang="en"><strong>How it connects to the labs.</strong> Lab 3 wraps the systolic matmul in an APB slave with CSRs (<a href="LAB3-systolic-matmul.html">the Lab 3 guide</a>); this lecture is the fabric those APB register writes cross on a real SoC. The Acc slots in slide 46's network are where that accelerator goes.</p>
+  </div>
+  <p lang="ko"><strong>다음 강의는 Lecture 12, System Verilog for Verification</strong>(녹화 강의). 여기서부터 검증으로 넘어간다. 이 강의의 함정들(VALID 를 붙들고 있기, starvation 없음, credit 이 넘치지 않음)이 곧 Lecture 13 의 assertion 거리다.</p>
+  <p lang="en"><strong>Next is Lecture 12, System Verilog for Verification</strong> (recorded). From here the course turns to verification, and this lecture's traps (hold VALID, no starvation, credits never overflow) are exactly what Lecture 13's assertions will check.</p>
+</section>
+
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 11 개인 학습 노트 (빠른 읽기 판)<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; 이 강의의 발표자: Eric Taylor (Co-Founder &amp; Chief HW Architect, Baud) &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있으며, 여러 그림은 각 슬라이드에 적힌 출처에서 인용된 것입니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 11 personal study notes (quick read)<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; guest speaker for this lecture: Eric Taylor (Co-Founder &amp; Chief HW Architect, Baud) &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University; several figures are quoted from the sources credited on each slide.</span>
+</footer>
+
+</main>
+</div>
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+
+</body>
+</html>
