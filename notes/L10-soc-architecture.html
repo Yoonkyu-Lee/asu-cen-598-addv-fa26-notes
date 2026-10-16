@@ -1179,14 +1179,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
         <tr><td>한 줄</td><td><strong>beat</strong> 는 버스 폭만큼의 데이터가 <strong>한 번 넘어가는 것</strong>, <strong>burst</strong> 는 주소 한 번에 딸려 오는 <strong>연속된 beat 들의 묶음</strong>이다</td></tr>
         <tr><td>언제</td><td>data transaction 에서. AXI 는 주소 handshake 한 번으로 beat 를 여러 개 보낸다 (<a href="#s14">14절</a>)</td></tr>
         <tr><td>누가</td><td>버스 규격이 정하고, master 가 burst 길이를 골라 요청한다</td></tr>
-        <tr><td>헷갈리는 것</td><td><strong>burst 라는 말은 이 과목에서 이미 다른 뜻으로 나왔다.</strong> <a href="LAB1-fifo-design.html#s10">Lab 1</a> 에서 burst 는 <strong>짧은 시간에 몰려 오는 데이터 덩어리</strong>였고 FIFO 깊이를 정하는 근거였다. 여기서는 <strong>주소 하나에 딸린 beat 묶음</strong>이라는 버스 프로토콜 용어다. 둘 다 "몰아서 온다" 는 느낌은 같지만, 버스 문서에서 burst length 라고 하면 <strong>beat 의 개수</strong>다</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>burst 라는 말은 이 과목에서 이미 다른 뜻으로 나왔다.</strong> <a href="LAB1-fifo-design.html#s15">Lab 1</a> 에서 burst 는 <strong>짧은 시간에 몰려 오는 데이터 덩어리</strong>였고 FIFO 깊이를 정하는 근거였다. 여기서는 <strong>주소 하나에 딸린 beat 묶음</strong>이라는 버스 프로토콜 용어다. 둘 다 "몰아서 온다" 는 느낌은 같지만, 버스 문서에서 burst length 라고 하면 <strong>beat 의 개수</strong>다</td></tr>
       </table>
       <table class="parts" lang="en">
         <tr><td>Full name</td><td>burst, beat; slide 24 writes "bursts/beats"</td></tr>
         <tr><td>One line</td><td>a <strong>beat</strong> is <strong>one transfer of bus-width data</strong>; a <strong>burst</strong> is <strong>the run of beats that follows a single address</strong></td></tr>
         <tr><td>When</td><td>in data transactions. AXI sends many beats per address handshake (<a href="#s14">§14</a>)</td></tr>
         <tr><td>Who</td><td>the bus specification defines them; the master picks a burst length when it requests</td></tr>
-        <tr><td>Easy to confuse</td><td><strong>The course has already used "burst" differently.</strong> In <a href="LAB1-fifo-design.html#s10">Lab 1</a> a burst was <strong>a clump of data arriving in a short time</strong>, the basis for sizing a FIFO. Here it is a bus protocol term for <strong>the beats tied to one address.</strong> Both feel like "arriving in a bunch", but in a bus document, burst length means <strong>the number of beats</strong></td></tr>
+        <tr><td>Easy to confuse</td><td><strong>The course has already used "burst" differently.</strong> In <a href="LAB1-fifo-design.html#s15">Lab 1</a> a burst was <strong>a clump of data arriving in a short time</strong>, the basis for sizing a FIFO. Here it is a bus protocol term for <strong>the beats tied to one address.</strong> Both feel like "arriving in a bunch", but in a bus document, burst length means <strong>the number of beats</strong></td></tr>
       </table>
     </div>
   </details>

@@ -438,7 +438,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">almost_full · almost_empty</div>
   <div class="d" lang="ko">FIFO 가 <strong>가득 차기 전에, 비기 전에</strong> 미리 알려주는 플래그. 문턱은 설계가 정한다. Lab 1 은 3/4 로 정했다. 포인터 비교만으로는 못 만들고 <strong>점유량을 세야</strong> 해서 gray code 포인터를 binary 로 되돌리는 계산이 붙는다.</div>
   <div class="d" lang="en">Flags that warn <strong>before</strong> a FIFO is actually full or empty. The threshold is a design choice; Lab 1 puts it at 3/4. Pointer comparison alone cannot produce them: you have to <strong>count occupancy</strong>, which means turning gray-coded pointers back into binary.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s4">Lab 1 · 04</a> · <a href="L11-soc-interconnect.html#s12">Lecture 11 · 12</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s9">Lab 1 · 09</a> · <a href="L11-soc-interconnect.html#s12">Lecture 11 · 12</a></div>
 </div>
 
 <div class="gterm">
@@ -651,7 +651,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Burst</div>
   <div class="d" lang="ko">짧은 시간에 몰려 들어오는 데이터 한 덩어리. FIFO 깊이는 평균 속도가 아니라 <strong>burst 동안 못 빠져나간 양</strong>으로 정한다. 평균 속도가 같아도 burst 가 있으면 깊이가 필요하다.</div>
   <div class="d" lang="en">A clump of data arriving in a short window. FIFO depth is sized not by average rate but by <strong>what cannot drain during the burst.</strong> Equal average rates still need depth if the traffic is bursty.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a> · <a href="L10-soc-architecture.html#s7">Lecture 10 · 07</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s15">Lab 1 · 15</a> · <a href="L10-soc-architecture.html#s7">Lecture 10 · 07</a></div>
 </div>
 
 <div class="gterm">
@@ -1632,7 +1632,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Mealy · Moore</div>
   <div class="d" lang="ko">출력이 <strong>지금의 입력을 직접 보면</strong> Mealy, <strong>상태만 보면</strong> Moore. 다음 상태가 입력에 걸리는 것은 둘 다 같다. 기준은 조합이냐 등록이냐가 아니라 입력을 보느냐다. 등록된 출력은 항상 Moore 다.</div>
   <div class="d" lang="en">An output that <strong>looks at the present input directly</strong> is Mealy; one that <strong>looks only at state</strong> is Moore. Both have next-state logic that depends on inputs. The test is not combinational versus registered but whether an input is looked at. A registered output is always Moore.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s8">Lab 1 · 08</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s0">Lab 1 · 00</a></div>
 </div>
 
 <div class="gterm">
@@ -1902,7 +1902,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">plusarg</div>
   <div class="d" lang="ko"><code>+TEST_FLAGS</code> 처럼 <strong>실행할 때</strong> simv 에 주는 인자. testbench 가 <code>$test$plusargs</code> 나 <code>$value$plusargs</code> 로 읽는다. 테스트 여럿을 한 번 컴파일한 실행 파일 안에 넣고 고를 수 있게 해준다.</div>
   <div class="d" lang="en">A run-time argument to simv, such as <code>+TEST_FLAGS</code>. The testbench reads it with <code>$test$plusargs</code> or <code>$value$plusargs</code>. It lets several tests live in one compiled executable and be picked at run time.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s5">Lab 1 · 05</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a></div>
 </div>
 
 <div class="gterm">
@@ -2023,7 +2023,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Registered Output</div>
   <div class="d" lang="ko">모듈의 출력을 <strong>flip-flop 을 한 번 거쳐서</strong> 내보내는 것. 출력이 깨끗하고 타이밍 예산을 나누기 쉽지만 <strong>한 사이클이 더 붙는다.</strong> Cummings FIFO 의 <code>rempty</code> 가 그래서 쓰기 뒤 세 엣지에 내려간다.</div>
   <div class="d" lang="en">Driving a module output <strong>through a flip-flop.</strong> The output is clean and timing budgets split neatly, but it <strong>costs one more cycle.</strong> That is why the Cummings FIFO's <code>rempty</code> falls three edges after a write.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s3">Lab 1 · 03</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s16">Lab 1 · 16</a></div>
 </div>
 
 <div class="gterm">
