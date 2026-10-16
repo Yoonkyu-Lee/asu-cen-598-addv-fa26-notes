@@ -1922,6 +1922,9 @@ StallF = StallD = FlushE = lwstall <span class="k">OR</span> branchstall</pre>
 
   <p lang="ko">오늘 배운 것 중 다음 강의에서 바로 쓰일 것은 <strong>슬라이드 17쪽의 비용 계산</strong>이다. 단수를 늘리면 무엇을 벌고 무엇을 잃는지 저울질하는 그 감각이 efficient design 의 출발점이다. 그리고 <strong>clock gating</strong> 도 다시 나온다. 슬라이드 9쪽과 16쪽에서 두 번 언급된 것이 거기서 본론이 된다.</p>
   <p lang="en">The piece of today that gets used immediately is <strong>the cost reasoning on slide 17.</strong> Weighing what another stage wins against what it costs is where efficient design starts. <strong>Clock gating</strong> returns too: mentioned twice here, on slides 9 and 16, and the main subject there.</p>
+
+  <p lang="ko"><strong>이 강의의 내용을 실제로 만든 기록은 <a href="LAB2-mips-processor-design.html">Lab 2 정리</a>에 있다.</strong> 주어진 single-cycle MIPS 를 다섯 칸으로 자르고, forwarding, lw 뒤의 stall, Decode 로 당긴 분기 판정과 flush 가 제출한 회로에서 사이클마다 어떻게 보였는지를 트레이스로 그렸다. 슬라이드 41&ndash;43쪽의 "Decode 에 새 data hazard" 가 그 회로의 <code>branchstallD</code> 다.</p>
+  <p lang="en"><strong>The record of actually building this is the <a href="LAB2-mips-processor-design.html">Lab 2 write-up</a>.</strong> It cuts the given single-cycle MIPS into five stages and draws, from traces, how forwarding, the stall after a load, and the branch decision moved into Decode with its flush looked cycle by cycle in the submitted circuit. The "new data hazard in Decode" from slides 41&ndash;43 is that circuit's <code>branchstallD</code>.</p>
 </section>
 
 

@@ -543,7 +543,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Backpressure</div>
   <div class="d" lang="ko">뒤 단계가 막혀서 <strong>앞 단계들이 멈춰야 하는 것.</strong> 압력이 데이터 흐름의 반대 방향으로 전해진다. Lab 2 릴리스 덱은 cache miss 로 명령어가 MEM 에서 기다리는 경우를 예로 들고, 이를 단계 사이의 <strong>valid-ready handshake</strong>(valid 는 앞에서 뒤로, ready 는 뒤에서 앞으로, 둘 다 1 일 때만 넘어감)로 다룬다고 소개한다. load-use stall 과 결과는 같지만 원인이 반대다. 앞 값이 없어서가 아니라 뒤가 받을 수 없어서다.</div>
   <div class="d" lang="en">A blocked later stage <strong>forcing the earlier stages to pause</strong>; the pressure travels against the data flow. The Lab 2 release deck's example is an instruction waiting in MEM on a cache miss, handled with a <strong>valid-ready handshake</strong> between stages (valid flows forward, ready flows back, a transfer happens only when both are 1). Same effect as a load-use stall, opposite cause: not an earlier value missing, but the back unable to accept.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s15">Lab 2 · 15</a> · <a href="L11-soc-interconnect.html#s12">Lecture 11 · 12</a></div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s5">Lab 2 · 05</a> · <a href="L11-soc-interconnect.html#s12">Lecture 11 · 12</a></div>
 </div>
 
 <div class="gterm">
@@ -644,7 +644,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Bubble</div>
   <div class="d" lang="ko">앞 명령어가 <strong>못 넘어와서</strong> 어떤 pipeline 단계가 이번 사이클에 빈 채로 도는 것. 그 빈 칸이 뒤 단계로 흘러간다. stall 이 걸리면 멈춘 단계 바로 뒤에 생긴다. register 에는 <code>valid &larr; 0</code> 이라 <strong>flush 와 회로가 같고 원인이 다르다.</strong> flush 는 들어와 있던 명령어를 지우는 것이다. L06 슬라이드의 <code>FlushE</code> 는 이 구별로는 bubble 이다. 프로그램에 실제로 들어 있는 nop 과도 다르다.</div>
   <div class="d" lang="en">A pipeline stage running empty this cycle because <strong>nothing could move into it</strong>; the empty slot then flows downstream. It appears right behind a stalled stage. The register gets <code>valid &larr; 0</code>, so <strong>same circuit as a flush, different cause</strong>: a flush wipes an instruction that was already there. By that distinction, L06's <code>FlushE</code> is a bubble. Not a nop either, which is a real instruction in the program.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s4">Lab 2 · 04</a></div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s5">Lab 2 · 05</a></div>
 </div>
 
 <div class="gterm">
@@ -1667,7 +1667,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Microcode · Control Store</div>
   <div class="d" lang="ko">control 신호 묶음(control word)을 <strong>ROM 에 적어두고 차례로 읽어</strong> datapath 를 움직이는 방식. 그 ROM 이 control store 다. Lab 2 릴리스 덱은 microprogramming, microsequencing 을 같은 말로 묶고, 한 줄에 micro-opcode 와 다음 micro-opcode, 그 밖의 control 비트가 있다고 그린다. 반대편은 <strong>hardwired control</strong>, 즉 opcode 를 조합 로직으로 바로 control 로 푸는 방식이다.</div>
   <div class="d" lang="en">Driving the datapath by <strong>storing control words in a ROM and stepping through them</strong>; that ROM is the control store. The Lab 2 release deck groups microprogramming and microsequencing with it and draws each entry as a micro-opcode, the next micro-opcode and other control bits. The alternative is <strong>hardwired control</strong>, which turns the opcode straight into control signals with combinational logic.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s15">Lab 2 · 15</a></div>
+  <div class="src">Lab 2 release deck</div>
 </div>
 
 <div class="gterm">
@@ -1909,7 +1909,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">PMU &middot; Performance Monitoring Unit</div>
   <div class="d" lang="ko">프로세서 안의 이벤트(사이클, 끝난 명령어, cache miss 등)를 <strong>세는 카운터 묶음</strong>과, 그 값을 소프트웨어가 읽는 통로. Lab 2 릴리스 덱은 ARM PMU 를 예로 들고 instructions retired 같은 지표를 적는다. Lab 2 Part 2 의 perfmon 이 사이클과 명령어 카운터 두 개짜리 축소판이다. "끝난" 명령어는 retire 한 것이지 fetch 한 것이 아니다. bubble 과 flush 된 것은 세지 않는다.</div>
   <div class="d" lang="en">A bank of <strong>counters for events inside a processor</strong> (cycles, finished instructions, cache misses) plus a way for software to read them. The Lab 2 release deck cites the ARM PMU and lists metrics such as instructions retired. Lab 2 Part 2's perfmon is a two-counter version, cycles and instructions. "Finished" means retired, not fetched: bubbles and flushed slots don't count.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s14">Lab 2 · 14</a></div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s15">Lab 2 · 15</a></div>
 </div>
 
 <div class="gterm">
@@ -2231,7 +2231,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">SRAM Macro</div>
   <div class="d" lang="ko">정해진 크기의 메모리 한 덩어리를 <strong>미리 설계해둔 부품.</strong> 합성 도구는 안을 모르고 크기, 핀, 타이밍만 아는 상자로 다룬다. 합성용 <code>.db</code> 와 시뮬레이션용 behavioral <code>.v</code> 가 같이 오는데, <strong><code>.v</code> 는 시뮬레이션 전용</strong>이다. Lab 2 과제 문서는 "memory cells" 라고 부른다. 이름의 <code>1rw</code> 는 보통 읽기와 쓰기를 같이 하는 포트 하나라는 뜻이라, 동시에 읽기 둘이 필요한 register file 에는 못 쓴다.</div>
   <div class="d" lang="en">A <strong>pre-designed block of memory</strong> of fixed size. Synthesis can't see inside; it knows only size, pins and timing. It ships as a <code>.db</code> for synthesis and a behavioural <code>.v</code> for simulation, and <strong>the <code>.v</code> is simulation only</strong>. The Lab 2 handout calls them "memory cells". A <code>1rw</code> in the name usually means one port shared by reads and writes, so it can't serve a register file that needs two reads at once.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s12">Lab 2 · 12</a></div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s11">Lab 2 · 11</a></div>
 </div>
 
 <div class="gterm">
@@ -2690,7 +2690,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">XMR &middot; Cross-Module Reference</div>
   <div class="d" lang="ko">포트를 거치지 않고 <code>top.mips.dp.rf...</code> 같은 <strong>계층 경로로 다른 모듈 안쪽 신호를 직접 읽는 것.</strong> SystemVerilog 표준은 hierarchical reference 라고 부른다. testbench 가 register file 이나 메모리 내용을 확인할 때 쓰고, 설계 코드에는 쓰지 않는다. 편하지만 인스턴스 이름에 묶여서 설계자가 이름을 바꾸면 testbench 가 깨진다. Lab 2 릴리스 덱은 프로세서 검증 방법 둘 중 하나로 소개하고, 다른 하나는 store 를 interface 신호에서 보는 것이다.</div>
   <div class="d" lang="en">Reading a signal inside another module <strong>directly by hierarchical path</strong>, like <code>top.mips.dp.rf...</code>, without going through ports. The SystemVerilog standard calls it a hierarchical reference. Testbenches use it to check register file or memory contents; design code never does. Handy, but tied to instance names: rename an instance and the testbench breaks. The Lab 2 release deck gives it as one of two ways to verify a processor; the other watches stores on the interface signals.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s9">Lab 2 · 09</a></div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s10">Lab 2 · 10</a></div>
 </div>
 
 <div class="gterm">

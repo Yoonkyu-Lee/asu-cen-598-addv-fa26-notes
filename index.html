@@ -949,14 +949,14 @@ a.mod:hover .num{color:var(--blue)}
   <div>
     <div class="when">9/28 (Mon) · Aman Arora</div>
     <h3>Lab 2 (Pipelined MIPS) overview</h3>
-    <p lang="ko">풀기 전에 보는 공략. 주어진 single-cycle MIPS 를 다섯 단계로 자르고 ADD 는 forwarding, BEQ 는 flush, 나머지는 전부 stall. bubble 과 flush 가 왜 다른지, flush 로 IPC 가 오르는 건 왜 not-taken 일 때뿐인지, 그리고 네 가지 설계 결정을 골라 사이클 표와 CPI 를 직접 뽑아보는 도구까지. Part 2 의 MULADD 와 perfmon 도.</p>
-    <p lang="en">A walkthrough for before you start. Cut the given single-cycle MIPS into five stages, forward for ADD, flush for BEQ, stall for everything else. Why a bubble isn't a flush, why flushing only lifts IPC on not-taken branches, and a tool that turns four design choices into a cycle table and a CPI. Part 2's MULADD and perfmon too.</p>
+    <p lang="ko">끝낸 뒤의 정리. 주어진 single-cycle MIPS 가 왜 느린지에서 출발해, 다섯 칸으로 자르면 생기는 문제 셋(아직 없는 앞 결과, 늦게 나오는 lw 값, 판정 전에 가져온 명령어)과 forwarding, stall, D 판정 flush, 그 대가로 길어진 경로까지. 사이클 표와 파형은 전부 제출 코드를 다시 돌린 트레이스에서 그렸다. 다시 낼 수 없었던 합성 숫자, Part 2 의 MULADD 와 미리 예측하고 돌린 perfmon 값도.</p>
+    <p lang="en">A write-up from after the lab. It starts with why the given single-cycle MIPS is slow, then the three problems that come with five stages (a result not there yet, a load's late value, instructions fetched before a branch is decided) and their fixes, forwarding, a stall and a flush decided in D, plus the longer paths they cost. Every cycle chart and waveform is drawn from a re-run of the submitted code. Also the synthesis numbers that wouldn't reproduce, Part 2's MULADD, and perfmon values predicted before simulating.</p>
     <div class="tags">
-      <span class="tag d">5-stage pipeline · hierarchy · file order</span>
-      <span class="tag d">forwarding · stall · bubble vs flush</span>
-      <span class="tag v">memfile.dat · store-based checks · XMR</span>
-      <span class="tag t">DC · set_dont_touch · timing report</span>
-      <span class="tag p">SRAM macro</span>
+      <span class="tag d">5-stage pipeline · valid bits</span>
+      <span class="tag d">forwarding · load stall · flush in D</span>
+      <span class="tag v">trace waveforms · untested paths</span>
+      <span class="tag t">DC · dont_touch · SRAM macros</span>
+      <span class="tag d">MULADD · perfmon</span>
     </div>
   </div>
   <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>

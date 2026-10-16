@@ -8,7 +8,8 @@
 CSV 에 있는 것만 그린다.
 
 사용법:
-  신호 스펙은 name:kind:role 이다. kind 는 bit / bus / busx / clk, role 은 색을 정한다
+  신호 스펙은 name:kind:role 이다. kind 는 bit / bus / busx / str / clk, role 은 색을 정한다.
+  str 은 CSV 값을 그대로 적는다(16 진수 트레이스나 명령어 이름). 모두 x 면 X
   (clk sig ver ok warn dim, 비우면 이름으로 짐작). CLAUDE.md 의 의미 고정 색상 그대로다.
 
   python scripts/wavesvg.py wave --csv t.csv --time cycle \\
@@ -87,14 +88,19 @@ def colour_for(name, kind, role=''):
 
 
 def fmt(v, kind):
-    if v in ('x', 'X', ''):
+    if v in ('x', 'X', '') or (v and set(v.lower()) == {'x'}):
         return 'X'
+    if kind == 'str':
+        return v
     if kind == 'busx':
         return '%02x' % int(v)
     return str(int(v))
 
 
-def render_wave(rows, time_col, specs, marks, label, title_note):
+def render_wave(rows, time_col, specs, marks, label, title_note, cells=False):
+    """cells=True: one sample per cycle. Each cycle gets its own cell, its number is centred
+    over the cell, values are not merged across cells, and a mark shades the whole cell
+    instead of drawing a line through it."""
     n = len(rows)
     plot = W - GUTTER - PAD_R
     step = plot / float(n)
@@ -108,6 +114,24 @@ def render_wave(rows, time_col, specs, marks, label, title_note):
 
     # 시간 눈금. 너무 촘촘하면 글자가 겹치므로 6 칸으로 자른다.
     ticks = 6
+    if cells:
+        for i, r in enumerate(rows):
+            x = GUTTER + step * (i + 0.5)
+            o.append('<line x1="%.1f" y1="%d" x2="%.1f" y2="%d" style="stroke:%s;stroke-width:1"/>'
+                     % (GUTTER + step * i, HEAD - 14, GUTTER + step * i, h - 16, GRID))
+            o.append('<text class="svgnum" x="%.1f" y="%d" style="font-size:10px;text-anchor:middle;fill:%s">%s</text>'
+                     % (x, HEAD - 28, DIM, r[time_col]))
+        for t, tag in marks:
+            idx = next((i for i, r in enumerate(rows) if int(r[time_col]) == t), None)
+            if idx is None:
+                continue
+            o.append('<rect x="%.1f" y="%d" width="%.1f" height="%d" style="fill:rgba(var(--sel-rgb),.10);stroke:none"/>'
+                     % (GUTTER + step * idx + 1, HEAD - 14, step - 2, h - HEAD - 2))
+            o.append('<circle cx="%.1f" cy="%d" r="8" style="fill:%s"/>' % (GUTTER + step * (idx + 0.5), HEAD - 14, MARK))
+            o.append('<text class="svgnum" x="%.1f" y="%d" style="font-size:10px;text-anchor:middle;fill:var(--paper)">%s</text>'
+                     % (GUTTER + step * (idx + 0.5), HEAD - 11, esc(tag)))
+        marks = []
+        ticks = -1
     for i in range(ticks + 1):
         frac = i / float(ticks)
         x = GUTTER + plot * frac
@@ -130,12 +154,12 @@ def render_wave(rows, time_col, specs, marks, label, title_note):
 
         vals = [r.get(name, '') for r in rows]
 
-        if kind in ('bus', 'busx'):
+        if kind in ('bus', 'busx', 'str'):
             # 값이 바뀌는 곳에서 육각형을 끊고 그 안에 숫자를 적는다.
             i = 0
             while i < n:
                 j = i
-                while j + 1 < n and vals[j + 1] == vals[i]:
+                while not cells and j + 1 < n and vals[j + 1] == vals[i]:
                     j += 1
                 x0 = GUTTER + step * i
                 x1 = GUTTER + step * (j + 1)
@@ -256,6 +280,7 @@ def main():
     ap.add_argument('--marks', default='')
     ap.add_argument('--label', default='simulation waveform')
     ap.add_argument('--note', default='')
+    ap.add_argument('--cells', action='store_true', help='one sample per cycle: centred cycle numbers, no merging')
     ap.add_argument('--ymax', type=int, default=0)
     ap.add_argument('--out', default='')
     ap.add_argument('--from', dest='lo', type=int, default=-10 ** 9)
@@ -288,7 +313,7 @@ def main():
                 continue
             t, _, tag = tok.partition('=')
             marks.append((int(t), tag))
-        out = render_wave(rows, a.time, specs, marks, a.label, a.note)
+        out = render_wave(rows, a.time, specs, marks, a.label, a.note, a.cells)
     else:
         series = []
         for tok in a.series.split(','):
