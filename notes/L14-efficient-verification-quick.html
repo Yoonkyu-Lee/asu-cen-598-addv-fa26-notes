@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV &middot; Lecture 14 &mdash; Efficient Verification Methods (quick read)</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+/* 애니메이션 슬라이더. 덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간을 한 자리에서 밟아본다. */
+/* 마크업 규약과 동작은 anim.js 가 단일 출처다. 스크립트가 없으면 첫 프레임만 보이고 막대가 안 생긴다. */
+.anim [data-f]{display:none}
+.anim [data-f~="0"]{display:revert}
+.anim.js-anim [data-f]{display:none}
+.anim.js-anim [data-f].on{display:revert}
+.anim:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.animbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--rule)}
+.animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.animbar button:disabled{opacity:.35;cursor:default}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
+.animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
+.animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
+@media(prefers-reduced-motion:reduce){.animbar button{transition:none}}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 14<br>Efficient Verification Methods</h1>
+  <p class="subtitle" lang="ko">검증 엔지니어의 요령 열한 개. 무엇을 어디에 두나, 다시 컴파일하지 않고 실행을 바꾸고, DUT 안에 손을 넣고, C 를 붙이고, 메시지에 무게를 달고, RTL 밖에서도 돌려본다.</p>
+  <p class="subtitle" lang="en">Eleven verification tips: where things go, changing a run without recompiling, reaching inside the DUT, attaching C, weighting messages, and simulating beyond RTL.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L14-efficient-verification.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L14-efficient-verification.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 14</div>
+    <div class="name">Efficient Verification Methods</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">무엇을 어디에</span><span lang="en">What goes where</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">실행에 손대기</span><span lang="en">Reaching into a run</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">C 와 메시지</span><span lang="en">C and messages</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">시간과 시뮬레이션 수준</span><span lang="en">Timing and simulation level</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+  <p lang="ko"><a href="L07-efficient-design.html">Lecture 7</a> 의 검증판이다. 14쪽짜리 짧은 덱에 서로 이어지지 않는 요령이 열한 개 있고, 발표자 노트는 비어 있다. Schedule 제목의 "Catch up" 몫의 슬라이드는 없다. 요령 대부분이 <strong>이미 만든 것을 다시 컴파일하거나 다시 짜지 않고 더 쓰는 법</strong>이다.</p>
+  <p lang="en">The verification twin of <a href="L07-efficient-design.html">Lecture 7</a>. A short 14-slide deck holds eleven unconnected tips, and the speaker notes are empty. The "Catch up" in the Schedule title has no slides. Most tips are about <strong>getting more out of what you've built without recompiling or rewriting it.</strong></p>
+  <table>
+    <thead><tr><th><span lang="ko">요령</span><span lang="en">Tip</span></th><th><span lang="ko">한 줄</span><span lang="en">One line</span></th></tr></thead>
+    <tbody>
+      <tr><td>Mixed</td><td><span lang="ko">stimulus, checking, coverage 는 서로의 안에 들어간다. self-checking test, illegal_bins, cover property</span><span lang="en">stimulus, checking and coverage nest inside each other: self-checking tests, illegal_bins, cover properties</span></td></tr>
+      <tr><td>What happens where</td><td><span lang="ko">stimulus 는 sequence, coverage 와 checking 은 monitor, 별도 부품(coverage class, scoreboard), interface</span><span lang="en">stimulus in sequences; coverage and checking in monitors, separate components (coverage class, scoreboard), interfaces</span></td></tr>
+      <tr><td>Plusargs</td><td><span lang="ko"><code>./simv +NAME=val</code> 를 <code>$test$plusargs</code>, <code>$value$plusargs</code> 로 읽는다. build once, run many times</span><span lang="en"><code>./simv +NAME=val</code>, read with <code>$test$plusargs</code> and <code>$value$plusargs</code>: build once, run many times</span></td></tr>
+      <tr><td>XMR</td><td><span lang="ko"><code>top.cpu0.pc</code> 같은 계층 경로로 내부에 닿는다. brittle, 재사용에 나쁘다</span><span lang="en">reach inside by a hierarchical path like <code>top.cpu0.pc</code>; brittle and bad for reuse</span></td></tr>
+      <tr><td>PLI / DPI</td><td><span lang="ko">PLI(tf, acc, vpi)는 시뮬레이터 안을 C 로 본다. DPI 는 함수만 주고받는다</span><span lang="en">PLI (tf, acc, vpi) looks inside the simulator from C; DPI just exchanges calls</span></td></tr>
+      <tr><td>Severity</td><td><span lang="ko"><code>$info</code> &lt; <code>$warning</code> &lt; <code>$error</code> &lt; <code>$fatal</code>, UVM_* 와 일대일. 멈추는 것은 <code>$fatal</code> 뿐</span><span lang="en"><code>$info</code> &lt; <code>$warning</code> &lt; <code>$error</code> &lt; <code>$fatal</code>, one to one with UVM_*; only <code>$fatal</code> stops</span></td></tr>
+      <tr><td>Black / white / gray</td><td><span lang="ko">spec 과 포트만 / RTL 과 내부까지 / 둘 사이</span><span lang="en">spec and ports only / RTL and internals / in between</span></td></tr>
+      <tr><td><span lang="ko">시간 어긋남, clocking block</span><span lang="en">Time offset, clocking blocks</span></td><td><span lang="ko">DUT 가 샘플하는 엣지에서 떨어져 넣고, 엣지 직전 값을 읽는다</span><span lang="en">drive away from the DUT's sampling edge; read the value from just before it</span></td></tr>
+      <tr><td>GLS</td><td><span lang="ko">RTL 대신 netlist 를 시뮬레이션. zero delay 와 SDF 를 입힌 timing</span><span lang="en">simulate the netlist instead of RTL: zero delay, or timing with SDF</span></td></tr>
+      <tr><td>force / release</td><td><span lang="ko">DUT 신호를 덮어쓴다. fault injection, corner case, 디버그</span><span lang="en">override DUT signals: fault injection, corner cases, debugging</span></td></tr>
+      <tr><td>Error injection</td><td><span lang="ko">XMR, check 끄기, constraint 끄기로 오류를 넣고 DUT 가 회복하거나 알리는지 본다</span><span lang="en">inject errors via XMRs, disabled checks, disabled constraints; check the DUT recovers or flags it</span></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">마지막 쪽은 OpenTitan 링크 하나다. 자세한 판의 13절이 OpenTitan 의 검증 문서에서 오늘의 요령이 어디 보이는지 짚는다.</p>
+  <p lang="en">The last slide is a single OpenTitan link. §13 of the full note points out where today's tips appear in OpenTitan's verification docs.</p>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">무엇을 어디에</h2><h2 lang="en">What goes where</h2></div>
+  <p lang="ko">슬라이드 2쪽 <strong>Mixed</strong> 는 네 짝이다. checking inside stimulus 는 <strong>self-checking test</strong>(test 가 기대값을 스스로 들고 비교), coverage inside stimulus 는 <strong>directed test 안에서 <code>cg.sample()</code></strong>, checking inside coverage 는 <strong><code>illegal_bins</code></strong>(값이 떨어지면 오류), coverage within checking 은 <strong><code>cover property</code></strong>(assertion 문법으로 횟수를 센다. 실패는 없다). 슬라이드 3쪽은 각 기둥의 자리를 적는다. 아래 그림이 그것이다.</p>
+  <p lang="en">Slide 2, <strong>Mixed</strong>, has four pairs. Checking inside stimulus is a <strong>self-checking test</strong> (the test carries and compares its own expected values); coverage inside stimulus is <strong><code>cg.sample()</code> inside a directed test</strong>; checking inside coverage is <strong><code>illegal_bins</code></strong> (a value landing there is an error); coverage within checking is <strong><code>cover property</code></strong> (assertion syntax counting hits; it never fails). Slide 3 gives each pillar its homes, drawn below.</p>
+  <figure>
+<svg viewBox="0 0 700 300" role="img" aria-label="sequence, driver, interface, DUT, monitor, scoreboard, coverage class 의 배치. 각 칸에 stimulus, checking, coverage 중 무엇이 사는지 표시">
+<defs><marker id="m2-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink2)"/></marker></defs>
+<rect x="16" y="50" width="110" height="52" rx="7" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="71" y="72" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">sequence</text>
+<text class="svglab" x="71" y="90" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">stimulus</text>
+<rect x="16" y="116" width="110" height="38" rx="7" fill="none" stroke="var(--pink)" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text class="svglab" x="71" y="132" text-anchor="middle" style="font-size:9.5px;fill:var(--pink)">initial block</text>
+<text class="svglab" x="71" y="146" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">bring-up stimulus</text>
+<rect x="196" y="50" width="100" height="52" rx="7" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="246" y="80" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">driver</text>
+<rect x="340" y="34" width="110" height="236" rx="8" fill="rgba(var(--ink-rgb),.06)" stroke="var(--ink2)" stroke-width="1.6"/>
+<text class="svgtxt" x="395" y="56" text-anchor="middle" style="font-size:13px;fill:var(--ink2);font-weight:700">interface</text>
+<rect x="352" y="118" width="86" height="34" rx="5" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.2"/>
+<text class="svglab" x="395" y="132" text-anchor="middle" style="font-size:9.5px;fill:var(--pink)">assertions</text>
+<text class="svglab" x="395" y="145" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">checking</text>
+<rect x="352" y="160" width="86" height="34" rx="5" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.2"/>
+<text class="svglab" x="395" y="174" text-anchor="middle" style="font-size:9.5px;fill:var(--pink)">cover prop.</text>
+<text class="svglab" x="395" y="187" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">coverage</text>
+<rect x="500" y="34" width="184" height="236" rx="8" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="1.8"/>
+<text class="svgtxt" x="592" y="150" text-anchor="middle" style="font-size:18px;fill:var(--blue);font-weight:750">DUT</text>
+<text class="svglab" x="592" y="172" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">design</text>
+<rect x="196" y="200" width="100" height="52" rx="7" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="246" y="222" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">monitor</text>
+<text class="svglab" x="246" y="240" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">basic checks, cov</text>
+<rect x="16" y="176" width="110" height="40" rx="7" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="71" y="194" text-anchor="middle" style="font-size:12px;fill:var(--pink);font-weight:700">scoreboard</text>
+<text class="svglab" x="71" y="208" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">checking</text>
+<rect x="16" y="236" width="110" height="40" rx="7" fill="rgba(var(--pink-rgb),.12)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="71" y="254" text-anchor="middle" style="font-size:12px;fill:var(--pink);font-weight:700">coverage class</text>
+<text class="svglab" x="71" y="268" text-anchor="middle" style="font-size:9px;fill:var(--ink2)">coverage</text>
+<line x1="126" y1="76" x2="194" y2="76" stroke="var(--ink2)" stroke-width="1.4" marker-end="url(#m2-ar)"/>
+<text class="svglab" x="160" y="69" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">item</text>
+<line x1="296" y1="76" x2="338" y2="76" stroke="var(--ink2)" stroke-width="1.4" marker-end="url(#m2-ar)"/>
+<text class="svglab" x="317" y="69" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">pins</text>
+<line x1="450" y1="76" x2="498" y2="76" stroke="var(--ink2)" stroke-width="1.4" marker-end="url(#m2-ar)"/>
+<text class="svglab" x="474" y="69" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">drive</text>
+<line x1="500" y1="236" x2="452" y2="236" stroke="var(--ink2)" stroke-width="1.4" marker-end="url(#m2-ar)"/>
+<text class="svglab" x="474" y="229" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">outputs</text>
+<line x1="340" y1="226" x2="298" y2="226" stroke="var(--ink2)" stroke-width="1.4" marker-end="url(#m2-ar)"/>
+<text class="svglab" x="319" y="219" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">pins</text>
+<line x1="196" y1="212" x2="128" y2="198" stroke="var(--ink2)" stroke-width="1.4" marker-end="url(#m2-ar)"/>
+<line x1="196" y1="242" x2="128" y2="254" stroke="var(--ink2)" stroke-width="1.4" marker-end="url(#m2-ar)"/>
+<text class="svglab" x="164" y="231" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">txn</text>
+<text class="svglab" x="16" y="30" text-anchor="start" style="font-size:9.5px;fill:var(--ink3)">testbench</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 3쪽의 목록을 testbench 에 옮긴 것. 분홍은 testbench, 파랑은 DUT, 회색은 interface. driver 는 슬라이드에 없지만 item 이 핀이 되려면 필요해서 넣었다.</figcaption>
+    <figcaption lang="en">Slide 3's list placed on a testbench. Pink is the testbench, blue the DUT, grey the interface. The driver isn't on the slide but an item needs one to become pin activity.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><ol><li><strong>sequence</strong>(stimulus) &rarr; <strong>"item"</strong> &rarr; <strong>driver</strong> &rarr; <strong>"pins"</strong> &rarr; interface &rarr; <strong>"drive"</strong> &rarr; DUT. item 은 UVM 의 sequence item, 즉 transaction 한 덩어리다</li><li><strong>점선 initial block</strong>: reset 같은 bring-up stimulus 는 <code>initial</code> 블록에 바로 써도 된다</li><li><strong>interface 안의 assertions</strong>(checking)와 <strong>cover prop.</strong>(cover property, coverage): 신호 몇 개의 관계는 핀이 모인 interface 에 둔다</li><li>DUT &rarr; <strong>"outputs"</strong> &rarr; interface &rarr; <strong>"pins"</strong> &rarr; <strong>monitor</strong>. monitor 는 보기만 하고, 칸 아래 <code>basic checks, cov</code> 처럼 간단한 check 와 coverage 를 둘 수 있다</li><li>monitor &rarr; <strong>"txn"</strong>(transaction) &rarr; <strong>scoreboard</strong>(checking)와 <strong>coverage class</strong>(coverage). 슬라이드가 "separate" 라고 부른 부품 둘이다</li></ol></div>
+    <div lang="en"><ol><li><strong>sequence</strong> (stimulus) &rarr; <strong>"item"</strong> &rarr; <strong>driver</strong> &rarr; <strong>"pins"</strong> &rarr; interface &rarr; <strong>"drive"</strong> &rarr; DUT. An item is a UVM sequence item, one transaction</li><li><strong>The dashed initial block</strong>: bring-up stimulus such as reset can go straight into an <code>initial</code> block</li><li><strong>assertions</strong> (checking) and <strong>cover prop.</strong> (cover property, coverage) inside the interface: relations among a few signals belong where the pins meet</li><li>DUT &rarr; <strong>"outputs"</strong> &rarr; interface &rarr; <strong>"pins"</strong> &rarr; <strong>monitor.</strong> A monitor only watches; as <code>basic checks, cov</code> says, simple checks and coverage can live there</li><li>monitor &rarr; <strong>"txn"</strong> (transaction) &rarr; <strong>scoreboard</strong> (checking) and <strong>coverage class</strong> (coverage), the two "separate" components on the slide</li></ol></div>
+  </div>
+  <div class="trap">
+  <span class="tag"><span lang="ko">함정 &middot; sequence 가 둘이다</span><span lang="en">Trap &middot; two kinds of sequence</span></span>
+  <p lang="ko">여기 "stimulus 는 sequence 에" 의 sequence 는 <strong>UVM 의 stimulus class</strong> 다. assertion 안의 SVA <code>sequence</code>(신호의 시간 패턴)와 이름만 같다. 문맥이 driver 면 UVM, assertion 이면 SVA.</p>
+  <p lang="en">The sequence in "stimulus goes in sequences" is <strong>UVM's stimulus class.</strong> It only shares a name with the SVA <code>sequence</code> (a time pattern of signals) inside assertions. Driver context means UVM; assertion context means SVA.</p>
+  </div>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">실행에 손대기</h2><h2 lang="en">Reaching into a run</h2></div>
+  <p lang="ko"><strong>Plusargs</strong>(4쪽). <code>./simv +VERBOSE +NUM_PACKETS=100 +TEST=memory_test</code>. <code>$test$plusargs("VERBOSE")</code> 는 있나 없나만 보고, <code>$value$plusargs("NUM_PACKETS=%d", n)</code> 은 값을 읽는다. <strong>못 찾으면 0 을 돌려주고 변수는 그대로</strong>라서 <code>if (!...) n = 10;</code> 으로 기본값을 둔다. 쓸모는 <strong>build once, run many times</strong>. 두 함정이 있다. <code>vcs +define+X</code> 는 컴파일 옵션이라 plusarg 가 아니고, <code>$test$plusargs</code> 는 <strong>앞부분만 맞아도 참</strong>이라 <code>+VERBOSE=0</code> 도 verbose 를 켠다.</p>
+  <p lang="en"><strong>Plusargs</strong> (slide 4): <code>./simv +VERBOSE +NUM_PACKETS=100 +TEST=memory_test</code>. <code>$test$plusargs("VERBOSE")</code> checks presence only; <code>$value$plusargs("NUM_PACKETS=%d", n)</code> reads a value. <strong>Not found returns 0 and leaves the variable alone</strong>, so defaults go in with <code>if (!...) n = 10;</code>. The point: <strong>build once, run many times.</strong> Two traps: <code>vcs +define+X</code> is a compile option, not a plusarg; and <code>$test$plusargs</code> is <strong>true on a prefix match</strong>, so <code>+VERBOSE=0</code> also turns verbose on.</p>
+  <p lang="ko"><strong>XMR</strong>(5쪽). <code>$display("PC = %h", top.cpu0.pc);</code> 처럼 포트를 안 거치고 계층 경로로 내부를 본다. IEEE 1800 의 이름은 hierarchical reference. 슬라이드의 단점은 <strong>Brittle</strong>(instance 이름이 바뀌면 깨진다)과 <strong>Not so good for reuse</strong>, 그리고 <strong>`define 이나 macro</strong> 로 경로를 한곳에 모으는 것.</p>
+  <p lang="en"><strong>XMRs</strong> (slide 5): <code>$display("PC = %h", top.cpu0.pc);</code> looks inside by hierarchical path without ports. IEEE 1800 calls it a hierarchical reference. The slide's issues: <strong>brittle</strong> (an instance rename breaks it), <strong>not so good for reuse</strong>, and <strong>`defines or macros</strong> to gather the paths in one place.</p>
+  <p lang="ko"><strong>force / release</strong>(12쪽). <code>force dut.blah.blah.sig1 = 1'b1;</code> 은 설계가 무엇을 주든 그 값으로 덮어쓰고, <code>release</code> 로 푼다. 쓰임은 fault injection, 도달하기 어려운 corner case, 디버그. IEEE 1800 기준으로 net 은 release 하면 바로 driver 값으로 돌아가지만, <strong>variable 은 다음 대입까지 force 값을 들고 있다.</strong></p>
+  <p lang="en"><strong>force / release</strong> (slide 12): <code>force dut.blah.blah.sig1 = 1'b1;</code> overrides whatever the design drives; <code>release</code> lets go. Uses: fault injection, hard-to-reach corner cases, debugging. Per IEEE 1800 a net returns to its driver's value at release, but <strong>a variable keeps the forced value until its next assignment.</strong></p>
+  <p lang="ko"><strong>Error injection</strong>(13쪽). memory bit 뒤집기, packet 깨기, invalid opcode, 응답 빠뜨리기 같은 special test 로 <strong>DUT 가 회복하거나 interrupt 로 알리는지</strong> 본다. 방법은 <strong>XMR</strong>, <strong>check 끄기</strong>(일부러 낸 오류를 실패로 잡지 않게, 예: <code>$assertoff</code>), <strong>constraint 끄기</strong>(<code>constraint_mode(0)</code> 로 불법 값을 허용). <strong>Lab 4 의 "심은 버그" 와 반대 방향</strong>이다. error injection 은 DUT 를 시험해서 통과해야 맞고, 심은 버그는 checker 를 시험해서 실패해야 맞다.</p>
+  <p lang="en"><strong>Error injection</strong> (slide 13): special tests (flip a memory bit, corrupt a packet, force an invalid opcode, drop a response) to check <strong>the DUT recovers or flags an interrupt.</strong> How: <strong>XMRs</strong>, <strong>disabling checks</strong> (so the deliberate error isn't flagged as a failure, e.g. <code>$assertoff</code>), <strong>disabling constraints</strong> (allow illegal values with <code>constraint_mode(0)</code>). It's <strong>the opposite of Lab 4's planted bugs</strong>: error injection tests the DUT and should pass; a planted bug tests the checker and should fail.</p>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">C 와 메시지</h2><h2 lang="en">C and messages</h2></div>
+  <p lang="ko"><strong>PLI 와 DPI</strong>(6쪽). PLI = Programming Language Interface, DPI = Direct Programming Interface. PLI 의 <strong>tf, acc, vpi</strong> 루틴은 사용자 정의 system task, Verilog 계층의 객체 접근과 조작, 시뮬레이션 제어를 한다. DPI 는 <code>import "DPI-C"</code> 로 C 함수를 SV 함수처럼 부를 뿐이다(<a href="L12-sv-for-verification.html#s15">Lecture 12 의 15절</a>). C 파일은 <strong>VCS 명령줄에 바로</strong> 주거나, <strong>shared object(<code>.so</code>)로 먼저 컴파일해서</strong> 명령줄에 준다. Lab 4 의 C 정답 모델이 이 길로 들어간다.</p>
+  <p lang="en"><strong>PLI and DPI</strong> (slide 6). PLI = Programming Language Interface, DPI = Direct Programming Interface. PLI's <strong>tf, acc, vpi</strong> routines do user-defined system tasks, access and manipulation of Verilog hierarchy objects, and simulation control. DPI just calls a C function like an SV one via <code>import "DPI-C"</code> (<a href="L12-sv-for-verification.html#s15">Lecture 12, §15</a>). C files go <strong>straight on the VCS command line</strong>, or are <strong>compiled into a shared object (<code>.so</code>) first</strong> and named there. Lab 4's C reference model comes in this way.</p>
+  <p lang="ko"><strong>Message severity</strong>(7쪽). <code>$info</code>/UVM_INFO, <code>$warning</code>/UVM_WARNING, <code>$error</code>/UVM_ERROR, <code>$fatal</code>/UVM_FATAL. 아래로 갈수록 무겁다. IEEE 1800 기준으로 앞의 셋은 <strong>찍고 계속</strong> 가고, <code>$fatal</code> 만 <strong>시뮬레이션을 끝낸다.</strong> 넷 다 파일, 줄, scope, 시간을 메시지에 붙인다. 순수 SV 에서 <code>$error</code> 개수는 testbench 가 직접 세서 PASS/FAIL 을 판정해야 한다. <code>$display("ERROR")</code> 는 severity 가 없어 아무도 세지 않는다.</p>
+  <p lang="en"><strong>Message severity</strong> (slide 7): <code>$info</code>/UVM_INFO, <code>$warning</code>/UVM_WARNING, <code>$error</code>/UVM_ERROR, <code>$fatal</code>/UVM_FATAL, heavier as you go down. Per IEEE 1800 the first three <strong>print and carry on</strong>; only <code>$fatal</code> <strong>ends the simulation.</strong> All four attach file, line, scope and time. In plain SV the testbench must count <code>$error</code>s itself to judge PASS/FAIL. <code>$display("ERROR")</code> has no severity, so nobody counts it.</p>
+  <p lang="ko">자세한 판의 07절에서 plusarg 를 골라 <code>simv</code> 를 흉내 내며 <code>$error</code> 와 <code>$fatal</code> 의 차이를 직접 볼 수 있다.</p>
+  <p lang="en">§07 of the full note lets you pick plusargs, mock-run <code>simv</code> and see the <code>$error</code> versus <code>$fatal</code> difference first hand.</p>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">시간과 시뮬레이션 수준</h2><h2 lang="en">Timing and simulation level</h2></div>
+  <p lang="ko"><strong>Black-box vs. white-box</strong>(8쪽). black-box 는 spec 만 알고 입출력만 본다. spec 위반을 찾지만 실패 위치를 좁히기 어렵다. white-box 는 RTL 전체와 내부 신호를 본다. 구현 버그를 찾지만 <strong>common-mode</strong>(RTL 과 TB 가 같은 버그) 위험이 있다. 슬라이드의 <strong>Gray-Box</strong> 는 이름만 있다. 흔히 판정은 바깥, 관찰은 일부 안이라는 뜻으로 쓴다.</p>
+  <p lang="en"><strong>Black-box vs. white-box</strong> (slide 8). Black-box knows only the spec and watches only inputs and outputs: it finds spec violations but struggles to localize failures. White-box sees the full RTL and internal signals: it finds implementation bugs but risks <strong>common-mode</strong> issues (RTL and TB share a bug). The slide's <strong>Gray-Box</strong> is a name only; it's commonly used for verdicts from outside with some observation inside.</p>
+  <p lang="ko"><strong>시간 어긋남과 clocking block</strong>(9~10쪽). TB 와 DUT 가 같은 엣지에서 바꾸고 읽으면 race 가 난다. 9쪽의 답은 TB 가 하강 엣지에 넣고 다음 하강 엣지에 보는 것, 10쪽의 답은 clocking block 이다.</p>
+  <p lang="en"><strong>Time offsets and clocking blocks</strong> (slides 9 to 10). If TB and DUT change and read on the same edge, you get a race. Slide 9's answer: the TB drives on the falling edge and observes on the next one. Slide 10's answer: a clocking block.</p>
+  <figure>
+<svg viewBox="0 0 700 300" role="img" aria-label="A: TB 는 하강 엣지에 data 를 바꾸고 DUT 는 다음 상승 엣지에 샘플하며 TB 는 그다음 하강 엣지에 출력을 본다. B: clocking block 이 상승 엣지 1ns 전에 done 을 샘플하고 2ns 뒤에 data 를 구동한다">
+<text class="svglab" x="16" y="16" text-anchor="start" style="font-size:10px;fill:var(--ink2);font-weight:600" lang="ko">A. 슬라이드 9쪽: TB 는 하강 엣지에 넣고 DUT 는 상승 엣지에 샘플한다</text><text class="svglab" x="16" y="16" text-anchor="start" style="font-size:10px;fill:var(--ink2);font-weight:600" lang="en">A. slide 9: TB drives on the falling edge, DUT samples on the rising edge</text>
+<text class="svglab" x="24" y="52" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">clk</text>
+<path d="M70 60 L100 60 L100 36 L180 36 L180 60 L260 60 L260 36 L340 36 L340 60 L420 60 L420 36 L500 36 L500 60 L580 60 L580 36 L660 36 L660 60 L680 60" fill="none" stroke="var(--ink)" stroke-width="1.6"/>
+<text class="svglab" x="24" y="90" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">data</text>
+<path d="M70 76 L176 76 L184 96 L496 96 L504 76 L680 76" fill="none" stroke="var(--pink)" stroke-width="1.4"/>
+<path d="M70 96 L176 96 L184 76 L496 76 L504 96 L680 96" fill="none" stroke="var(--pink)" stroke-width="1.4"/>
+<text class="svglab" x="128" y="90" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">old</text>
+<text class="svglab" x="300" y="90" text-anchor="middle" style="font-size:9.5px;fill:var(--ink)">8'h42</text>
+<text class="svglab" x="590" y="90" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">next</text>
+<line x1="180" y1="28" x2="180" y2="104" stroke="var(--pink)" stroke-width="1.2" stroke-dasharray="3 3"/>
+<line x1="260" y1="28" x2="260" y2="104" stroke="var(--blue)" stroke-width="1.2" stroke-dasharray="3 3"/>
+<line x1="340" y1="28" x2="340" y2="104" stroke="var(--pink)" stroke-width="1.2" stroke-dasharray="3 3"/>
+<text class="svglab" x="180" y="120" text-anchor="middle" style="font-size:9.5px;fill:var(--pink)">TB applies</text>
+<text class="svglab" x="260" y="120" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)">DUT samples</text>
+<text class="svglab" x="340" y="120" text-anchor="middle" style="font-size:9.5px;fill:var(--pink)">TB observes</text>
+
+<text class="svglab" x="16" y="156" text-anchor="start" style="font-size:10px;fill:var(--ink2);font-weight:600" lang="ko">B. 슬라이드 10쪽: clocking block, input #1ns, output #2ns</text><text class="svglab" x="16" y="156" text-anchor="start" style="font-size:10px;fill:var(--ink2);font-weight:600" lang="en">B. slide 10: clocking block, input #1ns, output #2ns</text>
+<text class="svglab" x="24" y="192" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">clk</text>
+<path d="M70 200 L100 200 L100 176 L180 176 L180 200 L260 200 L260 176 L340 176 L340 200 L420 200 L420 176 L500 176 L500 200 L580 200 L580 176 L660 176 L660 200 L680 200" fill="none" stroke="var(--ink)" stroke-width="1.6"/>
+<text class="svglab" x="24" y="228" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">data</text>
+<path d="M70 214 L288 214 L296 232 L680 232" fill="none" stroke="var(--pink)" stroke-width="1.4"/>
+<path d="M70 232 L288 232 L296 214 L680 214" fill="none" stroke="var(--pink)" stroke-width="1.4"/>
+<text class="svglab" x="140" y="227" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">old</text>
+<text class="svglab" x="400" y="227" text-anchor="middle" style="font-size:9.5px;fill:var(--ink)">8'h42</text>
+<text class="svglab" x="24" y="258" text-anchor="start" style="font-size:10.5px;fill:var(--ink)">done</text>
+<path d="M70 262 L260 262 L260 246 L680 246" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+<text class="svglab" x="236" y="257" text-anchor="end" style="font-size:9px;fill:var(--pink)">sampled 0</text>
+<line x1="244" y1="168" x2="244" y2="270" stroke="var(--pink)" stroke-width="1.2" stroke-dasharray="3 3"/>
+<line x1="260" y1="168" x2="260" y2="270" stroke="var(--blue)" stroke-width="1.2" stroke-dasharray="3 3"/>
+<line x1="292" y1="168" x2="292" y2="270" stroke="var(--pink)" stroke-width="1.2" stroke-dasharray="3 3"/>
+<text class="svglab" x="236" y="288" text-anchor="end" style="font-size:9.5px;fill:var(--pink)">sample #1ns before</text>
+<text class="svglab" x="262" y="288" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)">posedge</text>
+<text class="svglab" x="298" y="288" text-anchor="start" style="font-size:9.5px;fill:var(--pink)">drive #2ns after</text>
+    </svg>
+    <figcaption lang="ko">A 는 슬라이드 9쪽, B 는 슬라이드 10쪽의 <code>default input #1ns output #2ns</code>. 분홍은 testbench, 파랑은 DUT. B 는 주기 10 ns, 1 ns = 16 px 로 가정했다.</figcaption>
+    <figcaption lang="en">A is slide 9; B is slide 10's <code>default input #1ns output #2ns</code>. Pink is the testbench, blue the DUT. B assumes a 10 ns period, 1 ns = 16 px.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><ol><li><strong>A</strong>: clk 의 상승 엣지는 x=100, 260, 420, 580, 하강 엣지는 180, 340, 500, 660. <strong>TB applies</strong>(180, 하강)에서 data 가 <code>old</code> 에서 <code>8'h42</code>(8 비트 16 진수 42 = 0100_0010)로 바뀌고, <strong>DUT samples</strong>(260, 상승)에서 DUT 가 그 값을 읽고, <strong>TB observes</strong>(340, 하강)에서 TB 가 출력을 본다. data 는 500 에서 <code>next</code> 로 바뀐다. 값이 바뀌는 순간과 읽는 순간이 반 주기씩 떨어져서 race 가 없다</li><li><strong>B</strong>: 같은 clock 의 <strong>posedge</strong>(260)가 기준이다. <strong>sample #1ns before</strong>(244 = 260 &minus; 16)에 input 을 샘플한다. DUT 출력 <strong>done</strong> 은 260 에서 0 &rarr; 1 이지만 244 에서 읽었으므로 <code>sampled 0</code>, 즉 이 엣지에서 <code>intf.cb.done</code> 은 0 이다. <strong>drive #2ns after</strong>(292 = 260 + 32)에 output 이 실려 data 가 <code>old</code> 에서 <code>8'h42</code> 로 바뀌고, DUT 는 그것을 다음 엣지(420)에 읽는다</li></ol></div>
+    <div lang="en"><ol><li><strong>A</strong>: clk rises at x = 100, 260, 420, 580 and falls at 180, 340, 500, 660. At <strong>TB applies</strong> (180, falling) data changes from <code>old</code> to <code>8'h42</code> (8-bit hex 42 = 0100_0010); at <strong>DUT samples</strong> (260, rising) the DUT reads it; at <strong>TB observes</strong> (340, falling) the TB reads the output. Data moves to <code>next</code> at 500. Changes and reads are half a period apart, so there's no race</li><li><strong>B</strong>: the reference is the same clock's <strong>posedge</strong> (260). Inputs are sampled at <strong>sample #1ns before</strong> (244 = 260 &minus; 16). The DUT output <strong>done</strong> goes 0 &rarr; 1 at 260, but it was read at 244, hence <code>sampled 0</code>: <code>intf.cb.done</code> is 0 at this edge. Outputs land at <strong>drive #2ns after</strong> (292 = 260 + 32), where data goes from <code>old</code> to <code>8'h42</code>; the DUT reads it at the next edge (420)</li></ol></div>
+  </div>
+  <p lang="ko"><strong>Gate-level simulation</strong>(11쪽). RTL 대신 synthesis 가 낸 netlist 를 같은 testbench 로 돌린다. 잡는 것은 RTL 과 netlist 의 불일치, RTL 이 숨긴 X-propagation 과 초기화 문제, reset 과 power-up, timing 의존 동작, synthesis 가 넣은 gated clock 같은 로직. 종류는 <strong>zero delay</strong> 와 <strong>timing simulation</strong>(<strong>SDF</strong>, Standard Delay Format 으로 지연을 입힌다). timing GLS 는 STA 를 대신하지 않는다. test 가 지나간 경로만 본다.</p>
+  <p lang="en"><strong>Gate-level simulation</strong> (slide 11): run the synthesized netlist instead of RTL under the same testbench. It catches RTL/netlist mismatches, X-propagation and initialization problems RTL hides, reset and power-up issues, timing-dependent behaviour, and logic synthesis adds, such as gated clocks. Types: <strong>zero delay</strong> and <strong>timing simulation</strong> (delays applied from an <strong>SDF</strong>, Standard Delay Format, file). Timing GLS doesn't replace STA; it only sees the paths tests exercise.</p>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+  <table>
+    <thead><tr><th><span lang="ko">문제 모양</span><span lang="en">Shape of the question</span></th><th><span lang="ko">구별 기준 한 줄</span><span lang="en">The one line that decides it</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">Mixed 짝짓기</span><span lang="en">Matching "Mixed"</span></td><td><span lang="ko">illegal_bins 는 <strong>checking inside coverage</strong>, cover property 는 <strong>coverage within checking</strong></span><span lang="en">illegal_bins is <strong>checking inside coverage</strong>; cover property is <strong>coverage within checking</strong></span></td></tr>
+      <tr><td><span lang="ko">cover vs assert property</span><span lang="en">cover vs assert property</span></td><td><span lang="ko">assert 는 <strong>깨지면 오류</strong>, cover 는 <strong>성립하면 센다</strong></span><span lang="en">assert <strong>errors on failure</strong>; cover <strong>counts on success</strong></span></td></tr>
+      <tr><td><span lang="ko">두 plusarg 함수</span><span lang="en">the two plusarg functions</span></td><td><span lang="ko"><code>$test$plusargs</code> 는 <strong>있나 없나</strong>, <code>$value$plusargs</code> 는 <strong>값</strong></span><span lang="en"><code>$test$plusargs</code> for <strong>presence</strong>, <code>$value$plusargs</code> for <strong>a value</strong></span></td></tr>
+      <tr><td><span lang="ko">XMR 의 단점</span><span lang="en">XMR drawbacks</span></td><td><span lang="ko"><strong>brittle</strong>, <strong>재사용에 나쁨</strong></span><span lang="en"><strong>brittle</strong>, <strong>bad for reuse</strong></span></td></tr>
+      <tr><td><span lang="ko">tf, acc, vpi</span><span lang="en">tf, acc, vpi</span></td><td><span lang="ko"><strong>PLI</strong> 쪽이다. vpi 도 PLI 의 3 세대</span><span lang="en"><strong>PLI</strong>; vpi is PLI's third generation</span></td></tr>
+      <tr><td><span lang="ko">시뮬레이션을 멈추는 severity</span><span lang="en">the severity that stops simulation</span></td><td><span lang="ko"><code>$fatal</code>(UVM_FATAL) <strong>하나뿐</strong></span><span lang="en"><code>$fatal</code> (UVM_FATAL) <strong>alone</strong></span></td></tr>
+      <tr><td><span lang="ko">black vs white box</span><span lang="en">black vs white box</span></td><td><span lang="ko"><strong>spec 위반 / 디버그 어려움</strong> 대 <strong>구현 버그 / common-mode</strong></span><span lang="en"><strong>spec violations / hard to debug</strong> versus <strong>implementation bugs / common-mode</strong></span></td></tr>
+      <tr><td><code>default input #1ns output #2ns</code></td><td><span lang="ko">input 은 엣지 <strong>1 ns 전</strong> 샘플, output 은 엣지 <strong>2 ns 뒤</strong> 구동</span><span lang="en">inputs sampled <strong>1 ns before</strong> the edge, outputs driven <strong>2 ns after</strong></span></td></tr>
+      <tr><td><span lang="ko">GLS 의 두 종류</span><span lang="en">the two kinds of GLS</span></td><td><span lang="ko"><strong>zero delay</strong>, <strong>timing</strong>(SDF)</span><span lang="en"><strong>zero delay</strong>, <strong>timing</strong> (SDF)</span></td></tr>
+      <tr><td><span lang="ko">error injection 방법</span><span lang="en">how to inject errors</span></td><td><span lang="ko"><strong>XMR</strong>, <strong>check 끄기</strong>, <strong>constraint 끄기</strong></span><span lang="en"><strong>XMRs</strong>, <strong>disable checks</strong>, <strong>disable constraints</strong></span></td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+  <p lang="ko"><strong>Lab 과의 연결.</strong> <a href="LAB4-fifo-verification.html">Lab 4</a>(FIFO Verification)가 이 강의를 거의 다 쓴다. plusarg 로 심은 버그와 로그 단계를 켜고, assertion 안에서 XMR 로 FIFO 내부를 보고, C 정답 모델을 DPI 로 붙이고, <code>$display</code> 와 <code>$error</code> 로 알린다. 과제의 정확한 요구는 Lab 4 설명서가 기준이다.</p>
+  <p lang="en"><strong>How it connects to the labs.</strong> <a href="LAB4-fifo-verification.html">Lab 4</a> (FIFO Verification) uses nearly all of this lecture: plusargs switching planted bugs and log levels, XMRs into the FIFO inside assertions, a C reference model attached via DPI, and reporting with <code>$display</code> and <code>$error</code>. The Lab 4 handout is the authority on what's required.</p>
+  </div>
+  <p lang="ko"><strong>다음 강의는 Lecture 15, Case study: CPU verification</strong> (10/28 수, Aman Arora). 그 뒤 Lecture 16~18 이 UVM(Joel Feldman)이고, 오늘의 sequence 와 UVM_* severity 가 거기서 본격적으로 나온다.</p>
+  <p lang="en"><strong>Next is Lecture 15, Case study: CPU verification</strong> (Wednesday 10/28, Aman Arora). Lectures 16 to 18 after that are UVM (Joel Feldman), where today's sequences and UVM_* severities come in properly.</p>
+</section>
+
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 14 개인 학습 노트 (빠른 읽기 판)<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 14 personal study notes (quick read)<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
