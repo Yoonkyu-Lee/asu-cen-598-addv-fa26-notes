@@ -532,8 +532,8 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <p lang="ko">슬라이드 6쪽이 UVM 을 한 장으로 소개한다. <strong>A methodology and a library written in System Verilog.</strong> 언어가 아니라 SV 로 짠 <strong>class 라이브러리와 그것을 쓰는 관행</strong>이다. Accellera(슬라이드에는 Acellera 로 오타)가 시작했고 지금은 IEEE 표준이며 모든 EDA 벤더가 지원한다. 계보는 <strong>VMM, OVM, eRM 을 거쳐 UVM</strong> 으로 모였다. 존재 이유는 <strong>표준화와 재사용</strong>이고, 그 결과물이 <strong>Verification IP</strong>(VIP)다.</p>
   <p lang="en">Slide 6 introduces UVM in one page: <strong>a methodology and a library written in System Verilog.</strong> Not a language, but <strong>a class library written in SV plus the conventions for using it.</strong> Accellera (misspelled Acellera on the slide) started it, it is now an IEEE standard, and every EDA vendor supports it. The lineage runs <strong>VMM, OVM, eRM, and finally UVM.</strong> Its reason to exist is <strong>standardization and reuse</strong>, and the product of that is <strong>Verification IP</strong> (VIP).</p>
   <div class="callout">
-  <p lang="ko"><strong>UVM 은 Lecture 15~17 이다.</strong> 10/28, 11/2, 11/4 세 번을 외부 강사 Joel Feldman 이 맡는다. 오늘 배우는 class, inheritance, virtual method, virtual interface, randomize, covergroup 가 <strong>UVM 이 그대로 깔고 앉는 바닥</strong>이다. UVM 의 factory 같은 것은 오늘 덱에 나오지 않는다. <a href="glossary.html">약어 사전</a>의 UVM, OVM &middot; VMM, VIP 항목은 <a href="L02-design-and-verification-overview.html#s22">Lecture 2 의 22절</a>에서 들어갔다.</p>
-  <p lang="en"><strong>UVM is Lectures 15 to 17</strong>: 10/28, 11/2 and 11/4, taught by guest lecturer Joel Feldman. Today's classes, inheritance, virtual methods, virtual interfaces, randomize and covergroups are <strong>the floor UVM stands on.</strong> UVM features such as its factory do not appear in today's deck. The glossary entries for UVM, OVM &middot; VMM and VIP came in with <a href="L02-design-and-verification-overview.html#s22">Lecture 2, §22</a>.</p>
+  <p lang="ko"><strong>UVM 은 Lecture 16~18 이다.</strong> 10/28, 11/2, 11/4 세 번을 외부 강사 Joel Feldman 이 맡는다. 오늘 배우는 class, inheritance, virtual method, virtual interface, randomize, covergroup 가 <strong>UVM 이 그대로 깔고 앉는 바닥</strong>이다. UVM 의 factory 같은 것은 오늘 덱에 나오지 않는다. <a href="glossary.html">약어 사전</a>의 UVM, OVM &middot; VMM, VIP 항목은 <a href="L02-design-and-verification-overview.html#s22">Lecture 2 의 22절</a>에서 들어갔다.</p>
+  <p lang="en"><strong>UVM is Lectures 16 to 18</strong>: 10/28, 11/2 and 11/4, taught by guest lecturer Joel Feldman. Today's classes, inheritance, virtual methods, virtual interfaces, randomize and covergroups are <strong>the floor UVM stands on.</strong> UVM features such as its factory do not appear in today's deck. The glossary entries for UVM, OVM &middot; VMM and VIP came in with <a href="L02-design-and-verification-overview.html#s22">Lecture 2, §22</a>.</p>
   </div>
 </section>
 
@@ -1392,14 +1392,14 @@ sem.get(<span class="n">1</span>);   read_modify_write(<span class="n">32'h0000_
         <tr><td>한 줄</td><td><strong>interface instance 를 가리키는 handle.</strong> class 가 DUT 의 신호를 만지는 유일한 통로다</td></tr>
         <tr><td>언제</td><td>driver 가 값을 넣을 때, monitor 가 값을 읽을 때. 실행 시작 직후 top 에서 실제 instance 를 넘겨 받는다</td></tr>
         <tr><td>누가</td><td>검증 엔지니어. 설계 쪽 RTL 에는 나오지 않는다</td></tr>
-        <tr><td>헷갈리는 것</td><td><strong>interface 와 virtual interface 는 다른 것이다.</strong> 앞의 것은 하드웨어 instance 이고 뒤의 것은 그것을 가리키는 값이다. handle 이므로 <strong>아무것도 안 넘기면 null</strong> 이고, 그 상태로 <code>vif.req</code> 를 만지면 실행 중에 멈춘다. UVM 에서는 이 넘겨주기를 config DB 라는 장치로 한다(Lecture 15~17)</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>interface 와 virtual interface 는 다른 것이다.</strong> 앞의 것은 하드웨어 instance 이고 뒤의 것은 그것을 가리키는 값이다. handle 이므로 <strong>아무것도 안 넘기면 null</strong> 이고, 그 상태로 <code>vif.req</code> 를 만지면 실행 중에 멈춘다. UVM 에서는 이 넘겨주기를 config DB 라는 장치로 한다(Lecture 16~18)</td></tr>
       </table>
       <table class="parts" lang="en">
         <tr><td>Full name</td><td>virtual interface, shortened to <code>vif</code> in code and on the slides</td></tr>
         <tr><td>One line</td><td><strong>a handle that points at an interface instance</strong>, a class's only way to touch the DUT's signals</td></tr>
         <tr><td>When</td><td>whenever a driver drives values or a monitor reads them. It receives the real instance from top right after the run starts</td></tr>
         <tr><td>Who</td><td>verification engineers. It never appears in design RTL</td></tr>
-        <tr><td>Easy to confuse</td><td><strong>An interface and a virtual interface are different things.</strong> The first is a hardware instance, the second a value that points at one. Being a handle, <strong>it is null if nothing was passed in</strong>, and touching <code>vif.req</code> then dies at run time. UVM does the handing-over through a mechanism called the config DB (Lectures 15 to 17)</td></tr>
+        <tr><td>Easy to confuse</td><td><strong>An interface and a virtual interface are different things.</strong> The first is a hardware instance, the second a value that points at one. Being a handle, <strong>it is null if nothing was passed in</strong>, and touching <code>vif.req</code> then dies at run time. UVM does the handing-over through a mechanism called the config DB (Lectures 16 to 18)</td></tr>
       </table>
     </div>
   </details>
@@ -1436,8 +1436,8 @@ sem.get(<span class="n">1</span>);   read_modify_write(<span class="n">32'h0000_
     <li lang="en"><strong>This lecture's passive stimulus</strong> (slide 30): reacts to a DUT event and <strong>does put values in.</strong> <a href="L02-design-and-verification-overview.html#s16">Lecture 2</a> called the same thing <strong>reactive</strong></li>
     <li lang="ko"><strong>Lecture 2 의 passive monitor</strong>(<a href="L02-design-and-verification-overview.html#s18">18절</a>): 신호를 <strong>읽기만 하고 아무것도 넣지 않는다</strong></li>
     <li lang="en"><strong>Lecture 2's passive monitor</strong> (<a href="L02-design-and-verification-overview.html#s18">§18</a>): <strong>only reads signals and puts nothing in</strong></li>
-    <li lang="ko"><strong>UVM 의 passive agent</strong>: driver 를 끄고 monitor 만 돌리는 agent. 이것도 <strong>아무것도 넣지 않는다</strong>(Lecture 15~17 에서 나올 말)</li>
-    <li lang="en"><strong>UVM's passive agent</strong>: an agent with its driver switched off and only the monitor running. It too <strong>puts nothing in</strong> (a term due in Lectures 15 to 17)</li>
+    <li lang="ko"><strong>UVM 의 passive agent</strong>: driver 를 끄고 monitor 만 돌리는 agent. 이것도 <strong>아무것도 넣지 않는다</strong>(Lecture 16~18 에서 나올 말)</li>
+    <li lang="en"><strong>UVM's passive agent</strong>: an agent with its driver switched off and only the monitor running. It too <strong>puts nothing in</strong> (a term due in Lectures 16 to 18)</li>
   </ul>
   <p lang="ko">문서나 면접에서 "passive" 를 들으면 대개 뒤의 두 뜻이다. 이 강의의 passive stimulus 는 <strong>"강의에서는 이렇게 부른다"</strong> 로 기억해 두고, 밖에서는 reactive 라고 말하는 쪽이 오해가 적다.</p>
   <p lang="en">When you hear "passive" in a spec or an interview it usually means one of the last two. File this lecture's passive stimulus under <strong>"what the lecture calls it"</strong>, and say reactive elsewhere to avoid confusion.</p>
@@ -1698,8 +1698,8 @@ sem.get(<span class="n">1</span>);   read_modify_write(<span class="n">32'h0000_
   <p lang="ko">슬라이드 41쪽은 실제 칩 프로젝트의 파형 창 스크린샷이다. Group1 아래에 assertion 이 둘 있고, 각 assertion 밑에 그것이 보는 신호(clk_event, reset, 관련 신호)가 딸려 펼쳐져 있다. 값 칸에 <code>hs_act_assert</code> 는 failure, <code>recal_timeout_assert</code> 는 success 로 잘려 보인다. 위쪽 assertion 의 줄 끝에 <strong>빨간 아래 화살표</strong>, 아래쪽 assertion 의 줄 중간에 <strong>초록 위 화살표</strong>가 있다. 어긋나 붙은 발표자 노트가 "Take a guess as to what the red arrow is?" 라고 묻는다. 값 칸과 맞춰 보면 빨간 화살표가 <strong>실패한 시점</strong>, 초록 화살표가 <strong>통과한 시점</strong>으로 읽힌다. 빨간 화살표 옆의 숫자 1007 은 슬라이드가 설명하지 않는다. 요점은 <strong>assertion 이 파형 창에 신호처럼 올라와서, 실패한 시각으로 바로 뛰어갈 수 있다</strong>는 것이다.</p>
   <p lang="en">Slide 41 is a waveform viewer screenshot from a real chip project. Under Group1 are two assertions, each expanded to show the signals it watches (clk_event, reset, related signals). In the value column, <code>hs_act_assert</code> reads as failure and <code>recal_timeout_assert</code> as success, both truncated. The upper assertion's row ends in <strong>a red down arrow</strong>, the lower one has <strong>a green up arrow</strong> mid-row. A misplaced speaker note asks "Take a guess as to what the red arrow is?" Matched against the value column, the red arrow reads as <strong>the moment of failure</strong> and the green one as <strong>the moment of success.</strong> The number 1007 beside the red arrow is not explained on the slide. The point is that <strong>assertions show up in the waveform viewer like signals, and you can jump straight to the time of a failure.</strong></p>
   <div class="callout">
-  <p lang="ko"><strong>다음 강의가 이 절의 연장이다.</strong> <strong>Lecture 13, Assertion Based Verification</strong>(10/19)이 sequence, property, 그리고 assertion 을 검증 방법으로 쓰는 법을 제대로 다룬다. Backup 63쪽의 sequence 예(<a href="#s19">19절</a>)가 그 맛보기다. <strong>Lab 6</strong> 의 과제 이름에 Assertions 가 들어가 있고, <a href="L10-soc-architecture.html#s12">Lecture 10 의 APB</a> 규칙(예: 기다리는 동안 신호를 바꾸지 않는다)이 assertion 으로 걸기 좋은 재료다.</p>
-  <p lang="en"><strong>The next lecture continues this section.</strong> <strong>Lecture 13, Assertion Based Verification</strong> (10/19) properly covers sequences, properties and assertions as a verification method; backup slide 63's sequences (<a href="#s19">§19</a>) are a preview. <strong>Lab 6</strong> has Assertions in its title, and <a href="L10-soc-architecture.html#s12">Lecture 10's APB</a> rules (such as changing nothing while waiting) are good material for assertions.</p>
+  <p lang="ko"><strong>다음 강의가 이 절의 연장이다.</strong> 원래 이 자리에 있던 Assertion Based Verification 강의는 일정에서 빠졌고, <strong>Lecture 13, Verification Concepts</strong>(10/19)가 SVA 를 그 안의 한 절로 다룬다. Backup 63쪽의 sequence 예(<a href="#s19">19절</a>)가 그 맛보기다. <strong>Lab 6</strong> 의 과제 이름에 Assertions 가 들어가 있고, <a href="L10-soc-architecture.html#s12">Lecture 10 의 APB</a> 규칙(예: 기다리는 동안 신호를 바꾸지 않는다)이 assertion 으로 걸기 좋은 재료다.</p>
+  <p lang="en"><strong>The next lecture continues this section.</strong> The Assertion Based Verification lecture once planned here was dropped from the schedule; <strong>Lecture 13, Verification Concepts</strong> (10/19) covers SVA as one of its sections; backup slide 63's sequences (<a href="#s19">§19</a>) are a preview. <strong>Lab 6</strong> has Assertions in its title, and <a href="L10-soc-architecture.html#s12">Lecture 10's APB</a> rules (such as changing nothing while waiting) are good material for assertions.</p>
   </div>
 </section>
 
@@ -2178,14 +2178,14 @@ cmd_t     cmd;
         <tr><td>한 줄</td><td><strong>object 를 직접 만들 수 없고 상속받으라고만 있는 class.</strong> 자식들이 지켜야 할 API 를 정한다</td></tr>
         <tr><td>언제</td><td>packet 종류가 여럿인데 testbench 는 "send 할 수 있는 무언가" 로만 다루고 싶을 때. 부모 handle 하나로 여러 자식을 다룬다(05절의 polymorphism)</td></tr>
         <tr><td>누가</td><td>testbench 구조를 잡는 검증 엔지니어. UVM 의 base class 들이 이런 모양이다</td></tr>
-        <tr><td>헷갈리는 것</td><td><strong>virtual class 는 virtual interface 와 아무 관계가 없다.</strong> 08절 함정 참조. 그리고 허브 카드가 이 강의에 적어둔 <strong>factory pattern 은 이 덱에 나오지 않는다.</strong> UVM 의 이야기라 Lecture 15~17 에서 나올 것이다</td></tr>
+        <tr><td>헷갈리는 것</td><td><strong>virtual class 는 virtual interface 와 아무 관계가 없다.</strong> 08절 함정 참조. 그리고 허브 카드가 이 강의에 적어둔 <strong>factory pattern 은 이 덱에 나오지 않는다.</strong> UVM 의 이야기라 Lecture 16~18 에서 나올 것이다</td></tr>
       </table>
       <table class="parts" lang="en">
         <tr><td>Full name</td><td>abstract class, the slide's name. In SV syntax it is written <code>virtual class</code>, and a method with no body is <code>pure virtual</code></td></tr>
         <tr><td>One line</td><td><strong>a class you cannot build objects from, existing only to be inherited.</strong> It fixes the API its children must follow</td></tr>
         <tr><td>When</td><td>when there are several kinds of packet but the testbench wants to treat them all as "something that can send". One parent handle handles many children (§05's polymorphism)</td></tr>
         <tr><td>Who</td><td>verification engineers laying out testbench structure. UVM's base classes look like this</td></tr>
-        <tr><td>Easy to confuse</td><td><strong>A virtual class has nothing to do with a virtual interface.</strong> See the trap in §08. And <strong>the factory pattern the hub card listed for this lecture does not appear in this deck</strong>; it is a UVM topic, due in Lectures 15 to 17</td></tr>
+        <tr><td>Easy to confuse</td><td><strong>A virtual class has nothing to do with a virtual interface.</strong> See the trap in §08. And <strong>the factory pattern the hub card listed for this lecture does not appear in this deck</strong>; it is a UVM topic, due in Lectures 16 to 18</td></tr>
       </table>
     </div>
   </details>
@@ -2461,8 +2461,8 @@ expiry_case_cprop: <span class="k">cover property</span> (expiry_case);</pre>
   </div>
   <h3 lang="ko">다음 강의</h3>
   <h3 lang="en">Next lecture</h3>
-  <p lang="ko"><strong>Lecture 13, Assertion Based Verification.</strong> 10/19 (월), Aman Arora. 11절과 19절의 assertion 을 검증 방법론으로 키운다. sequence, property, implication, 그리고 assertion 을 어디에 어떻게 거는지. 그 뒤 Lecture 14 가 CPU verification case study, <strong>Lecture 15~17 이 UVM</strong> 이다. 오늘의 class, virtual method, virtual interface, randomize, covergroup 이 UVM 에서 이름만 바뀌어 다시 나온다.</p>
-  <p lang="en"><strong>Lecture 13, Assertion Based Verification</strong>, Monday 10/19, Aman Arora. It grows §11 and §19's assertions into a verification methodology: sequences, properties, implications, and where and how to place assertions. After that, Lecture 14 is a CPU verification case study and <strong>Lectures 15 to 17 are UVM.</strong> Today's classes, virtual methods, virtual interfaces, randomize and covergroups come back there under new names.</p>
+  <p lang="ko"><strong>Lecture 13, Verification Concepts.</strong> 10/19 (월), Aman Arora. verification plan, randomization 과 constraint, 그리고 SVA 를 검증 방법으로 묶는다 (원래 예정된 Assertion Based Verification 강의를 대체했다). 그 뒤 Lecture 14 가 Efficient verification methods, Lecture 15 가 CPU verification case study, <strong>Lecture 16~18 이 UVM</strong> 이다. 오늘의 class, virtual method, virtual interface, randomize, covergroup 이 UVM 에서 이름만 바뀌어 다시 나온다.</p>
+  <p lang="en"><strong>Lecture 13, Verification Concepts</strong>, Monday 10/19, Aman Arora. It ties the verification plan, randomization and constraints, and SVA together as a method (it replaced the planned Assertion Based Verification lecture). After that come Lecture 14, Efficient verification methods, Lecture 15, a CPU verification case study, and <strong>Lectures 16 to 18, UVM.</strong> Today's classes, virtual methods, virtual interfaces, randomize and covergroups come back there under new names.</p>
 </section>
 
 

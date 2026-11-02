@@ -401,7 +401,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">overlapping implication · non-overlapping implication</div>
   <div class="d" lang="ko">assertion 의 implication 연산자. 왼쪽(antecedent)이 참이면 오른쪽(consequent)을 검사한다. <code>|-&gt;</code> 는 <strong>같은 clock tick 부터</strong>, <code>|=&gt;</code> 는 <strong>다음 tick 부터</strong> 오른쪽을 시작한다. <code>$rose(Req) |-&gt; ##[2:20] Ready</code> 는 Req 가 오른 tick 의 2~20 tick 뒤 사이에 Ready 를 요구한다.</div>
   <div class="d" lang="en">The implication operators of assertions: if the left side (antecedent) holds, check the right side (consequent). <code>|-&gt;</code> starts the right side <strong>at the same clock tick</strong>, <code>|=&gt;</code> <strong>at the next tick.</strong> <code>$rose(Req) |-&gt; ##[2:20] Ready</code> requires Ready between 2 and 20 ticks after the tick Req rose.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s11">Lecture 12 &middot; 11</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s11">Lecture 12 &middot; 11</a> · <a href="L13-verification-concepts.html#s11">Lecture 13 &middot; 11</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
 </div>
 
 <div class="gterm">
@@ -421,6 +421,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">ACE · CHI</div>
+  <div class="f">AXI Coherency Extensions · Coherent Hub Interface</div>
+  <div class="d" lang="ko">AMBA 의 <strong>cache coherency 규격</strong> 둘. ACE 는 AMBA 4 로 AXI 에 snoop 채널을 더한 것이고, CHI 는 AMBA 5 의 계층을 나눈 packet 기반 규격이다. Lecture 15 에서는 CPU 의 MP testbench 구성 이름("가장 큰 AMBA 4 ACE 구성", "가장 큰 AMBA 5 CHI 구성")과 top-level testbench 의 ACE Snoop Generator 로 나온다.</div>
+  <div class="d" lang="en">AMBA's two <strong>cache coherency protocols.</strong> ACE is AMBA 4, AXI plus snoop channels; CHI is AMBA 5, a layered packet-based protocol. In Lecture 15 they name the CPU's MP testbench configurations ("largest AMBA 4 ACE-based", "largest AMBA 5 CHI-based") and the top-level testbench's ACE Snoop Generator.</div>
+  <div class="src"><a href="L10-soc-architecture.html#s11">Lecture 10 &middot; 11</a> · <a href="L15-cpu-verification.html#s6">Lecture 15 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Active · Reactive Stimulus</div>
+  <div class="d" lang="ko">누가 먼저 움직이나로 가른다. <strong>active</strong> 는 testbench 가 요청을 만들어 DUT 에 넣고, <strong>reactive</strong>(슬라이드 표현으로 passive/reactive)는 DUT 가 먼저 낸 요청에 testbench 가 응답한다. reactive 쪽은 응답의 지연, 순서, 오류 여부를 무작위로 한다. UVM 의 passive agent(monitor 만 켠 agent)와는 다른 말이다.</div>
+  <div class="d" lang="en">Split by who moves first. <strong>Active</strong>: the testbench creates requests and drives them into the DUT. <strong>Reactive</strong> (the slide says passive/reactive): the testbench answers requests the DUT issues, randomizing the response's delay, order and errors. Not the same as UVM's passive agent (monitor only).</div>
+  <div class="src"><a href="L13-verification-concepts.html#s6">Lecture 13 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Activity Factor</div>
   <div class="d" lang="ko">한 노드가 <strong>클럭 한 번당 평균 몇 번이나 값을 바꾸는가</strong>를 나타내는 값. dynamic power 를 좌우하는 네 가지 중 하나이고, <strong>RTL 설계자가 가장 직접 건드릴 수 있는 것</strong>이다. <a href="#gO">operand isolation</a> 과 <a href="#gC">clock gating</a> 이 둘 다 이 값을 낮추는 기법이다. 기능과 무관하므로 시뮬레이션 결과는 그대로다.</div>
   <div class="d" lang="en">How many times a node <strong>changes value per clock, on average.</strong> One of the four things that set dynamic power, and <strong>the one an RTL designer can reach most directly.</strong> Both <a href="#gO">operand isolation</a> and <a href="#gC">clock gating</a> work by lowering it. It has nothing to do with function, so simulation results do not move.</div>
@@ -431,7 +446,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Agent</div>
   <div class="d" lang="ko">Testbench에서 <strong>Driver와 Monitor를 (인터페이스와 함께) 한 부품으로 묶은 것.</strong> BFM, Transactor와 같은 것을 가리킨다. UVM에서 <code>uvm_agent</code>라서 이 이름이 가장 표준적이다. <strong>재사용의 단위다.</strong> APB agent를 한 번 만들면 APB를 쓰는 어떤 DUT에도 붙는다.</div>
   <div class="d" lang="en">In a testbench, <strong>the driver and monitor bundled into one component</strong> along with the interface. The same thing as a BFM or transactor. UVM calls it <code>uvm_agent</code>, which makes this the standard name. <strong>It is the unit of reuse:</strong> build an APB agent once and it plugs into any DUT that speaks APB.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -453,7 +468,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Advanced Microcontroller Bus Architecture</div>
   <div class="d" lang="ko">Arm 이 공개한 on-chip 버스와 인터페이스 규격의 <strong>가족 이름</strong>. APB, AHB, AXI, ACE, CHI 가 식구다. <strong>버스 하나의 이름이 아니다.</strong></div>
   <div class="d" lang="en">Arm's family of on-chip bus and interface specifications: APB, AHB, AXI, ACE, CHI. <strong>Not the name of one bus.</strong></div>
-  <div class="src"><a href="L10-soc-architecture.html#s11">Lecture 10 &middot; 11</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s11">Lecture 10 &middot; 11</a> · <a href="L15-cpu-verification.html#s6">Lecture 15 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -487,6 +502,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Architectural State</div>
+  <div class="d" lang="ko">프로그램이 볼 수 있는 프로세서의 상태. Lecture 15 슬라이드 47쪽은 다섯을 든다. <strong>PC, 범용·floating-point register, 메모리, CSR 과 privilege state, exception 과 interrupt.</strong> pipeline register 나 forwarding 경로처럼 <strong>구현에만 있는 상태는 들어가지 않는다.</strong> ISS 가 갱신하는 것도, retire 에서 RTL 과 비교하는 것도 이것이다.</div>
+  <div class="d" lang="en">The processor state a program can see. Lecture 15's slide 47 lists five: <strong>the PC, general-purpose and floating-point registers, memory, CSRs and privilege state, exceptions and interrupts.</strong> <strong>State that exists only in the implementation</strong>, like pipeline registers or forwarding paths, is not included. It's what an ISS updates and what gets compared with the RTL at retire.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s15">Lecture 15 &middot; 15</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">ASIC</div>
   <div class="f">Application Specific Integrated Circuit</div>
   <div class="d" lang="ko">한 가지 용도로 고정해서 만든 칩. 만들고 나면 회로가 안 바뀐다. FPGA의 반대편이다. <strong>틀리면 되돌릴 수 없다</strong>는 이 한 문장이 이 과목의 verification 전체를 설명한다.</div>
@@ -498,7 +520,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Assertion</div>
   <div class="d" lang="ko">설계가 <strong>반드시 보여야 하거나 절대 보이면 안 되는 동작</strong>을 코드로 명시한 것. 결정적인 성질은 <strong>"항상 켜져 있다"</strong>는 것이다. 어떤 테스트를 돌리든 계속 감시한다. 예: <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
   <div class="d" lang="en">Code that states behaviour the design <strong>must, or must never, exhibit.</strong> The decisive property is that it is <strong>always on</strong>: it keeps watching no matter which test is running. For example <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 13 전체</span><span lang="en">all of Lecture 13</span> · <a href="L12-sv-for-verification.html#s11">Lecture 12 · 11</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 13 전체</span><span lang="en">all of Lecture 13</span> · <a href="L12-sv-for-verification.html#s11">Lecture 12 · 11</a> · <a href="L13-verification-concepts.html#s9">Lecture 13 &middot; 09</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Assertion Coverage</div>
+  <div class="d" lang="ko">assertion 이 <strong>실제로 fire 한 횟수</strong>를 세는 coverage. 실패가 없어도 전부 vacuous pass 였을 수 있으므로, implication 의 왼쪽에 <code>cover property</code> 를 걸어 0 이 아닌지 본다. 도구는 assertion 마다 attempt, real success, vacuous success, failure 를 따로 보고한다.</div>
+  <div class="d" lang="en">Coverage that counts <strong>how often each assertion actually fired.</strong> With no failures, every pass may still have been vacuous, so put a <code>cover property</code> on the implication's left side and check it's nonzero. Tools report attempts, real successes, vacuous successes and failures per assertion.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s11">Lecture 13 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -506,6 +535,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko"><code>int grades[string];</code> 처럼 <strong>key 로 찾는 배열.</strong> 쓴 칸만 생기므로 넓은 주소 공간에서 건드린 주소만 저장하는 메모리 모델에 맞는다. 있는지는 <code>exists(key)</code> 로 본다(괄호다).</div>
   <div class="d" lang="en">An array <strong>looked up by key</strong>, as in <code>int grades[string];</code>. Only written entries exist, which suits memory models that store just the touched addresses of a huge space. Test membership with <code>exists(key)</code> (parentheses).</div>
   <div class="src"><a href="L12-sv-for-verification.html#s3">Lecture 12 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">assume property · Assumption</div>
+  <div class="d" lang="ko">property 에 assert 대신 <code>assume</code> 을 붙인 것. <strong>simulation 에서는 assertion 처럼 검사</strong>되어 testbench 가 어기면 보고되고, <strong>formal(FPV)에서는 가능한 입력의 범위를 좁히는 전제</strong>가 된다. 너무 강하면(over-constrain) 실제 입력까지 배제해 버그가 숨는다.</div>
+  <div class="d" lang="en">A property with <code>assume</code> instead of assert. <strong>In simulation it is checked like an assertion</strong>, reporting when the testbench violates it; <strong>in formal (FPV) it is a premise that narrows the possible inputs.</strong> Too strong (over-constrained), it excludes real inputs and hides bugs.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s13">Lecture 13 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -527,7 +563,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Advanced eXtensible Interface</div>
   <div class="d" lang="ko">주소, 데이터, 응답을 <strong>독립 채널 다섯</strong>(AW, W, B, AR, R)으로 나누고 채널마다 valid/ready handshake 를 하는 고성능 인터페이스. multiple outstanding, out-of-order, burst 를 지원한다. 읽기 응답 채널은 따로 없다.</div>
   <div class="d" lang="en">A high-performance interface splitting address, data and response into <strong>five independent channels</strong> (AW, W, B, AR, R), each with a valid/ready handshake. Supports multiple outstanding transactions, out-of-order completion and bursts. No separate read response channel.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a> · <a href="L15-cpu-verification.html#s11">Lecture 15 &middot; 11</a></div>
 </div>
 
 <h2 class="gletter" id="gB">B</h2>
@@ -554,6 +590,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Bare-metal</div>
+  <div class="d" lang="ko"><strong>OS 없이</strong> CPU 위에서 바로 도는 프로그램. 초기화 코드, trap handler, 종료 방법을 프로그램이 스스로 갖춰야 한다. Lecture 15 에서는 system level 의 "Baremetal stress verification" 과 "non-OS bare-metal memory and MP stress tests" 로 나온다. OS 를 올린 test 와 구별하려고 붙이는 이름이다.</div>
+  <div class="d" lang="en">A program running directly on the CPU <strong>with no OS</strong>, so it must bring its own setup code, trap handlers and termination. Lecture 15 uses it at system level: "Baremetal stress verification" and "non-OS bare-metal memory and MP stress tests". The name sets these apart from tests that boot an OS.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s4">Lecture 15 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">BDD · ROBDD</div>
   <div class="f">(Reduced Ordered) Binary Decision Diagram</div>
   <div class="d" lang="ko">Boolean 함수를 표현하고 조작하는 자료구조. ROBDD는 <strong>canonical</strong>하다. 즉 같은 함수는 반드시 같은 모양이 된다. 그래서 두 ROBDD를 비교하면 <strong>두 함수가 같은지가 즉시 증명된다.</strong> Equivalence checking의 바탕이다. 조합 논리에만 쓴다.</div>
@@ -573,7 +616,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Bus Functional Model</div>
   <div class="d" lang="ko">Agent와 같은 것. Driver와 Monitor를 묶은 testbench 부품을 부르는 다른 이름이다. 회사와 팀마다 Agent, BFM, Transactor 중 아무거나 쓴다.</div>
   <div class="d" lang="en">The same thing as an agent: another name for the testbench component that bundles a driver and a monitor. Companies and teams use agent, BFM and transactor interchangeably.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a> · <a href="L15-cpu-verification.html#s5">Lecture 15 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -613,10 +656,25 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">BIU</div>
+  <div class="f">Bus Interface Unit</div>
+  <div class="d" lang="ko">CPU 와 바깥 버스 사이의 창구가 되는 <strong>설계 블록.</strong> Lecture 15 는 BIU 하나를 예로 unit, L1 multi-unit, MP multi-unit, top level, system level 다섯 testbench 를 모두 거치는 bottom-up 검증을 보인다. 이름이 비슷한 BFM 은 testbench 부품이라 DUT 밖에 있다.</div>
+  <div class="d" lang="en">A <strong>design block</strong> that is the CPU's window onto the external bus. Lecture 15 uses one BIU to show bottom-up verification through all five testbenches: unit, L1 multi-unit, MP multi-unit, top level and system level. The similar-sounding BFM is a testbench part and sits outside the DUT.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s5">Lecture 15 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Black-box &middot; White-box &middot; Gray-box Verification</div>
+  <div class="d" lang="ko">검증 엔지니어가 DUT 를 얼마나 들여다보나. <strong>black-box</strong> 는 spec 만 알고 입출력만 본다(spec 위반을 찾지만 실패 위치를 좁히기 어렵다). <strong>white-box</strong> 는 RTL 과 내부 신호까지 본다(구현 버그를 찾지만 <a href="#gC">common-mode</a> 위험). <strong>gray-box</strong> 는 슬라이드에 이름만 있고, 흔히 판정은 바깥에서 하되 내부 몇 개를 관찰한다는 뜻으로 쓴다.</div>
+  <div class="d" lang="en">How far a verification engineer looks inside the DUT. <strong>Black-box</strong> knows only the spec and watches only inputs and outputs (finds spec violations, hard to localize failures). <strong>White-box</strong> sees the RTL and internal signals (finds implementation bugs, risks <a href="#gC">common-mode</a> issues). <strong>Gray-box</strong> is only named on the slide; it's commonly used for verdicts from outside with a few internals observed.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s8">Lecture 14 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Branch Prediction</div>
   <div class="d" lang="ko">분기 판정을 기다리지 않고 <strong>taken 인지 아닌지를 찍어서</strong> 계속 fetch 하는 것. static 은 방향만 본다 (뒤로 가는 분기면 taken, 루프일 가능성이 높으므로). dynamic 은 최근 분기 이력을 <strong>BTB</strong> 에 기록해서 참고한다. <strong>flush 를 없애는 게 아니라 flush 가 필요한 분기의 비율을 줄인다.</strong></div>
   <div class="d" lang="en">Guessing <strong>taken or not taken</strong> and continuing to fetch instead of waiting for the branch to resolve. Static prediction looks only at direction: backward means taken, since it is probably a loop. Dynamic prediction records recent branch history in a <strong>BTB</strong>. <strong>It does not remove flushes, it reduces the fraction of branches that need one.</strong></div>
-  <div class="src"><a href="L06-pipelined-cpu-design.html#s8">Lecture 6 &middot; 08</a></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s8">Lecture 6 &middot; 08</a> · <a href="L15-cpu-verification.html#s9">Lecture 15 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -630,7 +688,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Bring-up</div>
   <div class="d" lang="ko">새 칩이 처음 도착했을 때 <strong>동작하게 만들어가는 과정.</strong> 전원을 넣고 클럭이 도는지부터 확인한다. NVIDIA에는 이 단계에 붙는 고유 이름이 없어서 그냥 bringup이라고 부른다고 슬라이드가 적어놨다. Testbench 쪽에서도 "testbench and DUT bringup"이라는 표현을 같은 뜻으로 쓴다.</div>
   <div class="d" lang="en">The process of <strong>getting a brand new chip to do anything at all</strong>, starting from whether the clock runs when power goes in. The slides note that NVIDIA has no specific name for this stage and just calls it bringup. The same word is used on the testbench side, as in "testbench and DUT bringup".</div>
-  <div class="src"><a href="L01-course-intro.html#s10">Lecture 1 · 10</a></div>
+  <div class="src"><a href="L01-course-intro.html#s10">Lecture 1 · 10</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="L15-cpu-verification.html#s5">Lecture 15 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -671,6 +729,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gC">C</h2>
 
 <div class="gterm">
+  <div class="t">Cache Coherency</div>
+  <div class="d" lang="ko">여러 cache 가 <strong>같은 주소의 사본</strong>을 들고 있을 때 누가 쓰든 모두가 <strong>같은 값을 보게</strong> 맞추는 성질. cluster 안에서는 SCU, cluster 사이에서는 CCI 나 CCN 이 하드웨어로 맞추고 ACE, CHI 가 그 규칙이다. 코어가 하나면 생기지 않으므로 Lecture 15 의 MP testbench 에서 처음 시험한다. memory ordering(consistency)과는 다른 말이다.</div>
+  <div class="d" lang="en">When several caches hold <strong>copies of the same address</strong>, keeping them so everyone <strong>sees the same value</strong> whoever writes. Hardware maintains it: the SCU inside a cluster, a CCI or CCN between clusters, with ACE or CHI as the rules. It can't arise with one core, so Lecture 15's MP testbench is where it's first tested. Not the same as memory ordering (consistency).</div>
+  <div class="src"><a href="L15-cpu-verification.html#s6">Lecture 15 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">CAM &middot; Content-Addressable Memory</div>
   <div class="d" lang="ko">주소가 아니라 <strong>내용으로 찾는 메모리.</strong> 값을 주면 그 값이 어디 있는지를 돌려준다. 강의에서는 숨김 슬라이드의 building block 목록에 이름만 나온다.</div>
   <div class="d" lang="en">Memory looked up <strong>by content rather than address</strong>: give it a value and it tells you where that value is. In this course it appears only as a name in the building block list on a hidden slide.</div>
@@ -682,6 +747,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko"><strong>표현이 하나뿐이라는 뜻.</strong> 중복도 반복도 애매함도 없다. 어떤 표현이 canonical이면, 두 대상이 같은지를 <strong>모양만 비교해서</strong> 판정할 수 있다. ROBDD가 그렇다.</div>
   <div class="d" lang="en"><strong>There is exactly one representation.</strong> No redundancy, no repetition, no ambiguity. When a representation is canonical, you can decide whether two things are equal <strong>by comparing shapes alone.</strong> ROBDDs are the example.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">CCI · CCN</div>
+  <div class="f">Cache Coherent Interconnect · Cache Coherent Network</div>
+  <div class="d" lang="ko">Arm 의 coherent interconnect 제품군. <strong>CCI</strong> 는 슬라이드가 직접 푼다(CCI-400). cluster 여럿을 잇고 cache 를 맞춘다. <strong>CCN</strong> 은 슬라이드가 풀지 않으며 더 많은 cluster 를 위한 CHI 기반 interconnect 다. Lecture 15 의 MP testbench 구성 "MP4 + MP4 + CCI" 와 "MP4 &times; 4 + CCN" 에 나온다.</div>
+  <div class="d" lang="en">Arm's coherent interconnect products. <strong>CCI</strong> is expanded on the slides (CCI-400): it joins clusters and keeps their caches coherent. <strong>CCN</strong> isn't expanded on the slides; it's a CHI-based interconnect for more clusters. They appear in Lecture 15's MP testbench configurations "MP4 + MP4 + CCI" and "MP4 &times; 4 + CCN".</div>
+  <div class="src"><a href="L15-cpu-verification.html#s6">Lecture 15 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -703,7 +776,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Checker</div>
   <div class="d" lang="ko">DUT가 제대로 동작하는지 확인하고 <strong>불법적인 일이 벌어지면 오류를 띄우는</strong> testbench 부품. 두 층이 있다. 신호 수준(assertion)과 동작 수준(scoreboard). 검증의 세 기둥 중 하나.</div>
   <div class="d" lang="en">The testbench component that confirms the DUT behaves correctly and <strong>raises an error when something illegal happens.</strong> It has two layers: signal level, meaning assertions, and behavioural, meaning scoreboards. One of the three pillars of verification.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s11">Lecture 12 · 11</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s11">Lecture 12 · 11</a> · <a href="L13-verification-concepts.html#s7">Lecture 13 &middot; 07</a> · <a href="L15-cpu-verification.html#s3">Lecture 15 &middot; 03</a> · <a href="LAB4-fifo-verification.html#s4">Lab 4 · 04</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Chicken Bit</div>
+  <div class="d" lang="ko">새 기능이나 최적화를 <strong>꺼버릴 수 있게</strong> 설계에 남겨 둔 설정 bit. 실리콘에서 그 기능에 버그가 나오면 이 bit 로 끈다. Lecture 15 슬라이드 33쪽은 test 프로그램 목록에 <strong>"Chicken" bits</strong> 를 넣기만 하고 설명하지 않는다. 이 풀이는 슬라이드 밖이다. 켠 상태와 끈 상태 둘 다 검증해야 한다.</div>
+  <div class="d" lang="en">A configuration bit left in a design <strong>to switch off</strong> a new feature or optimisation; if that feature proves buggy in silicon, the bit turns it off. Lecture 15's slide 33 lists <strong>"Chicken" bits</strong> among the test programs without explaining them, so this gloss is from outside the slides. Both the on and off settings must be verified.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s11">Lecture 15 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -738,7 +818,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Clock Gating</div>
   <div class="d" lang="ko">회로에서 <strong>지금 쓰지 않는 부분에 클럭을 끊어</strong> 전력을 아끼는 기법. 클럭이 안 도는 flip-flop은 동적 전력을 거의 안 쓴다. 전원을 통째로 끄는 power gating과 다르다.</div>
   <div class="d" lang="en">Saving power by <strong>stopping the clock to parts of the circuit that are idle.</strong> A flip-flop with no clock burns almost no dynamic power. Distinct from power gating, which shuts the supply off entirely.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a> · <a href="L14-efficient-verification.html#s10">Lecture 14 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Clocking Block &middot; Skew</div>
+  <div class="d" lang="ko">testbench 가 interface 신호를 <strong>clock 기준으로 언제 읽고 언제 쓰나</strong>를 한곳에 선언하는 SV 구문(<code>clocking cb @(posedge clk); default input #1ns output #2ns; ... endclocking</code>). input 은 엣지 skew 만큼 <strong>전</strong> 값을 샘플하고, output 은 엣지 skew 만큼 <strong>뒤</strong>에 구동한다. TB 와 DUT 의 race 를 막는다. Lecture 4 의 clock skew 와는 이름만 같다.</div>
+  <div class="d" lang="en">The SV construct that declares, in one place and relative to a clock, <strong>when the testbench reads and writes interface signals</strong> (<code>clocking cb @(posedge clk); default input #1ns output #2ns; ... endclocking</code>). Inputs are sampled one skew <strong>before</strong> the edge, outputs driven one skew <strong>after.</strong> It prevents TB/DUT races. Shares only a name with Lecture 4's clock skew.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s9">Lecture 14 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -767,7 +854,28 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Code Coverage</div>
   <div class="d" lang="ko">코드의 줄·분기·상태·신호가 <strong>실행되거나 바뀌었다</strong>는 것을 세는 커버리지. Line, Branch, State Machine, Toggle coverage가 있다. <strong>한계:</strong> 실행된 것과 옳은 것은 다르고, 코드 줄에 대응하지 않는 시나리오는 셀 수 없다. Functional coverage가 뒤쪽을 보완한다.</div>
   <div class="d" lang="en">Coverage that counts whether lines, branches, states and signals <strong>were executed or toggled.</strong> Line, branch, state machine and toggle coverage. <strong>Its limits:</strong> executed is not correct, and scenarios that correspond to no single line cannot be counted. Functional coverage covers the latter.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s21">Lecture 12 · 21</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s21">Lecture 12 · 21</a> · <a href="L13-verification-concepts.html#s14">Lecture 13 &middot; 14</a> · <a href="L15-cpu-verification.html#s2">Lecture 15 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Combinatorial · Temporal Assertion</div>
+  <div class="d" lang="ko">assertion 의 <strong>내용에 시간이 들어가나</strong>로 가른 분류. combinatorial("zero-time")은 언제나 성립해야 하는 조건(버퍼가 넘치지 않는다, one-hot), temporal 은 여러 사이클에 걸친 순서(요청 뒤 5 사이클 안에 grant). combinatorial 이라도 보통은 클럭마다 보는 concurrent assertion 으로 쓴다. immediate assertion 과 같은 말이 아니다.</div>
+  <div class="d" lang="en">Assertions split by <strong>whether time enters their content.</strong> Combinatorial ("zero-time") conditions must hold at all times (the buffer never overflows, one-hot); temporal ones describe ordering across cycles (grant within 5 cycles of a request). Even combinatorial ones are usually written as clocked concurrent assertions; not the same as immediate assertions.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s9">Lecture 13 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Common-mode Issue</div>
+  <div class="d" lang="ko">설계(RTL)와 testbench 가 <strong>같은 버그</strong>를 가져서 서로 맞다고 확인해 주는 것. 테스트는 통과하는데 둘 다 틀렸다. 기대값을 spec 이 아니라 RTL 에서 베낄 때, 특히 설계자가 자기 RTL 의 testbench 나 C 모델을 직접 짤 때 생긴다. 슬라이드는 white-box 의 약점으로 든다.</div>
+  <div class="d" lang="en">The RTL and the testbench sharing <strong>the same bug</strong> and vouching for each other: the test passes, both are wrong. It happens when expected values are copied from the RTL instead of the spec, especially when designers write the testbench or C model for their own RTL. The slide lists it as white-box's weakness.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s8">Lecture 14 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Compliance Suite · Signature</div>
+  <div class="d" lang="ko"><strong>compliance suite</strong> 는 프로세서가 <strong>ISA 명세</strong>를 따르는지 보는 test 모음이다. 명령어 동작, operand corner case, register 갱신, privileged 기능을 시험하고, 결과를 정해진 메모리 영역(<strong>signature</strong>)에 써서 reference signature 와 비교한다. Lecture 15 는 이것이 CPU 검증의 <strong>아주 작은 부분</strong>이라고 한다. ISA 명세는 pipeline 을 모르므로 forwarding 이나 flush 버그는 directed, random test 의 몫이다.</div>
+  <div class="d" lang="en">A <strong>compliance suite</strong> checks whether a processor follows <strong>its ISA specification</strong>: instruction behaviour, operand corner cases, register updates, privileged features. Results are written to a designated memory region (<strong>the signature</strong>) and compared with a reference signature. Lecture 15 calls it <strong>a very small part</strong> of CPU verification: the ISA spec knows nothing of pipelines, so forwarding or flush bugs are left to directed and random tests.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s13">Lecture 15 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -781,14 +889,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Constrained Random</div>
   <div class="d" lang="ko">랜덤 자극을 넣되 <strong>constraint로 불법 입력을 걸러내는</strong> 방식. 아무 값이나 넣으면 설계가 애초에 대응할 필요 없는 상황에서 실패하고, 그건 버그가 아니다. 값뿐 아니라 <strong>타이밍과 순서</strong>도 randomize 하는 것이 핵심이다.</div>
   <div class="d" lang="en">Random stimulus with <strong>constraints filtering out illegal inputs.</strong> Throw anything in and the design fails in a situation it was never required to handle, which is not a bug. The important part is randomising <strong>timing and ordering</strong>, not just values.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s9">Lecture 12 · 09</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s9">Lecture 12 · 09</a> · <a href="L13-verification-concepts.html#s4">Lecture 13 &middot; 04</a> · <a href="L15-cpu-verification.html#s1">Lecture 15 &middot; 01</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Constraint</div>
   <div class="d" lang="ko">class 의 <code>rand</code> 변수가 가질 수 있는 값의 규칙. <code>constraint addr_c { ... }</code> 블록에 쓴다. 모양은 셋이다: <code>inside</code>(집합), <code>dist</code>(가중치), implication(<code>if</code>/<code>-&gt;</code>). 서로 모순이면 <code>randomize()</code> 가 0 을 돌려준다.</div>
   <div class="d" lang="en">Rules on the values a class's <code>rand</code> variables may take, written in a <code>constraint addr_c { ... }</code> block. Three shapes: <code>inside</code> (a set), <code>dist</code> (weights) and implication (<code>if</code>/<code>-&gt;</code>). If they contradict, <code>randomize()</code> returns 0.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s9">Lecture 12 &middot; 09</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s9">Lecture 12 &middot; 09</a> · <a href="L13-verification-concepts.html#s5">Lecture 13 &middot; 05</a> · <a href="L14-efficient-verification.html#s12">Lecture 14 &middot; 12</a></div>
 </div>
 
 <div class="gterm">
@@ -799,24 +907,45 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Controllability · Observability</div>
+  <div class="d" lang="ko">검증에서 <strong>원하는 상황을 만들 수 있는 정도</strong>(controllability)와 <strong>무엇이 일어났는지 볼 수 있는 정도</strong>(observability). unit-level 에서 이웃 블록의 RTL 대신 agent 를 세우는 이유로 슬라이드가 든다. agent 는 응답을 1 사이클에도 50 사이클에도 줄 수 있고, 오간 transaction 을 그대로 보여준다.</div>
+  <div class="d" lang="en">In verification, <strong>how easily you can create a desired situation</strong> (controllability) and <strong>how easily you can see what happened</strong> (observability). The slide's reason for using an agent instead of a neighbour's RTL at unit level: an agent can answer in 1 cycle or 50, and shows every transaction that passed.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s3">Lecture 13 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Corner Case</div>
+  <div class="d" lang="ko">여러 조건이 동시에 극단에 걸린, <strong>드물지만 합법인</strong> 상황. 가득 찬 순간의 동시 읽기쓰기, 카운터가 넘치는 바로 그 사이클 같은 것. constrained random 으로는 hard-to-hit 이라 슬라이드는 <strong>여전히 directed test 로</strong> 겨냥하라고 한다. 스펙 밖의 불법 입력과는 다르다.</div>
+  <div class="d" lang="en">A <strong>rare but legal</strong> situation where several conditions hit their extremes at once: simultaneous read and write at the moment of full, the exact cycle a counter wraps. Hard to hit with constrained random, so the slide says to aim at it <strong>with directed tests.</strong> Not the same as illegal, out-of-spec input.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s4">Lecture 13 &middot; 04</a> · <a href="LAB4-fifo-verification.html#s2">Lab 4 · 02</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Coverage</div>
   <div class="d" lang="ko">DUT를 <strong>얼마나 잘 두들겼는지를 정량화</strong>한 것. 점수가 높을수록 stimulus의 품질이 높다. <strong>실패한 테스트의 커버리지는 세지 않는다.</strong> Code coverage와 functional coverage 두 갈래가 있다.</div>
   <div class="d" lang="en">A <strong>quantitative measure of how well the DUT was exercised.</strong> A higher score means better stimulus. <strong>Never count coverage from a failing test.</strong> It splits into code coverage and functional coverage.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L13-verification-concepts.html#s16">Lecture 13 &middot; 16</a> · <a href="L15-cpu-verification.html#s2">Lecture 15 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Coverage Merge</div>
+  <div class="d" lang="ko">회귀 테스트의 여러 test 가 남긴 coverage 를 <strong>하나로 합치는 것</strong>. bin 은 한 test 에서라도 채워지면 채워진 것으로 친다. <strong>실패한 test 의 coverage 는 합치지 않는다.</strong> 틀리게 동작한 run 이 "겪었다" 는 것은 그 상황에서 DUT 가 옳았다는 증거가 아니기 때문이다.</div>
+  <div class="d" lang="en">Combining the coverage left by many regression tests <strong>into one.</strong> A bin hit in any single test counts as hit. <strong>Coverage from failing tests is not merged</strong>: a run that behaved wrongly having "experienced" a situation is no evidence the DUT was right there.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s16">Lecture 13 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Covergroup · Coverpoint · Bin</div>
   <div class="d" lang="ko">functional coverage 를 짜는 세 단위. <strong>covergroup</strong> 은 셀 것의 묶음, <strong>coverpoint</strong> 는 값을 셀 변수나 식, <strong>bin</strong> 은 그 값을 나눠 담는 칸이다. bin 을 안 적으면 도구가 auto bin 을 만든다. covergroup 은 <code>new</code> 로 만들고 <strong><code>sample()</code> 을 불러야만 센다.</strong></div>
   <div class="d" lang="en">The three units of written functional coverage: a <strong>covergroup</strong> bundles what to count, a <strong>coverpoint</strong> is a variable or expression whose values are counted, and a <strong>bin</strong> is a slot those values fall into. Write no bins and the tool makes auto bins. A covergroup is built with <code>new</code> and <strong>counts only when <code>sample()</code> is called.</strong></div>
-  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a> · <a href="L13-verification-concepts.html#s15">Lecture 13 &middot; 15</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">cover property</div>
   <div class="d" lang="ko">functional coverage 를 <strong>assertion 과 같은 문법</strong>으로 쓰는 것. <code>assert</code> 대신 <code>cover</code> 를 붙이면 성질이 깨질 때 오류를 내는 대신 <strong>성립한 횟수를 센다.</strong> 신호 수준 상황에 쓰고 보통 interface 안에 둔다.</div>
   <div class="d" lang="en">Functional coverage written in <strong>assertion syntax.</strong> Say <code>cover</code> instead of <code>assert</code> and, instead of erroring when the property breaks, it <strong>counts how often it held.</strong> Used for signal-level situations, usually inside interfaces.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s21">Lecture 12 &middot; 21</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s21">Lecture 12 &middot; 21</a> · <a href="L13-verification-concepts.html#s11">Lecture 13 &middot; 11</a> · <a href="L14-efficient-verification.html#s1">Lecture 14 &middot; 01</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
 </div>
 
 <div class="gterm">
@@ -844,7 +973,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Cross Coverage</div>
   <div class="d" lang="ko">covergroup 안에서 <code>cross a_cp, b_cp;</code> 로 <strong>두 coverpoint 의 조합</strong>을 세는 것. bin 수는 각 coverpoint 의 bin 수의 곱이다(3 &times; 3 = 9). 각 coverpoint 가 100% 여도 cross 는 비어 있을 수 있다.</div>
   <div class="d" lang="en">Counting <strong>combinations of two coverpoints</strong> inside a covergroup with <code>cross a_cp, b_cp;</code>. The bin count is the product of the coverpoints' bin counts (3 &times; 3 = 9). The cross can be sparse even when each coverpoint is at 100%.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a> · <a href="L13-verification-concepts.html#s15">Lecture 13 &middot; 15</a></div>
 </div>
 
 <div class="gterm">
@@ -861,6 +990,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">Temporal logic의 종류. <strong>순차적 동작을 분석 가능한 형태로 표현</strong>하려고 쓴다. <code>AG(req &rarr; F ack)</code>는 "어떤 경로에서든(A), 언제나(G), req가 뜨면 언젠가(F) ack가 뜬다", 즉 <strong>요청은 반드시 응답받는다</strong>는 뜻이다.</div>
   <div class="d" lang="en">Kinds of temporal logic, used to <strong>express sequential behaviour in an analysable form.</strong> <code>AG(req &rarr; F ack)</code> reads: on all paths (A), globally (G), if req rises then finally (F) ack rises. In plain words, <strong>every request gets answered.</strong></div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Cycle-Accurate · Boundary-Accurate</div>
+  <div class="d" lang="ko">golden model 이 DUT 를 <strong>얼마나 촘촘하게</strong> 흉내 내나. cycle-accurate 는 <strong>매 사이클 같은 출력</strong>을 내고(업계 공통의 말), boundary-accurate 는 강의에서 쓴 말로 이 노트는 <strong>transaction 의 내용과 순서만</strong> 맞추는 것으로 읽는다. 정밀할수록 RTL 을 따라 고쳐야 할 것이 늘어난다.</div>
+  <div class="d" lang="en">How finely a golden model mimics the DUT. Cycle-accurate <strong>matches the outputs every cycle</strong> (common industry term); boundary-accurate is the lecture's term, read in this note as <strong>matching only transaction contents and order.</strong> The finer the model, the more it must track RTL changes.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s8">Lecture 13 &middot; 08</a></div>
 </div>
 
 <h2 class="gletter" id="gD">D</h2>
@@ -884,6 +1020,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">DC 주변 확장자 셋. <strong>계보가 둘로 갈린다.</strong> <code>.lib</code> 은 technology library 의 사람이 읽는 ASCII 원본이고, <strong>Library Compiler</strong> 가 그것을 컴파일하면 DC 가 실제로 읽는 <code>.db</code> 가 된다. 여기까지가 library 계보다. <code>.ddc</code> 는 완전히 다른 것으로, <strong>DC 메모리 안의 설계</strong>를 저장하는 형식이다. 예전에는 설계도 <code>db</code> 로 저장했기 때문에 오래된 스크립트에서는 <code>.db</code> 가 설계 자리에 나온다. <strong>확장자만 보고 판단하지 말고 그 줄이 무엇을 읽고 쓰는지를 볼 것.</strong></div>
   <div class="d" lang="en">Three extensions that live around DC, in <strong>two separate lineages.</strong> <code>.lib</code> is the human-readable ASCII source of a technology library, and <strong>Library Compiler</strong> turns it into the <code>.db</code> that DC actually reads. That is the library lineage. <code>.ddc</code> is something else entirely: the format for saving <strong>the design</strong> held in DC memory. Designs used to be saved as <code>db</code> too, so in older scripts you will find <code>.db</code> where a design belongs. <strong>Do not judge by the extension; read what the line is loading or writing.</strong></div>
   <div class="src"><a href="LAB0-tools-tutorial.html#s11">Lab 0 · 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DCU · STB</div>
+  <div class="f">Data Cache Unit · Store Buffer</div>
+  <div class="d" lang="ko">Arm Cortex-A 코어의 L1 data 쪽 블록 이름. Lecture 15 슬라이드는 풀지 않고 BIU, TLB 와 함께 <strong>L1 Memory System</strong> 의 네 칸으로만 그린다. 이 넷이 L1 testbench 의 DUT 다.</div>
+  <div class="d" lang="en">Block names from the L1 data side of Arm Cortex-A cores. Lecture 15's slides don't expand them; they're drawn only as two of the four boxes of the <strong>L1 Memory System</strong>, with the BIU and TLB. Those four are the L1 testbench's DUT.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s0">Lecture 15 &middot; 00</a></div>
 </div>
 
 <div class="gterm">
@@ -931,6 +1075,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">disable iff</div>
+  <div class="d" lang="ko">SVA property 앞에 붙어 <strong>괄호 안이 참인 동안 검사를 끄고 진행 중인 시도를 버리는</strong> 키워드. 보통 reset 조건을 넣는다. active-low reset 이면 <code>disable iff (!rst_n)</code> 이다. 극성이 틀리면 정상 동작 내내 꺼지는데도 오류 메시지가 하나도 안 나온다.</div>
+  <div class="d" lang="en">The keyword at the head of an SVA property that <strong>switches checking off and drops attempts in progress while its condition is true</strong>, usually the reset. For an active-low reset it's <code>disable iff (!rst_n)</code>. Get the polarity wrong and checking is off for all of normal operation, without a single error message.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s10">Lecture 13 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">dist</div>
   <div class="d" lang="ko">constraint 에서 값마다 <strong>가중치</strong>를 주는 연산자. <code>:=</code> 는 범위 안의 <strong>값 하나하나</strong>에 가중치를 주고, <code>:/</code> 는 그 가중치를 <strong>범위 전체에 나눈다.</strong> <code>[100:200] := 20</code> 이면 101 개 값이 각각 20 이라 범위가 압도적으로 자주 나온다.</div>
   <div class="d" lang="en">The constraint operator that gives values <strong>weights.</strong> <code>:=</code> gives the weight to <strong>each value</strong> in a range; <code>:/</code> <strong>splits it across the range.</strong> With <code>[100:200] := 20</code>, each of 101 values weighs 20, so the range comes up overwhelmingly often.</div>
@@ -973,21 +1124,29 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Direct Programming Interface</div>
   <div class="d" lang="ko">SystemVerilog에서 <strong>C/C++ 함수를 직접 부르고 반대로 불리게 하는</strong> 인터페이스. 검증에서 <strong>C로 짠 참조 모델(golden model)을 testbench에 붙일 때</strong> 쓴다. 강의계획서가 "model based verification (C model integration using PLI/DPI)"으로 적어둔 것이 이것이고, Lab 4의 주제 중 하나다.</div>
   <div class="d" lang="en">The SystemVerilog interface for <strong>calling C and C++ functions directly, and being called back.</strong> In verification it is how <strong>a reference model written in C gets attached to a testbench.</strong> The syllabus lists it as "model based verification, C model integration using PLI/DPI", and it is one of the topics in Lab 4.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s15">Lecture 12 · 15</a> · Lab 4</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s15">Lecture 12 · 15</a> · Lab 4 · <a href="L13-verification-concepts.html#s8">Lecture 13 &middot; 08</a> · <a href="L14-efficient-verification.html#s5">Lecture 14 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Directed Test</div>
   <div class="d" lang="ko">시나리오를 사람이 정해서 정확히 그것만 만들어내는 테스트. <strong>좋은 점:</strong> 아주 잘 제어된다. <strong>나쁜 점:</strong> 몇 개나 쓸 수 있겠나. 가능한 시나리오를 사람이 다 생각해낼 수 없다. 그래서 randomization과 같이 쓴다.</div>
   <div class="d" lang="en">A test where a person fixes the scenario and produces exactly that. <strong>Good:</strong> extremely controllable. <strong>Bad:</strong> how many can you write? Nobody can think of every possible scenario. Hence it is paired with randomisation.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L13-verification-concepts.html#s4">Lecture 13 &middot; 04</a> · <a href="L14-efficient-verification.html#s1">Lecture 14 &middot; 01</a> · <a href="L15-cpu-verification.html#s13">Lecture 15 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Double-FF Synchronizer</div>
   <div class="d" lang="ko">받는 쪽 도메인에 flip-flop 두 개를 연달아 붙여, <strong>첫 flop이 metastable해도 두 번째가 잡을 때쯤엔 대개 정착해 있게</strong> 만드는 구조. 한 비트(또는 gray coded 버스)를 CDC로 넘길 때 <strong>가장 먼저 쓰는 기본 수단</strong>이다.</div>
   <div class="d" lang="en">Two flops back to back in the receiving domain, so that <strong>even if the first goes metastable, the value has usually settled by the time the second samples it.</strong> The default first choice for crossing one bit, or a gray-coded bus, over a CDC.</div>
-  <div class="src"><a href="L04-clock-and-reset.html#s7">Lecture 4 · 07</a></div>
+  <div class="src"><a href="L04-clock-and-reset.html#s7">Lecture 4 · 07</a> · <a href="LAB4-fifo-verification.html#s4">Lab 4 · 04</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">DPU</div>
+  <div class="f">Data Processing Unit</div>
+  <div class="d" lang="ko">Lecture 15 슬라이드 25쪽이 이렇게 푸는 CPU 블록. IFU 에 주소를 보내고 명령어를 받아 실행하는 쪽이다. IFU unit testbench 에서는 <code>dpu_bfm</code> 이 이 자리를 흉내 낸다. 다른 맥락의 DPU(예: 딥러닝 가속기)와 이름만 같다.</div>
+  <div class="d" lang="en">The CPU block Lecture 15's slide 25 expands this way: it sends addresses to the IFU and executes the instructions that come back. In the IFU unit testbench, <code>dpu_bfm</code> stands in for it. Same letters as DPUs in other contexts (such as deep learning accelerators), different thing.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s9">Lecture 15 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -1009,7 +1168,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Design Under Test</div>
   <div class="d" lang="ko">지금 검증하고 있는 그 설계. testbench가 둘러싸고 두들기는 대상이다. <strong>크기가 고정돼 있지 않다.</strong> FIFO 하나일 수도 SoC 전체일 수도 있다. 이름에 Test가 들어가지만 <strong>manufacturing test와 무관한 verification 용어다.</strong></div>
   <div class="d" lang="en">The design currently being verified: the thing the testbench surrounds and hammers. <strong>It has no fixed size</strong>, from one FIFO to an entire SoC. The word test is in the name but <strong>it is a verification term with nothing to do with manufacturing test.</strong></div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L15-cpu-verification.html#s5">Lecture 15 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -1093,7 +1252,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Equivalence Checking</div>
   <div class="d" lang="ko">서로 다른 두 표현을 비교해 <strong>논리적으로 같은지 증명하는</strong> formal verification 기법. 보통 추상화 수준이 다른 둘, 예를 들어 RTL과 합성된 netlist를 비교한다. <strong>업계에서 매우 널리 쓰인다.</strong> 통상적인 design verification과는 다른 일이다.</div>
   <div class="d" lang="en">A formal technique that compares two different representations and <strong>proves they are logically the same.</strong> Typically two levels of abstraction, such as RTL against the synthesised netlist. <strong>Very popular in industry</strong>, and a different job from ordinary design verification.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <a href="L13-verification-concepts.html#s13">Lecture 13 &middot; 13</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Error Injection &middot; Fault Injection</div>
+  <div class="d" lang="ko">올바른 DUT 에 <strong>일부러 오류를 넣는 special test</strong>. memory bit 뒤집기, packet 깨기, invalid opcode, 응답 빠뜨리기. DUT 가 회복하거나 interrupt 로 알리는지 본다. 방법은 XMR, check 끄기(<code>$assertoff</code>), constraint 끄기(<code>constraint_mode(0)</code>). fault injection 은 슬라이드에서 force 의 쓰임으로 나오고 거의 같은 자리에서 쓰인다. <strong>Lab 4 처럼 DUT 에 버그를 심어 checker 를 시험하는 것과는 반대 방향</strong>이다.</div>
+  <div class="d" lang="en"><strong>Special tests that inject errors on purpose</strong> into a correct DUT: flip a memory bit, corrupt a packet, force an invalid opcode, drop a response. They check the DUT recovers or flags an interrupt. Done with XMRs, disabled checks (<code>$assertoff</code>), disabled constraints (<code>constraint_mode(0)</code>). Fault injection appears on the slides as a use of force and lives in nearly the same place. <strong>The opposite of planting a bug in the DUT to test the checker</strong>, Lab 4 style.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s12">Lecture 14 &middot; 12</a></div>
 </div>
 
 <div class="gterm">
@@ -1109,6 +1275,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">thread 사이의 <strong>신호.</strong> <code>-&gt;ev;</code> 로 울리고 <code>@ev;</code> 로 기다린다. <code>@ev</code> 는 기다리기 시작한 뒤의 울림만 보므로 같은 시각에 먼저 울리면 놓친다. 그럴 때는 <code>wait (ev.triggered);</code>.</div>
   <div class="d" lang="en">A <strong>signal</strong> between threads: trigger with <code>-&gt;ev;</code>, wait with <code>@ev;</code>. <code>@ev</code> only sees triggers after it starts waiting, so one fired earlier in the same time step is missed; use <code>wait (ev.triggered);</code> then.</div>
   <div class="src"><a href="L12-sv-for-verification.html#s7">Lecture 12 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Exclusion List</div>
+  <div class="d" lang="ko">닿을 수 없거나 관심 없는 coverage 항목(상수로 묶인 입력, 방어용 <code>default</code> 등)을 <strong>분모에서 빼는 목록</strong>. 주로 code coverage 항목을 도구 쪽에서 뺀다. 점수를 올리는 가장 쉬운 방법이라 가장 위험하고, 항목마다 근거를 남겨 설계자와 함께 리뷰한다.</div>
+  <div class="d" lang="en">A list that <strong>removes unreachable or uninteresting coverage items from the denominator</strong> (inputs tied to constants, defensive <code>default</code>s), mostly code-coverage items, on the tool side. The easiest way to raise the score and so the most dangerous; each entry records its justification and is reviewed with the designers.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s16">Lecture 13 &middot; 16</a></div>
 </div>
 
 <h2 class="gletter" id="gF">F</h2>
@@ -1160,7 +1333,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Flush</div>
   <div class="d" lang="ko">이미 파이프라인에 들어온 명령어를 <strong>지워버리는 것.</strong> 없던 일로 만든다. 주로 <strong>control hazard</strong> 에서 쓴다. 분기가 성립해서 뒤따라 들어온 명령어들이 <strong>애초에 실행되면 안 되는 것</strong>이었을 때다. stall 과 다르다. stall 은 기다리면 쓸 수 있는 값을 기다리는 것이고, flush 는 기다려도 쓸모가 없는 것을 버리는 것이다.</div>
   <div class="d" lang="en"><strong>Discarding</strong> an instruction already in the pipeline, as if it never happened. Mostly used for <strong>control hazards</strong>, when a taken branch means the instructions behind it <strong>should never have run.</strong> Not the same as a stall: a stall waits for a value that will become usable, a flush throws away something that will never be useful.</div>
-  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a> · <a href="L15-cpu-verification.html#s16">Lecture 15 &middot; 16</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">force &middot; release</div>
+  <div class="d" lang="ko">testbench 가 DUT 안의 신호를 <strong>설계의 모든 대입을 이기는 값</strong>으로 덮어쓰고(<code>force dut.a.b.sig = 1'b1;</code>) 푸는(<code>release</code>) 문장. 쓰임은 fault injection, 도달하기 어려운 corner case, 디버그. IEEE 1800 기준으로 net 은 release 하면 바로 driver 값으로 돌아가지만 <strong>variable 은 다음 대입까지 force 값을 유지</strong>한다.</div>
+  <div class="d" lang="en">Statements with which a testbench overrides a DUT signal with a value that <strong>beats every design assignment</strong> (<code>force dut.a.b.sig = 1'b1;</code>) and lets go (<code>release</code>). Uses: fault injection, hard-to-reach corner cases, debugging. Per IEEE 1800 a net returns to its driver's value at release, but <strong>a variable keeps the forced value until its next assignment.</strong></div>
+  <div class="src"><a href="L14-efficient-verification.html#s11">Lecture 14 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -1174,14 +1354,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Formal Verification</div>
   <div class="d" lang="ko">검증 문제를 <strong>수학으로</strong> 푸는 것. 설계를 수식으로 표현하고 제약 아래 성립함을 증명한다. Static verification이라고도 한다. <strong>Exhaustive하지만 state explosion problem 때문에 확장이 안 된다.</strong> 슬라이드가 "이 과목의 초점이 아니다"라고 명시했다. 기법은 equivalence checking, model checking, theorem proving 셋.</div>
   <div class="d" lang="en">Solving the verification problem <strong>with mathematics</strong>: express the design as a formula and prove it holds under constraints. Also called static verification. <strong>Exhaustive, but it does not scale, because of the state explosion problem.</strong> The slides state outright that it is not a focus of this course. The three techniques are equivalence checking, model checking and theorem proving.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <span lang="ko">Lecture 21 전체</span><span lang="en">all of Lecture 21</span></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <span lang="ko">Lecture 21 전체</span><span lang="en">all of Lecture 21</span> · <a href="L13-verification-concepts.html#s13">Lecture 13 &middot; 13</a> · <a href="L15-cpu-verification.html#s4">Lecture 15 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Forwarding</div>
   <div class="d" lang="ko">아직 register file 에 안 적힌 결과를 <strong>뒤쪽 파이프라인 단계에서 앞쪽 단계로 직접 넘기는 경로.</strong> <strong>bypassing</strong> 이라고도 한다. EX 단계로는 Memory 단계와 Writeback 단계 두 곳에서 받을 수 있다. <strong>모든 data hazard 를 없애지는 못한다.</strong> <code>lw</code> 바로 뒤의 사용은 값이 아직 존재하지 않아서 stall 이 먼저 필요하다.</div>
   <div class="d" lang="en">A path handing a <strong>not yet written back result from a later pipeline stage to an earlier one.</strong> Also called <strong>bypassing</strong>. Into EX it can come from the Memory stage or the Writeback stage. <strong>It does not cover every data hazard:</strong> a use right after an <code>lw</code> needs a stall first, because the value does not exist yet.</div>
-  <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a> · <a href="L15-cpu-verification.html#s15">Lecture 15 &middot; 15</a></div>
 </div>
 
 <div class="gterm">
@@ -1208,6 +1388,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">FPV</div>
+  <div class="f">Formal Property Verification</div>
+  <div class="d" lang="ko">assertion(property)을 formal 도구에 주고 <strong>가능한 모든 입력에 대해</strong> 성립하는지 증명시키는 것. simulation 이 "이번에 어겼나" 라면 FPV 는 "어길 수 있나" 다. 모델은 unit 이나 cluster 크기의 합성되는 코드여야 하고, 반례는 수십 사이클짜리 최소 경로로 나온다.</div>
+  <div class="d" lang="en">Handing assertions (properties) to a formal tool to prove they hold <strong>for every possible input.</strong> Where simulation asks "was it violated this time", FPV asks "can it be violated". The model must be synthesizable and unit- or cluster-sized; counterexamples come out as minimal paths of tens of cycles.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s13">Lecture 13 &middot; 13</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Front-End</div>
   <div class="d" lang="ko">설계 흐름에서 <strong>코드와 문서를 다루는 구간.</strong> Specification, Architecture, Design(RTL). 산출물이 전부 텍스트 파일이다. Synthesis는 출력이 파일이지만 만들 때 물리 라이브러리를 쓰므로 경계에 걸쳐 있다.</div>
   <div class="d" lang="en">The part of the flow that <strong>deals in code and documents</strong>: specification, architecture and design in RTL. Everything it produces is a text file. Synthesis produces a file but uses a physical library to do it, so it straddles the line.</div>
@@ -1226,7 +1414,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Functional Coverage</div>
   <div class="d" lang="ko"><strong>보고 싶은 시나리오를 코드로 직접 적어두고</strong> 그 상황이 실제로 벌어졌는지 세는 것. Code coverage가 못 세는 <strong>조합 상황</strong>("FIFO가 가득 찬 상태에서 write가 들어왔다")을 잡아낸다. 대신 사람이 무엇을 볼지 미리 정해야 하므로 상상력의 한계가 다시 들어온다.</div>
   <div class="d" lang="en"><strong>Writing the scenarios you want to see as code</strong> and counting whether they actually occurred. It catches the <strong>combinations</strong> code coverage cannot, such as "a write arrived while the FIFO was full". The cost is that a person must decide in advance what to look for, so the imagination limit returns.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s12">Lecture 12 · 12</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s12">Lecture 12 · 12</a> · <a href="L13-verification-concepts.html#s15">Lecture 13 &middot; 15</a> · <a href="L15-cpu-verification.html#s2">Lecture 15 &middot; 02</a></div>
 </div>
 
 <h2 class="gletter" id="gG">G</h2>
@@ -1236,6 +1424,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">IP 의 인터페이스를 fabric 에 붙이면서 <strong>protocol 이나 packet 형식을 맞춰 주는</strong> 블록. AXI 를 쓰는 IP 를 NoC 에 붙이면 AXI 를 flit 으로 바꾸는 일을 한다. bridge 와 거의 같은 자리인데, bridge 는 버스와 버스 사이, 이 덱의 gasket 은 IP 와 fabric 사이다.</div>
   <div class="d" lang="en">A block attaching an IP interface to the fabric, <strong>adapting protocol or packet format.</strong> On a NoC it turns an IP's AXI into flits. Nearly the same slot as a bridge, which sits between two buses, while this deck's gasket sits between an IP and the fabric.</div>
   <div class="src"><a href="L11-soc-interconnect.html#s2">Lecture 11 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Gate-Level Simulation &middot; GLS</div>
+  <div class="d" lang="ko">RTL 대신 <strong>synthesis 가 낸 netlist</strong> 를 같은 testbench 로 시뮬레이션하는 것. RTL 과 netlist 의 불일치, RTL 이 숨긴 X 와 초기화 문제, reset, synthesis 가 넣은 gated clock 같은 로직을 잡는다. 종류는 <strong>zero delay</strong> 와 <a href="#gS">SDF</a> 로 지연을 입힌 <strong>timing simulation</strong>. 느려서 test 일부만 돌리고, test 가 지나간 경로만 보므로 STA 를 대신하지 않는다. 슬라이드는 GLS 라는 약어를 쓰지 않는다.</div>
+  <div class="d" lang="en">Simulating <strong>the synthesized netlist</strong> instead of RTL under the same testbench. It catches RTL/netlist mismatches, X and initialization problems RTL hides, reset issues, and logic synthesis adds such as gated clocks. Two kinds: <strong>zero delay</strong>, and <strong>timing simulation</strong> with delays from an <a href="#gS">SDF</a>. Slow, so only a subset of tests runs, and it sees only exercised paths, so it doesn't replace STA. The slide doesn't use the acronym GLS.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s10">Lecture 14 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -1261,6 +1456,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">GIC</div>
+  <div class="f">Generic Interrupt Controller</div>
+  <div class="d" lang="ko">Arm 의 인터럽트 컨트롤러. 인터럽트를 여러 코어에 나눠준다. Lecture 15 슬라이드는 풀지 않고 MP testbench 구성("with GIC and L2 caches")과 system level 의 GIC-400(virtual interrupts, multicore support)으로만 나온다. 슬라이드 20쪽의 "Global Interrupt Control" 은 이 약어의 풀이가 아니다.</div>
+  <div class="d" lang="en">Arm's interrupt controller, distributing interrupts to the cores. Lecture 15's slides don't expand it; it appears in the MP testbench configurations ("with GIC and L2 caches") and as the system-level GIC-400 (virtual interrupts, multicore support). Slide 20's "Global Interrupt Control" is not its expansion.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s6">Lecture 15 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Glue Logic</div>
   <div class="d" lang="ko">IP 와 IP 사이의 이름, 폭, 타이밍 차이를 맞추는 작은 회로. 슬라이드는 <strong>shim logic</strong> 이라고도 한다. 우리 팀이 방금 짠 것이라 버그가 모이기 쉽다.</div>
   <div class="d" lang="en">Small circuits reconciling names, widths and timing between IPs; the slide also says <strong>shim logic</strong>. Freshly written by your team, so bugs gather there.</div>
@@ -1268,10 +1471,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Golden Model · Reference Model</div>
+  <div class="d" lang="ko">DUT 가 내야 할 <strong>정답을 계산하는, DUT 와 독립적으로 짠 모델</strong>. checker 안에 들어가 random 입력의 기대 출력을 만든다. SV 로 쓰거나 C/C++ 로 쓰고 DPI 로 붙인다. RTL 설계자가 아닌 사람이 쓰는 것이 원칙이고, 불일치가 나면 모델이 틀렸을 수도 있다.</div>
+  <div class="d" lang="en">A model <strong>written independently of the DUT that computes the answers it should give.</strong> It sits inside the checker and produces expected outputs for random inputs, written in SV or in C/C++ attached via DPI. Ideally written by someone other than the RTL designer; on a mismatch, the model may be the one that's wrong.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s8">Lecture 13 &middot; 08</a> · <a href="L15-cpu-verification.html#s15">Lecture 15 &middot; 15</a> · <a href="LAB4-fifo-verification.html#s3">Lab 4 · 03</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Gray Code</div>
   <div class="d" lang="ko">인접한 두 값 사이에 <strong>딱 한 비트만</strong> 바뀌는 이진 코드. 멀티비트 카운터(FIFO의 read/write pointer)를 CDC로 넘길 때, <strong>double-FF synchronizer가 버스에서도 통하게 해주는 전제 조건</strong>이다.</div>
   <div class="d" lang="en">A binary encoding where adjacent values differ by <strong>exactly one bit.</strong> It is the precondition that lets a <strong>double-FF synchroniser work on a multi-bit bus</strong>, such as FIFO read and write pointers, crossing a CDC.</div>
   <div class="src"><a href="L04-clock-and-reset.html#s7">Lecture 4 · 07</a> · <a href="L05-fifo-design.html#s15">Lecture 5 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Grey Box Checking</div>
+  <div class="d" lang="ko">DUT 의 출력만이 아니라 <strong>안쪽 상태 일부를 probe 해서</strong> 하는 check. Lecture 15 슬라이드 7쪽의 정의다. 입력을 받아 기대값을 계산하는 <strong>result modelling</strong> 과 정확한 model 이 같이 필요하다. IFU 예에서는 branch 예측 결과를 이렇게 본다. 흔히 black box(출력만)와 white box(구현 전부)의 중간이라는 뜻으로 쓴다.</div>
+  <div class="d" lang="en">A check that <strong>probes some internal state</strong>, not just the DUT's outputs: Lecture 15's slide 7 definition. It needs <strong>result modelling</strong> (computing expected values from the inputs) and an accurate model. The IFU example checks branch predictions this way. Commonly used as the middle ground between black box (outputs only) and white box (full implementation knowledge).</div>
+  <div class="src"><a href="L15-cpu-verification.html#s3">Lecture 15 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -1308,7 +1525,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Hazard</div>
   <div class="d" lang="ko">파이프라인이 겹쳐 돌기 때문에 생기는, 그냥 두면 틀린 결과를 내는 상황. 세 종류다. <strong>structural</strong> (자원이 겹침), <strong>data</strong> (값이 아직 준비 안 됨), <strong>control</strong> (어느 명령어를 가져올지 모름). <strong>hazard 는 버그가 아니라 구조적 성질이다.</strong> 버그는 hazard 를 안 막은 쪽이다.</div>
   <div class="d" lang="en">A situation created by pipeline overlap that gives a wrong result if left alone. Three kinds: <strong>structural</strong> for a resource conflict, <strong>data</strong> for a value not ready, <strong>control</strong> for not knowing which instruction to fetch. <strong>A hazard is a structural fact, not a bug.</strong> The bug is failing to handle one.</div>
-  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a> · <a href="L15-cpu-verification.html#s14">Lecture 15 &middot; 14</a></div>
 </div>
 
 <div class="gterm">
@@ -1335,6 +1552,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Hierarchical Verification</div>
+  <div class="d" lang="ko">칩을 <strong>unit-level, sub-system level, top-level</strong> 순서로 아래부터 검증하는 것. 아래 층에서는 이웃 블록 자리에 agent 를 세우고, 위로 갈수록 가짜 이웃이 진짜 RTL 로 바뀌며 아래에서 만든 checker 는 재사용된다. 층의 이름은 회사마다 다르다(block, cluster, full-chip, SoC).</div>
+  <div class="d" lang="en">Verifying a chip bottom-up, <strong>unit-level, sub-system level, top-level.</strong> Lower levels put agents in place of neighbour blocks; going up, fake neighbours become real RTL while checkers built below are reused. Level names vary by company (block, cluster, full-chip, SoC).</div>
+  <div class="src"><a href="L13-verification-concepts.html#s3">Lecture 13 &middot; 03</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">HMMA</div>
   <div class="d" lang="ko">NVIDIA GPU 에 Tensor Core 와 함께 추가된 행렬곱 명령어(슬라이드 11쪽). <strong>슬라이드에 풀네임이 없다.</strong> 그림의 <code>D = A &times; B + C</code> 와 FP16 표기로 보아 half precision matrix multiply-accumulate 로 읽히지만 확인한 풀이는 아니다.</div>
   <div class="d" lang="en">The matrix multiply instruction NVIDIA added to its GPUs alongside Tensor Cores (slide 11). <strong>Not expanded on the slide.</strong> Given <code>D = A &times; B + C</code> and the FP16 labels it reads as half precision matrix multiply-accumulate, but that's an inference.</div>
@@ -1353,6 +1577,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">packet 이 <strong>router 하나에서 이웃 router 로 한 번 건너가는 것.</strong> 경로 길이와 최악 latency 를 hop 수로 센다. hop 수는 cycle 수가 아니다. router 하나에 몇 cycle 이 걸리는지는 router 설계에 달렸다.</div>
   <div class="d" lang="en">One step of a packet <strong>from a router to a neighbouring router.</strong> Path length and worst-case latency are counted in hops. Hops aren't cycles; cycles per router depend on the router design.</div>
   <div class="src"><a href="L11-soc-interconnect.html#s5">Lecture 11 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">HVP · vPlan</div>
+  <div class="f">Hierarchical Verification Plan (Synopsys) · Cadence verification plan</div>
+  <div class="d" lang="ko">verification plan 을 <strong>도구가 읽을 수 있는 형식</strong>으로 쓴 것. 기능 항목에 coverage 항목을 이어 두면 회귀 결과가 plan 위에 칠해진다. 슬라이드는 Word, Excel 과 나란히 형식의 예로만 든다. 형식이 바뀌어도 담기는 내용은 같다.</div>
+  <div class="d" lang="en">A verification plan in <strong>a format tools can read</strong>: link coverage items to features and regression results get painted onto the plan. The slide lists them only as format examples alongside Word and Excel; the contents are the same whatever the format.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s1">Lecture 13 &middot; 01</a></div>
 </div>
 
 <div class="gterm">
@@ -1388,10 +1620,25 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">IFU</div>
+  <div class="f">Instruction Fetch Unit</div>
+  <div class="d" lang="ko">명령어를 cache 나 메모리에서 가져오고, 부분 decode 해서 branch 를 예측하고, fetch queue 에 넣어 DPU 에 내주는 CPU 블록. Lecture 15 의 unit-level 예다. testbench 에서는 이웃(DPU, BIU)이 BFM 으로, instruction cache 가 model 로 바뀐다.</div>
+  <div class="d" lang="en">The CPU block that fetches instructions from cache or memory, partially decodes them to predict branches, and queues them for the DPU. Lecture 15's unit-level example; in its testbench the neighbours (DPU, BIU) become BFMs and the instruction cache gets a model.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s9">Lecture 15 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">ignore_bins · illegal_bins</div>
   <div class="d" lang="ko">coverpoint 에서 <strong>세지 않을 값</strong>(<code>ignore_bins</code>)과 <strong>나오면 오류인 값</strong>(<code>illegal_bins</code>)을 정하는 것. 둘 다 coverage 점수의 분모에서 빠진다. illegal_bins 는 sample 시점에 시뮬레이터가 오류를 내므로 coverage 가 작은 checker 노릇도 한다.</div>
   <div class="d" lang="en">Coverpoint declarations for <strong>values not to count</strong> (<code>ignore_bins</code>) and <strong>values that are an error if seen</strong> (<code>illegal_bins</code>). Both drop out of the coverage denominator. illegal_bins makes the simulator raise an error at sample time, so coverage doubles as a small checker.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s12">Lecture 12 &middot; 12</a> · <a href="L13-verification-concepts.html#s15">Lecture 13 &middot; 15</a> · <a href="L14-efficient-verification.html#s1">Lecture 14 &middot; 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Immediate · Concurrent Assertion</div>
+  <div class="d" lang="ko">SV assertion 의 두 평가 방식. <strong>immediate</strong>(<code>assert (expr);</code>)는 절차 코드에서 그 줄이 실행될 때 한 번 보고, <strong>concurrent</strong>(<code>assert property (@(posedge clk) ...)</code>)는 클럭마다 계속 감시한다. <code>assert(t.randomize())</code> 의 assert 는 앞의 것이다.</div>
+  <div class="d" lang="en">The two ways SV evaluates assertions. <strong>Immediate</strong> (<code>assert (expr);</code>) checks once when that line of procedural code runs; <strong>concurrent</strong> (<code>assert property (@(posedge clk) ...)</code>) keeps watching every clock. The assert in <code>assert(t.randomize())</code> is the former.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s5">Lecture 13 &middot; 05</a> &middot; <a href="L13-verification-concepts.html#s9">09</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
 </div>
 
 <div class="gterm">
@@ -1409,6 +1656,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Inline Constraint · randomize() with</div>
+  <div class="d" lang="ko"><code>t.randomize() with { ... }</code> 처럼 <strong>그 호출에만</strong> 붙이는 constraint. class 안에 이름을 달아 둔 constraint block(강의 표현으로 explicit constraint)을 <strong>대신하지 않고 그 위에 더해진다.</strong> 둘이 모순이면 randomize() 가 실패한다.</div>
+  <div class="d" lang="en">A constraint attached <strong>to one call only</strong>, as in <code>t.randomize() with { ... }</code>. It <strong>adds to, rather than replaces,</strong> the named constraint blocks inside the class (the lecture's explicit constraints); if the two contradict, randomize() fails.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s19">Lecture 12 &middot; 19</a> &middot; <a href="L13-verification-concepts.html#s5">Lecture 13 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Instantiate</div>
   <div class="d" lang="ko">module의 <strong>사본을 하나 실제로 만들어서 회로에 놓는 것.</strong> 함수 호출이 아니라 부품을 하나 사서 기판에 납땜하는 쪽에 가깝다. <strong>같은 module을 열 번 instantiate 하면 게이트가 열 벌 생긴다.</strong> 슬라이드 24가 따로 적어둘 만큼 흔한 혼동이다. <em>"You're not calling. You're instantiating."</em></div>
   <div class="d" lang="en">Making <strong>an actual copy of a module and placing it in the circuit</strong>, closer to soldering one component onto a board than to calling a function. <strong>Instantiate the same module ten times and you get ten copies of the gates.</strong> Slide 24 spells it out because the slip is so common: <em>"You're not calling. You're instantiating."</em></div>
@@ -1420,14 +1674,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">NoC = Network on Chip</div>
   <div class="d" lang="ko">interconnect 는 SoC 블록을 잇는 것 전부. crossbar 는 여러 경로를 동시에 잇는 방식, NoC 는 router 와 link 로 packet 을 보내는 방식이다. 슬라이드 말대로 NoC 와 interconnect 를 섞어 쓰기도 한다.</div>
   <div class="d" lang="en">Interconnect is whatever joins an SoC's blocks; a crossbar connects several paths at once; a NoC sends packets over routers and links. As the slide notes, NoC and interconnect are sometimes used interchangeably.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s10">Lecture 10 &middot; 10</a> · <a href="L11-soc-interconnect.html#s8">Lecture 11 · 08</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s10">Lecture 10 &middot; 10</a> · <a href="L11-soc-interconnect.html#s8">Lecture 11 · 08</a> · <a href="L15-cpu-verification.html#s8">Lecture 15 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">interface</div>
   <div class="d" lang="ko">여러 신호를 <strong>한 덩어리로 묶어 module 포트에 통째로 꽂을 수 있게 하는</strong> SystemVerilog 구조물. <code>module</code>과 나란한 급의 키워드다. 신호를 하나 추가할 때 고칠 곳이 여러 module에서 한 군데로 줄어든다. <strong>설계와 검증이 같은 것을 공유한다.</strong> UVM에서는 <strong>virtual interface</strong>로 다시 나온다. 소프트웨어의 "interface"와는 전혀 다른 것이다.</div>
   <div class="d" lang="en">A SystemVerilog construct that <strong>bundles signals so the bundle plugs into a module port as one thing.</strong> It is a keyword of the same rank as <code>module</code>. Adding a signal goes from editing many modules to editing one, and <strong>design and verification share the same one.</strong> In UVM it returns as a <strong>virtual interface.</strong> Nothing to do with a software "interface".</div>
-  <div class="src"><a href="L03-system-verilog-for-design.html#s9">Lecture 3 · 09</a> · <a href="L12-sv-for-verification.html#s8">Lecture 12 · 08</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s9">Lecture 3 · 09</a> · <a href="L12-sv-for-verification.html#s8">Lecture 12 · 08</a> · <a href="L14-efficient-verification.html#s9">Lecture 14 &middot; 09</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1450,6 +1704,21 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">한 사이클에 명령어가 몇 개 끝나는가. <strong>CPI 의 역수다.</strong> <strong>IPC 가 높다고 빠른 게 아니다.</strong> 클럭 주파수와 곱해야 실제 속도가 나오므로, IPC 를 올리려고 클럭을 떨어뜨리면 손해일 수 있다.</div>
   <div class="d" lang="en">How many instructions finish per cycle. <strong>The reciprocal of CPI.</strong> <strong>High IPC does not mean fast:</strong> you multiply by clock frequency to get real speed, so buying IPC by lowering the clock can be a net loss.</div>
   <div class="src"><a href="L06-pipelined-cpu-design.html#s2">Lecture 6 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Irritator</div>
+  <div class="d" lang="ko">본 테스트와 무관한 사건(interrupt, 다른 master 의 트래픽, cache snoop 등)을 <strong>배경에서 무작위로 일으켜</strong> 드문 상호작용을 끌어내는 testbench 부품. 스스로 판정하지 않고, 기존 checker 와 assertion 이 그동안에도 통과하는지가 요점이다. 슬라이드에는 제목만 있다.</div>
+  <div class="d" lang="en">A testbench component that <strong>fires unrelated events at random in the background</strong> (interrupts, another master's traffic, cache snoops) to draw out rare interactions. It judges nothing itself; the point is that existing checkers and assertions keep passing meanwhile. The slide has only the title.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s6">Lecture 13 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">ISS</div>
+  <div class="f">Instruction Set Simulator</div>
+  <div class="d" lang="ko">프로세서의 <strong>architectural 동작만</strong> 흉내 내는 소프트웨어 모델. 명령어마다 PC, register, 메모리, CSR 을 갱신하지만 <strong>pipeline 과 cycle 은 모른다.</strong> CPU 검증에서 정답을 내는 reference model 로 쓰고, RTL 과는 retire 할 때 비교한다. Lecture 15 에서는 같은 자리를 Arch Model, ISS reference model, Reference Model 로도 부른다. 예: Spike, Whisper, Imperas OVPSim.</div>
+  <div class="d" lang="en">A software model of <strong>only the architectural behaviour</strong> of a processor: each instruction updates the PC, registers, memory and CSRs, but <strong>it knows nothing of pipelines or cycles.</strong> In CPU verification it's the reference model that supplies the answers, compared with the RTL at retire. Lecture 15 also calls the same role Arch Model, ISS reference model and Reference Model. Examples: Spike, Whisper, Imperas OVPSim.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s15">Lecture 15 &middot; 15</a></div>
 </div>
 
 <h2 class="gletter" id="gL">L</h2>
@@ -1484,10 +1753,25 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">$info &middot; $warning &middot; $error &middot; $fatal</div>
+  <div class="f">severity system tasks</div>
+  <div class="d" lang="ko">무게가 붙은 <code>$display</code>. 메시지에 severity 와 파일, 줄, scope, 시뮬레이션 시간이 붙는다. IEEE 1800 기준으로 <strong>시뮬레이션을 멈추는 것은 <code>$fatal</code> 하나뿐</strong>이고, <code>$error</code> 는 찍고 계속 간다. 순수 SV 에서는 testbench 가 오류 개수를 직접 세서 PASS/FAIL 을 판정해야 한다. UVM 의 UVM_INFO ~ UVM_FATAL 과 일대일로 대응한다.</div>
+  <div class="d" lang="en"><code>$display</code> with weight: the message carries a severity plus file, line, scope and simulation time. Per IEEE 1800 <strong>only <code>$fatal</code> stops the simulation</strong>; <code>$error</code> prints and carries on. In plain SV the testbench must count errors itself to judge PASS/FAIL. Maps one to one onto UVM's UVM_INFO to UVM_FATAL.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s6">Lecture 14 &middot; 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">$rose · $fell · $onehot</div>
   <div class="d" lang="ko">assertion 에서 쓰는 system function. <code>$rose</code> 는 직전 clock 표본이 0 이고 이번이 1 일 때, <code>$fell</code> 은 그 반대일 때, <code>$onehot</code> 은 <strong>정확히 한 비트만 1</strong> 일 때 참이다. 엣지마다 찍은 표본으로 판단하므로 엣지 사이의 변화는 다음 엣지에서야 보인다.</div>
   <div class="d" lang="en">System functions used in assertions. <code>$rose</code> is true when the previous clock sample was 0 and this one is 1, <code>$fell</code> the reverse, and <code>$onehot</code> when <strong>exactly one bit is 1.</strong> They judge on per-edge samples, so a change between edges only shows at the next edge.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s11">Lecture 12 &middot; 11</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s11">Lecture 12 &middot; 11</a> · <a href="L13-verification-concepts.html#s10">Lecture 13 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">$test$plusargs &middot; $value$plusargs</div>
+  <div class="d" lang="ko"><a href="#gP">plusarg</a> 를 testbench 에서 읽는 두 system function. <code>$test$plusargs("X")</code> 는 있나 없나만 보고 <strong>앞부분만 맞아도 참</strong>이다(<code>+X=0</code> 도 참). <code>$value$plusargs("N=%d", n)</code> 은 값을 읽고, 못 찾으면 0 을 돌려주며 변수는 건드리지 않는다. 그래서 <code>if (!...) n = 기본값;</code> 모양으로 쓴다.</div>
+  <div class="d" lang="en">The two system functions that read a <a href="#gP">plusarg</a> in a testbench. <code>$test$plusargs("X")</code> checks presence only and is <strong>true on a prefix match</strong> (<code>+X=0</code> counts). <code>$value$plusargs("N=%d", n)</code> reads a value; if not found it returns 0 and leaves the variable alone, hence the <code>if (!...) n = default;</code> pattern.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s3">Lecture 14 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -1515,7 +1799,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Load-Use Hazard</div>
   <div class="d" lang="ko"><code>lw</code> 바로 뒤의 명령어가 그 결과를 쓰는 경우. <strong>forwarding 으로 못 막는 유일한 data hazard 다.</strong> <code>lw</code> 의 값은 메모리를 읽어야 나오므로 MEM 끝에야 존재하는데 뒤 명령어는 그것을 EX 에서 원한다. <strong>한 사이클 stall 이 반드시 필요하고 그 다음에 forwarding 한다.</strong></div>
   <div class="d" lang="en">When the instruction right after an <code>lw</code> uses its result. <strong>The one data hazard forwarding cannot fix.</strong> The load value only exists at the end of MEM, and the next instruction wants it in EX. <strong>One stall cycle is mandatory, then you forward.</strong></div>
-  <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s7">Lecture 6 &middot; 07</a> · <a href="L15-cpu-verification.html#s16">Lecture 15 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
@@ -1596,7 +1880,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">mailbox</div>
   <div class="d" lang="ko">thread 사이에 <strong>자료를 넘기는 우편함.</strong> 슬라이드 표현으로 "FIFO + Event". <code>put</code> 은 가득 차면, <code>get</code> 은 비면 기다리고, <code>try_</code> 가 붙은 것은 기다리지 않는다. <code>mailbox #(packet_t)</code> 로 담을 type 을 정한다.</div>
   <div class="d" lang="en">A <strong>postbox for passing data between threads</strong>, "FIFO + Event" in the slide's words. <code>put</code> waits when full, <code>get</code> when empty, and the <code>try_</code> versions never wait. <code>mailbox #(packet_t)</code> fixes the type it holds.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s7">Lecture 12 &middot; 07</a> &middot; <a href="L12-sv-for-verification.html#s17">17</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s7">Lecture 12 &middot; 07</a> &middot; <a href="L12-sv-for-verification.html#s17">17</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1682,14 +1966,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Memory-Mapped I/O</div>
   <div class="d" lang="ko">레지스터에 메모리 주소를 붙여 <strong>보통의 load/store 로</strong> 읽고 쓰게 하는 방식. 메모리처럼 보이지만 읽을 때마다 값이 바뀌거나 쓰는 순간 하드웨어가 움직인다.</div>
   <div class="d" lang="en">Giving registers memory addresses so <strong>ordinary loads and stores</strong> reach them. Looks like memory, but values can change on each read and writes can trigger hardware.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s4">Lecture 10 &middot; 04</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s4">Lecture 10 &middot; 04</a> · <a href="L15-cpu-verification.html#s16">Lecture 15 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Model Checking</div>
   <div class="d" lang="ko">주어진 모델(설계)이 <strong>주어진 제약 아래 주어진 property를 만족하는지</strong> 확인하는 formal 기법. Property checking이라고도 한다. 유한 상태 모델에 대해 temporal logic 식을 검사한다. 보통 시뮬레이션 기반 design verification을 <strong>보조</strong>하는 데 쓴다.</div>
   <div class="d" lang="en">A formal technique that checks whether a given model <strong>satisfies a given property under given constraints.</strong> Also called property checking. It evaluates temporal logic formulas on finite state models, and is usually used <strong>to aid</strong> simulation based design verification.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <a href="L13-verification-concepts.html#s13">Lecture 13 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -1704,7 +1988,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Monitor</div>
   <div class="d" lang="ko">Testbench에서 인터페이스 신호를 <strong>읽어서 transaction으로 되돌리는</strong> 부품. DUT를 건드리지 않는 <strong>수동</strong> 부품이다. <strong>Checker와 Coverage는 Monitor 없이 붙을 수 없다.</strong> 관측을 안 하는데 판정하거나 셀 수 없기 때문이다. Driver가 없는 곳에도 붙일 수 있다.</div>
   <div class="d" lang="en">The testbench component that <strong>reads interface signals back into transactions.</strong> It never touches the DUT and is <strong>passive.</strong> <strong>Neither a checker nor coverage can attach without one</strong>, because nothing can be judged or counted that was never observed. It can be placed where no driver exists.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L12-sv-for-verification.html#s14">Lecture 12 · 14</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L12-sv-for-verification.html#s14">Lecture 12 · 14</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="L15-cpu-verification.html#s10">Lecture 15 &middot; 10</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1757,7 +2041,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Netlist</div>
   <div class="d" lang="ko">gate와 flip-flop이 wire로 연결된 목록. Synthesis가 RTL을 씹어서 뱉어내는 것이다. <strong>"무엇을 하고 싶은지"는 남지 않고 "어떤 부품이 어떻게 연결되는지"만 남는다.</strong> ECO가 손대는 대상이 바로 이것이다.</div>
   <div class="d" lang="en">A list of gates and flip-flops joined by wires, produced when synthesis chews the RTL down. <strong>Nothing about intent survives, only which parts connect to which.</strong> It is the thing an ECO edits.</div>
-  <div class="src"><a href="L01-course-intro.html#s2">Lecture 1 · 02</a> · <a href="L02-design-and-verification-overview.html#s4">Lecture 2 · 04</a></div>
+  <div class="src"><a href="L01-course-intro.html#s2">Lecture 1 · 02</a> · <a href="L02-design-and-verification-overview.html#s4">Lecture 2 · 04</a> · <a href="L14-efficient-verification.html#s10">Lecture 14 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -1786,6 +2070,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">OpenTitan</div>
+  <div class="d" lang="ko">lowRISC 가 만드는 오픈소스 secure element 칩. 설계 기법(Lecture 7)과 검증 방법(Lecture 14)을 실제 파일에서 볼 수 있는 저장소라서 두 강의가 마지막 슬라이드로 링크한다. 검증은 UVM 1.2 기반 constrained-random 이고, IP 마다 testbench, testplan, DV 문서가 있다(예: <code>hw/ip/uart/dv/</code>).</div>
+  <div class="d" lang="en">An open-source secure element chip built by lowRISC. Both Lecture 7 and Lecture 14 end by linking it, because design techniques and verification methods can be seen there in real files. Verification is UVM 1.2 constrained random, with a testbench, testplan and DV document per IP (e.g. <code>hw/ip/uart/dv/</code>).</div>
+  <div class="src"><a href="L07-efficient-design.html#s11">Lecture 7 &middot; 11</a> &middot; <a href="L14-efficient-verification.html#s13">Lecture 14 &middot; 13</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">OpenVera</div>
   <div class="d" lang="ko">Synopsys 의 검증 언어. SystemVerilog 의 <strong>class</strong> 가 여기서 왔다(슬라이드 5쪽). <a href="L02-design-and-verification-overview.html#s22">Lecture 2</a> 에서 SpecMan e 와 함께 검증 전용 언어로 소개됐다.</div>
   <div class="d" lang="en">Synopsys's verification language, where SystemVerilog's <strong>classes</strong> came from (slide 5). Introduced in <a href="L02-design-and-verification-overview.html#s22">Lecture 2</a> alongside SpecMan e as a verification-only language.</div>
@@ -1810,7 +2101,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Outstanding · Out-of-Order</div>
   <div class="d" lang="ko">주소는 보냈지만 답을 아직 못 받은 트랜잭션을 <strong>여러 개 걸어두는 것</strong>과, 그 답이 <strong>보낸 순서와 다르게</strong> 와도 되는 것. AXI 는 ID 로 짝을 맞춘다. APB 에는 둘 다 없다.</div>
   <div class="d" lang="en">Keeping <strong>several transactions in flight</strong> (address sent, answer pending), and letting answers return <strong>in a different order.</strong> AXI matches them by ID; APB has neither.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a> · <a href="L11-soc-interconnect.html#s4">Lecture 11 · 04</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s13">Lecture 10 &middot; 13</a> · <a href="L11-soc-interconnect.html#s4">Lecture 11 · 04</a> · <a href="L15-cpu-verification.html#s7">Lecture 15 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -1887,7 +2178,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Programming Language Interface</div>
   <div class="d" lang="ko">Verilog 시절 C 와 시뮬레이터를 잇던 통로. 세 세대다: PLI 1.0 tf routines(1985), 2.0 acc routines(1989), 3.0 vpi routines(1995). 시뮬레이터 내부를 들여다보는 도구 제작자용에 가깝고, 함수를 그냥 주고받는 일은 SV 의 <strong>DPI</strong> 가 맡는다.</div>
   <div class="d" lang="en">The Verilog-era channel between C and the simulator, in three generations: PLI 1.0 tf routines (1985), 2.0 acc routines (1989), 3.0 vpi routines (1995). Closer to a tool builder's view into the simulator; simply calling functions both ways is SV's <strong>DPI.</strong></div>
-  <div class="src"><a href="L12-sv-for-verification.html#s15">Lecture 12 &middot; 15</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s15">Lecture 12 &middot; 15</a> · <a href="L14-efficient-verification.html#s5">Lecture 14 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -1902,7 +2193,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">plusarg</div>
   <div class="d" lang="ko"><code>+TEST_FLAGS</code> 처럼 <strong>실행할 때</strong> simv 에 주는 인자. testbench 가 <code>$test$plusargs</code> 나 <code>$value$plusargs</code> 로 읽는다. 테스트 여럿을 한 번 컴파일한 실행 파일 안에 넣고 고를 수 있게 해준다.</div>
   <div class="d" lang="en">A run-time argument to simv, such as <code>+TEST_FLAGS</code>. The testbench reads it with <code>$test$plusargs</code> or <code>$value$plusargs</code>. It lets several tests live in one compiled executable and be picked at run time.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a> · <a href="L14-efficient-verification.html#s3">Lecture 14 &middot; 03</a> · <a href="LAB4-fifo-verification.html#s5">Lab 4 · 05</a></div>
 </div>
 
 <div class="gterm">
@@ -1977,10 +2268,31 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Queue</div>
   <div class="d" lang="ko"><code>byte myqueue[$];</code> 처럼 <strong>앞뒤로 넣고 빼는 길이가 변하는 배열.</strong> <code>push_back</code> 과 <code>pop_front</code> 로 FIFO 가 된다. scoreboard 의 기대값 줄에 쓰고, RTL FIFO 를 검증할 때 정답 모델이 된다. 합성되지 않는다.</div>
   <div class="d" lang="en">A <strong>variable-length array you push to and pop from at either end</strong>, as in <code>byte myqueue[$];</code>. <code>push_back</code> plus <code>pop_front</code> makes a FIFO. Used for a scoreboard's expected values and as the reference model when verifying an RTL FIFO. Not synthesizable.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s3">Lecture 12 &middot; 03</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s3">Lecture 12 &middot; 03</a> · <a href="LAB4-fifo-verification.html#s7">Lab 4 · 07</a></div>
 </div>
 
 <h2 class="gletter" id="gR">R</h2>
+
+<div class="gterm">
+  <div class="t">Race Condition (TB&ndash;DUT)</div>
+  <div class="d" lang="ko">testbench 와 DUT 가 <strong>같은 clock 엣지에서</strong> 한쪽은 값을 바꾸고 한쪽은 읽을 때, 결과가 시뮬레이터의 process 실행 순서에 달리는 것. IEEE 1800 은 같은 시각 같은 단계의 process 순서를 정하지 않는다. 막는 법은 엣지에서 떨어진 시각에 구동하는 것: 하강 엣지에 넣거나(슬라이드 9쪽), <a href="#gC">clocking block</a> 을 쓴다(10쪽).</div>
+  <div class="d" lang="en">When the testbench and DUT change and read a value <strong>on the same clock edge</strong>, and the result depends on the simulator's process order. IEEE 1800 leaves the order of processes in the same time slot and region undefined. The cure is driving away from the edge: on the falling edge (slide 9), or through a <a href="#gC">clocking block</a> (slide 10).</div>
+  <div class="src"><a href="L14-efficient-verification.html#s9">Lecture 14 &middot; 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">rand_mode · constraint_mode</div>
+  <div class="d" lang="ko">test 쪽에서 class 를 고치지 않고 무작위를 조절하는 IEEE 1800 내장 메서드. <code>obj.var.rand_mode(0)</code> 은 <strong>변수를</strong> 무작위에서 빼고, <code>obj.c.constraint_mode(0)</code> 은 <strong>constraint block 을</strong> 끈다. 불법(error) stimulus 를 만들 때 쓴다. rand_mode(0) 인 변수에도 constraint 는 걸리고, 둘 다 다시 켤 때까지 꺼진 채로 남는다.</div>
+  <div class="d" lang="en">IEEE 1800 built-in methods for steering randomization from the test without editing the class. <code>obj.var.rand_mode(0)</code> takes <strong>a variable</strong> out of randomization; <code>obj.c.constraint_mode(0)</code> switches off <strong>a constraint block.</strong> Used to make illegal (error) stimulus. Constraints still bind a rand_mode(0) variable, and both stay off until switched back on.</div>
+  <div class="src"><a href="L12-sv-for-verification.html#s19">Lecture 12 &middot; 19</a> &middot; <a href="L13-verification-concepts.html#s5">Lecture 13 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Random Instruction Generator</div>
+  <div class="d" lang="ko">CPU 를 두들길 <strong>assembly 프로그램</strong>을 random 으로 만드는 도구. 명령어, operand, 명령어 사이의 관계, 프로그램 구조를 randomize 하고, supported ISA, register 초기화, memory map, control flow, 실행 환경을 constraint 로 묶는다. directed template 에 random 세부를 채우는 방식도 쓴다. 예: 구글의 riscv-dv. Lecture 15 의 말로 "CPU stimulus is a program".</div>
+  <div class="d" lang="en">A tool that randomly writes <strong>assembly programs</strong> to exercise a CPU. It randomizes instructions, operands, relationships between instructions and program structure, constrained by the supported ISA, register initialization, the memory map, control flow and the execution environment; it can also fill directed templates with random details. Example: Google's riscv-dv. In Lecture 15's words, "CPU stimulus is a program".</div>
+  <div class="src"><a href="L15-cpu-verification.html#s14">Lecture 15 &middot; 14</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">randomize()</div>
@@ -2034,6 +2346,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Regression · Seed</div>
+  <div class="d" lang="ko"><strong>regression</strong> 은 test 묶음을 통째로 다시 돌리는 일, <strong>seed</strong> 는 random 생성기의 출발값이다. seed 가 다르면 같은 test 가 다른 stimulus 를 내고, 같으면 똑같이 재현된다. Lecture 15 슬라이드 31쪽: "random regression over a large number of seeds" 로 기대한 것을 덮고 기대하지 못한 것을 드러낸다. 실패한 run 은 그 seed 로 다시 돌려 디버그한다.</div>
+  <div class="d" lang="en"><strong>Regression</strong> means rerunning a whole test suite; <strong>a seed</strong> is the random generator's starting value. A different seed gives the same test different stimulus; the same seed reproduces it exactly. Lecture 15's slide 31: "random regression over a large number of seeds" covers what you expect and uncovers what you didn't. A failing run is rerun with its seed to debug.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s10">Lecture 15 &middot; 10</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Reset Synchronizer</div>
   <div class="d" lang="ko">비동기 reset의 <strong>assert는 그대로 두고 de-assert만</strong> 목적지 클럭에 맞춰 내보내는 회로. <strong>Double-FF synchronizer와 회로 모양이 똑같지만</strong>, 통과시키는 게 데이터가 아니라 reset이라는 게 다르다.</div>
   <div class="d" lang="en">A circuit that <strong>leaves the assertion alone and aligns only the de-assertion</strong> of an asynchronous reset to the destination clock. <strong>Drawn identically to a double-FF synchroniser</strong>, but what passes through it is a reset, not data.</div>
@@ -2059,6 +2378,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">회로의 기능을 바꾸지 않고 <strong>register의 위치를 옮겨</strong> 단 사이 지연을 고르게 만드는 최적화. Timing 목표에 대응하는 수단이다.</div>
   <div class="d" lang="en">An optimisation that <strong>moves registers</strong> without changing what the circuit does, evening out the delay per stage. It is a lever for the timing goal.</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s10">Lecture 2 · 10</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Retire (Retirement)</div>
+  <div class="d" lang="ko">명령어의 효과가 <strong>architectural state 에 확정되는 순간.</strong> Lecture 15 슬라이드 49쪽의 정의: "when an instruction's effects become architecturally committed". 다섯 단계 in-order pipeline 에서는 대략 W 단계를 마칠 때다. flush 될 명령어는 실행은 돼도 retire 하지 않으므로, RTL 과 ISS 는 <strong>매 cycle 이 아니라 retire 할 때</strong> 비교한다. commit 도 같은 뜻으로 쓴다.</div>
+  <div class="d" lang="en">The moment an instruction's effects are <strong>committed to architectural state.</strong> Lecture 15's slide 49: "when an instruction's effects become architecturally committed". In a five-stage in-order pipeline that's roughly when it finishes W. An instruction that will be flushed may execute but never retires, so the RTL and ISS are compared <strong>at retire, not every cycle.</strong> "Commit" is used in the same sense.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s16">Lecture 15 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
@@ -2114,6 +2440,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gS">S</h2>
 
 <div class="gterm">
+  <div class="t">Safety · Liveness Property</div>
+  <div class="d" lang="ko"><strong>safety</strong> 는 "나쁜 일이 절대 안 일어난다" 로, <strong>유한한</strong> 시뮬레이션으로 반증된다. <strong>liveness</strong> 는 "좋은 일이 언젠가 일어난다" 로, 이상적으로는 무한한 run 이 있어야 반증되며 실무에서는 end-of-sim 을 무한으로 친다. "5 사이클 안에" 처럼 마감이 있으면 safety 다.</div>
+  <div class="d" lang="en"><strong>Safety</strong>: "something bad never happens", falsifiable by a <strong>finite</strong> run. <strong>Liveness</strong>: "something good eventually happens", ideally falsifiable only by an infinite run; in practice end-of-sim stands for infinity. A deadline such as "within 5 cycles" makes it safety.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s9">Lecture 13 &middot; 09</a> &middot; <a href="L13-verification-concepts.html#s10">10</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">SAT</div>
   <div class="f">Satisfiability</div>
   <div class="d" lang="ko">Boolean 함수를 <strong>참으로 만들 수 있는지</strong> 확인하는 문제. CNF(=POS) 형태로 바꾼 뒤 만족하는 대입을 찾는다. 하나라도 있으면 satisfiable, 하나도 없으면 unsatisfiable. BDD와 마찬가지로 조합 논리에만 적용된다.</div>
@@ -2132,7 +2465,23 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Scoreboard</div>
   <div class="d" lang="ko">동작 수준 checker. <strong>DUT에 들어간 transaction과 나온 transaction을 맞춰본다.</strong> "데이터 X를 담은 transaction을 넣었으니 응답은 데이터 Y여야 한다" 같은 검사다. 신호 수준의 assertion과 층이 다르다.</div>
   <div class="d" lang="en">A behavioural checker that <strong>matches transactions going into the DUT against those coming out</strong>, as in "a transaction carrying X went in, so the response should carry Y". It sits at a different layer from signal level assertions.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s20">Lecture 12 · 20</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s20">Lecture 12 · 20</a> · <a href="L13-verification-concepts.html#s7">Lecture 13 &middot; 07</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="LAB4-fifo-verification.html#s7">Lab 4 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">SCU</div>
+  <div class="f">Snoop Control Unit</div>
+  <div class="d" lang="ko">Arm MPCore cluster 안에서 <strong>코어들의 L1 cache 를 맞춰주는</strong> 블록. Lecture 15 슬라이드는 풀지 않고 "L2 and SCU", "Processor Coherency (SCU)" 로 그린다. MP testbench 의 DUT 에 처음 들어온다.</div>
+  <div class="d" lang="en">The block inside an Arm MPCore cluster that <strong>keeps the cores' L1 caches coherent.</strong> Lecture 15's slides don't expand it, drawing it as "L2 and SCU" and "Processor Coherency (SCU)". It first enters the DUT in the MP testbench.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s0">Lecture 15 &middot; 00</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">SDF &middot; Standard Delay Format</div>
+  <div class="f">Standard Delay Format</div>
+  <div class="d" lang="ko">netlist 의 셀과 배선에 입힐 <strong>지연 값을 담은 표준 파일 형식</strong>. 보통 배치 배선 뒤 STA 도구가 쓰고(synthesis 단계의 추정치로도 쓸 수 있다), timing gate-level simulation 이 읽어 각 셀 instance 에 지연을 입힌다(back-annotation).</div>
+  <div class="d" lang="en">The standard file format holding <strong>delays to apply to a netlist's cells and wires.</strong> Usually written by an STA tool after place and route (an estimate can also come from synthesis), and read by timing gate-level simulation to annotate each cell instance (back-annotation).</div>
+  <div class="src"><a href="L14-efficient-verification.html#s10">Lecture 14 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -2140,6 +2489,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">ECC 의 흔한 등급. <strong>한 비트 오류는 고치고 두 비트 오류는 검출만</strong> 한다. OpenTitan 의 <code>prim_secded_*</code> 가 실제 구현 예다.</div>
   <div class="d" lang="en">A common ECC grade: <strong>correct one bit error, detect two.</strong> OpenTitan’s <code>prim_secded_*</code> is a real implementation.</div>
   <div class="src"><a href="L07-efficient-design.html#s11">Lecture 7 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Self-checking Test</div>
+  <div class="d" lang="ko">기대값을 <strong>test 스스로 들고 비교해서 PASS/FAIL 을 찍는</strong> test. 파형을 눈으로 볼 필요가 없어서 regression 에 들어가려면 이래야 한다. 슬라이드 2쪽의 "checking inside stimulus". stimulus 와 떨어진 부품이 비교하는 <a href="#gS">scoreboard</a> 와 다르다.</div>
+  <div class="d" lang="en">A test that <strong>carries its own expected values, compares, and prints PASS/FAIL.</strong> No waveform staring, which is what lets it into a regression. Slide 2's "checking inside stimulus." Unlike a <a href="#gS">scoreboard</a>, where a component separate from the stimulus does the comparing.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s1">Lecture 14 &middot; 01</a> · <a href="L13-verification-concepts.html#s7">Lecture 13 &middot; 07</a> · <a href="L15-cpu-verification.html#s13">Lecture 15 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -2153,7 +2509,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Sequence · Property</div>
   <div class="d" lang="ko">assertion 을 나눠 쓰는 단위. <strong>sequence</strong> 는 <code>##[2:20] (ready == 1)</code> 같은 시간 패턴 조각에 이름을 붙인 것, <strong>property</strong> 는 sequence 를 implication 으로 엮은 주장이다. <code>assert property</code> 로 검사하고 <code>cover property</code> 로 센다.</div>
   <div class="d" lang="en">The units assertions are split into. A <strong>sequence</strong> names a piece of temporal pattern such as <code>##[2:20] (ready == 1)</code>; a <strong>property</strong> is a claim built from sequences with implications. <code>assert property</code> checks it, <code>cover property</code> counts it.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s19">Lecture 12 &middot; 19</a> &middot; <span lang="ko">Lecture 13 에서 본격적으로</span><span lang="en">in depth in Lecture 13</span></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s19">Lecture 12 &middot; 19</a> &middot; <span lang="ko">Lecture 13 에서 본격적으로</span><span lang="en">in depth in Lecture 13</span> · <a href="L13-verification-concepts.html#s9">Lecture 13 &middot; 09</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Sequence (UVM)</div>
+  <div class="d" lang="ko">UVM 에서 <strong>stimulus 를 만드는 class</strong>(<code>uvm_sequence</code>). 보낼 transaction(sequence item)의 순서와 내용을 만들어 driver 에게 넘긴다. 슬라이드 표현으로 "Stimulus goes in sequences". assertion 안의 SVA <code>sequence</code>(Sequence &middot; Property 항목)와 <strong>이름만 같다.</strong> UVM 강의(16~18)에서 본격적으로 나온다.</div>
+  <div class="d" lang="en">The UVM <strong>class that produces stimulus</strong> (<code>uvm_sequence</code>): it builds the order and content of transactions (sequence items) and hands them to a driver. In the slide's words, "Stimulus goes in sequences." It <strong>only shares a name</strong> with the SVA <code>sequence</code> inside assertions (see Sequence &middot; Property). Covered properly in the UVM lectures (16 to 18).</div>
+  <div class="src"><a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -2171,6 +2534,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Shared Object &middot; .so</div>
+  <div class="d" lang="ko">실행 중에 다른 프로그램에 붙어 쓰이는 <strong>미리 컴파일된 C 함수 묶음</strong>(Linux 의 동적 라이브러리, Windows 의 .dll). DPI 로 붙일 C 모델을 <code>gcc -shared</code> 로 따로 구워 VCS 명령줄에 준다. VCS 의 logical library 나 Design Compiler 의 technology library 와는 다른 물건이다.</div>
+  <div class="d" lang="en">A <strong>precompiled bundle of C functions</strong> that attaches to another program at run time (Linux's dynamic library, Windows' .dll). A C model for DPI is built separately with <code>gcc -shared</code> and named on the VCS command line. Not the same thing as a VCS logical library or a Design Compiler technology library.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s5">Lecture 14 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Side-Channel Attack</div>
   <div class="d" lang="ko">연산 자체가 아니라 <strong>전력 소모, 걸린 시간, 전자파</strong> 같은 부수적 신호에서 비밀을 읽어내는 공격. 완화 기법이 <strong>이 강의의 나머지와 정면으로 충돌한다.</strong> dummy cycle 과 shuffling 은 일부러 쓸데없는 일을 시키는 것이라, 효율을 내주고 보안을 산다.</div>
   <div class="d" lang="en">Reading a secret out of <strong>power draw, timing or emissions</strong> rather than out of the computation. The mitigations <strong>run straight into the rest of this lecture:</strong> dummy cycles and shuffling mean doing pointless work on purpose, buying security with efficiency.</div>
@@ -2185,10 +2555,17 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Sign-off Metric</div>
+  <div class="d" lang="ko">검증을 <strong>끝내도 된다는 근거로 쓰는 숫자</strong>. code coverage, functional coverage, assertion 결과, 테스트 통과율 같은 것이고, 목표치는 verification plan 에 미리 적는다. 숫자 하나로 끝나지 않으며 STA 나 physical 쪽의 sign-off 와는 다른 이야기다.</div>
+  <div class="d" lang="en">The numbers <strong>used as grounds for ending verification</strong>: code coverage, functional coverage, assertion results, test pass rate, with targets set up front in the verification plan. Never a single number, and not the same as STA or physical sign-off.</div>
+  <div class="src"><a href="L13-verification-concepts.html#s1">Lecture 13 &middot; 01</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">simv</div>
   <div class="d" lang="ko">VCS 의 elaboration 이 만들어내는 <strong>실행 파일</strong>. 이것을 실행하면 시뮬레이션이 돈다. 한 번 구워두면 옵션만 바꿔 몇 번이고 재사용할 수 있어서 <strong>compile once, run multiple times</strong> 라고 부른다. <strong>runtime 옵션 상당수는 compile time 에 짝이 켜져 있어야 산다.</strong> 짝이 없으면 에러가 아니라 빈 결과가 나온다.</div>
   <div class="d" lang="en">The <strong>executable</strong> that VCS elaboration produces. Running it runs the simulation. Bake it once and you can reuse it with different options as often as you like, which is why this is called <strong>compile once, run multiple times</strong>. <strong>Many runtime options only live if their compile-time counterpart exists</strong>; without it you get an empty result rather than an error.</div>
-  <div class="src"><a href="LAB0-tools-tutorial.html#s6">Lab 0 · 06</a></div>
+  <div class="src"><a href="LAB0-tools-tutorial.html#s6">Lab 0 · 06</a> · <a href="L14-efficient-verification.html#s3">Lecture 14 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -2196,6 +2573,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko"><strong>여유 시간.</strong> 신호가 도착해야 하는 시각에서 실제로 도착한 시각을 뺀 값이다. <strong>양수면 통과, 음수면 위반</strong>이고 음수 slack을 timing violation이라고 부른다. 합성과 STA 리포트의 핵심 숫자이며, "worst negative slack이 얼마냐"가 곧 "이 설계가 얼마나 안 되고 있냐"다.</div>
   <div class="d" lang="en"><strong>Spare time:</strong> the time a signal was required by, minus the time it actually arrived. <strong>Positive passes, negative is a violation</strong>, and negative slack is what people call a timing violation. It is the headline number in synthesis and STA reports, so "what is the worst negative slack" is the same question as "how badly is this failing".</div>
   <div class="src"><a href="L02-design-and-verification-overview.html#s5">Lecture 2 · 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Soak Verification</div>
+  <div class="d" lang="ko">coverage 가 다 찬 뒤에도 random test 를 <strong>seed 만 바꿔 아주 오래</strong> 돌리는 것. Lecture 15 슬라이드 6쪽의 "extended soak verification". functional coverage 는 정의한 칸만큼만 좋으므로, 아무도 생각 못 한 조합의 버그를 cycle 수로 찾는다. 새 버그가 나오면 coverage 에 칸을 더한다.</div>
+  <div class="d" lang="en">Keeping random tests running <strong>for a very long time with fresh seeds</strong> after coverage is full: Lecture 15 slide 6's "extended soak verification". Functional coverage is only as good as the bins defined, so this hunts for bugs in combinations nobody thought of by sheer cycle count. Each new bug adds a bin to the coverage model.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s2">Lecture 15 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -2260,7 +2644,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Stall</div>
   <div class="d" lang="ko">명령어를 <strong>제자리에 붙들어 두는 것.</strong> 다음 사이클에 같은 단계를 다시 한다. 기다리면 쓸 수 있는 값이 오기 때문이다. 주로 <strong>data hazard</strong> 와 <strong>structural hazard</strong> 에 쓴다. 앞 단계를 멈추면 뒤에 구멍이 생기므로 <strong>flush 가 같이 간다</strong> (<code>StallF = StallD = FlushE</code>).</div>
   <div class="d" lang="en"><strong>Holding an instruction in place</strong> so it redoes the same stage next cycle, because waiting will make the value available. Used mostly for <strong>data</strong> and <strong>structural</strong> hazards. Holding the front stages leaves a hole behind, so <strong>a flush rides along</strong>: <code>StallF = StallD = FlushE</code>.</div>
-  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a></div>
+  <div class="src"><a href="L06-pipelined-cpu-design.html#s6">Lecture 6 &middot; 06</a> · <a href="L15-cpu-verification.html#s16">Lecture 15 &middot; 16</a></div>
 </div>
 
 <div class="gterm">
@@ -2274,7 +2658,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Starvation</div>
   <div class="d" lang="ko">network 는 잘 도는데 <strong>특정 요청자 하나가 오래도록, 또는 영영 차례를 못 받는</strong> 것. static priority 와 QoS 에서 생긴다. 슬라이드 45쪽은 QoS 를 쓰면 반드시 대책(낮은 class 에 bandwidth 예약, 또는 갇힌 트랜잭션 감지 후 그것만 진행)을 두라고 한다.</div>
   <div class="d" lang="en">The network runs fine but <strong>one requester goes a long time, or forever, without a turn.</strong> Comes with static priority and QoS. Slide 45 says any QoS needs a remedy: reserve bandwidth for lower classes, or detect stuck transactions and let only those progress.</div>
-  <div class="src"><a href="L11-soc-interconnect.html#s19">Lecture 11 &middot; 19</a></div>
+  <div class="src"><a href="L11-soc-interconnect.html#s19">Lecture 11 &middot; 19</a> · <a href="L13-verification-concepts.html#s10">Lecture 13 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -2295,7 +2679,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Stimulus</div>
   <div class="d" lang="ko">DUT를 자극하려고 넣는 입력. <strong>Active</strong>는 값을 밀어 넣는 것, <strong>Reactive</strong>는 DUT에서 벌어진 일에 반응하는 것이다. 검증의 세 기둥 중 하나이고, <strong>이것만 있으면 시뮬레이션이 항상 통과한다.</strong> 결과를 보는 사람이 없기 때문이다.</div>
   <div class="d" lang="en">The inputs applied to stimulate the DUT. <strong>Active</strong> means driving values in; <strong>reactive</strong> means responding to something that happened inside. One of the three pillars, and <strong>on its own it makes every simulation pass</strong>, because nobody is looking at the result.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s9">Lecture 12 · 09</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s9">Lecture 12 · 09</a> · <a href="L13-verification-concepts.html#s4">Lecture 13 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -2412,7 +2796,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Testbench</div>
   <div class="d" lang="ko">DUT를 둘러싸고 자극하고 관측하고 판정하는 코드 전체. 구성은 <strong>Stimulus → Driver → DUT → Monitor → Checker와 Coverage</strong>, 그리고 DUT 안에 박히는 <strong>Assertions</strong>. Driver와 Monitor를 묶으면 Agent다. <strong>부품이 하나씩 빠지면 무엇을 못 하는지가 이 구조의 설명이다.</strong></div>
   <div class="d" lang="en">All the code that surrounds, drives, observes and judges a DUT: <strong>stimulus, driver, DUT, monitor, then checker and coverage</strong>, with <strong>assertions</strong> bound inside the DUT. Driver plus monitor makes an agent. <strong>The structure is best explained by what stops working when each piece is removed.</strong></div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -2434,7 +2818,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Theorem Proving</div>
   <div class="d" lang="ko">사양과 구현의 관계를 <strong>정리(theorem)로 보고</strong> 기호 표현·수리 논리·귀납 증명으로 증명하는 formal 기법. 도구가 대부분 <strong>학술용</strong>이다. 대신 무한 상태 시스템도 다룰 수 있다.</div>
   <div class="d" lang="en">A formal technique that <strong>treats the relation between specification and implementation as a theorem</strong> and proves it with symbolic representations, mathematical logic and inductive proofs. The tools are <strong>mostly academic</strong>, but it can handle infinite state systems.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s15">Lecture 2 · 15</a> · <a href="L13-verification-concepts.html#s13">Lecture 13 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -2504,6 +2888,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Trace Comparison · Step-and-Compare</div>
+  <div class="d" lang="ko">RTL 과 ISS 를 맞추는 두 방식(Lecture 15 슬라이드 50쪽). <strong>trace comparison</strong> 은 둘을 따로 끝까지 돌리고 실행 log 를 나중에 비교한다. 단순하지만 불일치를 run 이 끝난 뒤에 안다(Ibex 의 <code>post_compare</code>). <strong>step-and-compare</strong> 는 RTL 이 retire 할 때마다 ISS 를 한 step 진행시켜 바로 비교한다. 즉시 잡지만 더 단단히 엮어야 한다(CORE-V 의 Step &amp; Compare). 후자를 lock-step 비교라고 부르는 자료도 있다.</div>
+  <div class="d" lang="en">The two ways to match RTL against an ISS (Lecture 15, slide 50). <strong>Trace comparison</strong> runs both to the end independently and compares the logs afterwards: simple, but mismatches show up only after the run (Ibex's <code>post_compare</code>). <strong>Step-and-compare</strong> advances the ISS one step on every RTL retire and compares immediately: instant detection, tighter integration (CORE-V's Step &amp; Compare). Some sources call the latter lock-step comparison.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s16">Lecture 15 &middot; 16</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Traffic Class</div>
   <div class="d" lang="ko">트래픽을 <strong>요구하는 것</strong>으로 묶은 무리. 강의의 넷은 CC(Cache Coherent, compute cluster 안), LL(Low Latency, SRAM 으로), HB(High Bandwidth, DRAM 과 cache fill), BE(Best Effort, peripheral 과 DMA). 이름이 우선순위 순서는 아니고, BE 는 보장이 없다는 뜻이지 막 다뤄도 된다는 뜻이 아니다.</div>
   <div class="d" lang="en">Traffic grouped by <strong>what it needs.</strong> The lecture's four: CC (Cache Coherent, within the compute cluster), LL (Low Latency, to SRAM), HB (High Bandwidth, DRAM and cache fill), BE (Best Effort, peripherals and DMA). The names aren't a priority order, and BE means "no guarantee", not "anything goes".</div>
@@ -2511,10 +2902,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Transaction</div>
+  <div class="d" lang="ko">여러 사이클에 걸친 핀의 움직임을 <strong>"무슨 일이 있었나" 하나로 묶은 object.</strong> FIFO 라면 "이 시각에 이 값을 썼다". monitor 가 핀에서 만들어 scoreboard 로 넘기고, 반대로 stimulus 가 만들어 driver 가 핀으로 푼다. class 라서 변수에는 handle 이 들어간다. <strong>object 하나를 재사용해 mailbox 에 넣으면 안의 항목이 전부 같은 것을 가리킨다.</strong> 매번 <code>new()</code> 한다. 버스 프로토콜의 transaction(APB 전송 하나)과 말이 겹치는데, testbench 쪽은 그것을 담는 object 다.</div>
+  <div class="d" lang="en">An object bundling pin activity over several cycles into <strong>one "what happened"</strong>; for a FIFO, "wrote this value at this time". A monitor builds it from pins and passes it to a scoreboard; the other way round, stimulus builds it and a driver turns it into pin activity. It's a class, so variables hold handles: <strong>reuse one object for every mailbox put and all entries point to the same thing.</strong> Call <code>new()</code> each time. The word overlaps with a bus protocol's transaction (one APB transfer); the testbench one is the object that holds it.</div>
+  <div class="src"><a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Transactor</div>
   <div class="d" lang="ko">Agent, BFM과 같은 것. Driver와 Monitor를 묶은 testbench 부품의 또 다른 이름이다.</div>
   <div class="d" lang="en">The same thing as an agent or BFM: another name for the testbench component bundling a driver and a monitor.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Trickbox</div>
+  <div class="d" lang="ko">CPU 위에서 도는 <strong>test 프로그램이 testbench 에게 말을 거는 창구.</strong> Lecture 15 슬라이드 34쪽의 정의: "a testbench component that lets a test program trigger special events or control its simulation environment". 인터럽트나 reset 요청, 메모리 지연이나 오류 주입, snoop 요청, pass/fail 보고, 디버그 메시지에 쓴다. 프로그램 쪽에서는 정해진 주소에 쓰는 것이지만 받는 쪽은 진짜 주변장치가 아니라 testbench 다.</div>
+  <div class="d" lang="en">The channel through which <strong>a test program running on the CPU talks to the testbench.</strong> Lecture 15's slide 34: "a testbench component that lets a test program trigger special events or control its simulation environment". Used to raise interrupts or request resets, insert memory delays or errors, request snoops, report pass/fail and print debug messages. To the program it's a write to a fixed address, but the receiver is the testbench, not a real peripheral.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s11">Lecture 15 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -2557,6 +2962,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Unit · Multi-unit · Top-level · System-level</div>
+  <div class="d" lang="ko">CPU 검증을 쌓는 층(Lecture 15 슬라이드 10쪽, 맨 아래 sub-unit 까지 다섯). 위로 갈수록 DUT 가 커진다. unit 은 블록 하나에 BFM, multi-unit 은 L1 이나 MP 같은 서브시스템, top level 은 코어 전체에 프로그램, system level 은 interconnect, 메모리 컨트롤러, OS 까지. 규칙은 "가장 아래에서 버그를 다 짜내고 올라간다" 이고, 아래 층의 check 는 위 층에 실려 올라간다. formal proof 는 아래 두 층에만 있다.</div>
+  <div class="d" lang="en">The layers CPU verification builds up in (Lecture 15, slide 10; five with sub-unit at the bottom). The DUT grows going up: unit is one block with BFMs, multi-unit a subsystem like L1 or MP, top level the whole core running programs, system level adds interconnects, memory controllers and an OS. The rule is "exhaust bugs at the lowest level before moving up", and lower-level checks ride along upward. Formal proofs appear only in the bottom two.</div>
+  <div class="src"><a href="L15-cpu-verification.html#s4">Lecture 15 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Unsized Literal</div>
   <div class="d" lang="ko">폭을 안 적은 리터럴. SystemVerilog의 <code>'0</code> <code>'1</code> <code>'x</code> <code>'z</code>는 <strong>대상 신호의 폭을 알고 그 값 하나로 전체를 채운다.</strong> <code>6'b1</code>은 <strong>숫자 1</strong>이지만 <code>'1</code>은 <strong>전부 1</strong>이다. 그리고 폭이 모자란 리터럴은 위쪽이 <code>0</code>으로 채워지므로 <strong><code>4'bx</code>를 6비트에 넣으면 <code>00xxxx</code>가 된다.</strong> 리셋 값 쓸 때 매번 쓰게 된다.</div>
   <div class="d" lang="en">A literal written without a width. SystemVerilog's <code>'0</code>, <code>'1</code>, <code>'x</code> and <code>'z</code> are <strong>aware of the target's width and fill it with that one value.</strong> <code>6'b1</code> is <strong>the number one</strong>; <code>'1</code> is <strong>all ones</strong>. And a too-short literal pads on top with <code>0</code>, so <strong><code>4'bx</code> into six bits gives <code>00xxxx</code>.</strong> You reach for these every time you write a reset value.</div>
@@ -2575,10 +2987,24 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Universal Verification Methodology</div>
   <div class="d" lang="ko">검증 방법론의 사실상 표준. <strong>언어가 아니라 SystemVerilog로 쓰인 class 라이브러리 + 관행의 묶음이다.</strong> testbench 부품의 이름과 모양과 붙이는 방법을 정해두어 <strong>남이 만든 것(VIP)을 가져다 쓸 수 있게</strong> 한다. VMM과 OVM을 합친 것이다. 이 과목에서는 Lecture 15~22와 Lab 6에서 다룬다.</div>
   <div class="d" lang="en">The de facto standard verification methodology. <strong>Not a language but a class library written in SystemVerilog, plus a set of conventions.</strong> By fixing the names, shapes and connection rules of testbench components it makes it possible <strong>to use what somebody else built</strong>, that is, VIP. It merged VMM and OVM. This course covers it in lectures 20 to 22 and Lab 6.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a> · <a href="L15-cpu-verification.html#s12">Lecture 15 &middot; 12</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">UVM_INFO &middot; UVM_WARNING &middot; UVM_ERROR &middot; UVM_FATAL</div>
+  <div class="d" lang="ko">UVM 의 네 severity. SV 의 <code>$info</code> ~ <code>$fatal</code> 과 일대일로 대응한다(슬라이드 7쪽). <code>`uvm_info</code>, <code>`uvm_error</code> 같은 macro 로 부르고, UVM_ERROR 는 개수를 세며 UVM_FATAL 은 실행을 끝낸다. 자세한 action 과 verbosity 는 UVM 강의(16~18)에서 확인할 것.</div>
+  <div class="d" lang="en">UVM's four severities, mapping one to one onto SV's <code>$info</code> to <code>$fatal</code> (slide 7). Called through macros such as <code>`uvm_info</code> and <code>`uvm_error</code>; UVM_ERROR is counted and UVM_FATAL ends the run. Actions and verbosity details to be confirmed in the UVM lectures (16 to 18).</div>
+  <div class="src"><a href="L14-efficient-verification.html#s6">Lecture 14 &middot; 06</a></div>
 </div>
 
 <h2 class="gletter" id="gV">V</h2>
+
+<div class="gterm">
+  <div class="t">Vacuous Pass</div>
+  <div class="d" lang="ko">implication(<code>|-&gt;</code>, <code>|=&gt;</code>)의 <strong>왼쪽이 거짓이라 아무것도 검사하지 않고 끝난 통과</strong>. "pass" 로 집계되므로 실패가 없다는 것만으로는 assertion 이 일을 했는지 모른다. 슬라이드 표현으로 assertion 은 fire &amp; pass, fire &amp; fail, never fire(vacuous pass) 셋 중 하나다.</div>
+  <div class="d" lang="en">A pass where <strong>the implication's (<code>|-&gt;</code>, <code>|=&gt;</code>) left side was false, so nothing was checked.</strong> It is tallied as a "pass", so no failures alone doesn't tell you the assertion did any work. In the slide's words, an assertion either fires &amp; passes, fires &amp; fails, or never fires (vacuous pass).</div>
+  <div class="src"><a href="L13-verification-concepts.html#s11">Lecture 13 &middot; 11</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+</div>
 
 <div class="gterm">
   <div class="t">Validation</div>
@@ -2610,10 +3036,17 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Verbosity</div>
+  <div class="d" lang="ko">testbench 가 터미널에 <strong>얼마나 자세히 찍을지</strong> 정하는 단계. Lab 4 Part 3 의 logging plusarg 0, 1, 2 가 이것이다. 회귀 테스트는 낮게 돌리고 실패한 것만 높여 다시 돌리려고, 다시 컴파일하지 않게 plusarg 로 받는다. UVM 은 이걸 <code>UVM_NONE</code> … <code>UVM_FULL</code> 같은 단계와 <code>+UVM_VERBOSITY</code> 로 표준화했다. <strong>오류는 verbosity 와 상관없이 언제나 찍혀야 한다.</strong></div>
+  <div class="d" lang="en">The level that decides <strong>how much detail</strong> a testbench prints to the terminal; Lab 4 Part 3's logging plusarg values 0, 1, 2. It comes in as a plusarg so regressions can run low and failing tests can be rerun high without a recompile. UVM standardises it with levels like <code>UVM_NONE</code> … <code>UVM_FULL</code> and <code>+UVM_VERBOSITY</code>. <strong>Errors should print whatever the verbosity.</strong></div>
+  <div class="src"><a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Verdi</div>
   <div class="d" lang="ko">Synopsys 의 디버그 도구. 파형 뷰어라고만 알면 절반만 아는 것이다. <strong>KDB 와 FSDB 를 겹쳐 읽어서 파형의 한 지점을 소스의 한 줄에 연결하고</strong>, 신호를 거슬러 원인까지 추적한다. 예전에는 시뮬레이터와 디버거가 달라 같은 설계를 두 번 컴파일했는데, <strong>Unified Front-End</strong> 가 그것을 <code>-kdb</code> 하나로 없앴다.</div>
   <div class="d" lang="en">Synopsys's debug tool. Calling it a waveform viewer is half the story. It <strong>reads KDB and FSDB together to tie a point on a waveform to a line of source</strong>, and traces signals back to a cause. Simulator and debugger used to be separate tools, so the same design got compiled twice; the <strong>Unified Front-End</strong> collapsed that into a single <code>-kdb</code>.</div>
-  <div class="src"><a href="LAB0-tools-tutorial.html#s7">Lab 0 · 07</a></div>
+  <div class="src"><a href="LAB0-tools-tutorial.html#s7">Lab 0 · 07</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
 </div>
 
 <div class="gterm">
@@ -2627,7 +3060,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Verification Plan</div>
   <div class="d" lang="ko">DUT를 <strong>어떻게 검증할 것인지</strong>를 적은 문서. 전략, 방법론, testbench 구성 요소, sign-off 기준, 그리고 기능 목록이 들어간다. <strong>기능마다 stimulus·checking·coverage 세 줄을 적는데, 그게 곧 검증의 삼각대다.</strong> 형식은 Word, Excel, Synopsys HVP, Cadence VPlan 등.</div>
   <div class="d" lang="en">A document describing <strong>how you will verify a DUT</strong>: strategy, methodology, testbench components, sign-off metrics and a list of features. <strong>Each feature gets three lines, stimulus, checking and coverage, which is the trifecta itself.</strong> Formats include Word, Excel, Synopsys HVP and Cadence VPlan.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s20">Lecture 2 · 20</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s20">Lecture 2 · 20</a> · <a href="L13-verification-concepts.html#s1">Lecture 13 &middot; 01</a> · <a href="LAB4-fifo-verification.html#s2">Lab 4 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -2635,7 +3068,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Verification IP</div>
   <div class="d" lang="ko">재사용 가능한 검증 자산. 예를 들어 EDA 벤더에게서 checker나 agent를 <strong>사서 우리 testbench에 끼워 넣는다.</strong> 이게 가능하려면 부품의 모양이 표준화돼 있어야 하고, 그래서 UVM 같은 방법론이 필요하다.</div>
   <div class="d" lang="en">A reusable verification asset: <strong>buy a checker or an agent from an EDA vendor and plug it into your testbench.</strong> That only works if component shapes are standardised, which is what a methodology such as UVM is for.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -2651,7 +3084,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">vif</div>
   <div class="d" lang="ko"><strong>interface instance 를 가리키는 handle.</strong> class 는 시뮬레이션 전에 정해지는 interface 를 품을 수 없어서 이것으로 DUT 의 신호를 만진다(<code>virtual dut_if vif;</code>). top 이 실제 instance 를 넘겨주지 않으면 null 이다. virtual method, virtual class 와는 다른 뜻의 virtual 이다.</div>
   <div class="d" lang="en"><strong>A handle pointing at an interface instance.</strong> A class cannot contain an interface, which is fixed before simulation, so it touches the DUT's signals through this (<code>virtual dut_if vif;</code>). Null unless top hands over a real instance. A different virtual from virtual methods and virtual classes.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s8">Lecture 12 &middot; 08</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s8">Lecture 12 &middot; 08</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
 </div>
 
 <h2 class="gletter" id="gW">W</h2>
@@ -2690,7 +3123,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">XMR &middot; Cross-Module Reference</div>
   <div class="d" lang="ko">포트를 거치지 않고 <code>top.mips.dp.rf...</code> 같은 <strong>계층 경로로 다른 모듈 안쪽 신호를 직접 읽는 것.</strong> SystemVerilog 표준은 hierarchical reference 라고 부른다. testbench 가 register file 이나 메모리 내용을 확인할 때 쓰고, 설계 코드에는 쓰지 않는다. 편하지만 인스턴스 이름에 묶여서 설계자가 이름을 바꾸면 testbench 가 깨진다. Lab 2 릴리스 덱은 프로세서 검증 방법 둘 중 하나로 소개하고, 다른 하나는 store 를 interface 신호에서 보는 것이다.</div>
   <div class="d" lang="en">Reading a signal inside another module <strong>directly by hierarchical path</strong>, like <code>top.mips.dp.rf...</code>, without going through ports. The SystemVerilog standard calls it a hierarchical reference. Testbenches use it to check register file or memory contents; design code never does. Handy, but tied to instance names: rename an instance and the testbench breaks. The Lab 2 release deck gives it as one of two ways to verify a processor; the other watches stores on the interface signals.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s10">Lab 2 · 10</a></div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s10">Lab 2 · 10</a> · <a href="L14-efficient-verification.html#s4">Lecture 14 &middot; 04</a> · <a href="L15-cpu-verification.html#s3">Lecture 15 &middot; 03</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">X-propagation &middot; X-optimism</div>
+  <div class="d" lang="ko">모르는 값 <code>x</code> 가 회로를 따라 퍼지는 것. RTL 의 <code>if (sel)</code> 은 <code>sel</code> 이 <code>x</code> 면 else 로 가서 <strong>모르는 값이 깨끗한 값처럼 보인다</strong>(X-optimism). gate 로 바뀌면 <code>x</code> 가 그대로 퍼져 문제가 드러난다. 슬라이드 11쪽이 gate-level simulation 이 잡는 것으로 "X-propagation / initialization problems hidden by RTL assumptions" 를 든다.</div>
+  <div class="d" lang="en">An unknown value <code>x</code> spreading through a circuit. RTL's <code>if (sel)</code> with <code>sel</code> = <code>x</code> takes the else branch, so <strong>an unknown looks like a clean value</strong> (X-optimism). As gates, the <code>x</code> propagates and the problem shows. Slide 11 lists "X-propagation / initialization problems hidden by RTL assumptions" among what gate-level simulation catches.</div>
+  <div class="src"><a href="L14-efficient-verification.html#s10">Lecture 14 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
