@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV &middot; Lecture 13 &mdash; Verification Concepts (quick read)</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+/* 애니메이션 슬라이더. 덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간을 한 자리에서 밟아본다. */
+/* 마크업 규약과 동작은 anim.js 가 단일 출처다. 스크립트가 없으면 첫 프레임만 보이고 막대가 안 생긴다. */
+.anim [data-f]{display:none}
+.anim [data-f~="0"]{display:revert}
+.anim.js-anim [data-f]{display:none}
+.anim.js-anim [data-f].on{display:revert}
+.anim:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.animbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--rule)}
+.animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.animbar button:disabled{opacity:.35;cursor:default}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
+.animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
+.animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
+@media(prefers-reduced-motion:reduce){.animbar button{transition:none}}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 13<br>Verification Concepts</h1>
+  <p class="subtitle" lang="ko">검증은 <strong>plan</strong> 이라는 문서에서 시작하고, 그 문서는 기능마다 <strong>stimulus, checking, coverage</strong> 세 줄을 적는다. 이 강의는 그 세 줄을 펼치면서 <strong>assertion</strong> 과 <strong>formal</strong> 을 끼워 넣는다.</p>
+  <p class="subtitle" lang="en">Verification starts from a document called the <strong>plan</strong>, which lists three lines per feature: <strong>stimulus, checking, coverage.</strong> This lecture unfolds those three and slots in <strong>assertions</strong> and <strong>formal</strong> along the way.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L13-verification-concepts.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L13-verification-concepts.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 13</div>
+    <div class="name">Verification Concepts</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">plan 과 testbench</span><span lang="en">The plan and the testbench</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">stimulus 와 constraint</span><span lang="en">Stimulus and constraints</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">checking 과 golden model</span><span lang="en">Checking and golden models</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">assertion</span><span lang="en">Assertions</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">formal 과 coverage</span><span lang="en">Formal and coverage</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+  <p lang="ko">예전 Assertion Based Verification 자리를 대체한 강의다. assertion 은 덱의 가운데(22~33쪽)로 들어왔고, 강의 전체는 <strong>검증 엔지니어가 하는 일의 지도</strong>가 됐다. 제목만 있는 쪽(16, 17, 39, 44쪽)이 많아서, 자세한 판은 그 자리를 업계의 일반적인 뜻으로 메우고 그렇다고 밝혔다. <a href="L12-sv-for-verification.html">Lecture 12</a> 가 "무슨 문법으로" 였다면 이건 "무엇을, 왜" 다.</p>
+  <p lang="en">This lecture replaced the old Assertion Based Verification slot. Assertions moved into the middle of the deck (slides 22 to 33), and the lecture as a whole became <strong>a map of what a verification engineer does.</strong> Many slides are title only (16, 17, 39, 44), so the full note fills them with the usual industry meaning and says so. If <a href="L12-sv-for-verification.html">Lecture 12</a> was "in what syntax", this is "what, and why".</p>
+  <table>
+    <thead><tr><th><span lang="ko">한 줄로</span><span lang="en">In one line</span></th><th><span lang="ko">내용</span><span lang="en">What it says</span></th></tr></thead>
+    <tbody>
+      <tr><td>plan</td><td><span lang="ko">DUT 를 어떻게 검증할지 적은 <strong>문서</strong>. Strategy 와 기능마다 stimulus/checking/coverage</span><span lang="en">the <strong>document</strong> saying how the DUT will be verified: strategy plus stimulus/checking/coverage per feature</span></td></tr>
+      <tr><td>testbench</td><td><span lang="ko">driver + monitor 를 묶은 것이 <strong>agent = BFM = transactor</strong>. 아래 층에서는 agent 가 이웃 블록인 척한다</span><span lang="en">a driver + monitor bundle is an <strong>agent = BFM = transactor</strong>; at lower levels agents pose as neighbour blocks</span></td></tr>
+      <tr><td>stimulus</td><td><span lang="ko">constrained random 이 주력, corner case 는 여전히 directed</span><span lang="en">constrained random is the workhorse; corner cases still get directed tests</span></td></tr>
+      <tr><td>checking</td><td><span lang="ko">정답은 checker 안의 golden model(SV 나 C). assertion 은 신호를 직접 본다</span><span lang="en">the answer key is a golden model (SV or C) inside the checker; assertions watch signals directly</span></td></tr>
+      <tr><td>assertion</td><td><span lang="ko"><strong>safety 는 유한한 반례, liveness 는 무한</strong>. 통과에는 vacuous pass 가 섞여 있다</span><span lang="en"><strong>safety has finite counterexamples, liveness infinite.</strong> Passes include vacuous ones</span></td></tr>
+      <tr><td>formal</td><td><span lang="ko">simulation 은 "이번에 어겼나", FPV 는 "어길 수 있나". assume 이 입력을 제한한다</span><span lang="en">simulation asks "violated this time?", FPV "can it be violated?"; assumes restrict inputs</span></td></tr>
+      <tr><td>coverage</td><td><span lang="ko">code 는 조합을 모르고, functional 은 random 일 때 필수. 실패한 test 는 merge 하지 않는다</span><span lang="en">code coverage knows no combinations; functional is essential with random; failing tests are not merged</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">plan 과 testbench</h2><h2 lang="en">The plan and the testbench</h2></div>
+  <p lang="ko">슬라이드 2쪽. verification plan 은 <strong>DUT 를 어떻게 검증할지 적은 문서</strong>다. Strategy 아래 Methodology(simulation, formal), testbench components, <strong>sign-off metrics</strong>(무엇이 몇이어야 끝났다고 하나)를 정하고, 기능마다 세 줄을 쓴다. Stimulus("Apply inputs A&rarr;B&rarr;C, keeping D=0"), Checking("Check that E becomes 1 every time we enter state X"), Coverage("State X was reached"). 형식은 Word, Excel, Synopsys HVP, Cadence VPlan 등 무엇이든 된다. 3쪽의 trifecta 가 이 세 줄이다. Lab 4 Part 1 이 바로 이 문서다.</p>
+  <p lang="en">Slide 2. A verification plan is <strong>a document saying how the DUT will be verified.</strong> Under Strategy it fixes the methodology (simulation, formal), the testbench components and the <strong>sign-off metrics</strong> (what must reach what before you call it done), then gives three lines per feature: Stimulus ("Apply inputs A&rarr;B&rarr;C, keeping D=0"), Checking ("Check that E becomes 1 every time we enter state X"), Coverage ("State X was reached"). Any format works: Word, Excel, Synopsys HVP, Cadence VPlan. Slide 3's trifecta is those three lines. Lab 4 Part 1 is exactly this document.</p>
+  <p lang="ko">4~6쪽이 testbench 를 세 번 그린다. 가장 자세한 4쪽:</p>
+  <p lang="en">Slides 4 to 6 draw the testbench three times. The most detailed, slide 4:</p>
+  <figure>
+    <svg viewBox="0 0 700 330" role="img" aria-label="슬라이드 4쪽의 testbench. 양쪽에 Stimulus, Driver, Monitor 가 있고 DUT 를 사이에 둔다. Monitor 가 Checker 와 Coverage 에 transaction 을 보내고, Assertions 가 DUT 를 직접 본다. 오른쪽 Driver 와 Monitor 를 점선이 agent 로 묶는다">
+<defs>
+<marker id="m2-pk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--pink)"/></marker>
+<marker id="m2-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink2)"/></marker>
+</defs>
+<rect x="290" y="10" width="120" height="34" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="350" y="32" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Coverage</text>
+<rect x="290" y="56" width="120" height="34" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="350" y="78" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Checker</text>
+<rect x="150" y="96" width="90" height="40" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="195" y="121" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Monitor</text>
+<rect x="460" y="96" width="90" height="40" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="505" y="121" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Monitor</text>
+<path d="M195 96 L195 27 L288 27" fill="none" stroke="var(--pink)" stroke-width="1.5" marker-end="url(#m2-pk)"/>
+<path d="M195 73 L288 73" fill="none" stroke="var(--pink)" stroke-width="1.5" marker-end="url(#m2-pk)"/>
+<path d="M505 96 L505 27 L412 27" fill="none" stroke="var(--pink)" stroke-width="1.5" marker-end="url(#m2-pk)"/>
+<path d="M505 73 L412 73" fill="none" stroke="var(--pink)" stroke-width="1.5" marker-end="url(#m2-pk)"/>
+<text class="svglab" x="242" y="54" text-anchor="middle" style="font-size:10px;fill:var(--pink)">txn</text>
+<text class="svglab" x="458" y="54" text-anchor="middle" style="font-size:10px;fill:var(--pink)">txn</text>
+<rect x="10" y="184" width="90" height="46" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="55" y="212" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Stimulus</text>
+<rect x="150" y="184" width="90" height="46" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="195" y="212" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Driver</text>
+<rect x="300" y="170" width="100" height="74" rx="6" fill="rgba(var(--blue-rgb),.12)" stroke="var(--blue)" stroke-width="2"/>
+<text class="svgtxt" x="350" y="212" text-anchor="middle" style="font-size:15px;fill:var(--blue);font-weight:750">DUT</text>
+<rect x="460" y="184" width="90" height="46" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="505" y="212" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Driver</text>
+<rect x="600" y="184" width="90" height="46" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="645" y="212" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Stimulus</text>
+<line x1="102" y1="207" x2="148" y2="207" stroke="var(--pink)" stroke-width="1.5" marker-start="url(#m2-pk)" marker-end="url(#m2-pk)"/>
+<line x1="552" y1="207" x2="598" y2="207" stroke="var(--pink)" stroke-width="1.5" marker-start="url(#m2-pk)" marker-end="url(#m2-pk)"/>
+<text class="svglab" x="125" y="176" text-anchor="middle" style="font-size:10px;fill:var(--pink)">txn</text>
+<text class="svglab" x="575" y="176" text-anchor="middle" style="font-size:10px;fill:var(--pink)">txn</text>
+<line x1="242" y1="215" x2="298" y2="215" stroke="var(--ink2)" stroke-width="1.5" marker-start="url(#m2-ink)" marker-end="url(#m2-ink)"/>
+<line x1="402" y1="215" x2="458" y2="215" stroke="var(--ink2)" stroke-width="1.5" marker-start="url(#m2-ink)" marker-end="url(#m2-ink)"/>
+<text class="svglab" x="270" y="236" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">pins</text>
+<text class="svglab" x="430" y="236" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">pins</text>
+<path d="M270 213 L270 116 L242 116" fill="none" stroke="var(--ink2)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#m2-ink)"/>
+<path d="M430 213 L430 116 L458 116" fill="none" stroke="var(--ink2)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#m2-ink)"/>
+<text class="svglab" x="276" y="160" style="font-size:9.5px;fill:var(--ink2)">observe</text>
+<text class="svglab" x="424" y="160" text-anchor="end" style="font-size:9.5px;fill:var(--ink2)">observe</text>
+<rect x="300" y="280" width="100" height="34" rx="6" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.6"/>
+<text class="svgtxt" x="350" y="302" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Assertions</text>
+<line x1="350" y1="246" x2="350" y2="278" stroke="var(--pink)" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#m2-pk)"/>
+<text class="svglab" x="358" y="266" style="font-size:9.5px;fill:var(--pink)">watch</text>
+<rect x="448" y="86" width="114" height="156" rx="12" fill="none" stroke="var(--pink)" stroke-width="1.3" stroke-dasharray="6 4"/>
+<text class="svglab" x="505" y="262" text-anchor="middle" style="font-size:10px;fill:var(--pink);font-weight:700">agent = driver + monitor</text>
+<text class="svglab" x="505" y="278" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">(BFM, transactor)</text>
+    </svg>
+    <figcaption lang="ko">슬라이드 4쪽. 슬라이드는 칸마다 다른 색이지만 여기서는 testbench 쪽을 전부 분홍, DUT 를 파랑으로 칠했다. <code>txn</code> 은 transaction(object 하나), <code>pins</code> 는 신호 수준이다.</figcaption>
+    <figcaption lang="en">Slide 4. The slide gives each box its own colour; here the whole testbench side is pink and the DUT blue. <code>txn</code> means a transaction (one object), <code>pins</code> means signal level.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p><strong>좌우가 대칭</strong>이다. DUT 의 양쪽에 interface 가 하나씩 있고, 쪽마다 Stimulus, Driver, Monitor 가 한 벌씩 붙는다. 화살표는 두 종류다. 분홍 <code>txn</code> 은 <strong>transaction 이라는 object</strong> 가 오가는 길이고, 회색 <code>pins</code> 는 <strong>신호 선</strong>이다. 슬라이드는 앞의 것을 노란 화살표와 회색 육각형(transaction 을 뜻하는 아이콘)으로, 뒤의 것을 가는 갈색 화살표 다발로 그렸다.</p><ol><li><strong>Stimulus &harr; Driver, txn</strong>: Stimulus 가 transaction 을 만들어 Driver 에 넘긴다. 양쪽 화살표인 것은 응답이 되돌아오기도 해서다</li><li><strong>Driver &harr; DUT, pins</strong>: Driver 가 transaction 을 신호로 풀어 클럭에 맞춰 핀을 움직인다. DUT 의 출력도 이 선으로 돌아온다</li><li><strong>observe, 점선</strong>: Monitor 는 같은 핀을 <strong>읽기만</strong> 한다. 슬라이드에서는 Driver 와 DUT 사이 선에서 위로 갈라져 Monitor 로 올라가는 화살표 넷이 이것이다</li><li><strong>Monitor &rarr; Checker, Coverage, txn</strong>: Monitor 가 핀 값을 다시 transaction 으로 묶어 위로 보낸다. Checker 는 판정하고 Coverage 는 센다. <strong>양쪽 Monitor 가 둘 다 위로 보내야</strong> 들어간 것과 나온 것을 맞춰볼 수 있다</li><li><strong>DUT &rarr; Assertions, 점선</strong>: assertion 은 transaction 을 거치지 않고 <strong>DUT 의 신호를 직접</strong> 본다. 슬라이드의 보라 점선 화살표 셋이다</li><li><strong>agent 점선 테두리</strong>: 슬라이드가 오른쪽 Monitor 와 Driver 를 손으로 그린 곡선으로 묶고 이렇게 적었다. <strong>"Combined into one component and typically called an Agent or a BFM or a Transactor."</strong> 한 interface 를 맡는 Driver 와 Monitor 를 한 부품으로 묶은 것이다</li></ol></div>
+    <div lang="en"><p>The picture is <strong>symmetric.</strong> The DUT has an interface on each side, and each side gets its own Stimulus, Driver and Monitor. There are two kinds of arrows. Pink <code>txn</code> is the path for <strong>an object called a transaction</strong>; grey <code>pins</code> are <strong>signal wires.</strong> The slide draws the first as yellow arrows with grey hexagons (an icon for a transaction) and the second as bundles of thin brown arrows.</p><ol><li><strong>Stimulus &harr; Driver, txn</strong>: the Stimulus builds a transaction and hands it to the Driver; two-headed because responses come back too</li><li><strong>Driver &harr; DUT, pins</strong>: the Driver unpacks the transaction into signals and moves the pins in step with the clock; the DUT's outputs come back on the same wires</li><li><strong>observe, dashed</strong>: the Monitor <strong>only reads</strong> the same pins. On the slide, these are the four arrows branching up from the Driver-DUT wires to the Monitor</li><li><strong>Monitor &rarr; Checker, Coverage, txn</strong>: the Monitor packs pin values back into transactions and sends them up. The Checker judges, the Coverage counts. <strong>Both monitors must report</strong> for what went in to be matched against what came out</li><li><strong>DUT &rarr; Assertions, dashed</strong>: assertions skip transactions and look <strong>straight at the DUT's signals</strong>: the slide's three dotted purple arrows</li><li><strong>the dashed agent outline</strong>: the slide circles the right-hand Monitor and Driver with a hand-drawn curve and writes <strong>"Combined into one component and typically called an Agent or a BFM or a Transactor."</strong> The Driver and Monitor serving one interface become one component</li></ol></div>
+  </div>
+  <p lang="ko">5쪽은 Driver 와 Monitor 없이 Stimulus 와 Checker(golden model 포함)가 핀을 직접 만지는 가장 단순한 판, 6쪽은 Driver 와 Monitor 를 <strong>BFM/Agent/VIP</strong> 상자 하나로 접은 판이다. 9~10쪽은 <strong>unit, sub-system, top-level</strong> 의 층 구조다. unit 하나를 떼어 검증할 때 이웃 블록 자리에 agent 를 세운다. 이웃 RTL 은 아직 없거나 버그가 있을 수 있고, agent 가 <strong>controllability 와 observability</strong> 가 더 좋기 때문이다.</p>
+  <p lang="en">Slide 5 is the simplest version, with no driver or monitor: stimulus and a checker (with a golden model) touch the pins directly. Slide 6 folds driver and monitor into a single <strong>BFM/Agent/VIP</strong> box. Slides 9 to 10 give the levels: <strong>unit, sub-system, top-level.</strong> When a unit is verified alone, agents stand in for its neighbours, because neighbour RTL may not be ready or may be buggy, and an agent gives more <strong>controllability and observability.</strong></p>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">stimulus 와 constraint</h2><h2 lang="en">Stimulus and constraints</h2></div>
+  <p lang="ko">슬라이드 13쪽. 방법은 셋이다. <strong>directed</strong>(사람이 고른 입력), <strong>randomized</strong>(아무 값이나), <strong>constrained random</strong>(합법 범위 안의 무작위). 그리고 결론: <strong>corner case 는 hard-to-hit 이니 여전히 directed 로.</strong></p>
+  <p lang="en">Slide 13. Three ways: <strong>directed</strong> (inputs a person picks), <strong>randomized</strong> (any value), <strong>constrained random</strong> (random within the legal range). The conclusion: <strong>corner cases are hard to hit, so still use directed tests for them.</strong></p>
+  <figure>
+    <svg viewBox="0 0 700 226" role="img" aria-label="세 판에 같은 입력 공간을 그렸다. directed 는 점 넷이 corner case 를 맞히고, random 은 점이 합법 영역 밖에도 떨어지고, constrained random 은 합법 영역 안에만 많이 떨어지지만 corner 는 비어 있다">
+<text class="svgtxt" x="120" y="20" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Directed</text>
+<text class="svgtxt" x="350" y="20" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Randomized</text>
+<text class="svgtxt" x="580" y="20" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Constrained random</text>
+<rect x="20" y="34" width="200" height="150" rx="6" fill="none" stroke="var(--ink3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+<rect x="250" y="34" width="200" height="150" rx="6" fill="none" stroke="var(--ink3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+<rect x="480" y="34" width="200" height="150" rx="6" fill="none" stroke="var(--ink3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+<rect x="40" y="62" width="140" height="106" rx="16" fill="rgba(var(--ink-rgb),.03)" stroke="var(--ink2)" stroke-width="1.4"/>
+<rect x="270" y="62" width="140" height="106" rx="16" fill="rgba(var(--ink-rgb),.03)" stroke="var(--ink2)" stroke-width="1.4"/>
+<rect x="500" y="62" width="140" height="106" rx="16" fill="rgba(var(--ink-rgb),.03)" stroke="var(--ink2)" stroke-width="1.4"/>
+<text class="svglab" x="28" y="47" style="font-size:9px;fill:var(--ink3)">all inputs</text>
+<text class="svglab" x="258" y="47" style="font-size:9px;fill:var(--ink3)">all inputs</text>
+<text class="svglab" x="488" y="47" style="font-size:9px;fill:var(--ink3)">all inputs</text>
+<text class="svglab" x="50" y="160" style="font-size:9px;fill:var(--ink2)">legal</text>
+<text class="svglab" x="280" y="160" style="font-size:9px;fill:var(--ink2)">legal</text>
+<text class="svglab" x="510" y="160" style="font-size:9px;fill:var(--ink2)">legal</text>
+<path d="M172 64 L178 70 L172 76 L166 70 Z" fill="var(--amber)"/>
+<path d="M402 64 L408 70 L402 76 L396 70 Z" fill="var(--amber)"/>
+<path d="M632 64 L638 70 L632 76 L626 70 Z" fill="var(--amber)"/>
+<text class="svglab" x="160" y="56" text-anchor="end" style="font-size:9px;fill:var(--amber)">corner</text>
+<text class="svglab" x="390" y="56" text-anchor="end" style="font-size:9px;fill:var(--amber)">corner</text>
+<text class="svglab" x="620" y="56" text-anchor="end" style="font-size:9px;fill:var(--amber)">corner</text>
+<circle cx="172" cy="70" r="10" fill="none" stroke="var(--pink)" stroke-width="2"/>
+<circle cx="70" cy="90" r="4" fill="var(--pink)"/>
+<circle cx="110" cy="120" r="4" fill="var(--pink)"/>
+<circle cx="80" cy="140" r="4" fill="var(--pink)"/>
+<circle cx="290" cy="80" r="4" fill="var(--pink)"/>
+<circle cx="330" cy="100" r="4" fill="var(--pink)"/>
+<circle cx="360" cy="140" r="4" fill="var(--pink)"/>
+<circle cx="300" cy="130" r="4" fill="var(--pink)"/>
+<circle cx="385" cy="95" r="4" fill="var(--pink)"/>
+<circle cx="345" cy="72" r="4" fill="var(--pink)"/>
+<circle cx="320" cy="150" r="4" fill="var(--pink)"/>
+<circle cx="330" cy="54" r="4" fill="var(--amber)"/>
+<circle cx="430" cy="110" r="4" fill="var(--amber)"/>
+<circle cx="425" cy="174" r="4" fill="var(--amber)"/>
+<circle cx="262" cy="150" r="4" fill="var(--amber)"/>
+<circle cx="350" cy="176" r="4" fill="var(--amber)"/>
+<circle cx="440" cy="48" r="4" fill="var(--amber)"/>
+<circle cx="515" cy="80" r="4" fill="var(--pink)"/>
+<circle cx="540" cy="95" r="4" fill="var(--pink)"/>
+<circle cx="560" cy="75" r="4" fill="var(--pink)"/>
+<circle cx="580" cy="110" r="4" fill="var(--pink)"/>
+<circle cx="600" cy="90" r="4" fill="var(--pink)"/>
+<circle cx="525" cy="125" r="4" fill="var(--pink)"/>
+<circle cx="555" cy="140" r="4" fill="var(--pink)"/>
+<circle cx="590" cy="135" r="4" fill="var(--pink)"/>
+<circle cx="615" cy="120" r="4" fill="var(--pink)"/>
+<circle cx="570" cy="155" r="4" fill="var(--pink)"/>
+<circle cx="545" cy="115" r="4" fill="var(--pink)"/>
+<circle cx="605" cy="150" r="4" fill="var(--pink)"/>
+<text class="svglab" x="120" y="202" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">4 cases, 1 hits the corner</text>
+<text class="svglab" x="350" y="202" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">13 cases, 6 illegal</text>
+<text class="svglab" x="580" y="202" text-anchor="middle" style="font-size:9.5px;fill:var(--ink2)">12 cases, all legal</text>
+<text class="svglab" x="120" y="218" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">written by hand</text>
+<text class="svglab" x="350" y="218" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)">failures may be bogus</text>
+<text class="svglab" x="580" y="218" text-anchor="middle" style="font-size:9.5px;fill:var(--amber)">corner still missed</text>
+    </svg>
+    <figcaption lang="ko">세 방법을 같은 입력 공간 위에 놓은 개념도. 슬라이드에 없는 그림이고, 점의 개수와 자리는 설명을 위해 이 노트가 정했다.</figcaption>
+    <figcaption lang="en">The three methods on the same input space: a concept sketch not in the slides. The number and placement of the dots are this note's choices for illustration.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>세 판의 바탕은 같다. <strong>점선 사각형(all inputs)</strong> 은 입력 핀에 넣을 수 있는 모든 값의 조합이고, 그 안의 <strong>실선 둥근 사각형(legal)</strong> 은 스펙이 허락하는 합법 입력이다. 오른쪽 위 모서리의 <strong>amber 마름모(corner)</strong> 는 합법이지만 경계에 붙은 드문 경우, 예를 들어 "가득 찬 순간에 읽기와 쓰기가 같은 사이클에 온다" 같은 것이다. 점 하나가 테스트 입력 하나다. 분홍 점은 합법 입력, amber 점은 불법 입력이다.</p><ol><li><strong>Directed</strong>: 점이 넷뿐이다. 사람이 고른 것이라 그중 하나가 <strong>corner 를 정확히 맞혔다</strong>(분홍 고리). 대신 나머지 공간은 거의 비어 있다. 아래 줄 "4 cases, 1 hits the corner" 가 그 뜻이다</li><li><strong>Randomized</strong>: 점 13 개 중 7 개는 legal 안(분홍), <strong>6 개는 legal 밖(amber)</strong> 이다. 밖의 점으로 DUT 가 이상하게 동작해도 그건 스펙이 약속하지 않은 입력이라 <strong>버그가 아닐 수 있다</strong>. 아래 줄 "failures may be bogus" 가 그 뜻이다. corner 는 못 맞혔다</li><li><strong>Constrained random</strong>: 점 12 개가 <strong>전부 legal 안</strong>이다. constraint 가 불법 입력을 걸러서다. 그런데도 corner 마름모 주변은 비어 있다. 무작위는 드문 곳에 드물게 떨어진다. 아래 줄 "corner still missed" 가 슬라이드의 <strong>Hard-to-hit</strong> 이다</li></ol><p>그래서 슬라이드의 처방은 <strong>오른쪽 판에 왼쪽 판의 고리 하나를 더하는 것</strong>이다. 대부분은 constrained random 으로 넓게 덮고, corner 는 directed 로 콕 집는다. 어디가 비었는지는 coverage 가 알려준다(<a href="L13-verification-concepts.html#s15">15절</a>).</p></div>
+    <div lang="en"><p>All three panels share a background. The <strong>dashed rectangle (all inputs)</strong> is every combination you could put on the input pins; the <strong>solid rounded rectangle (legal)</strong> inside is what the spec allows. The <strong>amber diamond (corner)</strong> at the top right is a legal but rare case on the boundary, such as "a read and a write in the same cycle at the moment the FIFO is full". Each dot is one test input: pink dots are legal, amber dots illegal.</p><ol><li><strong>Directed</strong>: only four dots. A person picked them, so one <strong>hits the corner exactly</strong> (pink ring), but the rest of the space is nearly empty: "4 cases, 1 hits the corner"</li><li><strong>Randomized</strong>: of 13 dots, 7 are inside legal (pink) and <strong>6 are outside (amber).</strong> If the DUT misbehaves on those, the spec never promised anything for them, so it <strong>may not be a bug</strong>: "failures may be bogus". The corner is missed</li><li><strong>Constrained random</strong>: all 12 dots are <strong>inside legal</strong>, because constraints filter the illegal ones. Yet the corner is still empty: random lands rarely on rare places. "corner still missed" is the slide's <strong>hard-to-hit</strong></li></ol><p>So the slide's prescription is <strong>the right panel plus the left panel's one ring.</strong> Cover the bulk with constrained random, pin the corner with a directed test. Coverage tells you which corners are still empty (<a href="L13-verification-concepts.html#s15">§15</a>).</p></div>
+  </div>
+  <p lang="ko">14쪽: constraint 를 두는 자리는 둘이다. <strong>inline</strong> 은 <code>t.randomize() with {...}</code> 로 그 호출에만, <strong>explicit</strong> 은 class 안의 <code>constraint c_short {...}</code> 로 늘. <strong>둘은 더해진다.</strong> 15쪽: 불법 입력(error stimulus)을 일부러 만들 때 <code>constraint_mode(0)</code> 로 규칙을 끄고, <code>rand_mode(0)</code> 로 변수를 고정한다. rand_mode(0) 인 변수에도 constraint 는 걸린다는 것, 끈 것은 다시 켜야 한다는 것이 함정이다. 16~17쪽은 제목뿐이다. <strong>active</strong> stimulus 는 testbench 가 먼저 요청을 넣고, <strong>reactive</strong> 는 DUT 의 요청에 응답한다. <strong>irritator</strong> 는 interrupt 나 다른 트래픽 같은 무관한 사건을 배경에서 일으켜 드문 겹침을 만든다.</p>
+  <p lang="en">Slide 14: constraints live in two places. <strong>Inline</strong>, <code>t.randomize() with {...}</code>, applies to that call only; <strong>explicit</strong>, <code>constraint c_short {...}</code> in the class, always. <strong>They add up.</strong> Slide 15: to produce illegal (error) stimulus on purpose, switch a rule off with <code>constraint_mode(0)</code> and pin a variable with <code>rand_mode(0)</code>. The traps: constraints still bind a rand_mode(0) variable, and whatever you switch off stays off until you switch it back. Slides 16 and 17 are titles only. <strong>Active</strong> stimulus means the testbench issues requests first; <strong>reactive</strong> means it answers the DUT's requests. An <strong>irritator</strong> fires unrelated events (interrupts, other traffic) in the background to create rare overlaps.</p>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">checking 과 golden model</h2><h2 lang="en">Checking and golden models</h2></div>
+  <p lang="ko">19쪽의 넷. <strong>Self-checking stimulus</strong>(test 가 기대값을 품는다), <strong>assertions</strong>(신호를 매 클럭), <strong>checkers</strong>, 그 아래 <strong>scoreboards</strong>(들어간 것과 나온 것을 짝지어). 20쪽: random 입력의 정답은 checker 안의 <strong>golden(reference) model</strong> 이 계산한다. 모델은 <strong>SV 나 C</strong> 로 쓰고, C 는 DPI 로 붙인다. Lab 4 의 DPI checker 가 이 모양이다. 21쪽은 모델을 얼마나 촘촘하게 맞추나의 두 끝이다.</p>
+  <p lang="en">Slide 19's four: <strong>self-checking stimulus</strong> (the test carries its own expected values), <strong>assertions</strong> (signals, every clock), <strong>checkers</strong>, and under them <strong>scoreboards</strong> (pairing what went in with what came out). Slide 20: for random inputs, the right answer is computed by a <strong>golden (reference) model</strong> inside the checker, written in <strong>SV or C</strong>, with C attached through DPI; Lab 4's DPI checker has this shape. Slide 21 names the two ends of how finely the model matches.</p>
+  <figure>
+    <svg viewBox="0 0 700 240" role="img" aria-label="DUT 가 B 를 한 사이클 늦게 낸다. cycle-accurate 모델과 사이클마다 비교하면 4 와 5 에서 불일치, boundary-accurate 모델과 순서만 비교하면 A, B, C 모두 일치">
+<text class="svglab" x="150" y="22" text-anchor="end" style="font-size:10px;fill:var(--ink3)">cycle</text>
+<text class="svglab" x="170" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">0</text>
+<text class="svglab" x="220" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">1</text>
+<text class="svglab" x="270" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">2</text>
+<text class="svglab" x="320" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">3</text>
+<text class="svglab" x="370" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">4</text>
+<text class="svglab" x="420" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">5</text>
+<text class="svglab" x="470" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">6</text>
+<text class="svglab" x="520" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">7</text>
+<text class="svglab" x="570" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">8</text>
+<text class="svglab" x="620" y="22" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">9</text>
+<line x1="156" y1="30" x2="644" y2="30" stroke="var(--rule)" stroke-width="1"/>
+<text class="svglab" x="150" y="58" text-anchor="end" style="font-size:10px;fill:var(--blue);font-weight:700">DUT output</text>
+<rect x="256" y="44" width="28" height="22" rx="4" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="270" y="59" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">A</text>
+<rect x="406" y="44" width="28" height="22" rx="4" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="420" y="59" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">B</text>
+<rect x="456" y="44" width="28" height="22" rx="4" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="470" y="59" text-anchor="middle" style="font-size:11px;fill:var(--blue);font-weight:700">C</text>
+<text class="svglab" x="150" y="100" text-anchor="end" style="font-size:10px;fill:var(--pink);font-weight:700">cycle-accurate model</text>
+<rect x="256" y="86" width="28" height="22" rx="4" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.4"/><text class="svglab" x="270" y="101" text-anchor="middle" style="font-size:11px;fill:var(--pink);font-weight:700">A</text>
+<rect x="356" y="86" width="28" height="22" rx="4" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.4"/><text class="svglab" x="370" y="101" text-anchor="middle" style="font-size:11px;fill:var(--pink);font-weight:700">B</text>
+<rect x="456" y="86" width="28" height="22" rx="4" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.4"/><text class="svglab" x="470" y="101" text-anchor="middle" style="font-size:11px;fill:var(--pink);font-weight:700">C</text>
+<text class="svglab" x="150" y="134" text-anchor="end" style="font-size:9.5px;fill:var(--ink3)">compare per cycle</text>
+<text class="svglab" x="270" y="134" text-anchor="middle" style="font-size:10px;fill:var(--green);font-weight:700">ok</text>
+<text class="svglab" x="370" y="134" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700">ERR</text>
+<text class="svglab" x="420" y="134" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700">ERR</text>
+<text class="svglab" x="470" y="134" text-anchor="middle" style="font-size:10px;fill:var(--green);font-weight:700">ok</text>
+<line x1="20" y1="154" x2="680" y2="154" stroke="var(--rule)" stroke-width="1"/>
+<text class="svglab" x="150" y="186" text-anchor="end" style="font-size:10px;fill:var(--pink);font-weight:700">boundary-accurate model</text>
+<rect x="176" y="172" width="28" height="22" rx="4" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.4"/><text class="svglab" x="190" y="187" text-anchor="middle" style="font-size:11px;fill:var(--pink);font-weight:700">A</text>
+<rect x="210" y="172" width="28" height="22" rx="4" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.4"/><text class="svglab" x="224" y="187" text-anchor="middle" style="font-size:11px;fill:var(--pink);font-weight:700">B</text>
+<rect x="244" y="172" width="28" height="22" rx="4" fill="rgba(var(--pink-rgb),.1)" stroke="var(--pink)" stroke-width="1.4"/><text class="svglab" x="258" y="187" text-anchor="middle" style="font-size:11px;fill:var(--pink);font-weight:700">C</text>
+<text class="svglab" x="290" y="187" style="font-size:9.5px;fill:var(--ink3)">expected order, no cycle numbers</text>
+<text class="svglab" x="150" y="220" text-anchor="end" style="font-size:9.5px;fill:var(--ink3)">compare in order</text>
+<text class="svglab" x="176" y="220" style="font-size:10px;fill:var(--green);font-weight:700">A = A ok,  B = B ok,  C = C ok</text>
+    </svg>
+    <figcaption lang="ko">DUT 가 B 를 모델의 예상보다 한 사이클 늦게 낸 상황을 두 모델로 판정한 예. 슬라이드에 없는 그림이고 값은 이 노트가 정했다.</figcaption>
+    <figcaption lang="en">Judging a DUT that emits B one cycle later than the model expects, with each kind of model. Not in the slides; the values are this note's.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>맨 위 숫자 0~9 가 사이클이다. 첫 줄 <strong>DUT output</strong>(파랑, 설계 쪽)은 DUT 가 실제로 낸 출력 transaction 이다. A 는 사이클 2, <strong>B 는 사이클 5</strong>, C 는 사이클 6 에 나왔다.</p><ol><li><strong>cycle-accurate model</strong>(분홍, 검증 쪽)은 DUT 의 파이프라인까지 흉내 내서 "A 는 2, <strong>B 는 4</strong>, C 는 6" 이라고 사이클까지 예측한다</li><li><strong>compare per cycle</strong> 줄이 사이클마다 비교한 결과다. 사이클 2 는 둘 다 A 라 <strong>ok</strong>. 사이클 4 는 모델은 B 를 기대하는데 DUT 는 아무것도 안 냈으니 <strong>ERR</strong>. 사이클 5 는 DUT 가 B 를 냈는데 모델은 아무것도 기대하지 않았으니 또 <strong>ERR</strong>. 사이클 6 은 둘 다 C 라 <strong>ok</strong>. 불일치 두 건이다</li><li><strong>boundary-accurate model</strong> 은 사이클 번호 없이 "A, B, C 가 이 순서로 나와야 한다" 만 안다. 상자 셋이 사이클 칸이 아니라 왼쪽에 줄지어 있는 것이 그 뜻이다</li><li><strong>compare in order</strong> 줄: DUT 가 무언가를 낼 때마다 모델의 줄 맨 앞과 비교한다. A = A, B = B, C = C. <strong>전부 ok</strong> 다</li></ol><p>어느 쪽이 맞나. <strong>스펙이 무엇을 약속했느냐</strong>에 달렸다. 스펙이 "B 는 요청 뒤 정확히 2 사이클" 이라고 했다면 사이클 5 의 B 는 진짜 버그이고 cycle-accurate 모델만 잡는다. 스펙이 순서만 약속했다면 사이클 4 와 5 의 ERR 은 <strong>가짜 실패</strong>이고, cycle-accurate 모델은 DUT 의 마이크로아키텍처가 바뀔 때마다 같이 고쳐야 한다. 그래서 보통은 boundary 수준으로 데이터와 순서를 보고, 타이밍 약속은 assertion(09절)으로 따로 건다. 이건 일반적인 관행이고 슬라이드의 말은 아니다.</p></div>
+    <div lang="en"><p>The numbers 0 to 9 on top are cycles. The first row, <strong>DUT output</strong> (blue, design side), is what the DUT actually emitted: A at cycle 2, <strong>B at cycle 5</strong>, C at cycle 6.</p><ol><li>The <strong>cycle-accurate model</strong> (pink, verification side) mimics the DUT's pipeline and predicts down to the cycle: "A at 2, <strong>B at 4</strong>, C at 6"</li><li>The <strong>compare per cycle</strong> row checks cycle by cycle. Cycle 2: both A, <strong>ok.</strong> Cycle 4: the model expects B, the DUT emits nothing, <strong>ERR.</strong> Cycle 5: the DUT emits B, the model expects nothing, <strong>ERR</strong> again. Cycle 6: both C, <strong>ok.</strong> Two mismatches</li><li>The <strong>boundary-accurate model</strong> knows no cycle numbers, only "A, B, C must come out in this order". That's why its three boxes sit in a queue at the left instead of in cycle columns</li><li>The <strong>compare in order</strong> row: each time the DUT emits something, compare it with the front of the model's queue. A = A, B = B, C = C, <strong>all ok</strong></li></ol><p>Which is right? It depends on <strong>what the spec promised.</strong> If the spec says "B exactly 2 cycles after the request", cycle 5's B is a real bug and only the cycle-accurate model catches it. If the spec promises only order, the ERRs at cycles 4 and 5 are <strong>false failures</strong>, and the cycle-accurate model has to be updated every time the DUT's microarchitecture changes. So the usual practice is to check data and order at the boundary level and to put timing promises in separate assertions (§09). That's common practice, not something the slide says.</p></div>
+  </div>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">assertion</h2><h2 lang="en">Assertions</h2></div>
+  <p lang="ko">22쪽: <strong>property</strong> 는 동작을 기술한 문장, <strong>assertion</strong> 은 그것이 참이어야 한다는 지시다. 분류는 셋. 23쪽 <strong>combinatorial("zero-time") 대 temporal</strong>(시간이 들어가나), 24쪽 <strong>safety 대 liveness</strong>(유한한 반례가 있나), 25쪽 <strong>high-level 대 low-level</strong>(아키텍트와 검증 엔지니어가 모델과 testbench 에, 설계자가 RTL 에).</p>
+  <p lang="en">Slide 22: a <strong>property</strong> is a statement describing behaviour; an <strong>assertion</strong> is the directive that it must be true. Three splits: slide 23's <strong>combinatorial ("zero-time") versus temporal</strong> (does time enter), slide 24's <strong>safety versus liveness</strong> (is there a finite counterexample), slide 25's <strong>high-level versus low-level</strong> (architects and verification engineers in models and testbenches, designers in RTL).</p>
+  <figure>
+    <svg viewBox="0 0 700 226" role="img" aria-label="세 줄의 시간축. safety 는 사이클 6 의 overflow 에서 실패, 5 사이클 안에 응답해야 하는 bounded 조건은 사이클 7 에서 실패, liveness 는 시뮬레이션 끝까지 기다리는 중으로 남는다">
+<text class="svglab" x="150" y="18" text-anchor="end" style="font-size:10px;fill:var(--ink3)">cycle</text>
+<text class="svglab" x="170" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">0</text>
+<text class="svglab" x="208" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">1</text>
+<text class="svglab" x="246" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">2</text>
+<text class="svglab" x="284" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">3</text>
+<text class="svglab" x="322" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">4</text>
+<text class="svglab" x="360" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">5</text>
+<text class="svglab" x="398" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">6</text>
+<text class="svglab" x="436" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">7</text>
+<text class="svglab" x="474" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">8</text>
+<text class="svglab" x="512" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">9</text>
+<text class="svglab" x="550" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">10</text>
+<text class="svglab" x="588" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">11</text>
+<text class="svglab" x="626" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">12</text>
+<line x1="626" y1="26" x2="626" y2="200" stroke="var(--ink2)" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text class="svglab" x="630" y="214" text-anchor="end" style="font-size:9.5px;fill:var(--ink2)">end of sim</text>
+<text class="svglab" x="20" y="44" style="font-size:10.5px;fill:var(--ink);font-weight:700">safety: the FIFO never overflows</text>
+<line x1="170" y1="58" x2="620" y2="58" stroke="var(--ink3)" stroke-width="1.2"/>
+<path d="M392 52 L404 64 M404 52 L392 64" stroke="var(--amber)" stroke-width="2.4"/>
+<text class="svglab" x="412" y="50" style="font-size:10px;fill:var(--amber);font-weight:700">FAIL at 6: overflow</text>
+<text class="svglab" x="20" y="102" style="font-size:10.5px;fill:var(--ink);font-weight:700">safety (bounded): req answered within 5 cycles</text>
+<rect x="284" y="110" width="152" height="16" fill="rgba(var(--green-rgb),.1)" stroke="none"/>
+<line x1="170" y1="118" x2="620" y2="118" stroke="var(--ink3)" stroke-width="1.2"/>
+<line x1="246" y1="108" x2="246" y2="128" stroke="var(--blue)" stroke-width="2.2"/>
+<text class="svglab" x="246" y="142" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)">req</text>
+<text class="svglab" x="360" y="142" text-anchor="middle" style="font-size:9.5px;fill:var(--green)">allowed window 3-7</text>
+<path d="M430 112 L442 124 M442 112 L430 124" stroke="var(--amber)" stroke-width="2.4"/>
+<text class="svglab" x="450" y="110" style="font-size:10px;fill:var(--amber);font-weight:700">FAIL at 7: no answer</text>
+<text class="svglab" x="20" y="164" style="font-size:10.5px;fill:var(--ink);font-weight:700">liveness: every req is eventually acked</text>
+<line x1="170" y1="178" x2="620" y2="178" stroke="var(--ink3)" stroke-width="1.2"/>
+<line x1="246" y1="168" x2="246" y2="188" stroke="var(--blue)" stroke-width="2.2"/>
+<text class="svglab" x="246" y="202" text-anchor="middle" style="font-size:9.5px;fill:var(--blue)">req</text>
+<line x1="252" y1="172" x2="614" y2="172" stroke="var(--pink)" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text class="svglab" x="430" y="200" text-anchor="middle" style="font-size:10px;fill:var(--pink);font-weight:700">no ack yet: still pending</text>
+    </svg>
+    <figcaption lang="ko">세 property 를 같은 시간축 위에 놓았다. 위 둘은 safety, 아래 하나는 liveness 다. 사건의 사이클은 이 노트가 정했다.</figcaption>
+    <figcaption lang="en">Three properties on one time axis: the top two are safety, the bottom one liveness. The event cycles are this note's choice.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>위의 숫자 0~12 가 사이클이고, 오른쪽 끝 세로 점선이 <strong>시뮬레이션이 끝나는 곳(end of sim, 사이클 12)</strong>이다. 세 줄이 세 property 다.</p><ol><li><strong>safety: the FIFO never overflows.</strong> 사이클 6 에서 가득 찬 FIFO 에 쓰기가 들어왔다(amber X). 그 한 사이클이 반례다. 시뮬레이션이 6 사이클이든 100 만 사이클이든, <strong>사이클 6 까지만 보면</strong> 틀렸다고 확정된다</li><li><strong>safety (bounded): req answered within 5 cycles.</strong> 24쪽이 이것을 <strong>safety 쪽</strong>에 넣었다는 것이 요점이다. req 가 사이클 2 에 왔고(파란 막대), 허락된 창은 1~5 사이클 뒤인 3~7 이다(초록 띠, 2 + 1 = 3, 2 + 5 = 7). 7 까지 응답이 없으니 <strong>사이클 7 에서 실패가 확정</strong>된다. 마감이 있으면 유한한 시간 안에 틀렸다고 말할 수 있으므로 safety 다</li><li><strong>liveness: every req is eventually acked.</strong> req 는 똑같이 사이클 2 에 왔다. 마감이 없으니 분홍 점선처럼 계속 기다린다. 사이클 12 에서 시뮬레이션이 끝나도 "아직 안 왔다" 일 뿐 "영원히 안 온다" 는 증명이 아니다. 24쪽 말대로 <strong>실무에서는 end-of-sim 을 무한으로 쳐서</strong> 이 상태를 문제로 보고한다</li></ol><p>둘째 줄과 셋째 줄은 같은 상황이다. 차이는 property 에 <strong>"5"</strong> 라는 숫자가 있느냐 하나다. 숫자를 넣으면 liveness 가 safety 로 바뀌고, 시뮬레이션에서 확실하게 잡힌다. 대신 "5" 가 맞는 숫자인지는 스펙이 정해줘야 한다.</p></div>
+    <div lang="en"><p>The numbers 0 to 12 on top are cycles; the dashed vertical line at the right is <strong>where the simulation ends (end of sim, cycle 12).</strong> Each row is one property.</p><ol><li><strong>Safety: the FIFO never overflows.</strong> At cycle 6 a write arrives at a full FIFO (amber X). That one cycle is the counterexample: whether the run is 6 cycles or a million, <strong>looking up to cycle 6</strong> settles that it's false</li><li><strong>Safety (bounded): req answered within 5 cycles.</strong> The point is that slide 24 files this <strong>under safety.</strong> req arrives at cycle 2 (blue bar); the allowed window is 1 to 5 cycles later, cycles 3 to 7 (green band; 2 + 1 = 3, 2 + 5 = 7). No answer by 7, so <strong>failure is settled at cycle 7.</strong> With a deadline, falsity shows up in finite time, so it's safety</li><li><strong>Liveness: every req is eventually acked.</strong> Same req at cycle 2, but no deadline, so it keeps waiting (pink dashes). When the run ends at cycle 12, that's "not yet", not proof of "never". As slide 24 says, <strong>in practice end-of-sim is treated as infinity</strong> and this state is reported as a problem</li></ol><p>Rows two and three are the same situation. The only difference is whether the property contains the number <strong>"5".</strong> Adding a number turns liveness into safety and makes it reliably catchable in simulation; the spec has to tell you whether 5 is the right number.</p></div>
+  </div>
+  <p lang="ko">26~31쪽의 arbiter 예제. <code>a_mutex</code>(두 grant 가 동시에 1 이 아니다)는 safety, <code>a_0_not_starved</code>(<code>$rose(req[0]) |-&gt; ##[0:$] gnt[0]</code>)는 liveness, 31쪽의 공정성("두 arbitration cycle 안에")은 마감을 넣은 safety 다. <strong>슬라이드의 <code>disable iff (reset_n)</code> 은 극성이 반대다.</strong> active-low reset 이면 <code>!reset_n</code> 이어야 하고, 그대로면 정상 동작 내내 검사가 꺼져서 실패가 하나도 안 나온다. 그리고 IEEE 1800 의 기본(weak)대로라면 <code>##[0:$]</code> 은 시뮬레이션 끝에 기다리던 시도를 실패로 보고하지 않는다.</p>
+  <p lang="en">The arbiter example, slides 26 to 31. <code>a_mutex</code> (both grants never 1 together) is safety; <code>a_0_not_starved</code> (<code>$rose(req[0]) |-&gt; ##[0:$] gnt[0]</code>) is liveness; slide 31's fairness ("within two arbitration cycles") is safety with a deadline. <strong>The slide's <code>disable iff (reset_n)</code> has the wrong polarity:</strong> for an active-low reset it should be <code>!reset_n</code>; as written, checking is off for all of normal operation and nothing ever fails. Also, under IEEE 1800's default (weak), <code>##[0:$]</code> doesn't report an attempt still waiting at the end of simulation as a failure.</p>
+  <p lang="ko">32쪽: <strong>All my assertions pass, now what?</strong> assertion 은 fire &amp; pass, fire &amp; fail, never fire(<strong>vacuous pass</strong>) 셋 중 하나다. 처방은 <strong>assertion coverage</strong>, 왼쪽에 cover 를 거는 것이다.</p>
+  <p lang="en">Slide 32: <strong>all my assertions pass, now what?</strong> An assertion either fires and passes, fires and fails, or never fires (<strong>vacuous pass</strong>). The prescription is <strong>assertion coverage</strong>: put a cover on the left side.</p>
+  <figure>
+    <svg viewBox="0 0 680 226" role="img" aria-label="tick 2 에 sel1 이 1 이라 tick 3 의 ack 로 통과, tick 5 에 sel2 가 1 인데 tick 6 의 ack 가 0 이라 실패, 나머지 tick 은 vacuous 통과. cover 는 2 번">
+<text class="svglab" x="180" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">0</text>
+<text class="svglab" x="235" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">1</text>
+<text class="svglab" x="290" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">2</text>
+<text class="svglab" x="345" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">3</text>
+<text class="svglab" x="400" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">4</text>
+<text class="svglab" x="455" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">5</text>
+<text class="svglab" x="510" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">6</text>
+<text class="svglab" x="565" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">7</text>
+<text class="svglab" x="620" y="18" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">8</text>
+<text class="svglab" x="160" y="44" text-anchor="end" style="font-size:10px;fill:var(--blue)">sel1</text>
+<path d="M166 48 L262 48 L262 32 L317 32 L317 48 L650 48" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+<text class="svglab" x="160" y="76" text-anchor="end" style="font-size:10px;fill:var(--blue)">sel2</text>
+<path d="M166 80 L427 80 L427 64 L482 64 L482 80 L650 80" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+<text class="svglab" x="160" y="108" text-anchor="end" style="font-size:10px;fill:var(--blue)">ack</text>
+<path d="M166 112 L317 112 L317 96 L372 96 L372 112 L650 112" fill="none" stroke="var(--blue)" stroke-width="1.6"/>
+<line x1="166" y1="124" x2="650" y2="124" stroke="var(--rule)" stroke-width="1"/>
+<text class="svglab" x="160" y="144" text-anchor="end" style="font-size:10px;fill:var(--pink)">attempt</text>
+<text class="svglab" x="180" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">vac</text>
+<text class="svglab" x="235" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">vac</text>
+<text class="svglab" x="290" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--pink);font-weight:700">FIRE</text>
+<text class="svglab" x="345" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">vac</text>
+<text class="svglab" x="400" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">vac</text>
+<text class="svglab" x="455" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--pink);font-weight:700">FIRE</text>
+<text class="svglab" x="510" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">vac</text>
+<text class="svglab" x="565" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">vac</text>
+<text class="svglab" x="620" y="144" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">vac</text>
+<text class="svglab" x="160" y="174" text-anchor="end" style="font-size:10px;fill:var(--pink)">result</text>
+<text class="svglab" x="345" y="174" text-anchor="middle" style="font-size:10px;fill:var(--green);font-weight:700">pass</text>
+<text class="svglab" x="510" y="174" text-anchor="middle" style="font-size:10px;fill:var(--amber);font-weight:700">FAIL</text>
+<text class="svglab" x="160" y="204" text-anchor="end" style="font-size:10px;fill:var(--pink)">cover hits</text>
+<text class="svglab" x="290" y="204" text-anchor="middle" style="font-size:10px;fill:var(--pink);font-weight:700">1</text>
+<text class="svglab" x="455" y="204" text-anchor="middle" style="font-size:10px;fill:var(--pink);font-weight:700">2</text>
+<text class="svglab" x="650" y="204" text-anchor="end" style="font-size:10px;fill:var(--pink);font-weight:700">total 2</text>
+    </svg>
+    <figcaption lang="ko">32쪽의 두 줄을 이 노트가 만든 파형 위에서 돌린 결과. 맨 위 숫자는 clk 상승 엣지(tick)다.</figcaption>
+    <figcaption lang="en">Slide 32's two lines run over a waveform made for this note. The numbers on top are clk rising edges (ticks).</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>위 세 줄은 DUT 신호(파랑), 아래 세 줄은 assertion 과 cover 가 tick 마다 내리는 판정(분홍)이다. 표본 값부터 표로.</p><table><thead><tr><th>tick</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr></thead><tbody><tr><td>sel1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>sel2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr><tr><td>sel1 || sel2</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr><tr><td>ack</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody></table><ol><li><strong>attempt 줄.</strong> concurrent assertion 은 <strong>매 tick 시도를 하나씩</strong> 연다. 그 tick 에 왼쪽 <code>sel1 || sel2</code> 가 0 이면 오른쪽은 볼 것도 없이 그 시도는 성립으로 끝난다. 이것이 <strong>vac(vacuous pass)</strong> 다. 왼쪽이 1 인 tick 은 2 와 5 뿐이라 거기서만 <strong>FIRE</strong> 한다. 나머지 일곱 tick 은 전부 vac 다</li><li><strong>result 줄.</strong> <code>|=&gt;</code> 이므로 tick 2 에서 연 시도는 <strong>tick 3</strong> 의 ack 를 본다. 1 이다. <strong>tick 3 에서 pass</strong>(초록). tick 5 에서 연 시도는 <strong>tick 6</strong> 의 ack 를 본다. 0 이다. <strong>tick 6 에서 FAIL</strong>(amber). 32쪽의 fire &amp; pass, fire &amp; fail 이 각각 이것이다</li><li><strong>cover hits 줄.</strong> <code>cover property (sel1 || sel2)</code> 는 그 식이 1 인 tick 을 센다. tick 2 가 1 번째, tick 5 가 2 번째, 합계 <strong>2</strong>. 이 숫자가 0 이 아니어야 assert 줄의 통과가 의미를 가진다</li></ol><p>만약 sel1 과 sel2 가 시뮬레이션 내내 0 이었다면? attempt 줄이 아홉 칸 전부 vac, result 줄은 비고, 실패가 없으니 보고서에는 "pass" 로만 남는다. 그때 cover hits 가 <strong>0</strong> 이라는 것만이 "이 assertion 은 아무것도 검사하지 않았다" 를 알려준다. 이것이 슬라이드의 "Bring in assertion coverage!" 다.</p></div>
+    <div lang="en"><p>The top three rows are DUT signals (blue); the bottom three are the verdicts the assertion and cover give at each tick (pink). First the sampled values:</p><table><thead><tr><th>tick</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr></thead><tbody><tr><td>sel1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>sel2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr><tr><td>sel1 || sel2</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr><tr><td>ack</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody></table><ol><li><strong>The attempt row.</strong> A concurrent assertion opens <strong>one attempt every tick.</strong> If the left side <code>sel1 || sel2</code> is 0 on that tick, the attempt succeeds without looking at the right side: a <strong>vac (vacuous pass).</strong> The left side is 1 only at ticks 2 and 5, so it <strong>FIREs</strong> only there; the other seven ticks are all vac</li><li><strong>The result row.</strong> With <code>|=&gt;</code>, the attempt opened at tick 2 checks ack at <strong>tick 3</strong>: 1, so <strong>pass at tick 3</strong> (green). The one opened at tick 5 checks ack at <strong>tick 6</strong>: 0, so <strong>FAIL at tick 6</strong> (amber). These are slide 32's fire &amp; pass and fire &amp; fail</li><li><strong>The cover hits row.</strong> <code>cover property (sel1 || sel2)</code> counts the ticks where the expression is 1: tick 2 is hit 1, tick 5 hit 2, total <strong>2.</strong> This number must be nonzero for the assert line's passes to mean anything</li></ol><p>What if sel1 and sel2 stayed 0 the whole run? All nine attempt cells would be vac, the result row empty, and with no failures the report would just say "pass". Only the cover hits being <strong>0</strong> would tell you "this assertion checked nothing". That is the slide's "Bring in assertion coverage!"</p></div>
+  </div>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">formal 과 coverage</h2><h2 lang="en">Formal and coverage</h2></div>
+  <p lang="ko">34쪽: formal 은 equivalence checking, model(property) checking, theorem proving 셋이고, 값을 넣어 돌리는 대신 <strong>가능한 행동의 공간 전체</strong>를 수학으로 따진다. 35쪽의 표가 핵심이다. simulation 에서 assert 는 "지금 돌린 test 가 어겼나", FPV 에서는 "<strong>어떤 입력으로든 어길 수 있나</strong>". assume 은 simulation 에서는 assertion 처럼 검사되고, FPV 에서는 <strong>가능한 입력을 제한</strong>한다. cover 는 simulation 에서는 몇 번 겪었나, FPV 에서는 겪을 수 있나. 36쪽이 비유를 준다. simulation 은 <strong>여정</strong>을, FPV 는 <strong>목적지</strong>를 기술한다.</p>
+  <p lang="en">Slide 34: formal is equivalence checking, model (property) checking and theorem proving; instead of running values, it reasons mathematically over <strong>the whole space of possible behaviours.</strong> Slide 35's table is the core. In simulation, an assert reports "did the current tests violate it"; in FPV, "<strong>can any input violate it</strong>". An assume is checked like an assertion in simulation and <strong>limits the possible inputs</strong> in FPV. A cover counts how often in simulation, and asks whether it's possible in FPV. Slide 36 gives the image: simulation describes <strong>the journey</strong>, FPV <strong>the destination.</strong></p>
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="왼쪽 simulation 은 reset 에서 출발한 긴 경로 셋이 공간을 돌아다니지만 버그에 닿지 못한다. 오른쪽 FPV 는 assume 으로 좁힌 영역 전체를 분석하고 reset 에서 버그까지 짧은 반례를 낸다">
+<text class="svgtxt" x="175" y="22" text-anchor="middle" style="font-size:13px;fill:var(--pink);font-weight:700">Simulation</text>
+<text class="svgtxt" x="525" y="22" text-anchor="middle" style="font-size:13px;fill:var(--violet);font-weight:700">FPV</text>
+<rect x="30" y="34" width="290" height="166" rx="8" fill="none" stroke="var(--ink3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+<rect x="380" y="34" width="290" height="166" rx="8" fill="none" stroke="var(--ink3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text class="svglab" x="314" y="194" text-anchor="end" style="font-size:9px;fill:var(--ink3)">all states</text>
+<text class="svglab" x="664" y="194" text-anchor="end" style="font-size:9px;fill:var(--ink3)">all states</text>
+<polyline points="50,118 90,88 130,108 170,70 220,90 262,60" fill="none" stroke="var(--pink)" stroke-width="1.6"/>
+<polyline points="50,118 100,150 150,132 200,168 250,150 300,172" fill="none" stroke="var(--pink)" stroke-width="1.6"/>
+<polyline points="50,118 110,120 160,100 210,124 272,114" fill="none" stroke="var(--pink)" stroke-width="1.6"/>
+<circle cx="50" cy="118" r="5" fill="var(--ink2)"/>
+<text class="svglab" x="34" y="142" style="font-size:9.5px;fill:var(--ink2)">reset</text>
+<path d="M120 178 L127 185 L120 192 L113 185 Z" fill="var(--amber)"/>
+<text class="svglab" x="134" y="189" style="font-size:9.5px;fill:var(--amber);font-weight:700">bug (missed)</text>
+<rect x="398" y="58" width="254" height="124" rx="16" fill="rgba(var(--violet-rgb),.1)" stroke="var(--violet)" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text class="svglab" x="388" y="48" style="font-size:9px;fill:var(--ink3)">ruled out by assume</text>
+<text class="svglab" x="646" y="74" text-anchor="end" style="font-size:9px;fill:var(--violet)">legal: all analyzed</text>
+<circle cx="420" cy="120" r="5" fill="var(--ink2)"/>
+<text class="svglab" x="412" y="140" style="font-size:9.5px;fill:var(--ink2)">reset</text>
+<polyline points="425,118 480,106 540,100 594,94" fill="none" stroke="var(--violet)" stroke-width="2"/>
+<path d="M600 86 L607 93 L600 100 L593 93 Z" fill="var(--amber)"/>
+<text class="svglab" x="598" y="116" text-anchor="middle" style="font-size:9.5px;fill:var(--amber);font-weight:700">bug</text>
+<text class="svglab" x="510" y="166" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">counterexample: tens of cycles</text>
+<text class="svglab" x="175" y="222" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">journey: generate input values</text>
+<text class="svglab" x="175" y="240" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">long traces, only where they went</text>
+<text class="svglab" x="525" y="222" text-anchor="middle" style="font-size:10px;fill:var(--ink2)">destination: state the property</text>
+<text class="svglab" x="525" y="240" text-anchor="middle" style="font-size:9.5px;fill:var(--ink3)">every legal state, short trace</text>
+    </svg>
+    <figcaption lang="ko">36쪽 표의 "여정 대 목적지" 를 그림으로. 슬라이드에 없는 개념도다. simulation 경로를 분홍(stimulus), FPV 의 분석을 보라(도구)로 칠했다.</figcaption>
+    <figcaption lang="en">Slide 36's "journey versus destination" as a picture: a concept sketch not in the slides. Simulation paths are pink (stimulus), FPV's analysis violet (a tool).</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>두 판의 점선 사각형(all states)은 설계가 가질 수 있는 모든 상태다. 검은 점 <strong>reset</strong> 이 출발점이고 amber 마름모가 <strong>버그가 있는 상태</strong>다.</p><ol><li><strong>Simulation.</strong> 분홍 선 셋이 test 셋이다. 각각 reset 에서 출발해 입력을 하나씩 넣으며 상태를 옮겨 다닌다. 36쪽의 "describe the journey" 다. 선이 긴 것은 "thousands of cycles" 다. 세 선 모두 아래쪽의 <strong>bug (missed)</strong> 근처를 지나가지 않는다. 지나간 곳만 검사되고, 안 지나간 곳은 아무것도 모른다</li><li><strong>FPV.</strong> 보라 점선 둥근 사각형이 <strong>assume 으로 좁힌 합법 영역</strong>이고, 그 안을 도구가 <strong>전부</strong> 분석한다(legal: all analyzed). 바깥 띠(ruled out by assume)는 불법이라 고려하지 않는다. 36쪽의 passive constraint 다. 버그 상태가 합법 영역 안에 있으므로 도구는 reset 에서 거기까지의 <strong>가장 짧은 길</strong>(보라 실선)을 반례로 낸다. 36쪽의 "tens of cycles: minimal path" 다</li></ol><p>아래 두 줄이 36쪽 표의 둘째 줄(journey/destination)과 마지막 줄(trace 길이)을 옮긴 것이다. 반대로 버그가 assume 바깥 띠에 있었다면 FPV 는 그것을 <strong>못 본다</strong>. 그 입력이 정말 불법인지는 사람이 확인해야 한다.</p></div>
+    <div lang="en"><p>In both panels the dashed rectangle (all states) is every state the design can be in. The black dot <strong>reset</strong> is the start, the amber diamond <strong>a state with a bug.</strong></p><ol><li><strong>Simulation.</strong> The three pink lines are three tests, each starting at reset and moving from state to state as inputs go in: slide 36's "describe the journey". The lines are long: "thousands of cycles". None of them passes near the <strong>bug (missed)</strong> at the bottom. Only what they passed through gets checked; the rest stays unknown</li><li><strong>FPV.</strong> The dashed violet rounded rectangle is <strong>the legal region narrowed by assumes</strong>, and the tool analyses <strong>all</strong> of it (legal: all analyzed). The outer band (ruled out by assume) is illegal and not considered: slide 36's passive constraints. The bug state lies inside the legal region, so the tool returns the <strong>shortest path</strong> from reset to it (solid violet line) as the counterexample: slide 36's "tens of cycles: minimal path"</li></ol><p>The two lines below transcribe the table's second row (journey/destination) and last row (trace length). Conversely, had the bug sat in the band outside the assumes, FPV would <strong>never see it</strong>; whether those inputs are truly illegal is for a person to confirm.</p></div>
+  </div>
+  <p lang="ko">38쪽 code coverage 는 line, branch, toggle, FSM 넷이고, 39쪽의 한계는 <strong>없는 코드와 조합을 모른다</strong>는 것이다. 40쪽: functional coverage 는 <strong>random 일 때 특히 중요</strong>하다(directed 만 쓰면 test 목록이 곧 coverage). 41쪽: cross 로 조합을 세고, <strong>ignore_bins</strong> 는 분모에서 빼고 <strong>illegal_bins</strong> 는 나오면 오류. 42쪽: sample 은 요청이 아니라 <strong>받아들여진 순간</strong>에, reset 중에는 하지 않는다. 43쪽: coverage 는 merge 하되 <strong>실패한 test 의 coverage 는 세지 않는다.</strong> 44쪽 exclusion list 는 닿을 수 없는 항목을 근거와 리뷰를 붙여 분모에서 뺀다.</p>
+  <p lang="en">Slide 38's code coverage has four kinds: line, branch, toggle, FSM; slide 39's limits are that it can't see <strong>missing code or combinations.</strong> Slide 40: functional coverage matters <strong>especially with random</strong> (with directed tests alone, the test list is the coverage). Slide 41: crosses count combinations; <strong>ignore_bins</strong> leave the denominator, <strong>illegal_bins</strong> error if seen. Slide 42: sample at <strong>the moment of acceptance</strong>, not request, and not during reset. Slide 43: merge coverage, but <strong>don't count failing tests.</strong> Slide 44's exclusion lists remove unreachable items from the denominator, with a justification and a review.</p>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+  <table>
+    <thead><tr><th><span lang="ko">문제 모양</span><span lang="en">Shape of the question</span></th><th><span lang="ko">구별 기준 한 줄</span><span lang="en">The one line that decides it</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">plan 문장 분류</span><span lang="en">classifying plan lines</span></td><td><span lang="ko">동사로. <strong>넣는다 = stimulus, 맞아야 한다 = checking, 봤다 = coverage</strong></span><span lang="en">by the verb: <strong>apply = stimulus, must be = checking, saw = coverage</strong></span></td></tr>
+      <tr><td>agent / BFM / transactor / VIP</td><td><span lang="ko"><strong>같은 부품의 이름들.</strong> 재사용하거나 사오면 VIP</span><span lang="en"><strong>names for one component</strong>; reused or bought, it's VIP</span></td></tr>
+      <tr><td><span lang="ko">unit-level 의 agent</span><span lang="en">agents at unit level</span></td><td><span lang="ko">이웃 RTL 은 <strong>준비 안 됐거나 버그</strong>, agent 는 <strong>controllability, observability</strong></span><span lang="en">neighbour RTL is <strong>not ready or buggy</strong>; agents give <strong>controllability, observability</strong></span></td></tr>
+      <tr><td><span lang="ko">corner case</span><span lang="en">corner cases</span></td><td><span lang="ko">hard-to-hit, <strong>여전히 directed</strong></span><span lang="en">hard to hit, <strong>still directed</strong></span></td></tr>
+      <tr><td><span lang="ko">inline vs explicit</span><span lang="en">inline vs explicit</span></td><td><span lang="ko">이번 호출만 vs class 에 늘. <strong>둘은 더해진다</strong></span><span lang="en">this call only vs always, in the class. <strong>They add up</strong></span></td></tr>
+      <tr><td><span lang="ko">safety vs liveness</span><span lang="en">safety vs liveness</span></td><td><span lang="ko"><strong>유한한 반례가 있나.</strong> "within 5 cycles" 는 safety</span><span lang="en"><strong>is there a finite counterexample</strong>; "within 5 cycles" is safety</span></td></tr>
+      <tr><td><code>disable iff (reset_n)</code></td><td><span lang="ko">active-low 면 <strong><code>!reset_n</code></strong>. 아니면 정상 동작 내내 꺼진다</span><span lang="en">active-low means <strong><code>!reset_n</code></strong>; otherwise it's off for all of normal operation</span></td></tr>
+      <tr><td>vacuous pass</td><td><span lang="ko">왼쪽이 거짓이라 <strong>검사 없이 통과</strong>. cover 로 잡는다</span><span lang="en">left side false, <strong>passed without checking</strong>; catch it with a cover</span></td></tr>
+      <tr><td><span lang="ko">35쪽 표</span><span lang="en">slide 35's table</span></td><td><span lang="ko">sim 은 <strong>지금 돌린 것</strong>, FPV 는 <strong>가능한 모든 것</strong>. assume 은 sim 에서 검사, FPV 에서 입력 제한</span><span lang="en">sim reports on <strong>what ran</strong>, FPV on <strong>everything possible</strong>; assume is a check in sim, an input limit in FPV</span></td></tr>
+      <tr><td><span lang="ko">36쪽 표</span><span lang="en">slide 36's table</span></td><td><span lang="ko">journey vs destination, active vs passive constraint, 수천 vs 수십 사이클</span><span lang="en">journey vs destination, active vs passive constraints, thousands vs tens of cycles</span></td></tr>
+      <tr><td>ignore_bins vs illegal_bins</td><td><span lang="ko"><strong>세지 않는다 vs 나오면 오류</strong></span><span lang="en"><strong>not counted vs error if seen</strong></span></td></tr>
+      <tr><td><span lang="ko">coverage merge</span><span lang="en">coverage merge</span></td><td><span lang="ko"><strong>통과한 test 만</strong> 합친다</span><span lang="en">merge <strong>passing tests only</strong></span></td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+  <p lang="ko"><strong>Lab 4 와의 연결.</strong> Lab 4(FIFO Verification)의 Part 1 이 verification plan 이고, 2절의 testbench 그림이 블록도의 모양, 3절이 시나리오와 corner case, 4~5절이 check, 6절이 방법론과 sign-off metric 이다. DPI checker 는 4절의 C golden model 이다. 자세한 판의 01절 callout 에 각 항목을 읽을 곳을 모아 두었고, 과제 쪽 정리는 <a href="LAB4-fifo-verification.html">Lab 4 페이지</a>에 있다.</p>
+  <p lang="en"><strong>How it connects to Lab 4.</strong> Lab 4 (FIFO Verification) Part 1 is a verification plan: §2's testbench picture is the shape of the block diagram, §3 the scenarios and corner cases, §4 to §5 the checks, §6 the methodology and sign-off metrics. The DPI checker is §4's C golden model. The callout in the full note's §01 lists where to read up on each item; the lab itself is written up on the <a href="LAB4-fifo-verification.html">Lab 4 page</a>.</p>
+  </div>
+  <p lang="ko"><strong>다음 강의는 <a href="L14-efficient-verification.html">Lecture 14, Efficient verification methods</a></strong>(10/21 수, Aman Arora). 그 뒤 Lecture 15 가 CPU verification case study, Lecture 16~18 이 UVM 이다.</p>
+  <p lang="en"><strong>Next is <a href="L14-efficient-verification.html">Lecture 14, Efficient verification methods</a></strong> (Wed 10/21, Aman Arora). After that, Lecture 15 is a CPU verification case study and Lectures 16 to 18 are UVM.</p>
+</section>
+
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 13 개인 학습 노트 (빠른 읽기 판)<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 13 personal study notes (quick read)<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
