@@ -25,6 +25,10 @@
 | `13 SoC Interconnect Design Eric` | **11 강** |
 | `14_Lab3_Release` | 강의 아님 (Lab 3) |
 | `15_System Verilog for Verification` | **12 강** (녹화 강의) |
+| `16_Verification Concepts` | **13 강** |
+| `17_Efficient Verification Tips` | **14 강** |
+| `18_Lab4_Release` | 강의 아님 (Lab 4) |
+| `19_CPU verification` | **15 강** (Material 에 `risc-v-verification_techniques.pdf` 가 딸려 있다) |
 
 강의 사이트의 Schedule 번호는 Lab 을 함께 세므로 여기 번호와 다르다.
 아래 표의 `site` 열이 그 번호다. **강의 사이트와 대조할 때만 쓴다.**
@@ -46,12 +50,12 @@
 | 10 | 14 | 10/5 | SoC architecture and on-chip interfaces | Aman Arora |
 | 11 | 15 | 10/7 | Case study: SoC interconnect design | Eric Taylor |
 | 12 | 17 | 녹화 | System Verilog for Verification | Aman Arora | (Dropbox 영상, 00:15~1:43. 10/19 수업에 참여 quiz) |
-| 13 | 10 | 10/19 | Assertion Based Verification | Aman Arora |
-| 14 | 18 | 10/21 | Case study: CPU verification | Aman Arora |
-| 15 | 20 | 10/28 | UVM 1 | Joel Feldman |
-| 16 | 21 | 11/2 | UVM 2 | Joel Feldman |
-| 17 | 22 | 11/4 | UVM 3 | Joel Feldman |
-| 18 | 24 | 11/11 | Efficient verification methods + Catch up | Aman Arora |
+| 13 | 10 | 10/19 | Verification Concepts | Aman Arora | (예전 이 자리의 Assertion Based Verification 을 대체) |
+| 14 | 18 | 10/21 | Efficient verification methods + Catch up | Aman Arora | (11/11 에서 당겨짐) |
+| 15 | 20 | 10/28 | Case study: CPU verification | Aman Arora |
+| 16 | 21 | 11/2 | UVM 1 | Joel Feldman |
+| 17 | 22 | 11/4 | UVM 2 | Joel Feldman |
+| 18 | 24 | 11/11 | UVM 3 | Joel Feldman |
 | 19 | 25 | 11/16 | Case study: High-speed I/O design and verification | Aman Arora |
 | 20 | 26 | 11/18 | Case study: SoC verification | Brendan Donahe |
 | 21 | 28 | 11/25 | Formal verification overview | Amin Rezai |
@@ -68,7 +72,7 @@ Lab overview 강의는 별도 노트를 만들지 않고 `LAB{N}` 공략 페이�
 | 1 | 7 | 9/14 | FIFO |
 | 2 | 12 | 9/28 | Pipelined MIPS |
 | 3 | 16 | 10/14 | Systolic Matmul |
-| 4 | 19 | 10/26 | FIFO Checker, DPI |
+| 4 | 19 | 10/26 | FIFO Verification (plan, DPI, scoreboard, SVA) |
 | 5 | 23 | 11/9 | MIPS Random Stimulus, Coverage |
 | 6 | 27 | 11/23 | Systolic Matmul, APB agent, Assertions |
 
@@ -77,6 +81,18 @@ Lab overview 강의는 별도 노트를 만들지 않고 `LAB{N}` 공략 페이�
 | site | 날짜 | |
 |---|---|---|
 | 31 | 12/7 (월) | Final exam |
+
+## 2026-11-01 에 고친 것
+
+강의 사이트 Schedule 을 다시 긁었다. **13강부터 순서가 크게 바뀌었다.**
+
+- **10/19 는 Verification Concepts 다.** 원래 이 자리의 Assertion Based Verification 은 표에서 사라졌다.
+  SVA 는 Verification Concepts 덱 33쪽에 들어 있다
+- **Efficient verification methods 가 11/11 에서 10/21 로 당겨졌다** (덱 `17_Efficient Verification Tips`)
+- **CPU verification 은 10/21 에서 10/28 로 밀렸다.** UVM 1~3 은 11/2, 11/4, 11/11 이고 UVM 3 이 Lab 5 overview (11/9) 뒤로 갔다
+- 강의 수는 그대로 23 이다. 13~18 강의 번호가 전부 바뀌었다
+- **Lab 4 설명서 페이지가 Schedule 에서 다시 링크됐다.** 2 인 1 조다. 마감은 규칙상 Lab 5 overview (11/9) 전날 밤
+- Lab 3 설명서 페이지도 Schedule 에서 링크가 살아났다
 
 ## 2026-10-14 에 고친 것
 
