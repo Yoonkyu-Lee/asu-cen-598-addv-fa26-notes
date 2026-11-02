@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV &middot; Lecture 15 &mdash; Case study: CPU verification (quick)</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+/* 애니메이션 슬라이더. 덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간을 한 자리에서 밟아본다. */
+/* 마크업 규약과 동작은 anim.js 가 단일 출처다. 스크립트가 없으면 첫 프레임만 보이고 막대가 안 생긴다. */
+.anim [data-f]{display:none}
+.anim [data-f~="0"]{display:revert}
+.anim.js-anim [data-f]{display:none}
+.anim.js-anim [data-f].on{display:revert}
+.anim:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.animbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--rule)}
+.animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.animbar button:disabled{opacity:.35;cursor:default}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
+.animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
+.animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
+@media(prefers-reduced-motion:reduce){.animbar button{transition:none}}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Aman Arora</div>
+  <h1 class="title">Lecture 15<br>Case study: CPU verification</h1>
+  <p class="subtitle" lang="ko">CPU 를 검증할 때 stimulus 는 <strong>프로그램</strong>, 정답은 <strong>ISS</strong> 다. <strong>다섯 층</strong>으로 쌓아 올리고, RTL 과 ISS 는 명령어가 <strong>retire</strong> 할 때 맞춘다.</p>
+  <p class="subtitle" lang="en">When verifying a CPU, the stimulus is <strong>a program</strong> and the answers come from <strong>an ISS.</strong> Build up in <strong>five layers</strong>, and match the RTL against the ISS when each instruction <strong>retires.</strong></p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L15-cpu-verification.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L15-cpu-verification.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 15</div>
+    <div class="name">Case study: CPU verification</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">세 기둥, coverage, checking</span><span lang="en">Pillars, coverage, checking</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">다섯 층과 bottom-up</span><span lang="en">Five layers and bottom-up</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">Top-level testbench 와 test</span><span lang="en">Top-level testbench and tests</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">Stimulus 는 프로그램</span><span lang="en">The stimulus is a program</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">ISS 와 retire 비교</span><span lang="en">ISS and retire comparison</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+  <p lang="ko">검증의 일반론을 <strong>CPU 하나</strong>에 적용한 case study 다. 슬라이드 1쪽이 밝히듯 많은 쪽이 Hitesh Mishra 의 Arm 프로세서 검증 자료에서 왔고, 뒤쪽은 공개 RISC-V 프로젝트(CORE-V, Ibex, riscv-dv)의 예다. CPU 는 입력이 <strong>프로그램</strong>이고 pipeline 안에서 stall, forwarding, flush 가 섞여 돌기 때문에 매 cycle 의 정답을 적어둘 수 없다. 그래서 세 질문으로 갈린다.</p>
+  <p lang="en">A case study applying general verification ideas to <strong>one CPU.</strong> As slide 1 says, many slides come from Hitesh Mishra's processor verification material at Arm; the later ones are examples from open RISC-V projects (CORE-V, Ibex, riscv-dv). A CPU's input is <strong>a program</strong>, and inside the pipeline stalls, forwarding and flushes mix together, so you can't write down the right answer for every cycle. That splits into three questions.</p>
+  <table>
+    <thead><tr><th><span lang="ko">질문</span><span lang="en">Question</span></th><th><span lang="ko">답</span><span lang="en">Answer</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">어디서부터 쌓나</span><span lang="en">Where do you build up from?</span></td><td><span lang="ko"><strong>다섯 층.</strong> sub-unit, unit, multi-unit, top level, system. 가장 아래에서 버그를 다 짜내고 올라간다</span><span lang="en"><strong>Five layers</strong>: sub-unit, unit, multi-unit, top level, system. Exhaust the bugs at the lowest level before moving up</span></td></tr>
+      <tr><td><span lang="ko">무엇을 넣나</span><span lang="en">What do you feed it?</span></td><td><span lang="ko"><strong>프로그램.</strong> random instruction generator 가 constraint 와 명령어 사이 관계까지 randomize 해서 만든다</span><span lang="en"><strong>Programs</strong>, made by a random instruction generator that randomizes under constraints, relationships between instructions included</span></td></tr>
+      <tr><td><span lang="ko">무엇과 맞추나</span><span lang="en">What do you compare against?</span></td><td><span lang="ko"><strong>ISS.</strong> 매 cycle 이 아니라 명령어가 <strong>retire</strong> 할 때 효과를 비교한다</span><span lang="en"><strong>An ISS</strong>, comparing each instruction's effects when it <strong>retires</strong>, not every cycle</span></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">오늘의 약어: <strong>ISS</strong>(Instruction Set Simulator), <strong>BFM</strong>(Bus Functional Model), <strong>DUT</strong>(이 덱은 Device Under Test 로 푼다), <strong>BIU</strong>(Bus Interface Unit), <strong>IFU</strong>(Instruction Fetch Unit), <strong>DPU</strong>(덱은 Data Processing Unit 으로 푼다), <strong>CCI</strong>(Cache Coherent Interconnect), <strong>ACE</strong> &middot; <strong>CHI</strong>(AMBA 4, 5 의 coherency 규격).</p>
+  <p lang="en">Today's acronyms: <strong>ISS</strong> (Instruction Set Simulator), <strong>BFM</strong> (Bus Functional Model), <strong>DUT</strong> (this deck expands it as Device Under Test), <strong>BIU</strong> (Bus Interface Unit), <strong>IFU</strong> (Instruction Fetch Unit), <strong>DPU</strong> (the deck's expansion: Data Processing Unit), <strong>CCI</strong> (Cache Coherent Interconnect), <strong>ACE</strong> &middot; <strong>CHI</strong> (the coherency protocols of AMBA 4 and 5).</p>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">세 기둥, coverage, checking</h2><h2 lang="en">Three pillars, coverage, checking</h2></div>
+  <p lang="ko">슬라이드 3~8쪽. 방법론의 이름이 4쪽 제목이다. <strong>Coverage-Driven Constrained Random Verification + Directed Tests.</strong> constrained random 으로 넓게 찌르고, coverage 로 빈 곳을 보고, random 이 안 닿는 모서리는 directed test 로 메운다.</p>
+  <p lang="en">Slides 3 to 8. The method's name is slide 4's title: <strong>Coverage-Driven Constrained Random Verification + Directed Tests.</strong> Poke widely with constrained random, find empty spots through coverage, fill the corners random can't reach with directed tests.</p>
+  <ul>
+    <li lang="ko"><strong>5쪽의 coverage 표</strong>: 명령어 6 &times; destination register 10 = <strong>60칸</strong>. random 만으로 3칸(5%)에서 59칸(98.3%)까지 오르고 <strong>AND&rarr;r8 한 칸</strong>이 남는다. "steer constraints or directed test" 로 100%. 슬라이드의 21.1% 는 13칸(21.7%)의 오타로 보인다</li>
+    <li lang="en"><strong>Slide 5's coverage table</strong>: 6 instructions &times; 10 destination registers = <strong>60 bins.</strong> Random alone climbs from 3 bins (5%) to 59 (98.3%), leaving <strong>AND&rarr;r8.</strong> "Steer constraints or directed test" gets 100%. The slide's 21.1% looks like a typo for 13 bins (21.7%)</li>
+    <li lang="ko"><strong>6쪽: 100% 면 끝인가?</strong> 아니다. functional coverage 는 <strong>정의한 칸만큼만</strong> 좋다. soak 로 cycle 을 훨씬 더 돌리고, 새 버그는 새 칸이 된다</li>
+    <li lang="en"><strong>Slide 6: done at 100%?</strong> No. Functional coverage is <strong>only as good as the bins defined.</strong> Soak with many more cycles; each new bug becomes a new bin</li>
+    <li lang="ko"><strong>7쪽 grey box checking</strong>: DUT 의 출력만이 아니라 <strong>안쪽 상태를 probe</strong> 해서 하는 check. 입력으로 기대값을 계산하는 result modelling 이 같이 필요하고, model 이 정확해야 한다</li>
+    <li lang="en"><strong>Slide 7, grey box checking</strong>: a check that <strong>probes internal state</strong>, not just outputs. It needs result modelling (computing the expected values from the inputs), and the model must be accurate</li>
+  </ul>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">다섯 층과 bottom-up</h2><h2 lang="en">Five layers and bottom-up</h2></div>
+  <p lang="ko">슬라이드 10~22쪽. 11쪽은 같은 그림 위에서 DUT 를 다섯 번 바꾼다. BIU 하나가 다섯 testbench 를 다 거친다(12쪽).</p>
+  <p lang="en">Slides 10 to 22. Slide 11 changes the DUT five times over the same picture, and one BIU passes through all five testbenches (slide 12).</p>
+  <table>
+    <thead><tr><th><span lang="ko">층</span><span lang="en">Layer</span></th><th><span lang="ko">DUT (11쪽)</span><span lang="en">DUT (slide 11)</span></th><th><span lang="ko">방법</span><span lang="en">Method</span></th></tr></thead>
+    <tbody>
+      <tr><td>Unit</td><td>BIU</td><td><span lang="ko">BFM 이 이웃을 흉내 낸다. bring-up 이 가장 빠르다. 포화하면 위로. formal proof 도 이 층과 sub-unit 에만</span><span lang="en">BFMs mimic the neighbours; quickest bring-up. Move up when it saturates. Formal proofs appear here and at sub-unit only</span></td></tr>
+      <tr><td>Multi-unit (L1)</td><td>L1 Memory System</td><td><span lang="ko">코어 하나의 data side 메모리 시스템. 아래 unit 의 check 를 물려받는다</span><span lang="en">one core's data side memory system, inheriting the unit-level checks</span></td></tr>
+      <tr><td>Multi-unit (MP)</td><td>MP</td><td><span lang="ko">여러 코어 사이의 <strong>coherency</strong>. MP1 부터 AMBA 4 ACE 의 MP4+MP4+CCI, AMBA 5 CHI 의 MP4&times;4+CCN 까지</span><span lang="en"><strong>coherency</strong> between cores; from MP1 up to MP4+MP4+CCI (AMBA 4 ACE) and MP4&times;4+CCN (AMBA 5 CHI)</span></td></tr>
+      <tr><td>Top level</td><td>CPU0</td><td><span lang="ko">코어 전체. <strong>프로그램을 돌리며 바깥 환경을 조종한다</strong></span><span lang="en">the whole core: <strong>run programs while controlling the external environment</strong></span></td></tr>
+      <tr><td>System</td><td><span lang="ko">전체 system</span><span lang="en">the full system</span></td><td><span lang="ko">CCI-400, MMU-400, GIC-400, DMC-400, NIC-400 와 함께. OS 와 bare-metal stress</span><span lang="en">with CCI-400, MMU-400, GIC-400, DMC-400, NIC-400; OS and bare-metal stress</span></td></tr>
+    </tbody>
+  </table>
+  <div class="trap">
+  <span class="tag"><span lang="ko">함정 &middot; DUT 의 D</span><span lang="en">Trap &middot; the D in DUT</span></span>
+  <p lang="ko">11쪽은 <strong>Device</strong> Under Test, Lecture 2 와 약어 사전은 <strong>Design</strong> Under Test 다. 둘 다 쓰인다. 시험에서는 그 강의 슬라이드가 쓴 쪽으로 답한다.</p>
+  <p lang="en">Slide 11 says <strong>Device</strong> Under Test; Lecture 2 and the glossary say <strong>Design</strong> Under Test. Both are in use; on a quiz, answer with what that lecture's slides use.</p>
+  </div>
+  <p lang="ko">덱의 오류 둘. 19쪽 그림은 캡션과 달리 <strong>Cortex-A9</strong> 이다(그림 안에 Cortex-A9, PL310, PL390 이라 적혀 있다). cache line 하나의 명령어 수가 25쪽은 <strong>16</strong>(512/32), 29쪽은 <strong>8</strong> 이다.</p>
+  <p lang="en">Two errors in the deck. Slide 19's picture is a <strong>Cortex-A9</strong>, despite the caption (the picture itself says Cortex-A9, PL310, PL390). Instructions per cache line are <strong>16</strong> on slide 25 (512/32) but <strong>8</strong> on slide 29.</p>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">Top-level testbench 와 test 세 종류</h2><h2 lang="en">The top-level testbench and three kinds of test</h2></div>
+  <p lang="ko">18쪽의 부품 여섯: program loader, memory models, bus agents, coverage collectors, protocol checkers, arch state checkers. 33쪽 Arm 그림에서는 Test Programs 와 Memory Model, AXI BFM 둘, ACE Snoop Generator, Trickbox, ISS (Arch Model)가 그것이다. <strong>trickbox</strong> 는 test 프로그램이 testbench 에게 인터럽트, reset, 메모리 지연과 오류, snoop, pass/fail 을 요청하는 창구다(34쪽).</p>
+  <p lang="en">Slide 18's six components: program loader, memory models, bus agents, coverage collectors, protocol checkers, arch state checkers. In slide 33's Arm picture they're Test Programs and the Memory Model, two AXI BFMs, the ACE Snoop Generator, the Trickbox, and the ISS (Arch Model). <strong>A trickbox</strong> is how a test program asks the testbench for interrupts, resets, memory delays and errors, snoops, or pass/fail (slide 34).</p>
+  <table>
+    <thead><tr><th></th><th><span lang="ko">무엇을 기준으로 썼나</span><span lang="en">Written against</span></th><th><span lang="ko">판정</span><span lang="en">Checking</span></th></tr></thead>
+    <tbody>
+      <tr><td>Compliance suite <span lang="ko">(37쪽)</span><span lang="en">(slide 37)</span></td><td><span lang="ko">ISA 명세. CPU 검증의 아주 작은 부분</span><span lang="en">the ISA spec; a very small part of CPU verification</span></td><td><span lang="ko">결과를 <strong>signature</strong> 영역에 쓰고 reference 와 비교</span><span lang="en">results in a <strong>signature</strong> region, compared with a reference</span></td></tr>
+      <tr><td>Directed <span lang="ko">(38쪽)</span><span lang="en">(slide 38)</span></td><td><span lang="ko">이 microarchitecture, 특히 unit 경계를 넘는 기능. 그 CPU 전용</span><span lang="en">this microarchitecture, especially features crossing unit boundaries; CPU-specific</span></td><td rowspan="2"><span lang="ko">self-checking 이거나 바깥 checker(ISS 등)</span><span lang="en">self-checking, or an external checker (such as an ISS)</span></td></tr>
+      <tr><td>Random <span lang="ko">(39쪽)</span><span lang="en">(slide 39)</span></td><td><span lang="ko">generator 가 고른 조합. 'Random Instruction Sequence' test</span><span lang="en">combinations a generator picks; 'Random Instruction Sequence' tests</span></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">35쪽 CORE-V 는 reference model 과 <strong>Step &amp; Compare</strong> 로, 36쪽 Ibex 는 log 를 남긴 뒤 <strong>post_compare</strong> 로 맞춘다. 6절의 두 방식이다.</p>
+  <p lang="en">CORE-V (slide 35) matches its reference model with <strong>Step &amp; Compare</strong>; Ibex (slide 36) writes logs and matches them in <strong>post_compare.</strong> These are the two approaches in section 6.</p>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">Stimulus 는 프로그램이다</h2><h2 lang="en">The stimulus is a program</h2></div>
+  <p lang="ko">슬라이드 41~45쪽. random bit 는 illegal 명령어나 하는 일 없는 프로그램이 된다. generator 의 constraint 다섯: <strong>supported ISA, register initialization, memory map, control flow, execution environment</strong>. illegal 명령어는 exception 시험용으로 일부러 넣기도 한다.</p>
+  <p lang="en">Slides 41 to 45. Random bits give illegal instructions or programs that do nothing. A generator's five constraints: <strong>supported ISA, register initialization, memory map, control flow, execution environment.</strong> Illegal instructions are sometimes generated on purpose to test exceptions.</p>
+  <ul>
+    <li lang="ko"><strong>관계를 randomize</strong>(43쪽): destination 을 source 로 다시 쓸 확률, producer&ndash;consumer 거리, load/store/branch/long-latency 빈도, 같은 주소 확률. hazard 를 치려면 이게 필요하다</li>
+    <li lang="en"><strong>Randomize relationships</strong> (slide 43): the probability of reusing a destination as a source, producer&ndash;consumer distance, the mix of loads/stores/branches/long-latency ops, the probability of hitting the same address. Hitting hazards needs these</li>
+    <li lang="ko"><strong>directed template + random 세부</strong>(44쪽): 같은 주소에 store 다음 load, long-latency 다음 의존 명령어, taken branch 와 flush 될 명령어, 진행 중 연산 근처의 exception</li>
+    <li lang="en"><strong>Directed templates + random details</strong> (slide 44): store then load to the same address, a long-latency op then a dependent instruction, a taken branch with younger instructions to flush, an exception near in-flight operations</li>
+    <li lang="ko"><strong>riscv-dv</strong>(45쪽): 구글의 RISC-V generator. SystemVerilog class 로 짰다</li>
+    <li lang="en"><strong>riscv-dv</strong> (slide 45): Google's RISC-V generator, written as SystemVerilog classes</li>
+  </ul>
+  <div class="callout">
+  <p lang="ko"><strong>Lab 5 의 출발점.</strong> <a href="LAB2-mips-processor-design.html#s18">Lab 2 기록의 18절</a>이 확인 못 한 경로 셋(<code>branchstallD</code>, not-taken beq, lw 바로 뒤 beq)을 남겼다. 각각이 44쪽 표의 손잡이 하나다.</p>
+  <p lang="en"><strong>Where Lab 5 starts.</strong> <a href="LAB2-mips-processor-design.html#s18">§18 of the Lab 2 write-up</a> left three unchecked paths (<code>branchstallD</code>, a not-taken beq, a beq right after a lw). Each is one knob in slide 44's table.</p>
+  </div>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">ISS 와 retire 비교</h2><h2 lang="en">The ISS and retire comparison</h2></div>
+  <p lang="ko">슬라이드 47~52쪽. <strong>ISS 는 프로세서의 architectural 동작만 흉내 내는 소프트웨어 모델</strong>이다. PC, register, 메모리, CSR 과 privilege, exception 을 갱신하지만 pipeline 과 cycle 은 모른다. RTL 은 forwarding, stall, flush, 추측 실행을 하고 구현마다 cycle 수가 다르다. 그래서 49쪽: <strong>같은 프로그램, 같은 초기 상태로 돌리고, 매 cycle 이 아니라 retire 할 때 비교한다.</strong> retire 는 명령어의 효과가 architectural 하게 확정되는 순간이다.</p>
+  <p lang="en">Slides 47 to 52. <strong>An ISS is a software model of only the processor's architectural behaviour</strong>: it updates the PC, registers, memory, CSRs and privilege, and exceptions, but knows nothing about pipelines or cycles. The RTL does forwarding, stalls, flushes and speculation, in implementation-dependent cycles. Hence slide 49: <strong>run the same program from the same initial state, and compare at retire, not every cycle.</strong> Retirement is when an instruction's effects become architecturally committed.</p>
+  <figure>
+    <svg viewBox="0 0 700 150" role="img" aria-label="RTL 은 cycle 5, 7, 8, 9, 10, 12, 13, 14 에 retire 하고 6 은 stall, 11 은 flush 다. ISS 는 step 1 부터 8. retire 마다 ISS 를 한 step 진행시켜 비교한다">
+<text class="svgtxt" x="8" y="40" style="font-size:12px;fill:var(--blue);font-weight:700">RTL</text>
+<text class="svgtxt" x="8" y="124" style="font-size:12px;fill:var(--violet);font-weight:700">ISS</text>
+<rect x="72" y="20" width="40" height="30" rx="3" fill="var(--card)" stroke="var(--ink3)" stroke-width="1"/><text class="svglab" x="92" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c1-4</text>
+<rect x="116" y="20" width="40" height="30" rx="3" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="136" y="40" text-anchor="middle" style="font-size:10px;fill:var(--blue)">lw</text><text class="svglab" x="136" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c5</text>
+<rect x="160" y="20" width="40" height="30" rx="3" fill="var(--card)" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 2"/><text class="svglab" x="180" y="39" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">stall</text><text class="svglab" x="180" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c6</text>
+<rect x="204" y="20" width="40" height="30" rx="3" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="224" y="40" text-anchor="middle" style="font-size:10px;fill:var(--blue)">add</text><text class="svglab" x="224" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c7</text>
+<rect x="248" y="20" width="40" height="30" rx="3" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="268" y="40" text-anchor="middle" style="font-size:10px;fill:var(--blue)">sub</text><text class="svglab" x="268" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c8</text>
+<rect x="292" y="20" width="40" height="30" rx="3" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="312" y="40" text-anchor="middle" style="font-size:10px;fill:var(--blue)">or</text><text class="svglab" x="312" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c9</text>
+<rect x="336" y="20" width="40" height="30" rx="3" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="356" y="40" text-anchor="middle" style="font-size:10px;fill:var(--blue)">beq</text><text class="svglab" x="356" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c10</text>
+<rect x="380" y="20" width="40" height="30" rx="3" fill="var(--card)" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 2"/><text class="svglab" x="400" y="39" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">flush</text><text class="svglab" x="400" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c11</text>
+<rect x="424" y="20" width="40" height="30" rx="3" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="444" y="40" text-anchor="middle" style="font-size:10px;fill:var(--blue)">sw</text><text class="svglab" x="444" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c12</text>
+<rect x="468" y="20" width="40" height="30" rx="3" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="488" y="40" text-anchor="middle" style="font-size:10px;fill:var(--blue)">slt</text><text class="svglab" x="488" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c13</text>
+<rect x="512" y="20" width="40" height="30" rx="3" fill="rgba(var(--blue-rgb),.14)" stroke="var(--blue)" stroke-width="1.4"/><text class="svglab" x="532" y="40" text-anchor="middle" style="font-size:10px;fill:var(--blue)">sw</text><text class="svglab" x="532" y="14" text-anchor="middle" style="font-size:8.5px;fill:var(--ink3)">c14</text>
+<line x1="136" y1="50" x2="92" y2="104" stroke="var(--pink)" stroke-width="1.2"/><line x1="224" y1="50" x2="152" y2="104" stroke="var(--pink)" stroke-width="1.2"/><line x1="268" y1="50" x2="212" y2="104" stroke="var(--pink)" stroke-width="1.2"/><line x1="312" y1="50" x2="272" y2="104" stroke="var(--pink)" stroke-width="1.2"/><line x1="356" y1="50" x2="332" y2="104" stroke="var(--pink)" stroke-width="1.2"/><line x1="444" y1="50" x2="392" y2="104" stroke="var(--pink)" stroke-width="1.2"/><line x1="488" y1="50" x2="452" y2="104" stroke="var(--pink)" stroke-width="1.2"/><line x1="532" y1="50" x2="512" y2="104" stroke="var(--pink)" stroke-width="1.2"/>
+<rect x="72" y="104" width="40" height="30" rx="3" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.3"/><text class="svglab" x="92" y="123" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">1</text>
+<rect x="132" y="104" width="40" height="30" rx="3" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.3"/><text class="svglab" x="152" y="123" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">2</text>
+<rect x="192" y="104" width="40" height="30" rx="3" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.3"/><text class="svglab" x="212" y="123" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">3</text>
+<rect x="252" y="104" width="40" height="30" rx="3" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.3"/><text class="svglab" x="272" y="123" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">4</text>
+<rect x="312" y="104" width="40" height="30" rx="3" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.3"/><text class="svglab" x="332" y="123" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">5</text>
+<rect x="372" y="104" width="40" height="30" rx="3" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.3"/><text class="svglab" x="392" y="123" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">6</text>
+<rect x="432" y="104" width="40" height="30" rx="3" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.3"/><text class="svglab" x="452" y="123" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">7</text>
+<rect x="492" y="104" width="40" height="30" rx="3" fill="rgba(var(--violet-rgb),.12)" stroke="var(--violet)" stroke-width="1.3"/><text class="svglab" x="512" y="123" text-anchor="middle" style="font-size:9.5px;fill:var(--violet)">8</text>
+<text class="svglab" x="566" y="80" style="font-size:10px;fill:var(--pink);font-weight:700">compare</text>
+<text class="svglab" x="566" y="95" style="font-size:9.5px;fill:var(--ink2)">at each retire</text>
+    </svg>
+    <figcaption lang="ko">자세한 판 16절 그림을 줄였다. 프로그램은 lw, add, sub, or, beq, (flush 될 add), sw, slt, sw 이다.</figcaption>
+    <figcaption lang="en">A condensed version of the full note's §16 picture. The program is lw, add, sub, or, beq, (an add to be flushed), sw, slt, sw.</figcaption>
+  </figure>
+  <div class="def">
+    <span class="tag"><span lang="ko">그림 읽기</span><span lang="en">Reading the picture</span></span>
+    <div lang="ko"><p>위 줄이 RTL 의 cycle 이다. 다섯 단계라 c1~c4 는 pipeline 이 차는 중이고 첫 retire 는 c5 의 lw 다. <strong>c6 은 stall</strong>(add 가 lw 결과를 바로 써서 한 cycle 멈춘 빈자리), <strong>c11 은 flush</strong>(beq 가 taken 이라 버린 add 의 빈자리)다. 아래 줄은 ISS 의 step 1~8 로, cycle 도 빈자리도 없다. 분홍 선이 짝이다. RTL 의 c5, c7, c8, c9, c10, c12, c13, c14 가 ISS 의 1~8 과 맞춰진다. 매 cycle 을 비교했다면 c6 와 c11 에서 틀렸다고 했을 것이다.</p></div>
+    <div lang="en"><p>The top row is the RTL's cycles. With five stages, c1 to c4 fill the pipeline and the first retire is the lw in c5. <strong>c6 is a stall</strong> (the gap left when add waited a cycle for lw's result) and <strong>c11 a flush</strong> (the gap left by the add discarded after the taken beq). The bottom row is the ISS's steps 1 to 8, with no cycles and no gaps. The pink lines pair them: RTL c5, c7, c8, c9, c10, c12, c13, c14 match ISS 1 to 8. Comparing every cycle would have flagged c6 and c11.</p></div>
+  </div>
+  <table>
+    <thead><tr><th></th><th><span lang="ko">어떻게</span><span lang="en">How</span></th><th><span lang="ko">득실</span><span lang="en">Trade-off</span></th></tr></thead>
+    <tbody>
+      <tr><td>Trace comparison</td><td><span lang="ko">따로 끝까지 돌리고 log 를 나중에 비교</span><span lang="en">run both to the end, compare logs afterwards</span></td><td><span lang="ko">단순하지만 불일치를 run 이 끝난 뒤에 안다</span><span lang="en">simple, but mismatches show up after the run</span></td></tr>
+      <tr><td>Step-and-compare</td><td><span lang="ko">RTL 이 retire 할 때마다 ISS 를 한 step 진행시켜 즉시 비교</span><span lang="en">advance the ISS on every RTL retire and compare immediately</span></td><td><span lang="ko">즉시 잡지만 더 단단히 엮어야 한다</span><span lang="en">immediate, but needs tighter integration</span></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">51쪽: 초기 상태, ISA 구성, 인터럽트와 debug 요청의 시점, cycle counter 와 timer, MMIO, 구현 정의 동작이 맞지 않으면 <strong>RTL 이 멀쩡해도 불일치</strong>가 난다. 자세한 판 17절에서 버그를 심어 직접 돌려볼 수 있다.</p>
+  <p lang="en">Slide 51: if initial state, ISA configuration, the timing of interrupts and debug requests, cycle counters and timers, MMIO, or implementation-defined behaviour don't agree, you get <strong>mismatches even with correct RTL.</strong> §17 of the full note lets you plant bugs and try it.</p>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+  <table>
+    <thead><tr><th><span lang="ko">문제 모양</span><span lang="en">Shape of the question</span></th><th><span lang="ko">구별 기준 한 줄</span><span lang="en">The one line that decides it</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">5쪽 퍼센트</span><span lang="en">slide 5's percentages</span></td><td><span lang="ko">6 &times; 10 = 60칸. <strong>찬 칸 &divide; 60</strong></span><span lang="en">6 &times; 10 = 60 bins: <strong>hit bins &divide; 60</strong></span></td></tr>
+      <tr><td><span lang="ko">100% 면 끝?</span><span lang="en">done at 100%?</span></td><td><span lang="ko">아니다. <strong>정의한 칸만큼만</strong> 좋다</span><span lang="en">no: <strong>only as good as the bins defined</strong></span></td></tr>
+      <tr><td>grey box</td><td><span lang="ko"><strong>안쪽 상태를 probe</strong> 하는 check</span><span lang="en">a check that <strong>probes internal state</strong></span></td></tr>
+      <tr><td><span lang="ko">층의 순서</span><span lang="en">order of layers</span></td><td><span lang="ko">sub-unit, unit, multi-unit, top, system. formal 은 아래 둘</span><span lang="en">sub-unit, unit, multi-unit, top, system; formal in the bottom two</span></td></tr>
+      <tr><td><span lang="ko">L1 대 MP testbench</span><span lang="en">L1 vs MP testbench</span></td><td><span lang="ko"><strong>코어 하나의 data side 대 여러 코어 사이의 coherency</strong></span><span lang="en"><strong>one core's data side vs coherency between cores</strong></span></td></tr>
+      <tr><td><span lang="ko">compliance / directed / random</span><span lang="en">compliance / directed / random</span></td><td><span lang="ko"><strong>ISA 명세 / 이 microarchitecture / generator</strong> 중 무엇을 기준으로 썼나</span><span lang="en">written against <strong>the ISA spec / this microarchitecture / a generator</strong></span></td></tr>
+      <tr><td>trickbox</td><td><span lang="ko">test 프로그램이 testbench 에 사건을 요청하는 창구</span><span lang="en">a test program's channel for asking the testbench for events</span></td></tr>
+      <tr><td><span lang="ko">ISS 와 RTL</span><span lang="en">ISS vs RTL</span></td><td><span lang="ko">ISS 는 <strong>무엇을 하나</strong>만, RTL 은 <strong>어떻게</strong>까지(pipeline, cycle)</span><span lang="en">the ISS models <strong>what</strong> instructions do; the RTL also <strong>how</strong> (pipeline, cycles)</span></td></tr>
+      <tr><td><span lang="ko">언제 비교</span><span lang="en">when to compare</span></td><td><span lang="ko"><strong>retire 할 때.</strong> trace 는 끝나고, step-and-compare 는 즉시</span><span lang="en"><strong>at retire</strong>: trace afterwards, step-and-compare immediately</span></td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+  <p lang="ko"><strong>Lab 5</strong>(MIPS Random Stimulus, Coverage, overview 11/9)가 이 강의를 Lab 2 MIPS 에 적용한다. random 프로그램을 만들고, 명령어와 hazard 의 coverage 를 재고, 무엇과 비교할지 정한다. 과제 문서가 나오면 그쪽이 기준이다.</p>
+  <p lang="en"><strong>Lab 5</strong> (MIPS random stimulus and coverage, overview 11/9) applies this lecture to the Lab 2 MIPS: generate random programs, measure instruction and hazard coverage, and decide what to compare against. Once the handout is out, it is the authority.</p>
+  </div>
+  <p lang="ko"><strong>다음 강의는 Lecture 16, UVM 1</strong> (11/2 월, Joel Feldman). 11/4 UVM 2, 11/11 UVM 3 이 이어진다. 35쪽 CORE-V testbench 가 이미 UVM 으로 짜여 있었다.</p>
+  <p lang="en"><strong>Next is Lecture 16, UVM 1</strong> (Monday 11/2, Joel Feldman), followed by UVM 2 on 11/4 and UVM 3 on 11/11. Slide 35's CORE-V testbench was already written in UVM.</p>
+</section>
+
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 15 개인 학습 노트 (빠른 읽기 판)<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  함께 실린 강의 슬라이드의 저작권은 Aman Arora 교수와 Arizona State University에 있습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 15 personal study notes (quick read)<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in the accompanying lecture slides belongs to Professor Aman Arora and Arizona State University.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
