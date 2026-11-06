@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ko" data-lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEN 598 ADDV &middot; Lecture 16 &mdash; UVM 1 (quick)</title>
+<style>
+:root{
+  color-scheme:light dark;
+
+  /* 색 성분. rgba(var(--blue-rgb),.16) 형태로 농도 변형을 만든다. */
+  --ink-rgb:20,22,26;
+  --blue-rgb:18,80,196;
+  --pink-rgb:217,20,122;
+  --violet-rgb:107,47,168;
+  --green-rgb:0,132,95;
+  --amber-rgb:178,106,0;
+  --sel-rgb:75,29,140;
+  --brown-rgb:163,83,43;
+
+  --paper:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:rgb(var(--ink-rgb));
+  --ink2:#565D66;
+  --ink3:#8A9099;
+  --rule:#E2E1DB;
+  --blue:rgb(var(--blue-rgb));
+  --pink:rgb(var(--pink-rgb));
+  --violet:rgb(var(--violet-rgb));
+  --green:rgb(var(--green-rgb));
+  --amber:rgb(var(--amber-rgb));
+  --amber-bg:#FDF6E9;
+  --red:#C02626;
+  --sel:rgb(var(--sel-rgb));
+
+  /* 보조 표면과 진한 변형 */
+  --amber-line:#F0E2C4;
+  --code-bg:#F0EFEA;
+  --chip:#F1F0EB;
+  --sel-soft:#F6F2FB;
+  --pink-deep:#8B0D4E;
+  --green-deep:#005A42;
+  --amber-deep:#7A4A00;
+  --violet-deep:#3B1E70;
+  --brown:rgb(var(--brown-rgb));
+  --teal:#0E7490;
+  --shadow:rgba(var(--ink-rgb),.06);
+
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SFMono-Regular",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,"Segoe UI Variable Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Cambria Math","STIX Two Math","Latin Modern Math",Cambria,"Times New Roman",serif;
+}
+
+/* 다크 팔레트. 의미 고정 색상(Design=blue, Verification=pink, 도구=violet,
+   물리=brown, 함정=amber)은 그대로 두고 밝기만 어두운 배경에 맞게 올린다. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ink-rgb:232,234,238;
+  --blue-rgb:116,164,255;
+  --pink-rgb:255,124,178;
+  --violet-rgb:192,152,247;
+  --green-rgb:74,203,158;
+  --amber-rgb:232,172,82;
+  --sel-rgb:192,152,247;
+  --brown-rgb:201,138,90;
+
+  --paper:#131519;
+  --card:#1B1E24;
+  --ink2:#AEB4BD;
+  --ink3:#7B828C;
+  --rule:#2E333B;
+  --amber-bg:#2A2216;
+  --red:#FF7A7A;
+
+  --amber-line:#4A3A1E;
+  --code-bg:#23272E;
+  --chip:#262B33;
+  --sel-soft:#2A2140;
+  --pink-deep:#FFA8CC;
+  --green-deep:#7EE0BC;
+  --amber-deep:#F0C070;
+  --violet-deep:#3A2A66;
+  --teal:#4FC3DE;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 120px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px 80px}}
+
+header.top{grid-column:1/-1;padding:64px 0 40px;border-bottom:1px solid var(--rule);margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+h1.title{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:14px 0 6px}
+.subtitle{font-size:17px;color:var(--ink2);margin:0}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--ink2);background:var(--card)}
+.chip.hot{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+.chip.dim{color:var(--ink3);background:var(--chip);border-color:var(--rule)}
+.backlink{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--blue);text-decoration:none;letter-spacing:.04em}
+.backlink:hover{text-decoration:underline}
+
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+nav.toc .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+nav.toc a{display:flex;gap:9px;padding:5px 0;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;padding-left:11px;margin-left:-13px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--blue)}
+nav.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;min-width:14px}
+@media(max-width:900px){nav.toc{position:static;margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--rule)}}
+
+/* ── 상단 미니 헤더 ─────────────────────── */
+/* 큰 제목이 화면 밖으로 나가면 목차 위에 작게 나타나 계속 남는다.
+   목차가 이미 sticky라 그 안에 넣으면 따로 고정 장치가 필요 없다. */
+.mini-head{max-height:0;opacity:0;visibility:hidden;overflow:hidden;margin-bottom:0;
+  transition:max-height .22s ease,opacity .18s ease,margin-bottom .22s ease,visibility .18s}
+.mini-head.on{max-height:150px;opacity:1;visibility:visible;margin-bottom:22px}
+nav.toc .mini-head a.back{display:inline-block;margin:0 0 12px;padding:0;border-left:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--blue);text-decoration:none}
+nav.toc .mini-head a.back:hover{text-decoration:underline;color:var(--blue);border-left-color:transparent}
+.mini-head .mod{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.mini-head .name{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.mini-head .rule{height:1px;background:var(--rule);margin-top:16px}
+@media(max-width:900px){.mini-head{display:none}}
+
+section{margin-bottom:76px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em;padding-top:4px}
+h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.02em;font-weight:750;margin:0;line-height:1.25}
+.sec-sub{color:var(--ink2);font-size:15px;margin:0 0 30px 0}
+h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;margin:38px 0 12px}
+h4{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cD{color:var(--blue);font-weight:600}
+.cV{color:var(--pink);font-weight:600}
+.cT{color:var(--violet);font-weight:600}
+.cP{color:var(--brown);font-weight:600}
+
+/* ── 코드 블록 ──────────────────────────── */
+/* 이 과목은 수식 대신 SystemVerilog 가 나온다. 하이라이팅은 손으로 span 을 넣는다.
+   칠하는 것은 키워드·문자열·주석·숫자 넷뿐이다. 더 늘리면 유지가 안 된다.
+   가로 스크롤을 자기 안에서 처리하지 않으면 모바일에서 페이지 전체가 밀린다. */
+pre.code{font-family:var(--mono);font-size:13px;line-height:1.65;background:var(--code-bg);
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  overflow-x:auto;max-width:100%}
+pre.code .k{color:var(--violet);font-weight:600}
+pre.code .s{color:var(--green-deep)}
+pre.code .c{color:var(--ink3);font-style:italic}
+pre.code .n{color:var(--brown)}
+
+.def{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.def .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.def p:last-child,.def ol:last-child,.def ul:last-child{margin-bottom:0}
+
+.trap{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:18px 22px;margin:20px 0}
+.trap .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:7px;font-weight:600}
+.trap p:last-child,.trap ul:last-child,.trap table:last-child{margin-bottom:0}
+.trap h4{margin-top:18px;font-size:14.5px}
+.trap h4:first-of-type{margin-top:0}
+
+.ex{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 22px;margin:20px 0}
+.ex .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:7px;font-weight:600}
+.ex p:last-child,.ex ul:last-child,.ex ol:last-child{margin-bottom:0}
+details{margin-top:12px;border-top:1px dashed var(--rule);padding-top:12px}
+details summary{cursor:pointer;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--blue);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"\25b8\a0";display:inline-block}
+details[open] summary::before{content:"\25be\a0"}
+details .body{margin-top:12px}
+details .body p:last-child,details .body ol:last-child,details .body ul:last-child{margin-bottom:0}
+
+.callout{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:16px 0;margin:26px 0;font-size:15px;color:var(--ink2)}
+.callout strong{color:var(--ink)}
+
+/* ── 슬라이드 출처 표시 ─────────────────── */
+/* data-slide 값에서 라벨을 직접 만든다. 라벨과 앵커가 어긋날 수 없다. */
+.sec-head[data-slide],h3[data-slide]{display:flex;align-items:baseline;gap:14px}
+.sec-head[data-slide]>h2,h3[data-slide]{min-width:0}
+.sec-head[data-slide]::before,h3[data-slide]::before{
+  content:"";order:1;flex:1 1 auto;min-width:16px;height:1px;
+  background:var(--rule);align-self:center;opacity:.75}
+.sec-head[data-slide]::after,h3[data-slide]::after{
+  content:"슬라이드 " attr(data-slide) "쪽";order:2;flex:none;
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  color:var(--ink3);white-space:nowrap;align-self:center}
+html[data-lang="en"] .sec-head[data-slide]::after,
+html[data-lang="en"] h3[data-slide]::after{content:"slide " attr(data-slide)}
+@media(max-width:900px){
+  .sec-head[data-slide]::before,h3[data-slide]::before{min-width:10px}
+  .sec-head[data-slide]::after,h3[data-slide]::after{font-size:9.5px}
+}
+
+figure{margin:28px 0;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);line-height:1.6}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.mini{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.mini .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink2);text-align:center;margin-top:8px;line-height:1.4}
+.mini svg{display:block;width:100%;height:auto}
+/* 이 과목 도해는 블록도와 흐름도다. 세리프를 쓰면 도면이 아니라 논문처럼 보인다. */
+.svgtxt{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.svglab{font-family:var(--mono);font-size:11px;fill:var(--ink2)}
+.svgnum{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── 용어 뜯어보기 ────────────────────────────────────────────────
+   이 노트의 핵심 장치. 개념이 어려운 게 아니라 그 말이 어느 세계의 말인지
+   몰라서 막히는 걸 푼다. 기본은 펼쳐둔다(open). 모르는 사람에게 보이지
+   않으면 의미가 없기 때문이다. 대신 접을 수 있다. */
+.jargon{margin:18px 0;border:1px dashed var(--rule);border-radius:8px;background:var(--chip)}
+.jargon>summary{cursor:pointer;list-style:none;padding:9px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;user-select:none;border-top:none;padding-top:9px}
+.jargon>summary::-webkit-details-marker{display:none}
+.jargon>summary::before{content:"\25be";font-size:9px;display:inline-block;transition:transform .15s}
+.jargon:not([open])>summary::before{transform:rotate(-90deg)}
+.jargon>summary:hover{color:var(--ink2)}
+.jargon{border-top:1px dashed var(--rule);padding-top:0}
+.jargon .body{padding:2px 16px 14px;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:0}
+.jargon .body>*:first-child{margin-top:0}
+.jargon .body>*:last-child{margin-bottom:0}
+.jargon .parts{width:100%;border-collapse:collapse;margin:8px 0}
+.jargon .parts td{padding:6px 12px 6px 0;vertical-align:top;border-bottom:1px solid var(--rule);font-size:13.5px}
+.jargon .parts tr:last-child td{border-bottom:0}
+.jargon .parts td:first-child{white-space:nowrap;width:1%;color:var(--ink3);padding-right:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:9px}
+@media(max-width:900px){.jargon .parts td:first-child{white-space:normal}}
+
+/* ── 인터랙티브 도구 ────────────────────── */
+.play{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px;margin:28px 0}
+.plab{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:20px 0 9px}
+.plab:first-child{margin-top:0}
+.qrow{border:1px solid var(--rule);border-radius:8px;padding:13px 15px;margin-bottom:9px;background:var(--paper);transition:.15s}
+.qrow.ok{border-color:var(--green);background:rgba(var(--green-rgb),.06)}
+.qrow.no{border-color:var(--amber);background:var(--amber-bg)}
+.qrow .q{font-size:14.5px;line-height:1.55;margin-bottom:10px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:6px 11px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.qrow .opts button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.qrow .opts button:disabled{cursor:default;opacity:.5}
+.qrow .opts button.pick{opacity:1}
+.qrow .opts button.right{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.1);font-weight:600;opacity:1}
+.qrow .opts button.wrong{border-color:var(--amber);color:var(--amber);background:rgba(var(--amber-rgb),.12);font-weight:600;opacity:1}
+.qrow .why{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule);font-size:13.5px;color:var(--ink2);line-height:1.6;display:none}
+.qrow.done .why{display:block}
+.score{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink2);margin-bottom:14px;padding:9px 13px;background:var(--chip);border-radius:7px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score button{font-family:var(--mono);font-size:11px;padding:5px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer}
+.score button:hover{border-color:var(--sel);color:var(--sel)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+.presets button{font-family:var(--sans);font-size:12.5px;padding:7px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.presets button:hover{border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.presets button.act{border-color:var(--green);color:var(--green);background:rgba(var(--green-rgb),.06);font-weight:600}
+.verdict{border-radius:8px;padding:15px 18px;font-size:14.5px;line-height:1.65}
+.verdict.ok{background:rgba(var(--green-rgb),.08);border:1px solid rgba(var(--green-rgb),.3);color:var(--green-deep)}
+.verdict.bad{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-deep)}
+.verdict .hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.verdict strong{font-weight:700}
+#tbsvg [data-part]{transition:opacity .22s ease}
+@media(prefers-reduced-motion:reduce){#tbsvg [data-part]{transition:none}}
+.hintline{font-size:13px;color:var(--ink2);margin-top:16px;line-height:1.6;border-top:1px solid var(--rule);padding-top:13px}
+/* 애니메이션 슬라이더. 덱이 같은 그림을 여러 장에 걸쳐 움직이는 구간을 한 자리에서 밟아본다. */
+/* 마크업 규약과 동작은 anim.js 가 단일 출처다. 스크립트가 없으면 첫 프레임만 보이고 막대가 안 생긴다. */
+.anim [data-f]{display:none}
+.anim [data-f~="0"]{display:revert}
+.anim.js-anim [data-f]{display:none}
+.anim.js-anim [data-f].on{display:revert}
+.anim:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.animbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--rule)}
+.animbar button{font-family:var(--mono);font-size:12px;line-height:1.2;padding:8px 11px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;color:var(--ink2);cursor:pointer;transition:.13s}
+.animbar button:hover:not(:disabled){border-color:var(--sel);color:var(--sel);background:var(--sel-soft)}
+.animbar button:disabled{opacity:.35;cursor:default}
+.animbar .animplay{width:104px;min-width:0;text-align:center;white-space:nowrap}
+.animrange{flex:1 1 110px;min-width:0;accent-color:var(--blue);height:22px;cursor:pointer}
+.animstep{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:var(--ink3);flex:none;width:68px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.animcap{margin-top:15px;background:var(--paper);border-left:3px solid var(--ink);border-radius:0 7px 7px 0;padding:13px 16px;font-size:14px;line-height:1.65;color:var(--ink2)}
+.animcap[data-src]::before{content:"슬라이드 " attr(data-src) "쪽";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+html[data-lang="en"] .animcap[data-src]::before{content:"slide " attr(data-src)}
+@media(prefers-reduced-motion:reduce){.animbar button{transition:none}}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+@media(max-width:900px){table{display:block;max-width:100%;overflow-x:auto}}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:500}
+td.hd{font-weight:650;color:var(--ink)}
+
+footer{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:28px;margin-top:20px;font-size:13.5px;color:var(--ink3);line-height:1.7}
+footer a{color:var(--blue)}
+/* 본문 링크. 규칙이 없으면 브라우저 기본 남색이 나오고 다크모드에서 묻는다. */
+main a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(var(--blue-rgb),.4)}
+main a:hover{border-bottom-color:var(--blue);background:rgba(var(--blue-rgb),.09)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ── 테마 토글 ──────────────────────────── */
+.theme-btn{position:fixed;left:16px;bottom:16px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.theme-btn:hover{border-color:var(--sel);color:var(--sel)}
+@media(max-width:900px){.theme-btn{left:10px;bottom:10px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── 언어 전환 ──────────────────────────── */
+/* 언어 표시는 어떤 규칙보다 우선해야 한다. 더 구체적인 선택자가 display 를 되살린다. */
+html[data-lang="ko"] [lang="en"]{display:none!important}
+html[data-lang="en"] [lang="ko"]{display:none!important}
+.lang-btn{position:fixed;left:16px;bottom:56px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  padding:7px 11px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--card);color:var(--ink2);cursor:pointer;
+  box-shadow:0 1px 6px var(--shadow);transition:.13s}
+.lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:900px){.lang-btn{left:10px;bottom:46px;font-size:10.5px;padding:6px 9px}}
+@media(prefers-reduced-motion:reduce){.lang-btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">CEN 598 &middot; Advanced Digital Design and Verification &middot; Joel Feldman (Design Verification Engineer)</div>
+  <h1 class="title">Lecture 16<br>UVM 1</h1>
+  <p class="subtitle" lang="ko"><code>run_test()</code> 한 줄이 시뮬레이션을 넘겨받고, <strong>test</strong> 가 component 를 짓고, 모두가 같은 <strong>phase</strong> 를 밟고, run 은 <strong>objection</strong> 이 다 내려가야 끝난다. 핀은 <strong>driver 와 monitor</strong> 만 만진다.</p>
+  <p class="subtitle" lang="en">One <code>run_test()</code> call takes over the simulation, <strong>the test</strong> builds the components, everyone walks the same <strong>phases</strong>, and the run ends only when every <strong>objection</strong> is dropped. Only <strong>the driver and monitor</strong> touch pins.</p>
+  <div class="meta" lang="ko">
+    <span class="chip hot">빠른 읽기 판</span>
+    <span class="chip"><a href="L16-uvm-1.html">자세한 판 보기</a></span>
+    <span class="chip dim">훑고 다시 읽기 위한 판이다</span>
+  </div>
+  <div class="meta" lang="en">
+    <span class="chip hot">Quick read</span>
+    <span class="chip"><a href="L16-uvm-1.html">Full version</a></span>
+    <span class="chip dim">Built for skimming and re-reading</span>
+  </div>
+  <a class="backlink" href="../index.html" lang="ko">&larr; 강의 목록으로</a>
+  <a class="backlink" href="../index.html" lang="en">&larr; All lectures</a>
+</header>
+<nav class="toc">
+  <div class="mini-head">
+    <a class="back" href="../index.html" lang="ko">&larr; 강의 목록</a>
+    <a class="back" href="../index.html" lang="en">&larr; All lectures</a>
+    <div class="mod">Lecture 16</div>
+    <div class="name">UVM 1</div>
+  </div>
+  <p class="toc-h" lang="ko">목차</p>
+  <p class="toc-h" lang="en">Contents</p>
+  <a href="#q1"><span class="n">1</span><span lang="ko">결론부터</span><span lang="en">The short version</span></a>
+  <a href="#q2"><span class="n">2</span><span lang="ko">run_test 와 test</span><span lang="en">run_test and the test</span></a>
+  <a href="#q3"><span class="n">3</span><span lang="ko">Phase 와 objection</span><span lang="en">Phases and objections</span></a>
+  <a href="#q4"><span class="n">4</span><span lang="ko">Component 와 object</span><span lang="en">Components and objects</span></a>
+  <a href="#q5"><span class="n">5</span><span lang="ko">Transaction 과 agent</span><span lang="en">Transactions and agents</span></a>
+  <a href="#q6"><span class="n">6</span><span lang="ko">TLM 과 resource_db</span><span lang="en">TLM and resource_db</span></a>
+  <a href="#q7"><span class="n">7</span><span lang="ko">시험에 나올 것</span><span lang="en">What shows up on the quiz</span></a>
+</nav>
+
+<main>
+
+<section id="q1">
+  <div class="sec-head"><span class="sec-num">1</span><h2 lang="ko">결론부터</h2><h2 lang="en">The short version</h2></div>
+  <p lang="ko">Joel Feldman 의 UVM 세 강의 중 첫째(덱 제목 Introduction to UVM Part I). 덱은 PDF 로 배포되어 발표자 노트가 없고, 2쪽의 Compliance &amp; Permission 고지(ASU CSE/CEN 598 에서만, 저작권 &copy; 2025 Joel D. Feldman)에 따라 <strong>슬라이드 PDF 는 이 사이트에 올리지 않았다</strong>. 오늘은 코드를 짜는 날이 아니라 <strong>UVM 이 시뮬레이션을 어떻게 쥐는지</strong>, 뼈대와 이름을 세우는 날이다.</p>
+  <p lang="en">The first of Joel Feldman's three UVM lectures (deck title Introduction to UVM Part I). The deck came as a PDF with no speaker notes, and under slide 2's Compliance &amp; Permission notice (ASU CSE/CEN 598 only, copyright &copy; 2025 Joel D. Feldman) <strong>the slide PDF is not posted on this site.</strong> Today isn't about writing code; it sets up the frame and the names for <strong>how UVM takes hold of a simulation.</strong></p>
+  <table>
+    <thead><tr><th><span lang="ko">질문</span><span lang="en">Question</span></th><th><span lang="ko">답</span><span lang="en">Answer</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">누가 시뮬레이션을 끌고 가나</span><span lang="en">Who drives the simulation?</span></td><td><span lang="ko">UVM. top 은 <code>run_test()</code> 만 부르고, <strong>test</strong> 가 감독이 된다</span><span lang="en">UVM. The top only calls <code>run_test()</code>; <strong>the test</strong> becomes the director</span></td></tr>
+      <tr><td><span lang="ko">무슨 순서로</span><span lang="en">In what order?</span></td><td><span lang="ko"><strong>phase.</strong> 시간 0 의 function, 시간이 흐르는 task, 끝의 function</span><span lang="en"><strong>Phases</strong>: time-0 functions, time-consuming tasks, closing functions</span></td></tr>
+      <tr><td><span lang="ko">언제 끝나나</span><span lang="en">When does it end?</span></td><td><span lang="ko"><strong>objection</strong> 수가 0 이 될 때</span><span lang="en">When the <strong>objection</strong> count reaches zero</span></td></tr>
+      <tr><td><span lang="ko">핀은 누가</span><span lang="en">Who touches pins?</span></td><td><span lang="ko"><strong>driver</strong>(능동)와 <strong>monitor</strong>(수동)뿐. virtual interface 로</span><span lang="en">only the <strong>driver</strong> (active) and <strong>monitor</strong> (passive), through a virtual interface</span></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">오늘의 약어: <strong>UVM</strong>(Universal Verification Methodology), <strong>TLM</strong>(Transaction Level Model, 20쪽), <strong>DV</strong>(Design Verification), <strong>RAL</strong>(Register Abstraction Layer), <strong>OVM</strong>(Open Verification Methodology), <strong>VMM</strong>, <strong>AVM</strong>, <strong>eRM</strong>(UVM 이전의 벤더 방법론).</p>
+  <p lang="en">Today's acronyms: <strong>UVM</strong> (Universal Verification Methodology), <strong>TLM</strong> (Transaction Level Model, slide 20), <strong>DV</strong> (Design Verification), <strong>RAL</strong> (Register Abstraction Layer), <strong>OVM</strong> (Open Verification Methodology), <strong>VMM</strong>, <strong>AVM</strong>, <strong>eRM</strong> (vendor methodologies before UVM).</p>
+</section>
+
+<section id="q2">
+  <div class="sec-head"><span class="sec-num">2</span><h2 lang="ko">run_test 와 test</h2><h2 lang="en">run_test and the test</h2></div>
+  <p lang="ko">슬라이드 4~8쪽. UVM 은 <strong>testbench 를 걸어 둘 framework</strong> 다. 어느 testbench 든 같은 모양(코드 배치, configuration database, 메시지, component 계층)이고, <strong>한 번 컴파일하고 여러 번 돌린다.</strong> 7쪽의 대비가 요점이다.</p>
+  <p lang="en">Slides 4 to 8. UVM is <strong>a framework to hang your testbench on</strong>: every testbench has the same shape (code layout, configuration database, messaging, component hierarchy), and you <strong>compile once, simulate many times.</strong> Slide 7's contrast is the point.</p>
+  <ul>
+    <li lang="ko"><strong>옛 방식</strong>: test module 이 <code>tb_top.dut.signalA</code> 같은 계층 경로로 핀을 직접 건드리고, 기다리고, 비교하고, <code>$finish</code> 한다. 다 한 블록에 엉켜 있다</li>
+    <li lang="en"><strong>Old way</strong>: a test module pokes pins through hierarchical paths like <code>tb_top.dut.signalA</code>, waits, compares and calls <code>$finish</code>, all tangled in one block</li>
+    <li lang="ko"><strong>새 방식</strong>: top 의 <code>initial</code> 에서 <code>run_test("my_test")</code> 한 줄. 나머지는 UVM 이 한다. 실행 명령줄의 <code>+UVM_TESTNAME=...</code> 가 인자보다 이긴다(보충)</li>
+    <li lang="en"><strong>New way</strong>: one line, <code>run_test("my_test")</code>, in the top's <code>initial</code>; UVM does the rest. <code>+UVM_TESTNAME=...</code> on the command line beats the argument (supplement)</li>
+    <li lang="ko"><strong>8쪽</strong>: test 가 감독이다. <code>run_test</code> 가 test object 를 만들고 끝까지 끌고 가고, test 는 phase 마다 env 를 짓고 설정하고 sequence 를 띄운다. env 는 같은 virtual method 로 testbench 를 설정한다</li>
+    <li lang="en"><strong>Slide 8</strong>: the test is the director. <code>run_test</code> creates the test object and carries the run to the end; the test builds and configures the env and launches sequences phase by phase; the env configures the testbench through the same virtual methods</li>
+  </ul>
+  <div class="trap">
+  <span class="tag"><span lang="ko">함정 &middot; 시나리오 차이는 test 에</span><span lang="en">Trap &middot; scenario differences go in the test</span></span>
+  <p lang="ko">env 는 블록마다 한 번 짜서 여러 test 가 공유한다. test 마다 달라지는 것을 env 에 분기로 넣지 않는다. 4쪽 "each test describes the intent".</p>
+  <p lang="en">An env is written once per block and shared by many tests. Don't put per-test differences into the env as branches; slide 4's "each test describes the intent".</p>
+  </div>
+</section>
+
+<section id="q3">
+  <div class="sec-head"><span class="sec-num">3</span><h2 lang="ko">Phase 와 objection</h2><h2 lang="en">Phases and objections</h2></div>
+  <p lang="ko">슬라이드 9~13쪽. 구별 기준은 <strong>시간을 쓰나</strong>다. function 은 시간을 못 쓰고(짓기, 설정, 확인), task 는 쓸 수 있다(reset, stimulus, 기다리기, 샘플링).</p>
+  <p lang="en">Slides 9 to 13. The deciding question is <strong>does it take time?</strong> Functions can't (building, configuring, checking); tasks can (reset, stimulus, waiting, sampling).</p>
+  <table>
+    <thead><tr><th><span lang="ko">시점</span><span lang="en">When</span></th><th>phase</th><th><span lang="ko">종류</span><span lang="en">Kind</span></th></tr></thead>
+    <tbody>
+      <tr><td>t = 0</td><td>build, connect, end_of_elaboration, start_of_simulation</td><td>function</td></tr>
+      <tr><td>t &ge; 0</td><td><span lang="ko">run (와 나란히 reset, configure, main, shutdown, 각각 pre_/post_)</span><span lang="en">run (alongside it reset, configure, main, shutdown, each with pre_/post_)</span></td><td>task</td></tr>
+      <tr><td>t = N</td><td><span lang="ko">extract, (check), report, final</span><span lang="en">extract, (check), report, final</span></td><td>function</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li lang="ko"><strong>12쪽</strong>: build_phase 는 <strong>top-down</strong>(부모가 있어야 자식을 만든다), 나머지는 <strong>bottom-up</strong>. 보충: final_phase 는 top-down 이고, run_phase 는 모든 component 가 동시에 시작한다</li>
+    <li lang="en"><strong>Slide 12</strong>: build_phase runs <strong>top-down</strong> (a parent must exist to create its children), the others <strong>bottom-up.</strong> Supplement: final_phase is top-down, and every component's run_phase starts at once</li>
+    <li lang="ko"><strong>13쪽</strong>: 바쁜 component 는 <code>phase.raise_objection(this)</code> 로 손을 들고 끝나면 <code>phase.drop_objection(this)</code>. 수가 0 이 되면 task phase 가 끝난다. 예: transaction 이 끝나기를 기다리는 monitor</li>
+    <li lang="en"><strong>Slide 13</strong>: a busy component raises its hand with <code>phase.raise_objection(this)</code> and drops it with <code>phase.drop_objection(this)</code>; when the count hits zero, the task phase ends. Example: a monitor waiting for a transaction to finish</li>
+  </ul>
+  <div class="trap">
+  <span class="tag"><span lang="ko">함정 &middot; 0 ns 에 끝나는 test</span><span lang="en">Trap &middot; the test that ends at 0 ns</span></span>
+  <p lang="ko">아무도 raise 하지 않으면 run_phase 는 시작하자마자 끝나고, stimulus 0 개, 에러 0 개로 <strong>통과처럼 보인다.</strong> 반대로 drop 을 빠뜨리면 timeout 까지 돈다. 그리고 슬라이드는 check_phase 를 빠뜨렸다. UVM 의 끝 묶음은 extract, check, report, final 넷이다.</p>
+  <p lang="en">If nobody raises, run_phase ends as soon as it starts, with zero stimulus and zero errors: <strong>it looks like a pass.</strong> Forget a drop and it runs to the timeout. Also, the slides omit check_phase; UVM's closing group is extract, check, report, final.</p>
+  </div>
+</section>
+
+<section id="q4">
+  <div class="sec-head"><span class="sec-num">4</span><h2 lang="ko">Component 와 object</h2><h2 lang="en">Components and objects</h2></div>
+  <p lang="ko">슬라이드 14~15쪽. 모든 class 는 object 이고, 그중 특별한 부분집합이 <strong>component</strong> 다. component 는 phase 를 밟고, <strong>시간 0 에만 만들어져 끝까지 산다</strong>(<code>uvm_test</code>, <code>uvm_env</code>, <code>uvm_agent</code>, <code>uvm_driver</code>, <code>uvm_monitor</code>, <code>uvm_sequencer</code>, <code>uvm_scoreboard</code>). <code>uvm_sequence_item</code>, <code>uvm_transaction</code> 의 object 는 계속 생겼다 사라진다. 생성자로 구별한다: <code>new(name, parent)</code> 는 component, <code>new(name)</code> 은 object.</p>
+  <p lang="en">Slides 14 to 15. Every class is an object; a special subset are <strong>components</strong>, which walk the phases and <strong>are built only at time 0 and live to the end</strong> (<code>uvm_test</code>, <code>uvm_env</code>, <code>uvm_agent</code>, <code>uvm_driver</code>, <code>uvm_monitor</code>, <code>uvm_sequencer</code>, <code>uvm_scoreboard</code>). Objects of <code>uvm_sequence_item</code> and <code>uvm_transaction</code> keep coming and going. Tell them apart by the constructor: <code>new(name, parent)</code> for components, <code>new(name)</code> for objects.</p>
+  <div class="trap">
+  <span class="tag"><span lang="ko">함정 &middot; hierarchy 가 둘</span><span lang="en">Trap &middot; two hierarchies</span></span>
+  <p lang="ko">15쪽의 <strong>class hierarchy</strong> 는 상속(무엇을 extends 하나), 12쪽의 <strong>component hierarchy</strong> 는 포함(무엇 안에 있나)이다. class 로는 <code>uvm_agent</code> 와 <code>uvm_driver</code> 가 형제지만, testbench 안에서는 agent 가 driver 를 담는다. 보충: <code>uvm_sequence</code> 도 <code>uvm_sequence_item</code> 의 자손, 곧 object 다.</p>
+  <p lang="en">Slide 15's <strong>class hierarchy</strong> is inheritance (what extends what); slide 12's <strong>component hierarchy</strong> is containment (what's inside what). As classes, <code>uvm_agent</code> and <code>uvm_driver</code> are siblings; in a testbench the agent contains the driver. Supplement: <code>uvm_sequence</code> also descends from <code>uvm_sequence_item</code>, so it's an object.</p>
+  </div>
+</section>
+
+<section id="q5">
+  <div class="sec-head"><span class="sec-num">5</span><h2 lang="ko">Transaction 과 agent</h2><h2 lang="en">Transactions and agents</h2></div>
+  <p lang="ko">슬라이드 16~19쪽. <strong>transaction</strong> 은 핀의 세부에서 떨어진 높은 수준의 데이터(<code>uvm_sequence_item</code>)이고, <strong>transactor</strong> 는 핀에 닿는 낮은 층의 component 다. <strong>driver 는 능동적으로 입력을 움직이고, monitor 는 수동적으로 지켜본다.</strong> sequence 는 item 의 모음, sequencer 는 한 가지 item type 의 sequence 만 풀어 driver 에게 넘기고, driver 는 item 을 하나씩 <strong>당겨 간다</strong>(응답은 선택).</p>
+  <p lang="en">Slides 16 to 19. A <strong>transaction</strong> is high-level data abstracted from pin details (<code>uvm_sequence_item</code>); a <strong>transactor</strong> is a low-level component that touches pins. <strong>The driver actively drives inputs; the monitor passively watches.</strong> A sequence is a collection of items; a sequencer unpacks sequences of one item type for the driver, which <strong>pulls</strong> items one at a time (responses optional).</p>
+  <table>
+    <thead><tr><th>UVM</th><th><span lang="ko">장보기 비유 (18~19쪽)</span><span lang="en">Grocery analogy (slides 18 to 19)</span></th></tr></thead>
+    <tbody>
+      <tr><td>sequence item / sequence</td><td><span lang="ko">물건 하나 / 장바구니나 카트</span><span lang="en">one product / a basket or cart</span></td></tr>
+      <tr><td>sequencer / driver / monitor</td><td><span lang="ko">컨베이어 벨트 / 계산원(쇼핑은 안 한다) / UPC 스캐너</span><span lang="en">conveyor belt / cashier (not the shopper) / UPC scanner</span></td></tr>
+      <tr><td>agent</td><td><span lang="ko">계산대 줄 하나: driver, monitor, sequencer 를 담는다</span><span lang="en">one checkout line: holds a driver, monitor and sequencer</span></td></tr>
+      <tr><td>environment</td><td><span lang="ko">매장 전체: agent 여럿, scoreboard, coverage, sub-env(매장 안의 매장)</span><span lang="en">the store: agents, scoreboard, coverage, sub-envs (a store within a store)</span></td></tr>
+    </tbody>
+  </table>
+  <div class="trap">
+  <span class="tag"><span lang="ko">함정 &middot; transaction 대 transactor</span><span lang="en">Trap &middot; transaction vs transactor</span></span>
+  <p lang="ko">데이터인가 부품인가. 그리고 sequence(object), sequencer(component), sequence item(object)은 셋이 다 다르다.</p>
+  <p lang="en">Data or part? And sequence (object), sequencer (component) and sequence item (object) are three different things.</p>
+  </div>
+  <div class="callout">
+  <p lang="ko"><strong>Lab 6</strong> 의 APB agent 가 이 표의 agent 한 줄이다. 과제 문서가 나오면 그쪽이 기준이다.</p>
+  <p lang="en"><strong>Lab 6</strong>'s APB agent is the agent row of this table. Once the handout is out, it is the authority.</p>
+  </div>
+</section>
+
+<section id="q6">
+  <div class="sec-head"><span class="sec-num">6</span><h2 lang="ko">TLM 과 resource_db</h2><h2 lang="en">TLM and resource_db</h2></div>
+  <p lang="ko">슬라이드 20~25쪽. <strong>TLM</strong> 은 component 끼리 transaction 을 주고받는 연결이다. <strong>port</strong> 는 요청만 하고(driver), <strong>export</strong> 는 그 요청을 구현해 응하고(sequencer), <strong>analysis port</strong> 는 여러 구독자에게 뿌리고(monitor &rarr; scoreboard, coverage), <strong>FIFO</strong> 는 담아 두는 queue 다. 사용자는 connect_phase 에서 <code>connect()</code> 만 부른다. <a href="LAB4-fifo-verification.html#s7">Lab 4</a> 의 monitor &rarr; mailbox &rarr; scoreboard 가 그 이전 판이다.</p>
+  <p lang="en">Slides 20 to 25. <strong>TLM</strong> is how components pass transactions. A <strong>port</strong> only requests (driver), an <strong>export</strong> implements and answers (sequencer), an <strong>analysis port</strong> broadcasts to many subscribers (monitor &rarr; scoreboard, coverage), a <strong>FIFO</strong> is a queue. You just call <code>connect()</code> in connect_phase. <a href="LAB4-fifo-verification.html#s7">Lab 4</a>'s monitor &rarr; mailbox &rarr; scoreboard is the earlier version.</p>
+  <p lang="ko"><strong>class 는 계층 경로로 DUT 에 닿을 수 없다</strong>(22쪽 "illegal cross-module reference". 보충: package 안의 항목은 계층 참조를 못 쓴다). 그래서 top module 이 interface instance 의 handle 을 <code>uvm_resource_db#(virtual ...)::set</code> 으로 넣고, driver 가 <code>read_by_name</code> 으로 받아 virtual interface 로 핀을 움직인다(24~25쪽). UVM 코드에서는 그 위에 얹은 <code>uvm_config_db</code> 를 더 자주 본다(보충).</p>
+  <p lang="en"><strong>A class can't reach the DUT through a hierarchical path</strong> (slide 22's "illegal cross-module reference"; supplement: items in a package can't use hierarchical references). So the top module stores the interface instance's handle with <code>uvm_resource_db#(virtual ...)::set</code>, and the driver fetches it with <code>read_by_name</code> and drives pins through the virtual interface (slides 24 to 25). In UVM code you'll more often see <code>uvm_config_db</code>, layered on top (supplement).</p>
+  <div class="trap">
+  <span class="tag"><span lang="ko">슬라이드의 코드 실수</span><span lang="en">Slips in the slides' code</span></span>
+  <p lang="ko">둥근 따옴표(7, 9, 23, 25쪽), 7쪽의 대입 없는 줄과 닫히지 않은 문자열, <code>`include</code> 의 따옴표와 <code>import</code> 의 <code>::</code> 누락, 23쪽 virtual interface 선언의 괄호, 25쪽의 상속 없는 class 가 부르는 <code>get_full_name()</code>.</p>
+  <p lang="en">Curly quotes (slides 7, 9, 23, 25); slide 7's assignment-less line and unterminated string, the missing quotes on <code>`include</code> and missing <code>::</code> on <code>import</code>; parentheses on slide 23's virtual interface declaration; slide 25's plain class calling <code>get_full_name()</code>.</p>
+  </div>
+</section>
+
+<section id="q7">
+  <div class="sec-head"><span class="sec-num">7</span><h2 lang="ko">시험에 나올 것</h2><h2 lang="en">What shows up on the quiz</h2></div>
+  <table>
+    <thead><tr><th><span lang="ko">문제 모양</span><span lang="en">Shape of the question</span></th><th><span lang="ko">구별 기준 한 줄</span><span lang="en">The one line that decides it</span></th></tr></thead>
+    <tbody>
+      <tr><td><span lang="ko">phase 순서와 종류</span><span lang="en">phase order and kind</span></td><td><span lang="ko">t=0 function 넷 &rarr; run task &rarr; 끝 function</span><span lang="en">four t=0 functions &rarr; run task &rarr; closing functions</span></td></tr>
+      <tr><td><span lang="ko">계층 위의 방향</span><span lang="en">direction in the hierarchy</span></td><td><span lang="ko">build 만 top-down, 나머지 bottom-up</span><span lang="en">build top-down, the rest bottom-up</span></td></tr>
+      <tr><td>objection</td><td><span lang="ko">수가 0 이 되면 task phase 끝</span><span lang="en">the task phase ends when the count hits zero</span></td></tr>
+      <tr><td><span lang="ko">component 대 object</span><span lang="en">component vs object</span></td><td><span lang="ko">시간 0 에만 만들어져 끝까지 사나</span><span lang="en">built only at time 0 and alive to the end?</span></td></tr>
+      <tr><td><span lang="ko">driver 대 monitor</span><span lang="en">driver vs monitor</span></td><td><span lang="ko">능동으로 움직이나, 수동으로 보나</span><span lang="en">actively drives, or passively watches?</span></td></tr>
+      <tr><td><span lang="ko">port, analysis port, export</span><span lang="en">port, analysis port, export</span></td><td><span lang="ko">요청 / 여럿에게 뿌림 / 구현해서 응함</span><span lang="en">requests / broadcasts to many / implements and answers</span></td></tr>
+      <tr><td><span lang="ko">class 가 핀에 닿는 법</span><span lang="en">how a class reaches pins</span></td><td><span lang="ko">virtual interface handle 을 resource_db 로</span><span lang="en">a virtual interface handle via resource_db</span></td></tr>
+      <tr><td><span lang="ko">계보</span><span lang="en">lineage</span></td><td><span lang="ko">Specman/eRM(Cadence), VMM(Synopsys), AVM(Mentor) &rarr; OVM &rarr; UVM &rarr; IEEE 1800.2(보충)</span><span lang="en">Specman/eRM (Cadence), VMM (Synopsys), AVM (Mentor) &rarr; OVM &rarr; UVM &rarr; IEEE 1800.2 (supplement)</span></td></tr>
+    </tbody>
+  </table>
+  <p lang="ko">28쪽(backup)은 강사의 평가다. UVM 은 디지털 RTL 검증만 다루고, RAL 은 뼈대뿐이며, scoreboard, coverage, protocol 검증, clock/reset domain, low power 에는 정해진 방법론이 없다.</p>
+  <p lang="en">Slide 28 (backup) is the lecturer's assessment: UVM covers only digital RTL verification, RAL is skeletal, and there's no defined methodology for scoreboards, coverage, protocol verification, clock/reset domains or low power.</p>
+  <p lang="ko"><strong>다음 강의는 <a href="L17-uvm-2.html">Lecture 17, UVM 2</a></strong> (11/4 수, Joel Feldman). 26쪽이 예고한 "UVM 에서 이걸 어떻게 구현하나" 가 이어질 것이다. 11/11 에 UVM 3.</p>
+  <p lang="en"><strong>Next is <a href="L17-uvm-2.html">Lecture 17, UVM 2</a></strong> (Wednesday 11/4, Joel Feldman), picking up slide 26's "how do we implement this in UVM". UVM 3 follows on 11/11.</p>
+</section>
+
+
+<footer>
+  <span lang="ko">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 16 개인 학습 노트 (빠른 읽기 판)<br>
+  강의: Aman Arora, Arizona State University &middot; Fall 2026 &middot; 이 강의의 발표자: Joel Feldman (Design Verification Engineer) &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">강의 사이트</a><br>
+  이 노트 본문은 수강생이 강의 슬라이드를 재구성하고 보충해 만든 개인 학습 자료이며, 공식 강의 자료가 아닙니다.<br>
+  이 강의 슬라이드의 저작권은 Joel D. Feldman 에게 있습니다(Copyright &copy; 2025 Joel D Feldman). 슬라이드 2쪽의 고지에 따라 이 사이트는 슬라이드 PDF 를 싣지 않습니다.</span><span lang="en">CEN 598 / CSE 598 / CSE 494 Advanced Digital Design and Verification &middot; Lecture 16 personal study notes (quick read)<br>
+  Course: Aman Arora, Arizona State University &middot; Fall 2026 &middot; guest speaker for this lecture: Joel Feldman (Design Verification Engineer) &middot; <a href="https://adventlab.notion.site/addv-fall2026-website">course website</a><br>
+  These notes were written by a student who reorganised and expanded the lecture slides. They are not official course material.<br>
+  Copyright in this lecture's slides belongs to Joel D. Feldman (Copyright &copy; 2025 Joel D Feldman). Per the notice on slide 2, this site does not host the slide PDF.</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 큰 제목이 화면에서 사라지면 목차 위 미니 헤더를 띄운다.
+(function () {
+  var title = document.querySelector('header.top h1.title');
+  var mini = document.querySelector('nav.toc .mini-head');
+  if (!title || !mini || !window.IntersectionObserver) return;
+  new IntersectionObserver(function (es) {
+    mini.classList.toggle('on', !es[0].isIntersecting);
+  }, { threshold: 0 }).observe(title);
+})();
+</script>
+<button class="lang-btn" type="button">English</button>
+<button class="theme-btn" type="button">☾ 다크</button>
+<script>
+// 테마 토글. 기본은 OS 설정을 따르고, 누르면 그 반대로 고정한다.
+// 저장하지 않으므로 페이지를 옮기면 다시 OS 설정을 따른다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.theme-btn');
+  if (!btn) return;
+  var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  function current() {
+    return root.dataset.theme || (osDark && osDark.matches ? 'dark' : 'light');
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀ 라이트' : '☾ 다크';
+    btn.setAttribute('aria-label', dark ? '라이트 모드로' : '다크 모드로');
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    paint();
+  });
+  if (osDark && osDark.addEventListener) osDark.addEventListener('change', paint);
+  paint();
+})();
+</script>
+<script>
+// 언어 토글. 기본은 한국어. 저장하지 않으므로 페이지를 옮기면 한국어로 돌아간다.
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('.lang-btn');
+  if (!btn) return;
+  function paint() {
+    var en = root.dataset.lang === 'en';
+    btn.textContent = en ? '한국어' : 'English';
+    btn.setAttribute('aria-label', en ? '한국어로 보기' : 'View in English');
+    root.lang = en ? 'en' : 'ko';
+  }
+  btn.addEventListener('click', function () {
+    root.dataset.lang = root.dataset.lang === 'en' ? 'ko' : 'en';
+    paint();
+    window.dispatchEvent(new Event('langchange'));
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
