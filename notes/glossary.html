@@ -429,6 +429,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Active · Passive (is_active)</div>
+  <div class="f">uvm_active_passive_enum { UVM_PASSIVE = 0, UVM_ACTIVE = 1 }</div>
+  <div class="d" lang="ko">agent 의 모드. <strong>active</strong> 는 interface 신호를 바꾸는 driver(와 sequencer)까지 만들고, <strong>passive</strong> 는 보기만 하는 monitor 만 만든다. 값은 agent 의 <code>is_active</code> 이고 test 가 config db 로 정한다. block 단계에서는 active, 같은 agent 를 다른 블록이 입력을 모는 SoC 단계로 가져가면 passive 로 쓴다. Active · Reactive Stimulus 와는 다른 말이다.</div>
+  <div class="d" lang="en">An agent's mode. <strong>Active</strong> builds the driver (and sequencer) that alter interface signals; <strong>passive</strong> builds only the monitor that observes. The value is the agent's <code>is_active</code>, set by the test through the config db. Active at block level; passive when the same agent moves to SoC level, where another block drives the inputs. Not the same thing as Active · Reactive Stimulus.</div>
+  <div class="src"><a href="L17-uvm-2.html#s7">Lecture 17 &middot; 07</a> · <a href="L17-uvm-2.html#s8">Lecture 17 &middot; 08</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Active · Reactive Stimulus</div>
   <div class="d" lang="ko">누가 먼저 움직이나로 가른다. <strong>active</strong> 는 testbench 가 요청을 만들어 DUT 에 넣고, <strong>reactive</strong>(슬라이드 표현으로 passive/reactive)는 DUT 가 먼저 낸 요청에 testbench 가 응답한다. reactive 쪽은 응답의 지연, 순서, 오류 여부를 무작위로 한다. UVM 의 passive agent(monitor 만 켠 agent)와는 다른 말이다.</div>
   <div class="d" lang="en">Split by who moves first. <strong>Active</strong>: the testbench creates requests and drives them into the DUT. <strong>Reactive</strong> (the slide says passive/reactive): the testbench answers requests the DUT issues, randomizing the response's delay, order and errors. Not the same as UVM's passive agent (monitor only).</div>
@@ -446,7 +454,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Agent</div>
   <div class="d" lang="ko">Testbench에서 <strong>Driver와 Monitor를 (인터페이스와 함께) 한 부품으로 묶은 것.</strong> BFM, Transactor와 같은 것을 가리킨다. UVM에서 <code>uvm_agent</code>라서 이 이름이 가장 표준적이다. <strong>재사용의 단위다.</strong> APB agent를 한 번 만들면 APB를 쓰는 어떤 DUT에도 붙는다.</div>
   <div class="d" lang="en">In a testbench, <strong>the driver and monitor bundled into one component</strong> along with the interface. The same thing as a BFM or transactor. UVM calls it <code>uvm_agent</code>, which makes this the standard name. <strong>It is the unit of reuse:</strong> build an APB agent once and it plugs into any DUT that speaks APB.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a> · <a href="L16-uvm-1.html#s9">Lecture 16 &middot; 09</a> · <a href="L17-uvm-2.html#s8">Lecture 17 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -556,6 +564,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">task와 function을 <strong>호출할 때마다 지역 변수를 새로 만들게</strong> 하는 키워드. module 안에서는 기본이 <code>static</code>이라 <strong>모든 호출이 변수 한 벌을 공유한다.</strong> 같은 task가 <code>fork</code>로 동시에 두 번 돌면 서로를 덮어쓴다. 그래서 <strong>testbench의 task·function에는 거의 항상 붙인다.</strong></div>
   <div class="d" lang="en">A keyword that makes a task or function <strong>allocate fresh locals on every call.</strong> Inside a module the default is <code>static</code>, so <strong>every call shares one set of variables.</strong> Run the same task twice at once under a <code>fork</code> and they overwrite each other. <strong>Put it on nearly every testbench task and function.</strong></div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">AVM</div>
+  <div class="f">Advanced Verification Methodology</div>
+  <div class="d" lang="ko">Mentor Graphics(지금의 Siemens EDA)의 SystemVerilog testbench 방법론. UVM 이전의 벤더 방법론 중 하나로, Specman/eRM 의 장점과 함께 OVM 으로 모였다(슬라이드 31쪽). 슬라이드는 풀네임을 적지 않는다.</div>
+  <div class="d" lang="en">Mentor Graphics' (now Siemens EDA) SystemVerilog testbench methodology. One of the vendor methodologies before UVM; together with the best of Specman/eRM it converged into OVM (slide 31). The slides don't spell out the name.</div>
+  <div class="src"><a href="L16-uvm-1.html#s13">Lecture 16 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -811,7 +827,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Class · Object</div>
   <div class="d" lang="ko">class 는 <strong>property(변수)와 method(task, function)를 가진 type</strong>, object 는 그것으로 <code>new()</code> 가 <strong>실행 중에</strong> 찍어낸 실체다(instance 라고도 한다). transaction, driver, monitor 가 다 class 다. <strong>module instance 와 달리 시뮬레이션 도중에 생기고 사라진다.</strong></div>
   <div class="d" lang="en">A class is <strong>a type with properties (variables) and methods (tasks, functions)</strong>; an object is one stamped out from it by <code>new()</code> <strong>at run time</strong> (also called an instance). Transactions, drivers and monitors are all classes. <strong>Unlike module instances, objects appear and vanish during simulation.</strong></div>
-  <div class="src"><a href="L12-sv-for-verification.html#s4">Lecture 12 &middot; 04</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s4">Lecture 12 &middot; 04</a> · <a href="L16-uvm-1.html#s7">Lecture 16 &middot; 07</a></div>
 </div>
 
 <div class="gterm">
@@ -1153,7 +1169,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Driver</div>
   <div class="d" lang="ko">Testbench에서 transaction을 받아 <strong>실제 신호로 번역해 DUT에 밀어 넣는</strong> 부품. 프로토콜을 아는 쪽이고 <strong>능동</strong>이다. Monitor와 짝을 이루며, 둘을 묶으면 Agent가 된다.</div>
   <div class="d" lang="en">The testbench component that takes a transaction and <strong>translates it into real signals pushed into the DUT.</strong> It knows the protocol and it is <strong>active.</strong> It pairs with the monitor, and the two bundled make an agent.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L12-sv-for-verification.html#s14">Lecture 12 · 14</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L12-sv-for-verification.html#s14">Lecture 12 · 14</a> · <a href="L16-uvm-1.html#s8">Lecture 16 &middot; 08</a> · <a href="L17-uvm-2.html#s5">Lecture 17 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -1287,6 +1303,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gF">F</h2>
 
 <div class="gterm">
+  <div class="t">Factory Override</div>
+  <div class="f">set_type_override_by_type · set_inst_override_by_type</div>
+  <div class="d" lang="ko">factory 에게 "이 type 을 달라고 하면 저 type 을 만들어라" 고 걸어 두는 것. <strong>type(global) override</strong> 는 그 type 의 모든 create 를, <strong>instance override</strong> 는 한 경로의 instance 만 바꾼다. 대상이 create 되기 <strong>전에</strong>(보통 test 의 build_phase) 걸어야 하고, 바꾸는 type 은 원래 type 을 <strong>상속해야</strong> 한다. agent 같은 아래쪽 코드를 고치지 않고 driver 를 갈아 끼우는 길이다.</div>
+  <div class="d" lang="en">Telling the factory "when asked for this type, build that one". A <strong>type (global) override</strong> changes every create of that type; an <strong>instance override</strong> changes one instance at one path. It must be set <strong>before</strong> the target is created (usually in the test's build_phase), and the replacement must <strong>extend</strong> the original. It's how you swap a driver without touching lower-level code such as the agent.</div>
+  <div class="src"><a href="L17-uvm-2.html#s11">Lecture 17 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Factory · type_id::create</div>
+  <div class="f">uvm_factory</div>
+  <div class="d" lang="ko">등록된 type 의 목록(registry)과 override 표를 들고 object 를 대신 만들어 주는 UVM 의 중앙 장치. <code>`uvm_object_utils</code> / <code>`uvm_component_utils</code> 가 type 을 등록하고 <code>T::type_id::create(name, parent)</code> 가 만들어 달라는 요청이다. factory 는 override 가 있으면 요청받은 type 대신 그 자식 type 을 만든다. <strong><code>new()</code> 로 만든 것은 factory 를 거치지 않아 override 가 안 먹는다.</strong></div>
+  <div class="d" lang="en">UVM's central service that builds objects for you from a registry of types and an override table. <code>`uvm_object_utils</code> / <code>`uvm_component_utils</code> register a type; <code>T::type_id::create(name, parent)</code> is the request. If an override exists, the factory builds that child type instead. <strong>Anything built with <code>new()</code> bypasses the factory, so overrides don't apply.</strong></div>
+  <div class="src"><a href="L17-uvm-2.html#s9">Lecture 17 &middot; 09</a> · <a href="L17-uvm-2.html#s11">Lecture 17 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">False Path</div>
   <div class="d" lang="ko">회로에는 있지만 <strong>실제로는 절대 활성화되지 않는 timing path.</strong> STA는 모든 경로를 똑같이 "매 클럭 동작한다"고 가정하므로, 이런 경로는 사람이 timing constraint로 알려줘야 한다. <strong>잘못 선언하면 진짜 위반을 도구가 조용히 무시한다.</strong></div>
   <div class="d" lang="en">A timing path that exists in the circuit but <strong>is never actually activated.</strong> STA assumes every path runs every clock, so a human must declare these through timing constraints. <strong>Declare one wrongly and the tool quietly ignores a real violation.</strong></div>
@@ -1298,6 +1330,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">한 신호가 <strong>몇 군데를 먹이는가.</strong> 너무 많으면 그 신호가 느려진다. 강의의 해법은 <strong>만드는 쪽을 복제해 부하를 나누는 것</strong>이고, 대가는 면적과 전력이다.</div>
   <div class="d" lang="en"><strong>How many loads one signal drives.</strong> Too many and that signal gets slow. The lecture’s fix is <strong>duplicating the driver to split the load</strong>, paid for in area and power.</div>
   <div class="src"><a href="L07-efficient-design.html#s4">Lecture 7 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Field Macro · `uvm_field_int · UVM_ALL_ON</div>
+  <div class="f">field automation macro</div>
+  <div class="d" lang="ko"><code>`uvm_object_utils_begin</code>(또는 <code>`uvm_component_utils_begin</code>)과 <code>_end</code> 사이에 field 마다 적어, 그 field 의 copy, compare, print, pack, record 를 UVM 이 대신 만들게 하는 macro. <code>UVM_ALL_ON</code> 은 그 동작을 전부 켠다. type 별로 <code>_int</code>, <code>_enum</code> 등이 있다. component 의 field 로 등록하면 <code>super.build_phase</code> 가 config db 의 값을 자동으로 넣어 준다. 편하지만 펼쳐지는 코드가 크고 느리다는 비판이 있어 <code>do_copy</code> 같은 method 를 손으로 쓰는 쪽도 있다.</div>
+  <div class="d" lang="en">Macros written per field between <code>`uvm_object_utils_begin</code> (or <code>`uvm_component_utils_begin</code>) and <code>_end</code> so UVM generates that field's copy, compare, print, pack and record. <code>UVM_ALL_ON</code> switches all of them on; there's one per type (<code>_int</code>, <code>_enum</code>, ...). Registered on a component, the field also gets its value from the config db automatically in <code>super.build_phase</code>. Convenient, but criticised for large, slow expanded code, so some teams hand-write methods such as <code>do_copy</code> instead.</div>
+  <div class="src"><a href="L17-uvm-2.html#s2">Lecture 17 &middot; 02</a> · <a href="L17-uvm-2.html#s9">Lecture 17 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -1453,6 +1493,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko"><strong>하드웨어를 복사해서 여러 벌 만드는 반복문</strong>과 그 반복 변수. 실행되는 루프가 아니라 <strong>elaboration 때 한 번 펼쳐진다.</strong> 슬라이드 주석이 정확하다. <em>"creates 16 assign statements"</em>, 즉 16번 도는 게 아니라 16개를 만든다. <code>genvar</code>는 회로를 펼칠 때만 쓰이고 실물에는 남지 않는다. SV부터 <code>generate</code> 키워드는 선택사항이다.</div>
   <div class="d" lang="en"><strong>A loop that copies hardware</strong>, and its loop variable. It does not run; it <strong>unrolls once at elaboration.</strong> The slide comment says it exactly: <em>"creates 16 assign statements"</em>. Sixteen things built, not sixteen iterations. A <code>genvar</code> exists only while the circuit is unrolled and leaves nothing behind. Since SV the <code>generate</code> keyword is optional.</div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s15">Lecture 3 · 15</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">get_next_item · item_done</div>
+  <div class="f">seq_item_port · req · rsp</div>
+  <div class="d" lang="ko">driver 가 <code>seq_item_port</code> 로 sequencer 와 하는 handshake 의 두 호출. <code>get_next_item(req)</code> 는 item 이 올 때까지 <strong>멈췄다가</strong> 그 handle 을 <code>req</code> 에 담고, <code>item_done()</code> 은 그 item 이 끝났다고 알려 보낸 sequence 의 <code>finish_item</code> 을 풀어 준다. <strong>반드시 짝으로</strong> 부른다. 빼먹으면 "get_next_item called twice" UVM_ERROR 가 나고 sequence 가 멈춘다. <code>req</code>, <code>rsp</code> 는 <code>uvm_driver</code> 에 미리 선언된 요청과 응답 변수다.</div>
+  <div class="d" lang="en">The two calls of the handshake a driver does with its sequencer through <code>seq_item_port</code>. <code>get_next_item(req)</code> <strong>blocks</strong> until an item arrives and puts its handle in <code>req</code>; <code>item_done()</code> says the item is finished and releases the sending sequence's <code>finish_item</code>. <strong>Always call them as a pair</strong>; skip item_done and you get a "get_next_item called twice" UVM_ERROR and a stuck sequence. <code>req</code> and <code>rsp</code> are request and response variables <code>uvm_driver</code> declares for you.</div>
+  <div class="src"><a href="L17-uvm-2.html#s5">Lecture 17 &middot; 05</a> · <a href="L17-uvm-2.html#s12">Lecture 17 &middot; 12</a></div>
 </div>
 
 <div class="gterm">
@@ -1652,7 +1700,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Inheritance · extends</div>
   <div class="d" lang="ko"><code>class ErrPkt extends Packet;</code> 처럼 <strong>부모 class 의 property 와 method 를 물려받아</strong> 자식 class 를 만드는 것. 슬라이드 표현으로 검증된 부모를 깨거나 다시 쓰지 않고 고치는 방법이다. SV 는 부모를 하나만 허용한다.</div>
   <div class="d" lang="en">Building a child class that <strong>inherits a parent's properties and methods</strong>, as in <code>class ErrPkt extends Packet;</code>. Per the slide, a way to customise without breaking or rewriting a known-good parent. SV allows only one parent.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s5">Lecture 12 &middot; 05</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s5">Lecture 12 &middot; 05</a> · <a href="L17-uvm-2.html#s11">Lecture 17 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -1782,6 +1830,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">`uvm_component_utils · `uvm_object_utils</div>
+  <div class="d" lang="ko">class 를 UVM 의 factory 에 등록하는 macro. 등록해야 <code>run_test</code> 가 문자열 이름만으로 test 를 만들고, <code>type_id::create()</code> 로 object 를 만들 수 있다. component 에는 <code>`uvm_component_utils</code>, object(item, sequence)에는 <code>`uvm_object_utils</code> 를 쓴다. Lecture 16 슬라이드에는 이름이 나오지 않는다(노트의 보충).</div>
+  <div class="d" lang="en">Macros that register a class with UVM's factory, which is what lets <code>run_test</code> build a test from a string name and lets <code>type_id::create()</code> make objects. <code>`uvm_component_utils</code> for components, <code>`uvm_object_utils</code> for objects (items, sequences). Not named on the Lecture 16 slides (a supplement in the note).</div>
+  <div class="src"><a href="L16-uvm-1.html#s3">Lecture 16 &middot; 03</a> · <a href="L16-uvm-1.html#s7">Lecture 16 &middot; 07</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Lint</div>
   <div class="d" lang="ko">코드를 돌리지 않고 읽어서 <strong>가이드라인 위반을 찾는</strong> 정적 분석. 도구는 Synopsys Spyglass. 잡는 것: 도달할 수 없는 코드, 명명 규칙, blocking과 non-blocking 혼용, 합성 불가 구문, 다중 driver, <strong>의도치 않은 latch.</strong> <strong>스타일 지적이 아니다.</strong> 절반 이상이 실물이 코드와 다르게 동작하게 만드는 원인이다. 다만 lint는 verification이 아니다. "규칙을 지키는가"만 볼 뿐 "사양대로인가"는 못 본다.</div>
   <div class="d" lang="en">Static analysis that reads the code without running it and <strong>finds guideline violations.</strong> The tool named is Synopsys Spyglass. It catches unreachable code, naming conventions, mixed blocking and non-blocking assignments, un-synthesisable constructs, multiple drivers and <strong>unintended latches.</strong> <strong>These are not style nits:</strong> more than half of them cause the physical part to behave differently from the code. But lint is not verification; it only asks whether rules are followed, never whether the design matches the spec.</div>
@@ -1880,7 +1935,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">mailbox</div>
   <div class="d" lang="ko">thread 사이에 <strong>자료를 넘기는 우편함.</strong> 슬라이드 표현으로 "FIFO + Event". <code>put</code> 은 가득 차면, <code>get</code> 은 비면 기다리고, <code>try_</code> 가 붙은 것은 기다리지 않는다. <code>mailbox #(packet_t)</code> 로 담을 type 을 정한다.</div>
   <div class="d" lang="en">A <strong>postbox for passing data between threads</strong>, "FIFO + Event" in the slide's words. <code>put</code> waits when full, <code>get</code> when empty, and the <code>try_</code> versions never wait. <code>mailbox #(packet_t)</code> fixes the type it holds.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s7">Lecture 12 &middot; 07</a> &middot; <a href="L12-sv-for-verification.html#s17">17</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s7">Lecture 12 &middot; 07</a> &middot; <a href="L12-sv-for-verification.html#s17">17</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a> · <a href="L17-uvm-2.html#s6">Lecture 17 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1988,7 +2043,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Monitor</div>
   <div class="d" lang="ko">Testbench에서 인터페이스 신호를 <strong>읽어서 transaction으로 되돌리는</strong> 부품. DUT를 건드리지 않는 <strong>수동</strong> 부품이다. <strong>Checker와 Coverage는 Monitor 없이 붙을 수 없다.</strong> 관측을 안 하는데 판정하거나 셀 수 없기 때문이다. Driver가 없는 곳에도 붙일 수 있다.</div>
   <div class="d" lang="en">The testbench component that <strong>reads interface signals back into transactions.</strong> It never touches the DUT and is <strong>passive.</strong> <strong>Neither a checker nor coverage can attach without one</strong>, because nothing can be judged or counted that was never observed. It can be placed where no driver exists.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L12-sv-for-verification.html#s14">Lecture 12 · 14</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="L15-cpu-verification.html#s10">Lecture 15 &middot; 10</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L12-sv-for-verification.html#s14">Lecture 12 · 14</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="L15-cpu-verification.html#s10">Lecture 15 &middot; 10</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a> · <a href="L16-uvm-1.html#s8">Lecture 16 &middot; 08</a> · <a href="L17-uvm-2.html#s6">Lecture 17 &middot; 06</a></div>
 </div>
 
 <div class="gterm">
@@ -2062,6 +2117,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gO">O</h2>
 
 <div class="gterm">
+  <div class="t">Objection</div>
+  <div class="f">phase.raise_objection(this) · phase.drop_objection(this)</div>
+  <div class="d" lang="ko">UVM 의 task phase(run_phase 등)를 <strong>아직 끝내지 말라</strong>는 표시. 바쁜 component 가 올리고 끝나면 내린다. 올라간 수가 0 이 되면 phase 가 끝난다. <strong>아무도 안 올리면 run_phase 는 0 ns 에 끝나</strong> stimulus 없이 에러 0 개로 통과처럼 보이고, 올리고 안 내리면 timeout 까지 돈다.</div>
+  <div class="d" lang="en">UVM's way of saying <strong>don't end this task phase yet</strong> (run_phase and friends). A busy component raises one and drops it when done; when the count reaches zero, the phase ends. <strong>If nobody raises one, run_phase ends at 0 ns</strong> and the run looks like a pass with zero stimulus and zero errors; raise without dropping and it runs to the timeout.</div>
+  <div class="src"><a href="L16-uvm-1.html#s6">Lecture 16 &middot; 06</a> · <a href="L16-uvm-1.html#s14">Lecture 16 &middot; 14</a> · <a href="L17-uvm-2.html#s5">Lecture 17 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">OCN</div>
   <div class="f">On-Chip Network</div>
   <div class="d" lang="ko">Oracle 자료가 쓰는 NoC 의 이름. 강의의 예에서는 request(ring 넷), data(mesh), response(point to point) <strong>network 셋</strong>으로 되어 있다. AXI 가 채널을 나누듯 network 를 나눴다.</div>
@@ -2109,7 +2172,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Open Verification Methodology · Verification Methodology Manual</div>
   <div class="d" lang="ko">UVM 이전의 검증 방법론들. <strong>UVM이 이 둘을 합쳐 표준이 됐다.</strong> 지금 새로 배우는 건 UVM이고, 이 둘은 예전 코드에서 마주칠 이름이다.</div>
   <div class="d" lang="en">Verification methodologies that predate UVM. <strong>UVM merged them into the standard.</strong> UVM is what you learn now; these two are names you meet in older code.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a> · <a href="L16-uvm-1.html#s13">Lecture 16 &middot; 13</a></div>
 </div>
 
 <h2 class="gletter" id="gP">P</h2>
@@ -2142,6 +2205,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">배열 안에서 똑같이 반복되는 계산 칸 하나. 이 강의의 PE 는 명령어를 읽지 않고 MAC 와 데이터 전달만 한다. <strong>크기가 정해져 있지 않다.</strong> TPU 는 MAC 하나, Brainwave 는 MVM, GPU Tensor Core 는 4&times;4 행렬곱이다(슬라이드 11쪽).</div>
   <div class="d" lang="en">One compute cell repeated identically across an array. This lecture's PE reads no instructions; it does a MAC and passes data on. <strong>Its size isn't fixed</strong>: one MAC in the TPU, an MVM in Brainwave, a 4&times;4 matmul in a GPU Tensor Core (slide 11).</div>
   <div class="src"><a href="L09-matmul-accelerator.html#s5">Lecture 9 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Phase (UVM)</div>
+  <div class="f">build · connect · end_of_elaboration · start_of_simulation · run · extract · check · report · final</div>
+  <div class="d" lang="ko">모든 UVM component 가 함께 밟는 시뮬레이션의 순서표. 시간 0 의 function phase 넷, 시간이 흐르는 task phase(run_phase 와 나란히 도는 reset, configure, main, shutdown), 끝의 function phase 로 이루어진다. <strong>build_phase 는 top-down</strong>(부모가 자식을 만든다), connect 부터 report 까지는 bottom-up, run_phase 는 모든 component 가 동시에 시작한다. 슬라이드는 check_phase 를 빠뜨렸다.</div>
+  <div class="d" lang="en">The simulation timetable every UVM component follows: four time-0 function phases, time-consuming task phases (run_phase, with reset, configure, main and shutdown running alongside), then closing function phases. <strong>build_phase runs top-down</strong> (parents create children), connect through report bottom-up, and every component's run_phase starts at once. The slides omit check_phase.</div>
+  <div class="src"><a href="L16-uvm-1.html#s5">Lecture 16 &middot; 05</a> · <a href="L17-uvm-2.html#s5">Lecture 17 &middot; 05</a></div>
 </div>
 
 <div class="gterm">
@@ -2178,7 +2249,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Programming Language Interface</div>
   <div class="d" lang="ko">Verilog 시절 C 와 시뮬레이터를 잇던 통로. 세 세대다: PLI 1.0 tf routines(1985), 2.0 acc routines(1989), 3.0 vpi routines(1995). 시뮬레이터 내부를 들여다보는 도구 제작자용에 가깝고, 함수를 그냥 주고받는 일은 SV 의 <strong>DPI</strong> 가 맡는다.</div>
   <div class="d" lang="en">The Verilog-era channel between C and the simulator, in three generations: PLI 1.0 tf routines (1985), 2.0 acc routines (1989), 3.0 vpi routines (1995). Closer to a tool builder's view into the simulator; simply calling functions both ways is SV's <strong>DPI.</strong></div>
-  <div class="src"><a href="L12-sv-for-verification.html#s15">Lecture 12 &middot; 15</a> · <a href="L14-efficient-verification.html#s5">Lecture 14 &middot; 05</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s15">Lecture 12 &middot; 15</a> · <a href="L14-efficient-verification.html#s5">Lecture 14 &middot; 05</a> · <a href="L16-uvm-1.html#s11">Lecture 16 &middot; 11</a></div>
 </div>
 
 <div class="gterm">
@@ -2193,7 +2264,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">plusarg</div>
   <div class="d" lang="ko"><code>+TEST_FLAGS</code> 처럼 <strong>실행할 때</strong> simv 에 주는 인자. testbench 가 <code>$test$plusargs</code> 나 <code>$value$plusargs</code> 로 읽는다. 테스트 여럿을 한 번 컴파일한 실행 파일 안에 넣고 고를 수 있게 해준다.</div>
   <div class="d" lang="en">A run-time argument to simv, such as <code>+TEST_FLAGS</code>. The testbench reads it with <code>$test$plusargs</code> or <code>$value$plusargs</code>. It lets several tests live in one compiled executable and be picked at run time.</div>
-  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a> · <a href="L14-efficient-verification.html#s3">Lecture 14 &middot; 03</a> · <a href="LAB4-fifo-verification.html#s5">Lab 4 · 05</a></div>
+  <div class="src"><a href="LAB1-fifo-design.html#s10">Lab 1 · 10</a> · <a href="L14-efficient-verification.html#s3">Lecture 14 &middot; 03</a> · <a href="LAB4-fifo-verification.html#s5">Lab 4 · 05</a> · <a href="L16-uvm-1.html#s2">Lecture 16 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
@@ -2214,7 +2285,15 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Polymorphism · virtual method</div>
   <div class="d" lang="ko"><strong>부모 type 의 handle 로 자식의 method 를 부르는 것.</strong> 부모에서 <code>virtual</code> 로 선언한 method 는 handle 의 type 이 아니라 <strong>가리키는 object 의 type</strong> 으로 판을 고른다. virtual 이 없으면 handle 의 type 으로 정해져 부모 판이 돈다.</div>
   <div class="d" lang="en"><strong>Calling a child's method through a parent-type handle.</strong> A method declared <code>virtual</code> in the parent picks its version by <strong>the type of the object pointed at</strong>, not the handle's. Without virtual, the handle's type decides and the parent's version runs.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s5">Lecture 12 &middot; 05</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s5">Lecture 12 &middot; 05</a> · <a href="L17-uvm-2.html#s11">Lecture 17 &middot; 11</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Port · Export · Analysis Port</div>
+  <div class="f">UVM TLM connections (uvm_*_port · uvm_*_export · uvm_*_imp · uvm_analysis_port)</div>
+  <div class="d" lang="ko">UVM component 끼리 transaction 을 주고받는 연결 부품. <strong>port</strong> 는 요청만 하고(driver 의 <code>seq_item_port</code>), <strong>export</strong>(실제 구현 끝점은 imp)는 그 요청에 응하고(sequencer), <strong>analysis port</strong> 는 여러 구독자에게 뿌린다(monitor &rarr; scoreboard, coverage). connect_phase 에서 <code>connect()</code> 로 묶는다. analysis port 의 <code>write()</code> 는 function 이라 기다리지 않는다. mailbox 의 UVM 판이다.</div>
+  <div class="d" lang="en">The pieces UVM components use to pass transactions. A <strong>port</strong> only requests (the driver's <code>seq_item_port</code>), an <strong>export</strong> (the actual endpoint is an imp) services the request (the sequencer), and an <strong>analysis port</strong> broadcasts to many subscribers (monitor &rarr; scoreboard, coverage). Tied with <code>connect()</code> in connect_phase. An analysis port's <code>write()</code> is a function and never waits. UVM's take on the mailbox.</div>
+  <div class="src"><a href="L16-uvm-1.html#s10">Lecture 16 &middot; 10</a> · <a href="L17-uvm-2.html#s6">Lecture 17 &middot; 06</a> · <a href="L17-uvm-2.html#s8">Lecture 17 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -2437,6 +2516,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="src"><a href="L02-design-and-verification-overview.html#s12">Lecture 2 · 12</a></div>
 </div>
 
+<div class="gterm">
+  <div class="t">run_test · +UVM_TESTNAME</div>
+  <div class="d" lang="ko">UVM 시뮬레이션의 진입점. top module 의 <code>initial</code> 에서 <code>run_test("my_test")</code> 한 줄을 부르면 UVM 이 그 이름의 test object 를 만들고, phase 를 전부 돌리고, <code>$finish</code> 까지 간다. 실행 명령줄의 <code>+UVM_TESTNAME=...</code> 가 인자보다 이기므로, 다시 컴파일하지 않고 test 를 바꿀 수 있다("compile once, simulate many").</div>
+  <div class="d" lang="en">The entry point of a UVM simulation. One <code>run_test("my_test")</code> call in the top module's <code>initial</code> makes UVM create the named test object, run every phase and finish with <code>$finish</code>. <code>+UVM_TESTNAME=...</code> on the command line beats the argument, so you can switch tests without recompiling ("compile once, simulate many").</div>
+  <div class="src"><a href="L16-uvm-1.html#s2">Lecture 16 &middot; 02</a></div>
+</div>
+
 <h2 class="gletter" id="gS">S</h2>
 
 <div class="gterm">
@@ -2465,7 +2551,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Scoreboard</div>
   <div class="d" lang="ko">동작 수준 checker. <strong>DUT에 들어간 transaction과 나온 transaction을 맞춰본다.</strong> "데이터 X를 담은 transaction을 넣었으니 응답은 데이터 Y여야 한다" 같은 검사다. 신호 수준의 assertion과 층이 다르다.</div>
   <div class="d" lang="en">A behavioural checker that <strong>matches transactions going into the DUT against those coming out</strong>, as in "a transaction carrying X went in, so the response should carry Y". It sits at a different layer from signal level assertions.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s20">Lecture 12 · 20</a> · <a href="L13-verification-concepts.html#s7">Lecture 13 &middot; 07</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="LAB4-fifo-verification.html#s7">Lab 4 · 07</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <a href="L12-sv-for-verification.html#s20">Lecture 12 · 20</a> · <a href="L13-verification-concepts.html#s7">Lecture 13 &middot; 07</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="LAB4-fifo-verification.html#s7">Lab 4 · 07</a> · <a href="L16-uvm-1.html#s10">Lecture 16 &middot; 10</a> · <a href="L17-uvm-2.html#s10">Lecture 17 &middot; 10</a></div>
 </div>
 
 <div class="gterm">
@@ -2513,10 +2599,17 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Sequencer (uvm_sequencer)</div>
+  <div class="d" lang="ko">sequence 의 item 을 한 줄로 세워 driver 에게 넘기는 UVM component. 한 가지 item type 만 다루고(<code>#(item)</code> 으로 정한다), driver 가 <code>get_next_item()</code> 으로 <strong>당겨 간다</strong>. 슬라이드의 장보기 비유로 컨베이어 벨트. agent 안에 driver, monitor 와 함께 들어 있다. sequence(object)와 sequence item(object)과는 다른 것이다.</div>
+  <div class="d" lang="en">The UVM component that lines up a sequence's items and hands them to the driver. It handles one item type (fixed with <code>#(item)</code>), and the driver <strong>pulls</strong> items with <code>get_next_item()</code>. The conveyor belt in the slides' grocery analogy; it sits inside the agent with the driver and monitor. Not the same as a sequence (object) or a sequence item (object).</div>
+  <div class="src"><a href="L16-uvm-1.html#s8">Lecture 16 &middot; 08</a> · <a href="L16-uvm-1.html#s9">Lecture 16 &middot; 09</a> · <a href="L17-uvm-2.html#s4">Lecture 17 &middot; 04</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Sequence (UVM)</div>
   <div class="d" lang="ko">UVM 에서 <strong>stimulus 를 만드는 class</strong>(<code>uvm_sequence</code>). 보낼 transaction(sequence item)의 순서와 내용을 만들어 driver 에게 넘긴다. 슬라이드 표현으로 "Stimulus goes in sequences". assertion 안의 SVA <code>sequence</code>(Sequence &middot; Property 항목)와 <strong>이름만 같다.</strong> UVM 강의(16~18)에서 본격적으로 나온다.</div>
   <div class="d" lang="en">The UVM <strong>class that produces stimulus</strong> (<code>uvm_sequence</code>): it builds the order and content of transactions (sequence items) and hands them to a driver. In the slide's words, "Stimulus goes in sequences." It <strong>only shares a name</strong> with the SVA <code>sequence</code> inside assertions (see Sequence &middot; Property). Covered properly in the UVM lectures (16 to 18).</div>
-  <div class="src"><a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a></div>
+  <div class="src"><a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="L16-uvm-1.html#s8">Lecture 16 &middot; 08</a> · <a href="L17-uvm-2.html#s4">Lecture 17 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -2609,6 +2702,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">사양을 더 이상 바꾸지 않기로 못 박는 시점. Logic Freeze와 Tapeout 앞에 온다.</div>
   <div class="d" lang="en">The milestone at which the specification stops changing. It comes before logic freeze and tapeout.</div>
   <div class="src"><a href="L01-course-intro.html#s7">Lecture 1 · 07</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">Specman · e · eRM</div>
+  <div class="f">e Reuse Methodology</div>
+  <div class="d" lang="ko">Verisity(뒤에 Cadence)의 검증 도구 Specman 과 그 언어 e, 그리고 e 위의 재사용 방법론 eRM. UVM 이전의 벤더 방법론으로, 슬라이드 31쪽은 "시대를 꽤 앞서 갔다" 고 평하고 그 장점이 OVM 에 합쳐졌다고 쓴다. e 는 언어, Specman 은 도구, eRM 은 방법론이다.</div>
+  <div class="d" lang="en">Verisity's (later Cadence's) verification tool Specman, its language e, and eRM, the reuse methodology built on e. A vendor methodology before UVM; slide 31 calls it "quite ahead of its time" and says its best features were merged into OVM. e is the language, Specman the tool, eRM the methodology.</div>
+  <div class="src"><a href="L16-uvm-1.html#s13">Lecture 16 &middot; 13</a></div>
 </div>
 
 <div class="gterm">
@@ -2767,7 +2868,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">task · function</div>
   <div class="d" lang="ko"><strong>구별 기준은 하나다: 시간을 쓰는가.</strong> <code>function</code>은 <code>#</code>, <code>wait</code>, <code>@</code>를 못 쓰고 호출한 시점에 <strong>즉시</strong> 끝나며 그래서 조합 논리로 <strong>합성된다.</strong> <code>task</code>는 여러 클럭에 걸쳐 돌 수 있고 그래서 대개 <strong>합성되지 않는다.</strong> SystemVerilog가 <code>function</code>에 <code>return</code>과 <code>output</code> 인자를 추가했다.</div>
   <div class="d" lang="en"><strong>One criterion separates them: does it consume time.</strong> A <code>function</code> cannot use <code>#</code>, <code>wait</code> or <code>@</code>, finishes <strong>instantly</strong> at the point of call, and therefore <strong>synthesises</strong> into combinational logic. A <code>task</code> can run across many clocks and therefore usually <strong>does not synthesise.</strong> SystemVerilog gave functions a <code>return</code> and <code>output</code> arguments.</div>
-  <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a></div>
+  <div class="src"><a href="L03-system-verilog-for-design.html#s14">Lecture 3 · 14</a> · <a href="L16-uvm-1.html#s4">Lecture 16 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
@@ -2854,7 +2955,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Transaction Level Modeling</div>
   <div class="d" lang="ko">디지털 시스템을 <strong>RTL보다 높은 추상화 수준</strong>에서 모델링하는 것. 신호 다발 대신 <code>write(address, data)</code> 같은 호출로 블록을 잇는다. 세부가 적고, 코딩이 쉽고, 시뮬레이션이 빠르다. <strong>Testbench에서 Stimulus와 Driver가 나뉘는 경계가 정확히 여기다.</strong></div>
   <div class="d" lang="en">Modelling digital systems <strong>above RTL</strong>, connecting blocks by calls such as <code>write(address, data)</code> instead of bundles of signals. Fewer details, easier to code, faster to simulate. <strong>It is exactly the boundary at which a testbench splits stimulus from driver.</strong></div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s17">Lecture 2 · 17</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s17">Lecture 2 · 17</a> · <a href="L16-uvm-1.html#s10">Lecture 16 &middot; 10</a> · <a href="L17-uvm-2.html#s9">Lecture 17 &middot; 09</a></div>
 </div>
 
 <div class="gterm">
@@ -2905,14 +3006,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Transaction</div>
   <div class="d" lang="ko">여러 사이클에 걸친 핀의 움직임을 <strong>"무슨 일이 있었나" 하나로 묶은 object.</strong> FIFO 라면 "이 시각에 이 값을 썼다". monitor 가 핀에서 만들어 scoreboard 로 넘기고, 반대로 stimulus 가 만들어 driver 가 핀으로 푼다. class 라서 변수에는 handle 이 들어간다. <strong>object 하나를 재사용해 mailbox 에 넣으면 안의 항목이 전부 같은 것을 가리킨다.</strong> 매번 <code>new()</code> 한다. 버스 프로토콜의 transaction(APB 전송 하나)과 말이 겹치는데, testbench 쪽은 그것을 담는 object 다.</div>
   <div class="d" lang="en">An object bundling pin activity over several cycles into <strong>one "what happened"</strong>; for a FIFO, "wrote this value at this time". A monitor builds it from pins and passes it to a scoreboard; the other way round, stimulus builds it and a driver turns it into pin activity. It's a class, so variables hold handles: <strong>reuse one object for every mailbox put and all entries point to the same thing.</strong> Call <code>new()</code> each time. The word overlaps with a bus protocol's transaction (one APB transfer); the testbench one is the object that holds it.</div>
-  <div class="src"><a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
+  <div class="src"><a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a> · <a href="L16-uvm-1.html#s8">Lecture 16 &middot; 08</a> · <a href="L17-uvm-2.html#s2">Lecture 17 &middot; 02</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">Transactor</div>
-  <div class="d" lang="ko">Agent, BFM과 같은 것. Driver와 Monitor를 묶은 testbench 부품의 또 다른 이름이다.</div>
-  <div class="d" lang="en">The same thing as an agent or BFM: another name for the testbench component bundling a driver and a monitor.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a></div>
+  <div class="d" lang="ko">신호를 직접 흔들거나 지켜보는 testbench 부품. <strong>강의마다 가리키는 층이 다르다.</strong> 처음 나온 곳에서는 agent, BFM 처럼 driver 와 monitor 를 묶은 덩어리를 뜻했다. UVM 강의(Lecture 16, 17)는 driver, monitor, sequencer <strong>낱개</strong>를 transactor 라 부르고 agent 를 그것들을 담는 container 로 둔다. transaction(주고받는 데이터)과는 다른 말이다.</div>
+  <div class="d" lang="en">A testbench component that drives or watches signals. <strong>Which layer it names depends on the lecture.</strong> Where it first appeared it meant the bundle, like an agent or BFM wrapping a driver and a monitor. The UVM lectures (16 and 17) use it for <strong>each</strong> driver, monitor and sequencer, with the agent as their container. Not the same word as transaction, the data being passed.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s18">Lecture 2 · 18</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a> · <a href="L16-uvm-1.html#s8">Lecture 16 &middot; 08</a> · <a href="L17-uvm-2.html#s3">Lecture 17 &middot; 03</a></div>
 </div>
 
 <div class="gterm">
@@ -2985,16 +3086,51 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <div class="gterm">
   <div class="t">UVM</div>
   <div class="f">Universal Verification Methodology</div>
-  <div class="d" lang="ko">검증 방법론의 사실상 표준. <strong>언어가 아니라 SystemVerilog로 쓰인 class 라이브러리 + 관행의 묶음이다.</strong> testbench 부품의 이름과 모양과 붙이는 방법을 정해두어 <strong>남이 만든 것(VIP)을 가져다 쓸 수 있게</strong> 한다. VMM과 OVM을 합친 것이다. 이 과목에서는 Lecture 15~22와 Lab 6에서 다룬다.</div>
-  <div class="d" lang="en">The de facto standard verification methodology. <strong>Not a language but a class library written in SystemVerilog, plus a set of conventions.</strong> By fixing the names, shapes and connection rules of testbench components it makes it possible <strong>to use what somebody else built</strong>, that is, VIP. It merged VMM and OVM. This course covers it in lectures 20 to 22 and Lab 6.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a> · <a href="L15-cpu-verification.html#s12">Lecture 15 &middot; 12</a></div>
+  <div class="d" lang="ko">검증 방법론의 사실상 표준. <strong>언어가 아니라 SystemVerilog로 쓰인 class 라이브러리 + 관행의 묶음이다.</strong> testbench 부품의 이름과 모양과 붙이는 방법을 정해두어 <strong>남이 만든 것(VIP)을 가져다 쓸 수 있게</strong> 한다. VMM과 OVM을 합친 것이다. 이 과목에서는 Lecture 16~18 (UVM 1~3, Joel Feldman) 과 Lab 6 에서 다룬다.</div>
+  <div class="d" lang="en">The de facto standard verification methodology. <strong>Not a language but a class library written in SystemVerilog, plus a set of conventions.</strong> By fixing the names, shapes and connection rules of testbench components it makes it possible <strong>to use what somebody else built</strong>, that is, VIP. It merged VMM and OVM. This course covers it in Lectures 16 to 18 (UVM 1 to 3, Joel Feldman) and Lab 6.</div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L12-sv-for-verification.html#s1">Lecture 12 · 01</a> · <a href="L15-cpu-verification.html#s12">Lecture 15 &middot; 12</a> · <a href="L16-uvm-1.html#s1">Lecture 16 &middot; 01</a> · <a href="L17-uvm-2.html#s0">Lecture 17 &middot; 00</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">uvm_component · uvm_object</div>
+  <div class="d" lang="ko">UVM 의 두 base class. 모든 UVM class 는 <code>uvm_object</code> 에서 나오고, 그중 testbench 의 뼈대가 <code>uvm_component</code> 다. <strong>component 는 시간 0 에만 만들어져 끝까지 살고 phase 를 밟는다</strong>(test, env, agent, driver, monitor, sequencer, scoreboard). object 는 계속 생겼다 사라진다(sequence item, sequence). 생성자로 구별한다: <code>new(name, parent)</code> 대 <code>new(name)</code>. class 상속 계보와 component 계층(무엇이 무엇을 담나)은 다른 나무다.</div>
+  <div class="d" lang="en">UVM's two base classes. Every UVM class comes from <code>uvm_object</code>; the testbench skeleton comes from <code>uvm_component</code>. <strong>Components are built only at time 0, live to the end and walk the phases</strong> (test, env, agent, driver, monitor, sequencer, scoreboard); objects come and go (sequence items, sequences). Tell them apart by constructor: <code>new(name, parent)</code> vs <code>new(name)</code>. The class family tree and the component hierarchy (what contains what) are different trees.</div>
+  <div class="src"><a href="L16-uvm-1.html#s7">Lecture 16 &middot; 07</a> · <a href="L17-uvm-2.html#s4">Lecture 17 &middot; 04</a></div>
 </div>
 
 <div class="gterm">
   <div class="t">UVM_INFO &middot; UVM_WARNING &middot; UVM_ERROR &middot; UVM_FATAL</div>
   <div class="d" lang="ko">UVM 의 네 severity. SV 의 <code>$info</code> ~ <code>$fatal</code> 과 일대일로 대응한다(슬라이드 7쪽). <code>`uvm_info</code>, <code>`uvm_error</code> 같은 macro 로 부르고, UVM_ERROR 는 개수를 세며 UVM_FATAL 은 실행을 끝낸다. 자세한 action 과 verbosity 는 UVM 강의(16~18)에서 확인할 것.</div>
   <div class="d" lang="en">UVM's four severities, mapping one to one onto SV's <code>$info</code> to <code>$fatal</code> (slide 7). Called through macros such as <code>`uvm_info</code> and <code>`uvm_error</code>; UVM_ERROR is counted and UVM_FATAL ends the run. Actions and verbosity details to be confirmed in the UVM lectures (16 to 18).</div>
-  <div class="src"><a href="L14-efficient-verification.html#s6">Lecture 14 &middot; 06</a></div>
+  <div class="src"><a href="L14-efficient-verification.html#s6">Lecture 14 &middot; 06</a> · <a href="L16-uvm-1.html#s1">Lecture 16 &middot; 01</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">uvm_pkg · uvm_macros.svh</div>
+  <div class="d" lang="ko">UVM 라이브러리의 package 와 macro 정의 파일. <code>import uvm_pkg::*;</code> 로 class 를, <code>`include "uvm_macros.svh"</code> 로 <code>`uvm_info</code> 같은 macro 를 들여온다. macro 는 전처리 단계의 것이라 import 로는 안 들어오므로 둘 다 적는다.</div>
+  <div class="d" lang="en">The UVM library's package and its macro definitions file. <code>import uvm_pkg::*;</code> brings in the classes, <code>`include "uvm_macros.svh"</code> the macros like <code>`uvm_info</code>. Macros are preprocessor things an import doesn't bring, so you need both lines.</div>
+  <div class="src"><a href="L16-uvm-1.html#s1">Lecture 16 &middot; 01</a> · <a href="L16-uvm-1.html#s2">Lecture 16 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">uvm_resource_db · uvm_config_db</div>
+  <div class="d" lang="ko">이름(과 범위)을 열쇠로 아무 type 의 값을 넣고 꺼내는 UVM 의 전역 사전. 가장 흔한 쓰임은 <strong>virtual interface 를 class 에게 건네는 것</strong>이다. package 안의 class 는 계층 경로로 DUT 에 닿을 수 없으므로, top module 이 <code>set</code> 하고 driver 가 <code>read_by_name</code>(config_db 는 <code>get</code>)으로 받는다. <code>uvm_config_db</code> 는 resource_db 위에 얹어 component 계층 경로를 범위로 쓰는 편의 interface 다.</div>
+  <div class="d" lang="en">UVM's global dictionary for storing and fetching values of any type by name (and scope). Its most common job is <strong>handing a virtual interface to a class</strong>: a class in a package can't reach the DUT by hierarchical path, so the top module calls <code>set</code> and the driver receives it with <code>read_by_name</code> (<code>get</code> for config_db). <code>uvm_config_db</code> is a convenience layer on resource_db that scopes by component-hierarchy path.</div>
+  <div class="src"><a href="L16-uvm-1.html#s11">Lecture 16 &middot; 11</a> · <a href="L17-uvm-2.html#s5">Lecture 17 &middot; 05</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">uvm_sequence_item</div>
+  <div class="d" lang="ko">UVM 의 transaction base class. "한 번의 일" 을 field 로 적은 object 이고, sequence 가 만들어 sequencer 를 거쳐 driver 가 핀으로 풀며, monitor 가 핀에서 다시 만든다. 시뮬레이션 내내 생겼다 사라지는 동적 object 다. <code>uvm_sequence</code> 도 이 class 의 자손이다.</div>
+  <div class="d" lang="en">UVM's transaction base class: an object recording "one unit of work" as fields. A sequence creates it, it passes through the sequencer, the driver turns it into pins, and the monitor rebuilds it from pins. A dynamic object made and dropped throughout the run; <code>uvm_sequence</code> itself descends from it.</div>
+  <div class="src"><a href="L16-uvm-1.html#s8">Lecture 16 &middot; 08</a> · <a href="L17-uvm-2.html#s2">Lecture 17 &middot; 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">uvm_test · uvm_env</div>
+  <div class="d" lang="ko">UVM component 계층의 맨 위 두 층. <strong>test 는 감독</strong>으로, 이번 시뮬레이션이 무엇을 하는지 정하고 env 를 짓고 sequence 를 띄운다. <strong>env 는 그릇</strong>으로, agent 여럿, scoreboard, coverage, sub-env 를 담는다. env 는 블록마다 한 번 짜서 여러 test 가 공유하고, 시나리오의 차이는 test 쪽에 둔다.</div>
+  <div class="d" lang="en">The top two layers of the UVM component hierarchy. <strong>The test is the director</strong>: it decides what this simulation does, builds the env and launches sequences. <strong>The env is the container</strong> for agents, scoreboards, coverage and sub-envs. An env is written once per block and shared by many tests; scenario differences belong in the test.</div>
+  <div class="src"><a href="L16-uvm-1.html#s3">Lecture 16 &middot; 03</a> · <a href="L16-uvm-1.html#s9">Lecture 16 &middot; 09</a> · <a href="L17-uvm-2.html#s10">Lecture 17 &middot; 10</a></div>
 </div>
 
 <h2 class="gletter" id="gV">V</h2>
@@ -3068,7 +3204,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Verification IP</div>
   <div class="d" lang="ko">재사용 가능한 검증 자산. 예를 들어 EDA 벤더에게서 checker나 agent를 <strong>사서 우리 testbench에 끼워 넣는다.</strong> 이게 가능하려면 부품의 모양이 표준화돼 있어야 하고, 그래서 UVM 같은 방법론이 필요하다.</div>
   <div class="d" lang="en">A reusable verification asset: <strong>buy a checker or an agent from an EDA vendor and plug it into your testbench.</strong> That only works if component shapes are standardised, which is what a methodology such as UVM is for.</div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s22">Lecture 2 · 22</a> · <a href="L13-verification-concepts.html#s2">Lecture 13 &middot; 02</a> · <a href="L17-uvm-2.html#s8">Lecture 17 &middot; 08</a></div>
 </div>
 
 <div class="gterm">
@@ -3084,7 +3220,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">vif</div>
   <div class="d" lang="ko"><strong>interface instance 를 가리키는 handle.</strong> class 는 시뮬레이션 전에 정해지는 interface 를 품을 수 없어서 이것으로 DUT 의 신호를 만진다(<code>virtual dut_if vif;</code>). top 이 실제 instance 를 넘겨주지 않으면 null 이다. virtual method, virtual class 와는 다른 뜻의 virtual 이다.</div>
   <div class="d" lang="en"><strong>A handle pointing at an interface instance.</strong> A class cannot contain an interface, which is fixed before simulation, so it touches the DUT's signals through this (<code>virtual dut_if vif;</code>). Null unless top hands over a real instance. A different virtual from virtual methods and virtual classes.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s8">Lecture 12 &middot; 08</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s8">Lecture 12 &middot; 08</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a> · <a href="L16-uvm-1.html#s11">Lecture 16 &middot; 11</a> · <a href="L17-uvm-2.html#s5">Lecture 17 &middot; 05</a></div>
 </div>
 
 <h2 class="gletter" id="gW">W</h2>
@@ -3123,7 +3259,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">XMR &middot; Cross-Module Reference</div>
   <div class="d" lang="ko">포트를 거치지 않고 <code>top.mips.dp.rf...</code> 같은 <strong>계층 경로로 다른 모듈 안쪽 신호를 직접 읽는 것.</strong> SystemVerilog 표준은 hierarchical reference 라고 부른다. testbench 가 register file 이나 메모리 내용을 확인할 때 쓰고, 설계 코드에는 쓰지 않는다. 편하지만 인스턴스 이름에 묶여서 설계자가 이름을 바꾸면 testbench 가 깨진다. Lab 2 릴리스 덱은 프로세서 검증 방법 둘 중 하나로 소개하고, 다른 하나는 store 를 interface 신호에서 보는 것이다.</div>
   <div class="d" lang="en">Reading a signal inside another module <strong>directly by hierarchical path</strong>, like <code>top.mips.dp.rf...</code>, without going through ports. The SystemVerilog standard calls it a hierarchical reference. Testbenches use it to check register file or memory contents; design code never does. Handy, but tied to instance names: rename an instance and the testbench breaks. The Lab 2 release deck gives it as one of two ways to verify a processor; the other watches stores on the interface signals.</div>
-  <div class="src"><a href="LAB2-mips-processor-design.html#s10">Lab 2 · 10</a> · <a href="L14-efficient-verification.html#s4">Lecture 14 &middot; 04</a> · <a href="L15-cpu-verification.html#s3">Lecture 15 &middot; 03</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+  <div class="src"><a href="LAB2-mips-processor-design.html#s10">Lab 2 · 10</a> · <a href="L14-efficient-verification.html#s4">Lecture 14 &middot; 04</a> · <a href="L15-cpu-verification.html#s3">Lecture 15 &middot; 03</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a> · <a href="L16-uvm-1.html#s11">Lecture 16 &middot; 11</a> · <a href="L17-uvm-2.html#s1">Lecture 17 &middot; 01</a></div>
 </div>
 
 <div class="gterm">

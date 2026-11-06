@@ -445,14 +445,14 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt slide by slide from the lecture deck. What blocks you in this course is not maths but <strong>industry vocabulary</strong>, so every term comes with its full name and a note on who says it and when.</p>
 
   <div class="facts" lang="ko">
-    <span class="chip">15 / 23강 완료</span>
-    <span class="chip">약어 사전 373항목</span>
+    <span class="chip">17 / 23강 완료</span>
+    <span class="chip">약어 사전 391항목</span>
     <span class="chip">슬라이드 동기화</span>
     <span class="chip">한국어 · English</span>
   </div>
   <div class="facts" lang="en">
-    <span class="chip">15 of 23 lectures</span>
-    <span class="chip">373 glossary entries</span>
+    <span class="chip">17 of 23 lectures</span>
+    <span class="chip">391 glossary entries</span>
     <span class="chip">slide sync</span>
     <span class="chip">Korean &amp; English</span>
   </div>
@@ -860,24 +860,52 @@ a.mod:hover .num{color:var(--blue)}
   <a href="notes/L15-cpu-verification-quick.html" lang="en">seven sections: layers, coverage, generators, the ISS and retire</a>
 </div>
 
-<div class="mod soon">
+<a class="mod" href="notes/L16-uvm-1.html">
   <div class="num">16</div>
   <div>
     <div class="when">11/2 (Mon) · <span class="who">Joel Feldman</span></div>
     <h3>UVM 1</h3>
-    <p lang="ko">Lecture 2에서 이름만 나온 방법론. 세 강의에 걸쳐 다룬다.</p>
-    <p lang="en">The methodology that was only a name in Lecture 2, spread over three lectures.</p>
+    <p lang="ko">UVM 세 강의의 첫째(Introduction to UVM Part I). 옛 방식의 test 는 계층 경로로 핀을 직접 건드렸고, 새 방식은 <code>run_test()</code> 한 줄로 시뮬레이션을 UVM 에 넘긴다. <strong>test</strong> 가 감독이 되어 component 를 짓고, 모두가 같은 <strong>phase</strong> 를 밟으며(build 는 top-down, 나머지는 bottom-up), run 은 <strong>objection</strong> 이 다 내려가야 끝난다. component 와 object, transaction 과 transactor, 장보기 비유의 agent 와 env, TLM 의 port 와 analysis port, 그리고 class 가 resource_db 로 virtual interface 를 받아 DUT 핀에 닿는 법까지. objection 을 골라 run_phase 가 언제 끝나는지 밟아 보는 도구가 들어 있다. 슬라이드 PDF 는 2쪽의 고지에 따라 올리지 않았다.</p>
+    <p lang="en">The first of three UVM lectures (Introduction to UVM Part I). The old-way test poked pins through hierarchical paths; the new way hands the simulation to UVM with one <code>run_test()</code> call. <strong>The test</strong> directs, building the components; everyone walks the same <strong>phases</strong> (build top-down, the rest bottom-up); and the run ends only when every <strong>objection</strong> drops. Also components vs objects, transactions vs transactors, agents and envs via a grocery-store analogy, TLM ports and analysis ports, and how a class reaches DUT pins by getting a virtual interface through resource_db. Includes a tool for choosing objections and stepping through to see when run_phase ends. The slide PDF isn't posted, per the notice on slide 2.</p>
+    <div class="tags">
+      <span class="tag t">run_test · phase · objection</span>
+      <span class="tag v">uvm_component · uvm_object</span>
+      <span class="tag v">sequence item · sequencer · driver · monitor</span>
+      <span class="tag v">agent · env · scoreboard</span>
+      <span class="tag t">TLM port · analysis port</span>
+      <span class="tag t">virtual interface · resource_db</span>
+    </div>
   </div>
-  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L16-uvm-1-quick.html" lang="ko">run_test, phase 와 objection, component, agent, TLM 으로 7절</a>
+  <a href="notes/L16-uvm-1-quick.html" lang="en">seven sections: run_test, phases and objections, components, agents, TLM</a>
 </div>
 
-<div class="mod soon">
+<a class="mod" href="notes/L17-uvm-2.html">
   <div class="num">17</div>
   <div>
     <div class="when">11/4 (Wed) · <span class="who">Joel Feldman</span></div>
     <h3>UVM 2</h3>
+    <p lang="ko">UVM testbench 를 <strong>안에서 바깥으로</strong> 조립한다. DUT 의 port 를 <code>uvm_sequence_item</code> 으로 옮기고, sequencer, driver(<code>get_next_item</code> / <code>item_done</code>), monitor(analysis port)를 짜고, <code>is_active</code> 로 active 와 passive 를 바꾸는 <strong>agent</strong> 와 scoreboard 를 잇는 <strong>environment</strong> 로 묶는다. field macro, resource database, <strong>factory override</strong> 의 "magic" 을 풀고, 덱 코드의 실수를 짚는다. 슬라이드 PDF 는 2쪽 고지에 따라 싣지 않았다. sequence 와 driver 의 handshake 를 한 단계씩 밟는 도구가 들어 있다.</p>
+    <p lang="en">A UVM testbench assembled <strong>inside out</strong>: the DUT's ports become a <code>uvm_sequence_item</code>, then a sequencer, a driver (<code>get_next_item</code> / <code>item_done</code>) and a monitor (analysis port), bundled into an <strong>agent</strong> that switches active/passive via <code>is_active</code> and an <strong>environment</strong> that wires in the scoreboard. Opens up the "magic" of field macros, the resource database and <strong>factory overrides</strong>, and flags slips in the deck's code. The slide PDF isn't published, per the notice on slide 2. Includes a tool for stepping through the sequence&ndash;driver handshake.</p>
+    <div class="tags">
+      <span class="tag v">transaction · sequencer · driver · monitor</span>
+      <span class="tag v">agent · active/passive · env</span>
+      <span class="tag t">get_next_item · item_done</span>
+      <span class="tag t">analysis port · TLM</span>
+      <span class="tag t">factory · type override</span>
+      <span class="tag t">config_db · objection</span>
+    </div>
   </div>
-  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L17-uvm-2-quick.html" lang="ko">조립 순서, handshake, agent, factory 로 6절</a>
+  <a href="notes/L17-uvm-2-quick.html" lang="en">six sections: build order, the handshake, agents, the factory</a>
 </div>
 
 <div class="mod soon">
