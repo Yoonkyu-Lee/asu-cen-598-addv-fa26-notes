@@ -121,6 +121,11 @@ Lab 페이지는 설명에 필요한 **짧은 발췌**만 `pre.code` 로 싣는�
 다른 덱에는 이런 문구가 없다. 사용자가 노트만 게시하고 PDF 는 로컬에 두기로 했다.
 `.gitignore` 에 `slides/L08-floating-point.pdf` 가 있다. **새 게스트 덱은 커밋 전에 이런 고지가 있는지 본다.**
 
+**2026-11-05. 같은 이유로 L16, L17 (Joel Feldman, UVM 1, 2) 슬라이드 PDF 도 올리지 않는다.**
+두 덱 2쪽 Compliance & Permission 이 "Used with permission ... exclusively for ASU CSE/CEN 598",
+"extended for this academic course work only" 라고 적는다. 사용자가 L08 과 같은 처리를 골랐다.
+UVM 3 이 같은 강사이니 올라오면 같은 고지가 있는지 보고 물어본다.
+
 **그래도 안 올리는 것이 있다. Lab 문제지 원문과 Quiz · Exam 문제다.**
 그건 우리 저작물이 아니고 위 Student Copyright 조항에 정면으로 걸린다.
 
@@ -133,7 +138,7 @@ Lab 페이지는 설명에 필요한 **짧은 발췌**만 `pre.code` 로 싣는�
 
 | 파일 | 커밋 |
 |---|---|
-| `slides/L{NN}-*.pdf` (강의 슬라이드) | O. **L08 만 X** (게스트 덱의 배포 금지 고지) |
+| `slides/L{NN}-*.pdf` (강의 슬라이드) | O. **L08, L16, L17 은 X** (게스트 덱의 배포 제한 고지) |
 | `vendor/pdf.js/` | O |
 | `*.pptx` 원본 | **X.** PDF만 올린다. 발표자 노트가 딸려 들어간다 |
 | `lecture/` 전체 | **X.** 원본 스테이징 폴더다. 폰트 zip 은 재배포 금지 자산이다 |
