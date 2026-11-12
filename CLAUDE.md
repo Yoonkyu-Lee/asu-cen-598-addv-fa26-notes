@@ -124,7 +124,14 @@ Lab 페이지는 설명에 필요한 **짧은 발췌**만 `pre.code` 로 싣는�
 **2026-11-05. 같은 이유로 L16, L17 (Joel Feldman, UVM 1, 2) 슬라이드 PDF 도 올리지 않는다.**
 두 덱 2쪽 Compliance & Permission 이 "Used with permission ... exclusively for ASU CSE/CEN 598",
 "extended for this academic course work only" 라고 적는다. 사용자가 L08 과 같은 처리를 골랐다.
-UVM 3 이 같은 강사이니 올라오면 같은 고지가 있는지 보고 물어본다.
+2026-11-11 에 UVM 3 (L18) 도 같은 고지가 있어서 사용자에게 묻고 같은 처리를 했다.
+
+**2026-11-11. L19 (UVM review, Aman Arora) 는 PDF 를 올리되 9쪽만 가린다.** 강사 덱이라 고지는 없지만
+9쪽이 Lecture 16 의 그림을 그대로 가져왔고 "Copyright © 2025 Joel D Feldman" 이 찍혀 있다. 사용자가 그 한 장만
+가리고 게시하기로 했다. `slides/L19-uvm-review.pdf` 의 9쪽은 같은 크기의 안내 페이지다 (쪽 번호 유지).
+**`pptx2pdf.ps1 -Force` 로 다시 만들면 가린 쪽이 되살아난다.** 다시 만들었으면 PyMuPDF 로 9쪽을
+`delete_page(8)` 후 같은 크기 `new_page(pno=8)` 에 안내 문구를 넣어 다시 가린다.
+**강사 덱에도 게스트 강사의 그림이 섞여 들어올 수 있다.** 새 덱은 "Copyright" 와 게스트 이름을 grep 하고 렌더해서 본다.
 
 **그래도 안 올리는 것이 있다. Lab 문제지 원문과 Quiz · Exam 문제다.**
 그건 우리 저작물이 아니고 위 Student Copyright 조항에 정면으로 걸린다.
@@ -138,7 +145,7 @@ UVM 3 이 같은 강사이니 올라오면 같은 고지가 있는지 보고 물
 
 | 파일 | 커밋 |
 |---|---|
-| `slides/L{NN}-*.pdf` (강의 슬라이드) | O. **L08, L16, L17 은 X** (게스트 덱의 배포 제한 고지) |
+| `slides/L{NN}-*.pdf` (강의 슬라이드) | O. **L08, L16, L17, L18 은 X** (게스트 덱의 배포 제한 고지) |
 | `vendor/pdf.js/` | O |
 | `*.pptx` 원본 | **X.** PDF만 올린다. 발표자 노트가 딸려 들어간다 |
 | `lecture/` 전체 | **X.** 원본 스테이징 폴더다. 폰트 zip 은 재배포 금지 자산이다 |

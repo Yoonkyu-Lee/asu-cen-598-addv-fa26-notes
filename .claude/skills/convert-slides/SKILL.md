@@ -159,6 +159,9 @@ node scripts/render-slides.mjs slides/L01-course-intro.pdf 12-18
 4. **게스트 덱이면 배포 고지를 찾는다.** `pptx-text.py` 출력에서 `reproduce`, `distribut`, `permission` 을 grep 한다.
    L08 (Prashant Joshi) 슬라이드 3쪽이 청중 외 배포를 금해서 그 PDF 만 `.gitignore` 에 넣었다 (CLAUDE.md 참조).
    **고지가 있으면 커밋 전에 사용자에게 묻는다.**
+   **강사 덱도 본다.** L19 (UVM review) 9쪽이 게스트 강사 Feldman 의 그림을 저작권 줄째로 가져왔다.
+   텍스트 층에 안 잡히는 그림 속 글자일 수 있으니 `Copyright` 와 게스트 이름을 grep 하고, 그림 쪽은 렌더해서 본다.
+   그런 쪽이 있으면 사용자에게 묻는다. L19 는 그 쪽만 안내 페이지로 바꿔 게시했다 (CLAUDE.md 참조).
 5. **슬라이드 본문과 발표자 노트를 뽑아 읽는다.**
    `python scripts/pptx-text.py "<pptx>"`. 필요하면 강의 사이트의 Material 링크도 확인한다.
    **노트에 옮길 문구는 PDF 가 아니라 이 XML 추출을 원본으로 삼는다.** 변환기가 무엇이든

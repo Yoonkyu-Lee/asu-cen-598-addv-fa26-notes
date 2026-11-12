@@ -47,6 +47,9 @@ $map = [ordered]@{
   '16_Verification Concepts.pptx'                      = 'L13-verification-concepts.pdf'
   '17_Efficient Verification Tips.pptx'                 = 'L14-efficient-verification.pdf'
   '19_CPU verification.pptx'                            = 'L15-cpu-verification.pdf'
+  # L19 은 변환 뒤 9쪽(Feldman 저작 그림)을 안내 페이지로 바꾼 사본이 slides/ 에 있다. -Force 로 다시 만들면
+  # 가린 쪽이 되살아나니, 다시 만들었으면 CLAUDE.md 의 L19 절차대로 9쪽을 다시 가린다.
+  '24_UVM_Review.pptx'                                  = 'L19-uvm-review.pdf'
 }
 
 New-Item -ItemType Directory -Force $work | Out-Null

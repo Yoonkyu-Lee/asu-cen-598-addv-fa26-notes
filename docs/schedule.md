@@ -28,6 +28,11 @@
 | `16_Verification Concepts` | **13 강** |
 | `17_Efficient Verification Tips` | **14 강** |
 | `18_Lab4_Release` | 강의 아님 (Lab 4) |
+| `20_Introduction to UVM Part 1` (PDF) | **16 강** |
+| `21_Introduction to UVM Part 2` (PDF) | **17 강** |
+| `22_Introduction to UVM Part 3` (PDF) | **18 강** |
+| `23_Lab5_Release` | 강의 아님 (Lab 5) |
+| `24_UVM_Review` | **19 강** |
 | `19_CPU verification` | **15 강** (Material 에 `risc-v-verification_techniques.pdf` 가 딸려 있다) |
 
 강의 사이트의 Schedule 번호는 Lab 을 함께 세므로 여기 번호와 다르다.
@@ -51,16 +56,16 @@
 | 11 | 15 | 10/7 | Case study: SoC interconnect design | Eric Taylor |
 | 12 | 17 | 녹화 | System Verilog for Verification | Aman Arora | (Dropbox 영상, 00:15~1:43. 10/19 수업에 참여 quiz) |
 | 13 | 10 | 10/19 | Verification Concepts | Aman Arora | (예전 이 자리의 Assertion Based Verification 을 대체) |
-| 14 | 18 | 10/21 | Efficient verification methods + Catch up | Aman Arora | (11/11 에서 당겨짐) |
-| 15 | 20 | 10/28 | Case study: CPU verification | Aman Arora |
-| 16 | 21 | 11/2 | UVM 1 | Joel Feldman |
-| 17 | 22 | 11/4 | UVM 2 | Joel Feldman |
-| 18 | 24 | 11/11 | UVM 3 | Joel Feldman |
-| 19 | 25 | 11/16 | Case study: High-speed I/O design and verification | Aman Arora |
-| 20 | 26 | 11/18 | Case study: SoC verification | Brendan Donahe |
-| 21 | 28 | 11/25 | Formal verification overview | Amin Rezai |
-| 22 | 29 | 11/30 | Emulation | Vivek Tiwari |
-| 23 | 30 | 12/2 | Testing | Aman Arora |
+| 14 | 19 | 10/21 | Efficient verification methods + Catch up | Aman Arora | (11/11 에서 당겨짐) |
+| 15 | 21 | 10/28 | Case study: CPU verification | Aman Arora |
+| 16 | 22 | 11/2 | UVM 1 | Joel Feldman |
+| 17 | 23 | 11/4 | UVM 2 | Joel Feldman |
+| 18 | 24 | 11/9 | UVM 3 | Joel Feldman | (11/11 에서 당겨짐) |
+| 19 | 26 | 11/16 | UVM review | Aman Arora | (예전 이 자리의 High-speed I/O case study 를 대체) |
+| 20 | 27 | 11/18 | Case study: SoC verification | Brendan Donahe |
+| 21 | 29 | 11/25 | Formal verification overview | Amin Rezai |
+| 22 | 30 | 11/30 | Emulation | Vivek Tiwari |
+| 23 | 31 | 12/2 | Testing | Aman Arora |
 
 ## Lab (7)
 
@@ -72,15 +77,26 @@ Lab overview 강의는 별도 노트를 만들지 않고 `LAB{N}` 공략 페이�
 | 1 | 7 | 9/14 | FIFO |
 | 2 | 12 | 9/28 | Pipelined MIPS |
 | 3 | 16 | 10/14 | Systolic Matmul |
-| 4 | 19 | 10/26 | FIFO Verification (plan, DPI, scoreboard, SVA) |
-| 5 | 23 | 11/9 | MIPS Random Stimulus, Coverage |
-| 6 | 27 | 11/23 | Systolic Matmul, APB agent, Assertions |
+| 4 | 20 | 10/26 | FIFO Verification (plan, DPI, scoreboard, SVA) |
+| 5 | - | 11/10 (화) | MIPS Verification (instruction generator, coverage, ISS) | (녹화 영상) |
+| 6 | 28 | 11/23 | Systolic Matmul, APB agent, Assertions |
 
 ## 기말
 
 | site | 날짜 | |
 |---|---|---|
-| 31 | 12/7 (월) | Final exam |
+| 32 | 12/7 (월) | Final exam (BAC 116) |
+
+## 2026-11-11 에 고친 것
+
+강의 사이트 Schedule 을 다시 긁었다.
+
+- **UVM 3 이 11/11 에서 11/9 (월) 로 당겨졌다.** 11/11 은 Veterans Day 다
+- **Lab 5 overview 는 11/10 (화)** 이고 Schedule 에 Dropbox 영상이 붙어 있다. 설명서 제목은 "MIPS Verification" 이다
+- **11/16 (월) 은 UVM review (Aman Arora) 다.** 예전 이 자리의 Case study: High-speed I/O design and verification 은 표에서 사라졌다.
+  강의 수는 그대로 23 이다. 19 강의 주제만 바뀌었다
+- **기말은 12/7 (월), BAC 116** 이다
+- site 번호가 14 강부터 한 칸씩 밀려 있었다 (UVM 1 이 22 번). 14~23 강과 Lab 4~6 의 `site` 열을 고쳤다. Lab 5 행은 사이트에 번호가 없다 (25 번은 Veterans Day 가 가져갔다)
 
 ## 2026-11-01 에 고친 것
 
