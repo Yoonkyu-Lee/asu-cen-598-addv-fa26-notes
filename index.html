@@ -445,14 +445,14 @@ a.mod:hover .num{color:var(--blue)}
   <p class="lede" lang="en">Personal study notes rebuilt slide by slide from the lecture deck. What blocks you in this course is not maths but <strong>industry vocabulary</strong>, so every term comes with its full name and a note on who says it and when.</p>
 
   <div class="facts" lang="ko">
-    <span class="chip">17 / 23강 완료</span>
-    <span class="chip">약어 사전 391항목</span>
+    <span class="chip">19 / 23강 완료</span>
+    <span class="chip">약어 사전 414항목</span>
     <span class="chip">슬라이드 동기화</span>
     <span class="chip">한국어 · English</span>
   </div>
   <div class="facts" lang="en">
-    <span class="chip">17 of 23 lectures</span>
-    <span class="chip">391 glossary entries</span>
+    <span class="chip">19 of 23 lectures</span>
+    <span class="chip">414 glossary entries</span>
     <span class="chip">slide sync</span>
     <span class="chip">Korean &amp; English</span>
   </div>
@@ -461,8 +461,8 @@ a.mod:hover .num{color:var(--blue)}
     <div class="nh" lang="ko">학기 운영 공지</div>
     <div class="nh" lang="en">Course logistics</div>
     <ul lang="ko">
-      <li><strong>Lab 4 (FIFO Verification) 는 2 인 1 조다.</strong> 마감은 규칙상 Lab 5 overview (11/9) 전날 밤, 즉 <strong>11/8 밤</strong>으로 보이니 Canvas 에서 확인한다. 리포트에 <strong>파트너별 기여 요약이 없으면 20점</strong>이 깎인다. 제출 파일 이름 규칙이 또 <code>_lab3</code> 로 적혀 있으니 TA 에게 확인한다.</li>
-      <li><strong>13강부터 일정이 바뀌었다.</strong> Assertion Based Verification 이 빠지고 Verification Concepts (10/19) 가 들어왔다. Efficient verification 은 10/21 로 당겨졌고 CPU verification 은 10/28 로 밀렸다. <strong>UVM 1 은 11/2 (월), UVM 3 은 11/11</strong> 이다. 강의 사이트 Schedule 기준, 11/1 확인.</li>
+      <li><strong>Lab 5 (MIPS Verification) 는 2 인 1 조다.</strong> 마감은 규칙상 Lab 6 overview (11/23) 전날 밤, 즉 <strong>11/22 밤</strong>으로 보이니 Canvas 에서 확인한다. 리포트에 <strong>파트너별 기여 요약이 없으면 20점</strong>이 깎인다. Lab 5 overview 는 11/10 (화) 녹화 영상으로 나왔다.</li>
+      <li><strong>일정이 또 바뀌었다.</strong> UVM 3 은 11/9 로 당겨졌고 11/11 은 Veterans Day 다. <strong>11/16 은 UVM review (Aman Arora)</strong> 이고, 예정돼 있던 High-speed I/O case study 는 빠졌다. <strong>기말은 12/7 (월), BAC 116.</strong> 강의 사이트 Schedule 기준, 11/11 확인.</li>
       <li><strong>Lab 제출 정책이 양방향이다.</strong> 늦으면 24시간당 15% 감점(최대 3구간, 그 뒤 0점), <strong>일찍 내면 24시간당 5% 가산점</strong>(최대 10%). 48시간 전에 내면 그냥 10%를 얻는다.</li>
       <li><strong>Synopsys 트레이닝이 유료로 보이면</strong> 먼저 로그인할 것. 강사가 확인한 사항이다.</li>
       <li>Pre-Req Test는 <strong>성적에 반영되지 않고</strong> 여러 번 응시할 수 있다.</li>
@@ -470,8 +470,8 @@ a.mod:hover .num{color:var(--blue)}
       <li>Lecture 12 (55쪽) 와 Lecture 13 (11쪽) 이 Synopsys 트레이닝 <strong>"SystemVerilog for Verification" 을 이수하라고 지정했다.</strong> Lecture 13 (33쪽) 은 <strong>"Language: SystemVerilog Assertions"</strong> 도 지정했다. 둘 다 마감은 덱에 없다.</li>
     </ul>
     <ul lang="en">
-      <li><strong>Lab 4 (FIFO Verification) is done in pairs.</strong> By the course rule it is due the night before the Lab 5 overview (9 Nov), which looks like <strong>the night of 8 November</strong>. Confirm on Canvas. <strong>Leaving out the per-partner contribution summary costs 20 points.</strong> Its file naming rule says <code>_lab3</code> again, so confirm with the TA.</li>
-      <li><strong>The schedule changed from Lecture 13 on.</strong> Assertion Based Verification is gone and Verification Concepts (19 Oct) took its slot. Efficient verification moved up to 21 Oct and CPU verification back to 28 Oct. <strong>UVM 1 is Monday 2 November and UVM 3 is 11 November.</strong> Per the course site Schedule, checked 1 November.</li>
+      <li><strong>Lab 5 (MIPS Verification) is done in pairs.</strong> By the course rule it is due the night before the Lab 6 overview (23 Nov), which looks like <strong>the night of 22 November</strong>. Confirm on Canvas. <strong>Leaving out the per-partner contribution summary costs 20 points.</strong> The Lab 5 overview came out on Tuesday 10 November as a recorded video.</li>
+      <li><strong>The schedule moved again.</strong> UVM 3 moved up to 9 November, and 11 November is Veterans Day. <strong>16 November is a UVM review (Aman Arora)</strong>, replacing the planned High-speed I/O case study. <strong>The final is Monday 7 December in BAC 116.</strong> Per the course site Schedule, checked 11 November.</li>
       <li><strong>Lab submission runs both ways.</strong> Late costs 15% per 24 hours, up to three periods, then a zero. <strong>Early pays 5% per 24 hours</strong>, up to 10%. Submitting 48 hours ahead is simply worth ten points.</li>
       <li><strong>If the Synopsys training looks paywalled</strong>, log in first. The instructor confirmed this.</li>
       <li>The pre-req test <strong>does not count toward the grade</strong> and allows multiple attempts.</li>
@@ -908,22 +908,52 @@ a.mod:hover .num{color:var(--blue)}
   <a href="notes/L17-uvm-2-quick.html" lang="en">six sections: build order, the handshake, agents, the factory</a>
 </div>
 
-<div class="mod soon">
+<a class="mod" href="notes/L18-uvm-3.html">
   <div class="num">18</div>
   <div>
-    <div class="when">11/11 (Wed) · <span class="who">Joel Feldman</span></div>
+    <div class="when">11/9 (Mon) · <span class="who">Joel Feldman</span></div>
     <h3>UVM 3</h3>
+    <p lang="ko">Lecture 17 이 남긴 "이걸 다 어떻게 묶어 test 를 돌리나" 의 답. sequence item 에 <code>rand</code> 와 constraint 를 붙이고, <strong>sequence</strong> 의 <code>body()</code> 에서 <code>`uvm_do</code> / <code>`uvm_do_with</code> 로 item 을 보내고(실제 펼쳐지는 순서는 create, start_item, randomize, finish_item), sequence 안에 sequence 를 넣는다. <strong>test</strong> 가 env 를 짓고 raise, <code>seq.start(sqr)</code>, drop 으로 sequence 를 띄운다. package 둘, <code>tb_top</code>, 컴파일 순서, <code>+UVM_TESTNAME</code> 과 <code>uvm_test_top</code>, <code>reset_phase</code> / <code>main_phase</code>, <code>req.print()</code> 까지. 덱 코드의 실수(물려받은 run_phase, 1 bit implicit net 등)를 짚는다. 슬라이드 PDF 는 2쪽 고지에 따라 싣지 않았다. test 가 어느 phase 에서 무엇을 띄우는지 골라 보는 시간표 도구가 들어 있다.</p>
+    <p lang="en">The answer to Lecture 17's "how do we put it all together and run a test?" The sequence item gets <code>rand</code> and constraints; a <strong>sequence</strong>'s <code>body()</code> sends items with <code>`uvm_do</code> / <code>`uvm_do_with</code> (really create, start_item, randomize, finish_item), and sequences nest inside sequences. The <strong>test</strong> builds the env and launches sequences with raise, <code>seq.start(sqr)</code>, drop. Then two packages, <code>tb_top</code>, compile order, <code>+UVM_TESTNAME</code> and <code>uvm_test_top</code>, <code>reset_phase</code> / <code>main_phase</code>, and <code>req.print()</code>, with slips in the deck's code flagged (an inherited run_phase, 1-bit implicit nets and more). The slide PDF isn't published, per the notice on slide 2. Includes a timetable tool for choosing what a test launches in which phase.</p>
+    <div class="tags">
+      <span class="tag v">sequence · body() · `uvm_do</span>
+      <span class="tag v">hierarchical sequence · uvm_test</span>
+      <span class="tag t">rand · constraint · solve before</span>
+      <span class="tag t">package · tb_top · run_test</span>
+      <span class="tag t">+UVM_TESTNAME · uvm_test_top</span>
+      <span class="tag t">reset_phase · main_phase · print()</span>
+    </div>
   </div>
-  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L18-uvm-3-quick.html" lang="ko">sequence, test, 실행, sub-phase 로 7절</a>
+  <a href="notes/L18-uvm-3-quick.html" lang="en">seven sections: sequences, the test, running it, sub-phases</a>
 </div>
 
-<div class="mod soon">
+<a class="mod" href="notes/L19-uvm-review.html">
   <div class="num">19</div>
   <div>
     <div class="when">11/16 (Mon) · Aman Arora</div>
-    <h3>Case study: High-speed I/O design and verification</h3>
+    <h3>UVM review</h3>
+    <p lang="ko">UVM 세 강의를 담당 강사가 자기 말로 다시 묶는 복습. 수업 전에 올라온 덱으로 쓴 노트다. 이미 나온 것은 Lecture 16, 17 의 그 절로 보내고, 새로 붙은 <strong>이름</strong>(object 와 component, <strong>parent 와 super</strong>, config_db 와 resource_db, 강의마다 층이 달랐던 <strong>transactor</strong>)과 앞 강의에 없던 코드(<code>`uvm_do</code>, analysis FIFO, <code>`uvm_analysis_imp_decl</code>, <code>print_topology</code>)를 푼다. 중심은 <strong>Lab 4 의 SV testbench 와 UVM testbench</strong> 를 줄마다 맞댄 표다. 5쪽의 움직이는 data flow 그림을 슬라이더로 되살렸고, 이 강의의 짝들을 골라 보는 분류기가 들어 있다.</p>
+    <p lang="en">The course instructor re-tells the three UVM lectures in his own terms; written from the deck posted before class. What's already covered points back to Lectures 16 and 17; the note unpacks the new <strong>names</strong> (objects and components, <strong>parent and super</strong>, config_db and resource_db, and <strong>transactor</strong>, whose layer shifted between lectures) and code the earlier lectures didn't show (<code>`uvm_do</code>, the analysis FIFO, <code>`uvm_analysis_imp_decl</code>, <code>print_topology</code>). The centrepiece is a row-by-row table matching <strong>a Lab 4 SV testbench against a UVM testbench.</strong> Slide 5's animated data-flow figure comes back as a slider, and a classifier lets you sort this lecture's pairs.</p>
+    <div class="tags">
+      <span class="tag v">object · component · parent · super</span>
+      <span class="tag v">VIP · agent · BFM · transactor</span>
+      <span class="tag t">config_db · resource_db</span>
+      <span class="tag t">`uvm_do · start_item · finish_item</span>
+      <span class="tag t">analysis FIFO · imp_decl · print_topology</span>
+      <span class="tag v">SV testbench vs UVM testbench</span>
+    </div>
   </div>
-  <span class="status wait" lang="ko">준비 중</span><span class="status wait" lang="en">to come</span>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
+<div class="qk">
+  <span lang="ko">빠른 읽기 판 ·</span><span lang="en">Quick read ·</span>
+  <a href="notes/L19-uvm-review-quick.html" lang="ko">두 나무, 이름, db, TLM, SV 대 UVM 으로 7절</a>
+  <a href="notes/L19-uvm-review-quick.html" lang="en">seven sections: two trees, names, the db, TLM, SV vs UVM</a>
 </div>
 
 <div class="mod soon">
@@ -1061,14 +1091,22 @@ a.mod:hover .num{color:var(--blue)}
   </div>
   <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
 </a>
-<div class="mod soon">
+<a class="mod" href="notes/LAB5-mips-verification.html">
   <div class="num">5</div>
   <div>
-    <div class="when">11/9 (Mon) · Aman Arora</div>
-    <h3>Lab 5 (MIPS Random Stimulus, Coverage) overview</h3>
+    <div class="when">11/10 (Tue) · Aman Arora</div>
+    <h3>Lab 5 (MIPS Verification) overview</h3>
+    <p lang="ko">풀기 전에 보는 공략. Lab 2 의 pipelined MIPS 를 검증한다. uvm_transaction 명령어 class 와 assembler, 의존 쌍과 gap 을 만드는 random instruction generator, setup 과 trickbox store, $writememh → $readmemh 로 imem 싣기, fetch interface 의 uvm_monitor → uvm_subscriber coverage, seed 별 vdb 와 urg merge, code coverage, 공개 MIPS ISS 와 retire 순서 trace 비교까지. gap 마다 우리 pipeline 의 어느 forwarding 경로가 일하는지, fetch 와 retire 가 왜 갈리는지(offset 1 의 taken 은 fetch 주소로 안 보인다)를 그림으로 푼다. seed 를 더하며 merge coverage 가 오르는 미니 generator 포함.</p>
+    <p lang="en">A walkthrough for before you start: verifying Lab 2's pipelined MIPS. A uvm_transaction instruction class with an assembler, a random instruction generator for dependent pairs and gaps, setup and a trickbox store, loading imem via $writememh → $readmemh, a uvm_monitor on the fetch interface feeding a uvm_subscriber coverage collector, per-seed vdbs merged with urg, code coverage, and retire-order trace comparison against a public MIPS ISS. Figures show which forwarding path in our pipeline each gap exercises and why fetch and retire diverge (an offset-1 taken branch is invisible in fetch addresses). Includes a mini generator where merged coverage climbs as you add seeds.</p>
+    <div class="tags">
+      <span class="tag v">random instruction generator · constraint</span>
+      <span class="tag v">uvm_monitor · uvm_subscriber · covergroup</span>
+      <span class="tag v">ISS · trace comparison · trickbox</span>
+      <span class="tag t">seed · vdb · urg merge · Verdi</span>
+    </div>
   </div>
-  <span class="status lab" lang="ko">Lab 안내</span><span class="status lab" lang="en">lab brief</span>
-</div>
+  <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
+</a>
 <div class="mod soon">
   <div class="num">6</div>
   <div>
