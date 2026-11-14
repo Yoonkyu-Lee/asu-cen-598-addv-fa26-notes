@@ -1064,13 +1064,14 @@ a.mod:hover .num{color:var(--blue)}
   <div>
     <div class="when">10/14 (Wed) · Aman Arora</div>
     <h3>Lab 3 (Systolic Matmul) overview</h3>
-    <p lang="ko">풀기 전에 보는 공략. 근거는 릴리스 덱 하나뿐이라 덱이 정한 것과 안 정한 것을 갈라 적었다. 4×4 int8 matmul 을 FP8 E3M4 로 바꾸고(bias 3, 최대 15.5, 그리고 덱이 안 정한 111 과 000), 누적 고리 때문에 FP 연산기의 pipeline 을 걷어내고, flags 를 bitwise OR 로 모으고, APB slave 와 CSR 로 감싸고, 8×8 로 키운다. 256 코드를 다 눌러보는 FP8 도구와 Lab 1 채점에서 가져올 것까지.</p>
-    <p lang="en">A walkthrough for before you start. The release deck is the only source, so what it decides is kept apart from what it leaves open. Switch the 4×4 int8 matmul to FP8 E3M4 (bias 3, max 15.5, and the 111 and 000 rows the deck leaves open), de-pipeline the FP units because of the accumulation loop, merge flags with a bitwise OR, wrap it in an APB slave with CSRs, and grow it to 8×8. Plus an FP8 tool covering all 256 codes and the lessons from Lab 1 grading.</p>
+    <p lang="ko">끝낸 뒤의 정리. 행렬곱이 왜 곱하고 더하기 512 번인지에서 출발해, 숫자를 격자에 흘려보내는 systolic array, int8 을 FP8 E3M4 로 바꾸면 생기는 반올림과 flag(계산기로는 기대값을 못 내는 이유), 누적 고리 때문에 연산기를 한 사이클에 넣은 대가, 4×4 넷을 이을 때 17 사이클에 박힌 done 이라는 함정, START 레지스터 하나가 FSM 을 대신하는 APB slave 까지. 주어진 것과 얹은 것은 git 으로 대조했고, 다시 낼 수 없었던 합성 숫자도 적었다.</p>
+    <p lang="en">A write-up from after the lab. It starts with why a matrix product is 512 multiply-adds, then the systolic array, the rounding and flags that come with swapping int8 for FP8 E3M4 (and why a calculator can't give the expected values), the cost of fitting the units in one cycle because of the accumulation loop, the done pulse hard-wired at cycle 17 that trips up an 8×8 built from four 4×4s, and an APB slave where one START register replaces the FSM. Given vs added is checked with git, and the synthesis numbers that couldn't be reproduced are recorded.</p>
     <div class="tags">
-      <span class="tag d">FP8 E3M4 · bias · de-pipelining</span>
-      <span class="tag d">PE flags · 8×8 from four 4×4s</span>
-      <span class="tag d">wrapper · CSR · register map</span>
-      <span class="tag v">apb_write · apb_read · polling</span>
+      <span class="tag d">systolic array · FP8 E3M4 · ties to even</span>
+      <span class="tag d">one-cycle MAC · 8×8 from four 4×4s</span>
+      <span class="tag d">APB slave · CSR · register map</span>
+      <span class="tag v">reference model · exception waveform</span>
+      <span class="tag t">DC · 4×4 vs 8×8</span>
     </div>
   </div>
   <span class="status done" lang="ko">읽기</span><span class="status done" lang="en">read</span>
@@ -1080,12 +1081,12 @@ a.mod:hover .num{color:var(--blue)}
   <div>
     <div class="when">10/26 (Mon) · Aman Arora</div>
     <h3>Lab 4 (FIFO Verification) overview</h3>
-    <p lang="ko">풀기 전에 보는 공략. 처음으로 검증만 하는 Lab. Lab 1 의 비동기 FIFO 에 검증 계획을 쓰고, C golden model 을 DPI 로 부르는 checker 와 "N 번째 쓰기마다 버리는" bug 를 세우고, interface 둘과 monitor → mailbox → scoreboard(q[$])를 짜고, even-odd 회로에 SVA 다섯 개를 건다. 0 지연 모델과 flag 를 그냥 비교하면 왜 거짓 오류가 나는지, assertion 이 실제로 발동하는지(vacuous pass)까지. bug 와 비교 방식을 바꿔 가며 첫 오류를 찾아보는 FIFO 모형 포함.</p>
-    <p lang="en">A walkthrough for before you start, on the first verification-only lab. Write a verification plan for Lab 1's asynchronous FIFO, build a checker that calls a C golden model through DPI plus a "drop every Nth write" bug, write two interfaces and monitor → mailbox → scoreboard (q[$]), and put five SVAs on the even-odd circuit. Covers why comparing flags with a zero-latency model raises false errors, and whether your assertions really fire (vacuous pass). Includes a FIFO model where you change the bug and the comparison style and watch for the first error.</p>
+    <p lang="ko">끝낸 뒤의 정리. 회로를 고치는 대신 testbench 가 스스로 PASS / FAIL 을 찍게 만든 Lab. C 로 짠 정답 짝을 DPI 로 부르는 checker, interface · monitor · mailbox · scoreboard(q[$]), even-odd 회로에 assertion 여섯. 일부러 심은 bug 를 셋 다 잡은 실행 기록(버린 쓰기 9 개 → 오류 9, 145 ns 의 a_turn_flips 실패), 실패 0 이 "검사 0" 이었던 막힌 곳들, N 과 비교 연산자를 바꿔 보는 모형까지.</p>
+    <p lang="en">A write-up from after the lab, where instead of fixing a circuit you make the testbench print PASS or FAIL itself: a checker calling a C golden model through DPI, interfaces, monitors, a mailbox and a q[$] scoreboard, and six assertions on the even-odd circuit. Includes the runs where all three caught a planted bug (9 dropped writes → 9 errors, a_turn_flips failing at 145 ns), the places where zero failures meant zero checks, and a toy for changing N and the comparison operator.</p>
     <div class="tags">
       <span class="tag v">verification plan · DPI-C golden model</span>
       <span class="tag v">monitor · mailbox · scoreboard</span>
-      <span class="tag v">SVA · vacuous pass · XMR</span>
+      <span class="tag v">SVA · vacuous pass · cover property</span>
       <span class="tag t">plusarg · make targets · Verdi</span>
     </div>
   </div>

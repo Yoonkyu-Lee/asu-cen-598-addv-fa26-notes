@@ -401,7 +401,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">overlapping implication · non-overlapping implication</div>
   <div class="d" lang="ko">assertion 의 implication 연산자. 왼쪽(antecedent)이 참이면 오른쪽(consequent)을 검사한다. <code>|-&gt;</code> 는 <strong>같은 clock tick 부터</strong>, <code>|=&gt;</code> 는 <strong>다음 tick 부터</strong> 오른쪽을 시작한다. <code>$rose(Req) |-&gt; ##[2:20] Ready</code> 는 Req 가 오른 tick 의 2~20 tick 뒤 사이에 Ready 를 요구한다.</div>
   <div class="d" lang="en">The implication operators of assertions: if the left side (antecedent) holds, check the right side (consequent). <code>|-&gt;</code> starts the right side <strong>at the same clock tick</strong>, <code>|=&gt;</code> <strong>at the next tick.</strong> <code>$rose(Req) |-&gt; ##[2:20] Ready</code> requires Ready between 2 and 20 ticks after the tick Req rose.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s11">Lecture 12 &middot; 11</a> · <a href="L13-verification-concepts.html#s11">Lecture 13 &middot; 11</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s11">Lecture 12 &middot; 11</a> · <a href="L13-verification-concepts.html#s11">Lecture 13 &middot; 11</a> · <a href="LAB4-fifo-verification.html#s8">Lab 4 · 08</a></div>
 </div>
 
 <div class="gterm">
@@ -409,6 +409,22 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="d" lang="ko">자료형이 가질 수 있는 값의 가짓수. <strong>4-state는 <code>0 1 x z</code></strong>, <strong>2-state는 <code>0 1</code></strong>뿐이다. <code>logic</code>·<code>wire</code>·<code>reg</code>가 4-state, <code>bit</code>·<code>int</code>가 2-state다. 설계에 2-state를 쓰면 리셋 안 된 flop이 <code>x</code> 대신 <code>0</code>으로 보여서 <strong>버그가 시뮬레이션을 통과한다.</strong></div>
   <div class="d" lang="en">How many values a type can take. <strong>Four-state is <code>0 1 x z</code></strong>; <strong>two-state is just <code>0 1</code></strong>. <code>logic</code>, <code>wire</code> and <code>reg</code> are four-state; <code>bit</code> and <code>int</code> are two-state. Use two-state in a design and an unreset flop reads <code>0</code> instead of <code>x</code>, so <strong>the bug passes simulation.</strong></div>
   <div class="src"><a href="L03-system-verilog-for-design.html#s2">Lecture 3 · 02</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">$past · $stable</div>
+  <div class="f">sampled value functions</div>
+  <div class="d" lang="ko">SVA 에서 지난 clock tick 의 값을 꺼내 보는 system function. <code>$past(x)</code> 는 직전 tick 의 x, <code>$stable(x)</code> 는 x 가 직전 tick 과 같으면 참이다. Lab 4 의 <code>do_pop |=&gt; sel != $past(sel)</code> 가 "꺼낸 다음 tick 에는 차례가 바뀌어 있다" 를 이렇게 적는다. <code>$rose</code>, <code>$fell</code> 도 같은 무리다.</div>
+  <div class="d" lang="en">SVA system functions that look back one clock tick. <code>$past(x)</code> is x at the previous tick; <code>$stable(x)</code> is true when x equals its previous-tick value. Lab 4's <code>do_pop |=&gt; sel != $past(sel)</code> says "the tick after a pop, the turn has changed" this way. <code>$rose</code> and <code>$fell</code> are in the same family.</div>
+  <div class="src"><a href="LAB4-fifo-verification.html#s8">Lab 4 · 08</a></div>
+</div>
+
+<div class="gterm">
+  <div class="t">=== · !==</div>
+  <div class="f">case equality · case inequality</div>
+  <div class="d" lang="ko">x 와 z 까지 값으로 보고 비트마다 정확히 같은지 보는 비교. 결과는 늘 0 아니면 1 이다. <code>==</code> · <code>!=</code> 는 한쪽에 x 가 있으면 결과가 x 이고 <code>if</code> 는 x 를 거짓으로 처리해서, <strong>DUT 가 x 를 내도 불일치로 잡히지 않는다.</strong> 그래서 checker 의 비교는 <code>!==</code> 로 쓴다.</div>
+  <div class="d" lang="en">A comparison that counts x and z as values and checks every bit for an exact match; the result is always 0 or 1. With <code>==</code> or <code>!=</code>, an x on either side makes the result x, and <code>if</code> treats x as false, so <strong>a DUT driving x doesn't register as a mismatch.</strong> That's why checkers compare with <code>!==</code>.</div>
+  <div class="src"><a href="LAB4-fifo-verification.html#s4">Lab 4 · 04</a></div>
 </div>
 
 <h2 class="gletter" id="gA">A</h2>
@@ -528,7 +544,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Assertion</div>
   <div class="d" lang="ko">설계가 <strong>반드시 보여야 하거나 절대 보이면 안 되는 동작</strong>을 코드로 명시한 것. 결정적인 성질은 <strong>"항상 켜져 있다"</strong>는 것이다. 어떤 테스트를 돌리든 계속 감시한다. 예: <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
   <div class="d" lang="en">Code that states behaviour the design <strong>must, or must never, exhibit.</strong> The decisive property is that it is <strong>always on</strong>: it keeps watching no matter which test is running. For example <code>assert property (@(posedge clk) !(grant0 &amp; grant1));</code></div>
-  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 13 전체</span><span lang="en">all of Lecture 13</span> · <a href="L12-sv-for-verification.html#s11">Lecture 12 · 11</a> · <a href="L13-verification-concepts.html#s9">Lecture 13 &middot; 09</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+  <div class="src"><a href="L02-design-and-verification-overview.html#s16">Lecture 2 · 16</a> · <span lang="ko">Lecture 13 전체</span><span lang="en">all of Lecture 13</span> · <a href="L12-sv-for-verification.html#s11">Lecture 12 · 11</a> · <a href="L13-verification-concepts.html#s9">Lecture 13 &middot; 09</a> · <a href="LAB4-fifo-verification.html#s8">Lab 4 · 08</a></div>
 </div>
 
 <div class="gterm">
@@ -841,7 +857,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Clocking Block &middot; Skew</div>
   <div class="d" lang="ko">testbench 가 interface 신호를 <strong>clock 기준으로 언제 읽고 언제 쓰나</strong>를 한곳에 선언하는 SV 구문(<code>clocking cb @(posedge clk); default input #1ns output #2ns; ... endclocking</code>). input 은 엣지 skew 만큼 <strong>전</strong> 값을 샘플하고, output 은 엣지 skew 만큼 <strong>뒤</strong>에 구동한다. TB 와 DUT 의 race 를 막는다. Lecture 4 의 clock skew 와는 이름만 같다.</div>
   <div class="d" lang="en">The SV construct that declares, in one place and relative to a clock, <strong>when the testbench reads and writes interface signals</strong> (<code>clocking cb @(posedge clk); default input #1ns output #2ns; ... endclocking</code>). Inputs are sampled one skew <strong>before</strong> the edge, outputs driven one skew <strong>after.</strong> It prevents TB/DUT races. Shares only a name with Lecture 4's clock skew.</div>
-  <div class="src"><a href="L14-efficient-verification.html#s9">Lecture 14 &middot; 09</a></div>
+  <div class="src"><a href="L14-efficient-verification.html#s9">Lecture 14 &middot; 09</a> · <a href="LAB4-fifo-verification.html#s6">Lab 4 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -1065,7 +1081,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">De-pipelining</div>
   <div class="d" lang="ko">pipeline 단계 사이의 register 를 선으로 바꿔 <strong>여러 사이클짜리 연산기를 한 사이클짜리 조합 회로로</strong> 만드는 것. Lab 3 릴리스 덱 15쪽 제목의 표현이고, 업계 표준 용어라기보다 서술로 읽는 게 안전하다. Lab 3 에서는 PE 의 누적이 매 사이클 새 항을 받으므로 결과가 자기 다음 입력이 되는 FP 덧셈기 고리 안에 사이클이 있으면 안 된다. 대가는 긴 critical path 다. register 와 같이 단계를 따라가던 valid 같은 control 신호도 같이 정리해야 한다.</div>
   <div class="d" lang="en">Turning the registers between pipeline stages into wires so <strong>a multi-cycle unit becomes one cycle of combinational logic.</strong> The phrase is the title of slide 15 in the Lab 3 release deck; read it as a description rather than a fixed industry term. In Lab 3 the PE's accumulator takes a new term every cycle, so the FP adder loop that feeds its own next input can't have extra cycles in it. The price is a longer critical path. Control that travelled down the stages with the registers, such as valid bits, needs cleaning up too.</div>
-  <div class="src"><a href="LAB3-systolic-matmul.html#s5">Lab 3 · 05</a></div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s6">Lab 3 · 06</a></div>
 </div>
 
 <div class="gterm">
@@ -2210,7 +2226,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="f">Neural Processing Unit</div>
   <div class="d" lang="ko">신경망 추론 같은 행렬 연산을 떼어 맡는 가속기. 중심에 MAC 배열이 있다. Lab 3 릴리스 덱은 Intel Core Ultra 의 NPU 와 Qualcomm Hexagon NPU 를 예로 들고, Lab 3 의 systolic matmul 이 그것과 다른 점(작은 크기, 행렬곱만, 결과는 메모리로, on-chip RAM 만, int8 만)을 나열한다. Lecture 9 의 TPU 도 같은 계열이고 회사마다 이름이 다르다.</div>
   <div class="d" lang="en">An accelerator that takes matrix work such as neural network inference off the CPU, built around a MAC array. The Lab 3 release deck shows the Intel Core Ultra NPU and the Qualcomm Hexagon NPU, and lists how Lab 3's systolic matmul differs (smaller, matmul only, results to memory, on-chip RAM only, int8 only). Lecture 9's TPU is the same family; the name varies by company.</div>
-  <div class="src"><a href="LAB3-systolic-matmul.html#s2">Lab 3 · 02</a></div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s1">Lab 3 · 01</a></div>
 </div>
 
 <h2 class="gletter" id="gO">O</h2>
@@ -2385,7 +2401,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Polling</div>
   <div class="d" lang="ko">상태 레지스터를 <strong>될 때까지 되풀이해 읽으며</strong> 기다리는 것. Lab 3 에서 testbench 가 APB 로 done 을 읽어 가속기가 끝났는지 보는 4 단계가 이것이다. 반대편은 interrupt, 즉 블록이 선을 올려 CPU 를 부르는 방식이다. polling 은 단순하지만 그동안 버스를 쓴다. 그리고 읽는 쪽이 놓치지 않게 상태가 유지되어야 한다. done 이 한 사이클짜리 펄스면 두 사이클 걸리는 APB 읽기로 놓칠 수 있다. 끝없이 기다리지 않게 시간 제한을 둔다.</div>
   <div class="d" lang="en">Waiting by <strong>reading a status register over and over</strong> until it says yes. In Lab 3 it's step 4: the testbench reads done over APB to see whether the accelerator has finished. The alternative is an interrupt, where the block raises a line to call the CPU. Polling is simple but keeps the bus busy, and the status must be held so the reader can't miss it: a one-cycle done pulse can slip past two-cycle APB reads. Put a timeout on it so it can't wait forever.</div>
-  <div class="src"><a href="LAB3-systolic-matmul.html#s8">Lab 3 · 08</a></div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s11">Lab 3 · 11</a></div>
 </div>
 
 <div class="gterm">
@@ -2535,7 +2551,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Register Map</div>
   <div class="d" lang="ko">IP 의 CSR 마다 <strong>주소, 폭, 비트 배치, 접근 방식(읽기 쓰기 / 읽기만), reset 값</strong>을 적은 표. RTL, testbench, driver 소프트웨어가 전부 이 표 하나를 보고 만들어지고, 실제로는 spec 문서에 들어간다. Lab 3 릴리스 덱 24쪽은 학생이 직접 register map 을 만들고 testbench 에서 맞는 주소에 쓰라고 한다. SoC 전체의 address map 과 층이 다르다. address map 은 어느 IP 인지, register map 은 그 IP 안의 어느 레지스터인지다.</div>
   <div class="d" lang="en">A table giving each of an IP's CSRs its <strong>address, width, bit layout, access (read-write or read-only) and reset value.</strong> RTL, testbench and driver software are all built from it; in practice it lives in the spec. Slide 24 of the Lab 3 release deck has students create their own and write to the right addresses from the testbench. It sits a level below the SoC's address map: the address map says which IP, the register map says which register inside it.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a> · <a href="LAB3-systolic-matmul.html#s7">Lab 3 · 07</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a> · <a href="LAB3-systolic-matmul.html#s11">Lab 3 · 11</a></div>
 </div>
 
 <div class="gterm">
@@ -2703,7 +2719,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Self-checking Test</div>
   <div class="d" lang="ko">기대값을 <strong>test 스스로 들고 비교해서 PASS/FAIL 을 찍는</strong> test. 파형을 눈으로 볼 필요가 없어서 regression 에 들어가려면 이래야 한다. 슬라이드 2쪽의 "checking inside stimulus". stimulus 와 떨어진 부품이 비교하는 <a href="#gS">scoreboard</a> 와 다르다.</div>
   <div class="d" lang="en">A test that <strong>carries its own expected values, compares, and prints PASS/FAIL.</strong> No waveform staring, which is what lets it into a regression. Slide 2's "checking inside stimulus." Unlike a <a href="#gS">scoreboard</a>, where a component separate from the stimulus does the comparing.</div>
-  <div class="src"><a href="L14-efficient-verification.html#s1">Lecture 14 &middot; 01</a> · <a href="L13-verification-concepts.html#s7">Lecture 13 &middot; 07</a> · <a href="L15-cpu-verification.html#s13">Lecture 15 &middot; 13</a></div>
+  <div class="src"><a href="L14-efficient-verification.html#s1">Lecture 14 &middot; 01</a> · <a href="L13-verification-concepts.html#s7">Lecture 13 &middot; 07</a> · <a href="L15-cpu-verification.html#s13">Lecture 15 &middot; 13</a> · <a href="LAB4-fifo-verification.html#s1">Lab 4 · 01</a></div>
 </div>
 
 <div class="gterm">
@@ -2717,7 +2733,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Sequence · Property</div>
   <div class="d" lang="ko">assertion 을 나눠 쓰는 단위. <strong>sequence</strong> 는 <code>##[2:20] (ready == 1)</code> 같은 시간 패턴 조각에 이름을 붙인 것, <strong>property</strong> 는 sequence 를 implication 으로 엮은 주장이다. <code>assert property</code> 로 검사하고 <code>cover property</code> 로 센다.</div>
   <div class="d" lang="en">The units assertions are split into. A <strong>sequence</strong> names a piece of temporal pattern such as <code>##[2:20] (ready == 1)</code>; a <strong>property</strong> is a claim built from sequences with implications. <code>assert property</code> checks it, <code>cover property</code> counts it.</div>
-  <div class="src"><a href="L12-sv-for-verification.html#s19">Lecture 12 &middot; 19</a> &middot; <span lang="ko">Lecture 13 에서 본격적으로</span><span lang="en">in depth in Lecture 13</span> · <a href="L13-verification-concepts.html#s9">Lecture 13 &middot; 09</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+  <div class="src"><a href="L12-sv-for-verification.html#s19">Lecture 12 &middot; 19</a> &middot; <span lang="ko">Lecture 13 에서 본격적으로</span><span lang="en">in depth in Lecture 13</span> · <a href="L13-verification-concepts.html#s9">Lecture 13 &middot; 09</a> · <a href="L14-efficient-verification.html#s2">Lecture 14 &middot; 02</a> · <a href="LAB4-fifo-verification.html#s8">Lab 4 · 08</a></div>
 </div>
 
 <div class="gterm">
@@ -2917,7 +2933,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Status Flag (FP exception)</div>
   <div class="d" lang="ko">FP 연산 결과가 정상이 아니었다는 표시로, 결과 값과 따로 나오는 1 bit 신호. IEEE 754 는 예외 다섯(invalid operation, division by zero, overflow, underflow, inexact)마다 flag 하나를 둔다. 소프트웨어가 여러 연산 뒤에 모아 읽으므로 한 번 켜지면 지울 때까지 남는 방식이 흔하다. Lab 3 덱은 PE 의 FP 곱셈기와 덧셈기가 <code>flag[3:0]</code> 를 내고 그것을 OR 로 모은다고만 그리고, 4 bit 의 뜻은 적지 않는다. 4 bit 를 합칠 때는 <code>||</code> 가 아니라 <code>|</code> 다.</div>
   <div class="d" lang="en">A 1-bit signal, separate from the result, saying an FP operation didn't go normally. IEEE 754 keeps one flag per exception (invalid operation, division by zero, overflow, underflow, inexact). Software reads them after many operations, so flags commonly stay set until cleared. The Lab 3 deck only draws the PE's FP multiplier and adder each putting out <code>flag[3:0]</code>, merged with an OR; it doesn't say what the 4 bits mean. Merge 4 bits with <code>|</code>, not <code>||</code>.</div>
-  <div class="src"><a href="LAB3-systolic-matmul.html#s6">Lab 3 · 06</a></div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s5">Lab 3 · 05</a></div>
 </div>
 
 <div class="gterm">
@@ -2939,7 +2955,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Stride (address stride)</div>
   <div class="d" lang="ko">다음 원소(Lab 3 에서는 RAM 의 다음 줄)를 읽으려면 <strong>주소를 얼마씩 건너뛰는지.</strong> 시작 주소와 함께 CSR 로 설정하고, 가속기는 k 번째 주소를 시작 주소 + k × stride 로 센다. Lab 3 릴리스 덱 12쪽 그림은 시작 0xF0, stride 4 로 0xF0, 0xF4, 0xF8, 0xFC 를 읽는다. 단위(바이트인지 RAM 한 줄인지)를 testbench 와 RTL 이 같게 정해야 한다. 다르면 주소가 4 배씩 어긋난다.</div>
   <div class="d" lang="en">How far <strong>to jump in the address</strong> to read the next element (in Lab 3, the next RAM row). It's set as a CSR alongside the start address, and the accelerator computes the k-th address as start + k × stride. The figure on slide 12 of the Lab 3 release deck starts at 0xF0 with stride 4 and reads 0xF0, 0xF4, 0xF8, 0xFC. Testbench and RTL must agree on the unit (bytes or RAM rows), or addresses come out off by a factor of four.</div>
-  <div class="src"><a href="LAB3-systolic-matmul.html#s2">Lab 3 · 02</a></div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s11">Lab 3 · 11</a></div>
 </div>
 
 <div class="gterm">
@@ -2982,7 +2998,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Systolic Array</div>
   <div class="d" lang="ko">슬라이드 12쪽 정의: <strong>a network of processors that rhythmically compute and pass data through the system.</strong> 이웃끼리만 연결된 PE 가 클럭마다 계산하고 옆으로 넘기며, 데이터는 가장자리로만 출입하고 지나가며 재사용된다. global wire 가 없어 배열을 키워도 클럭이 안 느려진다. 이름은 심장 수축기(systole) 비유에서 왔다.</div>
   <div class="d" lang="en">Slide 12: <strong>a network of processors that rhythmically compute and pass data through the system.</strong> Neighbour-connected PEs compute and pass sideways every clock; data enters and leaves only at the edges and is reused on the way. No global wires, so a bigger array doesn't slow the clock. Named after systole, the heart's contraction.</div>
-  <div class="src"><a href="L09-matmul-accelerator.html#s6">Lecture 9 &middot; 06</a></div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s6">Lecture 9 &middot; 06</a> · <a href="LAB3-systolic-matmul.html#s2">Lab 3 · 02</a></div>
 </div>
 
 <div class="gterm">
@@ -3313,7 +3329,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Vacuous Pass</div>
   <div class="d" lang="ko">implication(<code>|-&gt;</code>, <code>|=&gt;</code>)의 <strong>왼쪽이 거짓이라 아무것도 검사하지 않고 끝난 통과</strong>. "pass" 로 집계되므로 실패가 없다는 것만으로는 assertion 이 일을 했는지 모른다. 슬라이드 표현으로 assertion 은 fire &amp; pass, fire &amp; fail, never fire(vacuous pass) 셋 중 하나다.</div>
   <div class="d" lang="en">A pass where <strong>the implication's (<code>|-&gt;</code>, <code>|=&gt;</code>) left side was false, so nothing was checked.</strong> It is tallied as a "pass", so no failures alone doesn't tell you the assertion did any work. In the slide's words, an assertion either fires &amp; passes, fires &amp; fails, or never fires (vacuous pass).</div>
-  <div class="src"><a href="L13-verification-concepts.html#s11">Lecture 13 &middot; 11</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a></div>
+  <div class="src"><a href="L13-verification-concepts.html#s11">Lecture 13 &middot; 11</a> · <a href="LAB4-fifo-verification.html#s8">Lab 4 · 08</a></div>
 </div>
 
 <div class="gterm">
@@ -3327,7 +3343,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Validity Mask</div>
   <div class="d" lang="ko">bit 하나가 lane(또는 행, 열) 하나에 대응해서 <strong>"이 칸의 값은 진짜다 / 무시하라"</strong> 를 표시하는 비트 묶음. Lecture 9 슬라이드 44쪽과 Lab 3 릴리스 덱 21쪽에 이름만 나오고, 무엇을 가리는지는 정의되지 않았다. 배열보다 작은 행렬을 넣을 때 쓰는 읽기와, systolic 계단 앞뒤의 빈 사이클을 가리는 읽기가 있다. 1 이 유효인지 무효인지(극성)도 정해야 한다.</div>
   <div class="d" lang="en">A set of bits, one per lane (or row, or column), marking <strong>"this value is real / ignore it".</strong> Lecture 9's slide 44 and slide 21 of the Lab 3 release deck only name it; what it masks isn't defined. One reading is for matrices smaller than the array, another for blanking the empty cycles around the systolic staircase. The polarity (does 1 mean valid?) has to be fixed too.</div>
-  <div class="src"><a href="L09-matmul-accelerator.html#s14">Lecture 9 &middot; 14</a> · <a href="LAB3-systolic-matmul.html#s7">Lab 3 · 07</a></div>
+  <div class="src"><a href="L09-matmul-accelerator.html#s14">Lecture 9 &middot; 14</a> · <a href="LAB3-systolic-matmul.html#s17">Lab 3 · 17</a></div>
 </div>
 
 <div class="gterm">
@@ -3356,7 +3372,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Verdi</div>
   <div class="d" lang="ko">Synopsys 의 디버그 도구. 파형 뷰어라고만 알면 절반만 아는 것이다. <strong>KDB 와 FSDB 를 겹쳐 읽어서 파형의 한 지점을 소스의 한 줄에 연결하고</strong>, 신호를 거슬러 원인까지 추적한다. 예전에는 시뮬레이터와 디버거가 달라 같은 설계를 두 번 컴파일했는데, <strong>Unified Front-End</strong> 가 그것을 <code>-kdb</code> 하나로 없앴다.</div>
   <div class="d" lang="en">Synopsys's debug tool. Calling it a waveform viewer is half the story. It <strong>reads KDB and FSDB together to tie a point on a waveform to a line of source</strong>, and traces signals back to a cause. Simulator and debugger used to be separate tools, so the same design got compiled twice; the <strong>Unified Front-End</strong> collapsed that into a single <code>-kdb</code>.</div>
-  <div class="src"><a href="LAB0-tools-tutorial.html#s7">Lab 0 · 07</a> · <a href="LAB4-fifo-verification.html#s9">Lab 4 · 09</a> · <a href="LAB5-mips-verification.html#s7">Lab 5 · 07</a></div>
+  <div class="src"><a href="LAB0-tools-tutorial.html#s7">Lab 0 · 07</a> · <a href="LAB4-fifo-verification.html#s10">Lab 4 · 10</a> · <a href="LAB5-mips-verification.html#s7">Lab 5 · 07</a></div>
 </div>
 
 <div class="gterm">
@@ -3400,6 +3416,14 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 <h2 class="gletter" id="gW">W</h2>
 
 <div class="gterm">
+  <div class="t">W1S · W1C</div>
+  <div class="f">write-1-to-set · write-1-to-clear</div>
+  <div class="d" lang="ko">레지스터 필드의 접근 방식. W1S 는 1 을 쓴 비트만 켜지고 0 을 쓴 비트는 그대로, W1C 는 1 을 쓴 비트만 꺼진다. 다른 비트를 건드리지 않고 한 비트만 바꿀 수 있어서 시작 명령 비트나 interrupt 상태 비트에 쓴다. register map 표에는 <code>R/W1S</code> 처럼 적는다. Lab 3 의 START 가 W1S 다.</div>
+  <div class="d" lang="en">Register field access types. With W1S only the bits written as 1 get set and bits written as 0 stay as they are; with W1C the bits written as 1 get cleared. One bit can change without touching the others, which suits command bits like start and interrupt status bits. Register map tables write it as <code>R/W1S</code>. Lab 3's START is W1S.</div>
+  <div class="src"><a href="LAB3-systolic-matmul.html#s11">Lab 3 · 11</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Wait State</div>
   <div class="d" lang="ko">slave 가 아직 못 끝내서 <strong>전송이 한 cycle 늘어나는 것.</strong> APB 에서는 ACCESS 에서 PREADY=0 인 cycle 하나. 에러가 아니다.</div>
   <div class="d" lang="en"><strong>A transfer stretched one cycle</strong> because the slave is not done; in APB, an ACCESS cycle with PREADY=0. Not an error.</div>
@@ -3414,6 +3438,13 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
 </div>
 
 <div class="gterm">
+  <div class="t">Watchdog (simulation timeout)</div>
+  <div class="d" lang="ko">시뮬레이션이 정해진 시간 안에 안 끝나면 오류를 찍고 끝내 버리는 testbench 장치. <code>initial</code> 하나에서 <code>#limit</code> 만큼 기다린 뒤 실패를 찍고 <code>$finish</code> 한다. 없으면 flag 를 기다리는 루프가 영원히 돌 수 있다. Lab 4 Part 3 는 100 µs 로 걸었다.</div>
+  <div class="d" lang="en">A testbench guard that prints an error and ends the simulation if it hasn't finished in time: one <code>initial</code> waits <code>#limit</code>, reports a failure and calls <code>$finish</code>. Without it, a loop waiting on a flag can run forever. Lab 4 Part 3 sets it at 100 µs.</div>
+  <div class="src"><a href="LAB4-fifo-verification.html#s7">Lab 4 · 07</a></div>
+</div>
+
+<div class="gterm">
   <div class="t">Wrap Bit</div>
   <div class="d" lang="ko">FIFO 포인터에서 <strong>주소로 쓰이지 않는 맨 위 한 비트.</strong> 주소부가 한 바퀴 돌 때마다 저절로 뒤집혀서 <strong>"몇 바퀴째인가" 를 기록한다.</strong> 이것 덕분에 두 포인터가 같은 주소에 있을 때 <strong>전부 같으면 empty, wrap bit 만 다르면 full</strong> 로 가를 수 있다. 주소가 <code>ADDR_WIDTH</code> 비트면 포인터는 <code>ADDR_WIDTH+1</code> 비트다. <strong>슬라이드는 이 비트를 숫자로만 보여주고 이름을 붙이지 않는다.</strong> 업계에서 쓰는 이름이다.</div>
   <div class="d" lang="en">The <strong>top bit of a FIFO pointer that is never used as an address.</strong> It flips by itself each time the address part wraps, so it <strong>records which lap you are on.</strong> That is what lets two pointers sitting on the same address be told apart: <strong>all bits equal means empty, wrap bits differing means full.</strong> If the address is <code>ADDR_WIDTH</code> bits, the pointer is <code>ADDR_WIDTH+1</code>. <strong>The slides only ever show it as a number and never name it</strong>; this is the industry name.</div>
@@ -3424,7 +3455,7 @@ html[data-lang="en"] [lang="ko"]{display:none!important}
   <div class="t">Wrapper</div>
   <div class="d" lang="ko">IP 의 제멋대로인 포트 앞에 <strong>표준 버스 인터페이스와 CSR 을 세워</strong> 바깥에는 표준 인터페이스만 보이게 감싼 껍데기 모듈. 잘 돌던 IP 를 SoC 에 붙일 때 안쪽을 고치지 않고 바깥만 바꾼다. Lab 3 에서는 systolic matmul 앞에 APB slave 와 CSR 을 세운 것이 wrapper 다. 릴리스 덱 23쪽은 그 부품을 "APB protocol converter or APB slave interface" 라고 부른다. wrapper 는 계산을 하지 않는다.</div>
   <div class="d" lang="en">A shell module that <strong>puts a standard bus interface and CSRs</strong> in front of an IP's ad hoc ports, so the outside sees only the standard interface. A working IP goes into an SoC this way, with the inside untouched. In Lab 3 the APB slave and CSRs in front of the systolic matmul are the wrapper; slide 23 of the release deck calls that part "APB protocol converter or APB slave interface". A wrapper computes nothing.</div>
-  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a> · <a href="LAB3-systolic-matmul.html#s7">Lab 3 · 07</a></div>
+  <div class="src"><a href="L10-soc-architecture.html#s6">Lecture 10 &middot; 06</a> · <a href="LAB3-systolic-matmul.html#s10">Lab 3 · 10</a></div>
 </div>
 
 <h2 class="gletter" id="gX">X</h2>
