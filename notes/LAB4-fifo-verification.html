@@ -424,6 +424,9 @@ figcaption.oos strong{color:var(--ink2)}
 table.tl td,table.tl th{text-align:left}
 table.tl td:first-child{white-space:nowrap}
 @media(max-width:900px){table.tl td:first-child{white-space:normal}}
+pre.tree{line-height:1.5}
+pre.tree .fd{color:var(--blue)}pre.tree .fv{color:var(--pink)}pre.tree .ft{color:var(--violet)}
+pre.tree .fx{color:var(--ink2)}pre.tree .fo{color:var(--ink3)}
 </style>
 </head>
 
@@ -462,6 +465,7 @@ table.tl td:first-child{white-space:nowrap}
   <a href="#s12"><span class="n">12</span><span lang="ko">검증 · 코드에서 센 숫자와 실행에서 나온 숫자</span><span lang="en">Verification · Numbers counted from the code against numbers from the runs</span></a>
   <a href="#s13"><span class="n">13</span><span lang="ko">막힌 곳 · 통과는 하는데 검사가 비어 있던 곳들</span><span lang="en">Where we got stuck · Passing runs with holes in the checking</span></a>
   <a href="#s14"><span class="n">14</span><span lang="ko">남은 질문 · 확인하지 않은 것</span><span lang="en">Open questions · What wasn't checked</span></a>
+  <a href="#s15"><span class="n">15</span><span lang="ko">타임라인 · 빈 저장소에서 데모까지, 라운드별 상태 변화</span><span lang="en">Timeline · From an empty repo to the demo, round by round</span></a>
 </nav>
 <main>
 <!-- ══════════════════════════════════════════════════════ 00 -->
@@ -1807,6 +1811,428 @@ c_turn_flips: <span class="k">cover property</span> (`EO_DUT.do_pop) n_turn++;</
 </tbody></table>
 <p lang="ko">다음 MIPS Lab (<a href="LAB5-mips-verification.html">Lab 5</a>) 이 이 목록의 뒤를 잇는다. 그 Lab 은 입력을 무작위로 만들고(constrained random), 무엇이 덮였는지를 coverage 로 잰다. 이 Lab 의 "예의 바른 stimulus" 가 놓친 구석을 무작위 입력이 찾아 주고, "조건이 몇 번 참이었나" 를 센 <code>cover property</code> 가 functional coverage 로 커진다.</p>
 <p lang="en">The next MIPS lab (<a href="LAB5-mips-verification.html">Lab 5</a>) picks up where this list ends. It generates inputs at random (constrained random) and measures what got covered. Random inputs find the corners this lab's "polite stimulus" missed, and the <code>cover property</code> counts of "how often did the condition hold" grow into functional coverage.</p>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════ 15 -->
+<section id="s15">
+  <div class="sec-head"><span class="sec-num">15</span><h2 lang="ko">타임라인 · 빈 저장소에서 데모까지, 라운드별 상태 변화</h2><h2 lang="en">Timeline · From an empty repo to the demo, round by round</h2></div>
+  <p class="sec-sub" lang="ko">앞의 절들이 "무엇을 왜" 였다면, 이 절은 "어떤 순서로 쌓였나" 다. 라운드마다 폴더 모양, 코드, 그 라운드가 세운 개념.</p>
+  <p class="sec-sub" lang="en">The earlier sections were "what and why"; this one is "in what order it piled up". For each round: the folder layout, the code, and the idea that round put in place.</p>
+<p lang="ko"><strong>라운드는 커밋 묶음이다.</strong> 한 가지 목적으로 연달아 들어간 커밋을 하나로 묶었다. 근거는 셋이다. 제출용 팀 저장소의 <code>git log</code>, 실행 기록과 리포트 스크립트를 둔 개인 작업 저장소의 <code>git log</code>, 그리고 실행 기록 <code>RUNS.md</code>. 날짜와 시각은 <strong>커밋된 시각</strong>이지 작업한 시간이 아니다. 11 월 5 일 18:40~18:54 에 커밋이 몰린 것은 그 15 분 동안 다 짰다는 뜻이 아니라, 그때 나눠서 기록했다는 뜻이다. 파일 옆 숫자는 git 이 센 줄 수다.</p>
+<p lang="en"><strong>A round is a bundle of commits</strong> made back to back for one purpose. Three sources: the <code>git log</code> of the team repo that was submitted, the <code>git log</code> of a private working repo that holds the run log and report scripts, and the run log <code>RUNS.md</code> itself. Dates and times are <strong>commit times</strong>, not working time. The cluster of commits between 18:40 and 18:54 on November 5 doesn't mean it was all written in 15 minutes; it means it was recorded in pieces then. The number next to each file is its line count as git counts it.</p>
+<p lang="ko"><strong>폴더 그림 읽는 법.</strong> 파일 이름의 색은 역할이다. <span style="color:var(--blue)">파랑</span>은 회로(RTL), <span style="color:var(--pink)">분홍</span>은 검증 쪽 코드(testbench, C 모델, assertion), <span style="color:var(--violet)">보라</span>는 도구 설정과 스크립트(Makefile, Verdi 신호 목록 <code>.rc</code>, 리포트 스크립트), <span style="color:var(--ink2)">회색</span>은 문서다. 오른쪽 끝 표시는 그 라운드에서의 변화다. <code>+</code> 는 새로 생김, <code>~</code> 는 고쳐짐, 표시가 없으면 그대로다. 흐리게 찍힌 줄은 이전 라운드에서 온 것이다.</p>
+<p lang="en"><strong>How to read the folder trees.</strong> File name colors are roles: <span style="color:var(--blue)">blue</span> is the circuit (RTL), <span style="color:var(--pink)">pink</span> is verification code (testbench, C model, assertions), <span style="color:var(--violet)">violet</span> is tool setup and scripts (Makefile, Verdi signal lists <code>.rc</code>, report scripts), <span style="color:var(--ink2)">gray</span> is documentation. The mark at the right end is that round's change: <code>+</code> new, <code>~</code> modified, no mark unchanged. Faded lines carry over from earlier rounds.</p>
+
+<figure>
+<svg viewBox="0 0 760 300" role="img" aria-label="Timeline of Lab 4 by round. Columns are dates from before the lab through 11/13; lanes are Part 1 to Part 4 and the working repo. Round 0 before the lab; round 1 on 11/02 in Parts 1 and 2; rounds 2 and 3 on 11/03 in Parts 2 and 1; rounds 4 to 9 on 11/05; round 9 runs to 11/06; round 10 on 11/06 in Parts 3 and 4 and on 11/07 in the working repo; round 11 on 11/13.">
+<text class="svglab" x="178" y="26" style="font-size:11px;text-anchor:middle;fill:var(--ink2)">before</text>
+<line x1="178" y1="38" x2="178" y2="266" style="stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4"/>
+<text class="svglab" x="268" y="26" style="font-size:11px;text-anchor:middle;fill:var(--ink2)">11/02</text>
+<line x1="268" y1="38" x2="268" y2="266" style="stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4"/>
+<text class="svglab" x="358" y="26" style="font-size:11px;text-anchor:middle;fill:var(--ink2)">11/03</text>
+<line x1="358" y1="38" x2="358" y2="266" style="stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4"/>
+<text class="svglab" x="448" y="26" style="font-size:11px;text-anchor:middle;fill:var(--ink2)">11/05</text>
+<line x1="448" y1="38" x2="448" y2="266" style="stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4"/>
+<text class="svglab" x="538" y="26" style="font-size:11px;text-anchor:middle;fill:var(--ink2)">11/06</text>
+<line x1="538" y1="38" x2="538" y2="266" style="stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4"/>
+<text class="svglab" x="628" y="26" style="font-size:11px;text-anchor:middle;fill:var(--ink2)">11/07</text>
+<line x1="628" y1="38" x2="628" y2="266" style="stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4"/>
+<text class="svglab" x="718" y="26" style="font-size:11px;text-anchor:middle;fill:var(--ink2)">11/13</text>
+<line x1="718" y1="38" x2="718" y2="266" style="stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4"/>
+<line x1="120" y1="64" x2="742" y2="64" style="stroke:var(--rule);stroke-width:1"/>
+<text class="svglab" x="112" y="68" style="font-size:11px;text-anchor:end;fill:var(--ink)">Part 1</text>
+<line x1="120" y1="106" x2="742" y2="106" style="stroke:var(--rule);stroke-width:1"/>
+<text class="svglab" x="112" y="110" style="font-size:11px;text-anchor:end;fill:var(--ink)">Part 2</text>
+<line x1="120" y1="148" x2="742" y2="148" style="stroke:var(--rule);stroke-width:1"/>
+<text class="svglab" x="112" y="152" style="font-size:11px;text-anchor:end;fill:var(--ink)">Part 3</text>
+<line x1="120" y1="190" x2="742" y2="190" style="stroke:var(--rule);stroke-width:1"/>
+<text class="svglab" x="112" y="194" style="font-size:11px;text-anchor:end;fill:var(--ink)">Part 4</text>
+<line x1="120" y1="246" x2="742" y2="246" style="stroke:var(--rule);stroke-width:1"/>
+<text class="svglab" x="112" y="250" style="font-size:11px;text-anchor:end;fill:var(--ink)">working repo</text>
+<line x1="20" y1="218" x2="742" y2="218" style="stroke:var(--ink3);stroke-width:1;stroke-dasharray:6 4"/>
+<text class="svglab" x="20" y="212" style="font-size:9.5px;fill:var(--ink3)">submitted</text>
+<text class="svglab" x="20" y="230" style="font-size:9.5px;fill:var(--ink3)">not submitted</text>
+<line x1="474" y1="246" x2="538" y2="246" style="stroke:var(--amber);stroke-width:4;stroke-linecap:round;opacity:.55"/>
+<circle cx="538" cy="246" r="4" style="fill:var(--amber)"/>
+<circle cx="178" cy="246" r="11" style="fill:var(--card);stroke:var(--ink3);stroke-width:2"/>
+<text class="svgnum" x="178" y="250" style="font-size:11.5px;text-anchor:middle;fill:var(--ink3)">0</text>
+<circle cx="268" cy="64" r="11" style="fill:var(--card);stroke:var(--ink2);stroke-width:2"/>
+<text class="svgnum" x="268" y="68" style="font-size:11.5px;text-anchor:middle;fill:var(--ink2)">1</text>
+<circle cx="268" cy="106" r="11" style="fill:var(--card);stroke:var(--ink2);stroke-width:2"/>
+<text class="svgnum" x="268" y="110" style="font-size:11.5px;text-anchor:middle;fill:var(--ink2)">1</text>
+<circle cx="358" cy="106" r="11" style="fill:var(--card);stroke:var(--pink);stroke-width:2"/>
+<text class="svgnum" x="358" y="110" style="font-size:11.5px;text-anchor:middle;fill:var(--pink)">2</text>
+<circle cx="358" cy="64" r="11" style="fill:var(--card);stroke:var(--pink);stroke-width:2"/>
+<text class="svgnum" x="358" y="68" style="font-size:11.5px;text-anchor:middle;fill:var(--pink)">3</text>
+<circle cx="422" cy="246" r="11" style="fill:var(--card);stroke:var(--ink3);stroke-width:2"/>
+<text class="svgnum" x="422" y="250" style="font-size:11.5px;text-anchor:middle;fill:var(--ink3)">4</text>
+<circle cx="434" cy="148" r="11" style="fill:var(--card);stroke:var(--pink);stroke-width:2"/>
+<text class="svgnum" x="434" y="152" style="font-size:11.5px;text-anchor:middle;fill:var(--pink)">5</text>
+<circle cx="434" cy="190" r="11" style="fill:var(--card);stroke:var(--pink);stroke-width:2"/>
+<text class="svgnum" x="434" y="194" style="font-size:11.5px;text-anchor:middle;fill:var(--pink)">6</text>
+<circle cx="448" cy="246" r="11" style="fill:var(--card);stroke:var(--green);stroke-width:2"/>
+<text class="svgnum" x="448" y="250" style="font-size:11.5px;text-anchor:middle;fill:var(--green)">7</text>
+<circle cx="462" cy="148" r="11" style="fill:var(--card);stroke:var(--violet);stroke-width:2"/>
+<text class="svgnum" x="462" y="152" style="font-size:11.5px;text-anchor:middle;fill:var(--violet)">8</text>
+<circle cx="462" cy="190" r="11" style="fill:var(--card);stroke:var(--violet);stroke-width:2"/>
+<text class="svgnum" x="462" y="194" style="font-size:11.5px;text-anchor:middle;fill:var(--violet)">8</text>
+<circle cx="474" cy="246" r="11" style="fill:var(--card);stroke:var(--amber);stroke-width:2"/>
+<text class="svgnum" x="474" y="250" style="font-size:11.5px;text-anchor:middle;fill:var(--amber)">9</text>
+<circle cx="538" cy="148" r="11" style="fill:var(--card);stroke:var(--pink);stroke-width:2"/>
+<text class="svgnum" x="538" y="152" style="font-size:10.5px;text-anchor:middle;fill:var(--pink)">10</text>
+<circle cx="538" cy="190" r="11" style="fill:var(--card);stroke:var(--pink);stroke-width:2"/>
+<text class="svgnum" x="538" y="194" style="font-size:10.5px;text-anchor:middle;fill:var(--pink)">10</text>
+<circle cx="628" cy="246" r="11" style="fill:var(--card);stroke:var(--green);stroke-width:2"/>
+<text class="svgnum" x="628" y="250" style="font-size:10.5px;text-anchor:middle;fill:var(--green)">10</text>
+<circle cx="718" cy="246" r="11" style="fill:var(--card);stroke:var(--violet);stroke-width:2"/>
+<text class="svgnum" x="718" y="250" style="font-size:10.5px;text-anchor:middle;fill:var(--violet)">11</text>
+<circle cx="40" cy="286" r="5" style="fill:var(--card);stroke:var(--ink3);stroke-width:2"/>
+<text class="svglab" x="50" y="290" style="font-size:10px;fill:var(--ink2)">outside / baseline</text>
+<circle cx="185.39999999999998" cy="286" r="5" style="fill:var(--card);stroke:var(--ink2);stroke-width:2"/>
+<text class="svglab" x="195.39999999999998" y="290" style="font-size:10px;fill:var(--ink2)">docs</text>
+<circle cx="242.59999999999997" cy="286" r="5" style="fill:var(--card);stroke:var(--pink);stroke-width:2"/>
+<text class="svglab" x="252.59999999999997" y="290" style="font-size:10px;fill:var(--ink2)">checker code</text>
+<circle cx="350.19999999999993" cy="286" r="5" style="fill:var(--card);stroke:var(--violet);stroke-width:2"/>
+<text class="svglab" x="360.19999999999993" y="290" style="font-size:10px;fill:var(--ink2)">tool setup</text>
+<circle cx="445.19999999999993" cy="286" r="5" style="fill:var(--card);stroke:var(--green);stroke-width:2"/>
+<text class="svglab" x="455.19999999999993" y="290" style="font-size:10px;fill:var(--ink2)">runs</text>
+<circle cx="502.3999999999999" cy="286" r="5" style="fill:var(--card);stroke:var(--amber);stroke-width:2"/>
+<text class="svglab" x="512.3999999999999" y="290" style="font-size:10px;fill:var(--ink2)">review findings</text>
+</svg>
+<figcaption lang="ko">라운드 0~11 을 날짜(가로)와 자리(세로)에 놓은 지도. 위 네 줄은 제출한 폴더, 맨 아래 줄은 제출하지 않는 작업 저장소다. 동그라미 안의 숫자가 라운드 번호이고, 색은 그 라운드가 한 일의 종류다.</figcaption>
+<figcaption lang="en">Rounds 0 to 11 placed by date (across) and by where they landed (down). The top four lanes are the submitted folders; the bottom lane is the working repo, which isn't submitted. The number in each circle is the round; its color is the kind of work.</figcaption>
+</figure>
+<div class="def">
+<p lang="ko"><strong>그림 읽기.</strong> 왼쪽 끝 "before" 칸에는 라운드 0 하나뿐이고, 저장소 밖(회색)이다. Lab 1 에서 낸 코드와 강의 샘플 코드가 이미 있었다는 뜻이다. 11/02 칸에서 라운드 1 이 Part 1 과 Part 2 줄에 회색으로 찍힌다. README 한 줄짜리 폴더 둘이다. 11/03 칸에서 Part 2 줄에 분홍 2 (C 모델, checker, testbench 가 한꺼번에), Part 1 줄에 분홍 3 (계획 README)이 찍힌다. 11/05 칸이 제일 붐빈다. 맨 아래 줄에 회색 4 (주어진 코드를 먼저 커밋), Part 3 줄에 분홍 5, Part 4 줄에 분홍 6 이 들어오고, 맨 아래 줄에 초록 7 (첫 실행 기록 R1~R8, 심은 bug 셋을 다 잡음)이 뒤따른다. 같은 날 Part 3 와 Part 4 줄에 보라 8 (파형에 보이게 하는 설정)이 붙는다. 맨 아래 줄의 주황 9 는 11/05 에서 11/06 까지 막대로 이어진다. 리포트를 스크립트로 만들고 독립 검토를 받은 라운드이고, 주황인 것은 그 검토가 구멍을 찾았기 때문이다. 11/06 칸에서 Part 3 와 Part 4 줄에 분홍 10 이 찍히고(구멍을 고침), 11/07 칸 맨 아래 줄의 초록 10 은 고친 뒤 다시 돌린 R9~R12 다. 마지막 11/13 칸의 보라 11 은 데모 화면 설정이다. Part 1 과 Part 2 줄은 11/03 뒤로 비어 있다. 그 두 폴더는 그 뒤로 한 번도 안 바뀌었다.</p>
+<p lang="en"><strong>Reading the figure.</strong> The leftmost "before" column holds only round 0, outside the repo (gray): the code submitted in Lab 1 and the course sample code already existed. In the 11/02 column, round 1 sits in gray on the Part 1 and Part 2 lanes: two folders with a one-line README each. In 11/03, a pink 2 on the Part 2 lane (C model, checker and testbench in one go) and a pink 3 on the Part 1 lane (the plan README). The 11/05 column is the busiest. On the bottom lane a gray 4 (the given code committed first), a pink 5 on Part 3 and a pink 6 on Part 4, then a green 7 on the bottom lane (the first run log, R1 to R8, all three planted bugs caught). The same day, a violet 8 on the Part 3 and Part 4 lanes (setup so things show in the waveform). The amber 9 on the bottom lane stretches as a bar from 11/05 to 11/06: the report built by script and an independent review, amber because the review found holes. In 11/06 a pink 10 on the Part 3 and Part 4 lanes (the holes fixed), and the green 10 on the bottom lane in 11/07 is the rerun after the fix, R9 to R12. The violet 11 in the last column, 11/13, is the demo screen setup. The Part 1 and Part 2 lanes are empty after 11/03: those two folders never changed again.</p>
+</div>
+
+<table class="tl"><thead><tr><th><span lang="ko">라운드</span><span lang="en">Round</span></th><th><span lang="ko">날짜</span><span lang="en">Date</span></th><th><span lang="ko">커밋</span><span lang="en">Commits</span></th><th><span lang="ko">무엇이 생겼나</span><span lang="en">What appeared</span></th><th><span lang="ko">끝나고 나면 할 수 있는 것</span><span lang="en">What you can do afterwards</span></th></tr></thead><tbody>
+<tr><td>0</td><td><span lang="ko">이전</span><span lang="en">before</span></td><td>&ndash;</td><td><span lang="ko">Lab 1 코드, 강의 샘플 코드, 설명서</span><span lang="en">Lab 1 code, course sample code, handout</span></td><td><span lang="ko">아무것도. 재료만 있다</span><span lang="en">Nothing yet, just materials</span></td></tr>
+<tr><td>1</td><td>11/02</td><td>2</td><td><code>part_1/</code>, <code>part_2/</code> <span lang="ko">README</span><span lang="en">READMEs</span></td><td><span lang="ko">제출 모양이 정해짐</span><span lang="en">The submission's shape is fixed</span></td></tr>
+<tr><td>2</td><td>11/03</td><td>11</td><td><span lang="ko">Part 2 전부 (RTL 7, C 모델, checker, testbench, Makefile)</span><span lang="en">All of Part 2 (7 RTL files, C model, checker, testbench, Makefile)</span></td><td><code>make run_good</code>, <code>make run_bug</code></td></tr>
+<tr><td>3</td><td>11/03</td><td>1</td><td><span lang="ko">Part 1 README 확장</span><span lang="en">Part 1 README expanded</span></td><td><span lang="ko">무엇을 검증하는지 글로 남음</span><span lang="en">What's being verified is written down</span></td></tr>
+<tr><td>4</td><td>11/05</td><td>1</td><td><span lang="ko">주어진 코드와 설명서 (작업 저장소)</span><span lang="en">Given code and handout (working repo)</span></td><td><span lang="ko"><code>git diff</code> 로 "우리가 얹은 것" 을 셀 수 있음</span><span lang="en">"What we added" becomes a <code>git diff</code></span></td></tr>
+<tr><td>5</td><td>11/05</td><td>2</td><td><span lang="ko">Part 3 전부</span><span lang="en">All of Part 3</span></td><td><span lang="ko">scoreboard 판정, <code>+LOG_LEVEL</code></span><span lang="en">Scoreboard verdicts, <code>+LOG_LEVEL</code></span></td></tr>
+<tr><td>6</td><td>11/05</td><td>4</td><td><span lang="ko">Part 4 전부</span><span lang="en">All of Part 4</span></td><td><span lang="ko">assertion 여섯 개가 매 클럭 감시</span><span lang="en">Six assertions watching every clock</span></td></tr>
+<tr><td>7</td><td>11/05</td><td>3</td><td><span lang="ko">README 둘, 실행 기록 R1~R8</span><span lang="en">Two READMEs, run log R1 to R8</span></td><td><span lang="ko">"셋 다 bug 를 잡는다" 가 기록으로 남음</span><span lang="en">"All three catch the bug" is on record</span></td></tr>
+<tr><td>8</td><td>11/05</td><td>4</td><td><span lang="ko">파형용 설정</span><span lang="en">Waveform setup</span></td><td><span lang="ko">scoreboard 상태가 파형에 보임, 시간 축이 ns</span><span lang="en">Scoreboard state in the waveform, time axis in ns</span></td></tr>
+<tr><td>9</td><td>11/05~06</td><td>6</td><td><span lang="ko">리포트 스크립트, 그림, 검토 두 개</span><span lang="en">Report scripts, figures, two reviews</span></td><td><span lang="ko">리포트를 다시 만들 수 있음, 구멍 목록</span><span lang="en">The report can be rebuilt; a list of holes</span></td></tr>
+<tr><td>10</td><td>11/06~07</td><td>2 + 1</td><td><span lang="ko">구멍 넷 수리, 재실행 R9~R12</span><span lang="en">Four holes fixed, reruns R9 to R12</span></td><td><span lang="ko">PASS 가 "실제로 검사했고 맞았다" 를 뜻함</span><span lang="en">PASS means "actually checked, and it agreed"</span></td></tr>
+<tr><td>11</td><td>11/13</td><td>2</td><td><span lang="ko">데모용 신호 목록과 창 배치 스크립트</span><span lang="en">Demo signal list and a window-tiling script</span></td><td><span lang="ko">요구된 셋을 한 화면에</span><span lang="en">The three required views on one screen</span></td></tr>
+</tbody></table>
+
+<!-- ── round 0 -->
+<h3 lang="ko">라운드 0 · 이전 · 백지: 저장소는 비었고 재료는 있다</h3>
+<h3 lang="en">Round 0 · Before · Blank: an empty repo, but the materials exist</h3>
+<pre class="code tree"><span class="fo">lab1/part1/</span>                 <span class="fo">(Lab 1 Part 1, submitted)</span>
+├─ <span class="fd">async_fifo.sv</span>             84
+├─ <span class="fd">fifo_if.sv</span>                26
+├─ <span class="fd">fifo_mem.sv</span>               19
+├─ <span class="fd">fifo_rptr.sv</span>              90
+├─ <span class="fd">fifo_wptr.sv</span>              93
+├─ <span class="fd">sync_r2w.sv</span>  <span class="fd">sync_w2r.sv</span>   23 + 23
+├─ <span class="fv">tb_async_fifo.sv</span>         357
+└─ <span class="ft">Makefile</span>                  35
+<span class="fo">lab1/part2/</span>                 <span class="fo">(Lab 1 Part 2, submitted)</span>
+├─ rtl/<span class="fd">even_odd_top.sv</span>      137
+├─ rtl/sync/<span class="fd">fifo_q.sv</span>         79
+└─ tb/<span class="fv">tb_even_odd.sv</span>       436
+<span class="fo">course sample code</span>
+├─ <span class="fv">dpi.c</span>  <span class="fv">dpi_1.sv</span>  <span class="fv">dpi_2.sv</span>
+└─ <span class="fv">sv_style_1.sv</span> ... <span class="fv">sv_style_4.sv</span>
+<span class="fo">lab4/</span>                       <span class="fo">(empty)</span></pre>
+<p lang="ko"><strong>코드베이스.</strong> 검증할 대상은 새로 짜지 않는다. Lab 1 에서 우리가 낸 비동기 FIFO(위 7 파일)와 even-odd 회로(동기 FIFO <code>fifo_q</code> 둘을 번갈아 읽는 회로)가 그대로 DUT 가 된다. Lab 1 의 FIFO 는 <code>almost_full</code>, <code>almost_empty</code> 까지 붙인 판이라 포인터 파일이 90 줄, 93 줄이다. 강의 샘플 코드는 FIFO 가 아니라 <strong>8 bit 덧셈기</strong>를 검증하는 예제다. <code>dpi_1.sv</code> 는 SystemVerilog 에서 C 함수 하나를 부르는 법, <code>dpi_2.sv</code> 는 그 C 함수를 정답으로 써서 매 클럭 비교하는 checker, <code>sv_style_1</code>~<code>4</code> 는 같은 testbench 를 interface, transaction, monitor, mailbox, scoreboard 로 한 단계씩 쪼개 가는 네 판이다(06 절).</p>
+<p lang="en"><strong>Codebase.</strong> The thing under test isn't written fresh. The asynchronous FIFO we submitted in Lab 1 (the 7 files above) and the even-odd circuit (which reads two synchronous FIFOs <code>fifo_q</code> in turn) become the DUTs as they are. Lab 1's FIFO is the version with <code>almost_full</code> and <code>almost_empty</code> added, which is why the pointer files are 90 and 93 lines. The course sample code verifies not a FIFO but an <strong>8-bit adder</strong>: <code>dpi_1.sv</code> shows how to call one C function from SystemVerilog, <code>dpi_2.sv</code> a checker that uses that C function as the answer and compares every clock, and <code>sv_style_1</code> to <code>4</code> are four versions of one testbench split step by step into interface, transaction, monitor, mailbox and scoreboard (section 06).</p>
+<p lang="ko"><strong>개념과 목적.</strong> 설계 Lab 과 순서가 반대다. 설계 Lab 은 "회로를 만들고 testbench 로 확인" 이었다. 이 Lab 은 <strong>회로가 이미 있고, 확인하는 장치 자체가 결과물</strong>이다. 그래서 백지 단계에서 정할 것은 코드가 아니라 재료의 쓰임새다. 비동기 FIFO 는 Part 2 · 3 의 DUT, even-odd 회로는 Part 4 의 DUT, 덧셈기 샘플은 모양만 빌리는 뼈대. 설명서가 "Lab 1 에서 덧붙인 것은 필요 없다" 고 해서 almost flag 는 다음 라운드에서 걷어낸다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> The order is the reverse of a design lab. A design lab was "build the circuit, then confirm it with a testbench". Here <strong>the circuit already exists and the checking machinery is the deliverable</strong>. So what gets decided at the blank stage isn't code but what each material is for: the async FIFO is the DUT for Parts 2 and 3, the even-odd circuit the DUT for Part 4, and the adder sample a skeleton whose shape is borrowed. The handout says Lab 1's additions aren't needed, so the almost flags come out in the next round.</p>
+
+<!-- ── round 1 -->
+<h3 lang="ko">라운드 1 · 11/02 · 폴더 둘: 제출 모양부터</h3>
+<h3 lang="en">Round 1 · 11/02 · Two folders: the submission's shape first</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ part_1/<span class="fx">README.md</span>             1  +
+└─ part_2/<span class="fx">README.md</span>             1  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 두 개(<code>7067569</code>, <code>0c8c959</code>), 파일 두 개, 각각 제목 한 줄. 아직 돌아가는 것은 없다.</p>
+<p lang="en"><strong>Codebase.</strong> Two commits (<code>7067569</code>, <code>0c8c959</code>), two files, one title line each. Nothing runs yet.</p>
+<p lang="ko"><strong>개념과 목적.</strong> 설명서는 코드를 zip 하나로 내되 <strong>Part 마다 폴더 하나, 폴더마다 README</strong> 를 요구한다. 저장소 첫날부터 그 모양으로 시작하면 마지막 날 zip 을 만들 때 옮길 것이 없다. 저장소의 폴더 구조 = 제출물의 폴더 구조. 작은 결정이지만 라운드 5 에서 Part 2 의 RTL 을 Part 3 로 통째로 복사하는 이유가 여기서 나온다(아래 "여기서 의문").</p>
+<p lang="en"><strong>Idea and purpose.</strong> The handout wants the code as one zip, but with <strong>one folder per part and a README in each</strong>. Start the repo in that shape on day one and there's nothing to move on the last day. Repo layout = submission layout. A small decision, but it's why round 5 copies Part 2's RTL wholesale into Part 3 (see the question below).</p>
+
+<!-- ── round 2 -->
+<h3 lang="ko">라운드 2 · 11/03 · Part 2: C 정답 짝과 checker 가 한꺼번에</h3>
+<h3 lang="en">Round 2 · 11/03 · Part 2: the C twin and the checker in one go</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ <span class="fo">part_1/README.md            1</span>
+└─ part_2/
+   ├─ <span class="fx">README.md</span>                80  ~
+   ├─ <span class="ft">Makefile</span>                 60  +
+   ├─ rtl/
+   │  ├─ <span class="fd">async_fifo.sv</span>         82  +
+   │  ├─ <span class="fd">fifo_if.sv</span>            26  +
+   │  ├─ <span class="fd">fifo_mem.sv</span>           97  +
+   │  ├─ <span class="fd">fifo_rptr.sv</span>          59  +
+   │  ├─ <span class="fd">fifo_wptr.sv</span>          61  +
+   │  ├─ <span class="fd">sync_r2w.sv</span>           23  +
+   │  └─ <span class="fd">sync_w2r.sv</span>           23  +
+   ├─ dpi/
+   │  └─ <span class="fv">fifo_model.c</span>          76  +
+   └─ tb/
+      ├─ <span class="fv">fifo_checker.sv</span>      224  +
+      └─ <span class="fv">tb_fifo_dpi.sv</span>       465  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 11 개(<code>fa2cc01</code> ~ <code>a790655</code>). 그중 여섯은 GitHub 웹에서 폴더를 만들려고 넣은 <code>.gitkeep</code> 을 넣고 지운 것이라 남은 것은 없다. 실제로 들어온 것은 12 파일, 1,275 줄이다.</p>
+<ul>
+<li lang="ko"><strong>RTL 7 파일.</strong> Lab 1 의 비동기 FIFO 에서 almost flag 를 걷어냈다. 포인터 파일이 90 → 59 줄, 93 → 61 줄로 줄었다. <code>fifo_mem.sv</code> 만 19 → 97 줄로 커졌는데, 늘어난 것은 전부 bug 주입이고, 쓰기 블록은 그걸 끼우려고 다시 짰다. <code>+INJECT_BUG</code> 가 붙으면 받아들인 쓰기를 세다가 <code>+BUG_N</code> 번째마다 메모리에 안 쓰고 넘어간다(05 절).</li>
+<li lang="en"><strong>7 RTL files.</strong> Lab 1's async FIFO with the almost flags removed: the pointer files shrink from 90 to 59 and from 93 to 61 lines. Only <code>fifo_mem.sv</code> grows, from 19 to 97 lines, and all of that is bug injection (the write block was rewritten to fit it in): with <code>+INJECT_BUG</code> it counts accepted writes and skips the memory write on every <code>+BUG_N</code>-th one (section 05).</li>
+<li lang="ko"><strong>C 모델 76 줄.</strong> 16 칸 배열, 포인터 둘, 개수 하나. 함수는 <code>fifo_reset</code>, <code>fifo_push</code>, <code>fifo_pop</code>, <code>fifo_is_empty</code>, <code>fifo_is_full</code>, <code>fifo_get_count</code> 여섯(03 절).</li>
+<li lang="en"><strong>76-line C model.</strong> A 16-slot array, two pointers, one count. Six functions: <code>fifo_reset</code>, <code>fifo_push</code>, <code>fifo_pop</code>, <code>fifo_is_empty</code>, <code>fifo_is_full</code>, <code>fifo_get_count</code> (section 03).</li>
+<li lang="ko"><strong>checker 224 줄.</strong> 쓰기 clock 과 읽기 clock 을 따로 따라가면서, DUT 가 실제로 받아들인 엣지에서만 C 의 push · pop 을 부르고, 읽은 값을 <code>!==</code> 로 대조한다(04 절).</li>
+<li lang="en"><strong>224-line checker.</strong> Follows the write clock and the read clock separately, calls the C push and pop only on edges the DUT actually accepted, and compares read data with <code>!==</code> (section 04).</li>
+<li lang="ko"><strong>testbench 465 줄.</strong> Lab 1 testbench 의 reset · write · read task 를 그대로 살려 테스트를 다시 짜고 checker 를 붙였다. 끝에 쓰기 · 읽기 · 오류 개수를 찍는다.</li>
+<li lang="en"><strong>465-line testbench.</strong> Keeps Lab 1's reset, write and read tasks, rebuilds the tests around them, hooks up the checker, and prints write, read and error counts at the end.</li>
+<li lang="ko"><strong>Makefile 60 줄.</strong> <code>compile</code>, <code>run_good</code>, <code>run_bug</code>(<code>+INJECT_BUG +BUG_N=5</code>), <code>waves_good</code>, <code>waves_bug</code>. 같은 RTL 을 한 번 컴파일하고 plusarg 만 바꿔 두 번 돌린다.</li>
+<li lang="en"><strong>60-line Makefile.</strong> <code>compile</code>, <code>run_good</code>, <code>run_bug</code> (<code>+INJECT_BUG +BUG_N=5</code>), <code>waves_good</code>, <code>waves_bug</code>. The same RTL is compiled once and run twice with different plusargs.</li>
+</ul>
+<p lang="ko"><strong>개념과 목적.</strong> 이 라운드가 세운 개념은 둘이다. 하나는 <strong>정답을 다른 언어로 짠다</strong>는 것. 회로와 같은 언어, 같은 구조로 정답을 짜면 같은 실수가 양쪽에 들어간다. C 로, 배열 하나로 짜면 그럴 일이 적다. DPI-C 는 그 C 함수를 SystemVerilog 에서 그냥 함수처럼 부르게 해 주는 다리다. 다른 하나는 <strong>bug 를 스위치로 켠다</strong>는 것. bug 판 RTL 을 따로 두면 두 판이 갈라진다. plusarg 하나로 켜고 끄면 "같은 회로에서 bug 만 다르다" 가 보장된다. 이 라운드가 끝나면 Part 2 는 코드로는 다 있다. 다만 실행 기록이 남은 것은 라운드 7(R1, R2)이다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> Two ideas land in this round. One: <strong>write the answer in a different language</strong>. An answer written in the circuit's language and structure inherits the circuit's mistakes; one written in C, as a single array, is unlikely to. DPI-C is the bridge that lets SystemVerilog call that C function like any other function. Two: <strong>turn the bug on with a switch</strong>. A separate buggy copy of the RTL drifts from the good one; one plusarg to switch it guarantees "same circuit, only the bug differs". After this round Part 2 exists in full as code, though its first recorded runs come in round 7 (R1, R2).</p>
+
+<!-- ── round 3 -->
+<h3 lang="ko">라운드 3 · 11/03 · Part 1: 계획을 글로</h3>
+<h3 lang="en">Round 3 · 11/03 · Part 1: the plan in writing</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ part_1/<span class="fx">README.md</span>            31  ~
+└─ <span class="fo">part_2/ (12 files)       1275</span></pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 하나(<code>bb79e61</code>). README 가 1 줄에서 31 줄이 됐다. DUT 가 무엇인지(Cummings 구조의 비동기 FIFO), 쓰기 쪽 신호 다섯(<code>wclk</code>, <code>wrst_n</code>, <code>winc</code>, <code>wdata</code>, <code>wfull</code>)과 읽기 쪽 신호 다섯, gray code 포인터와 synchronizer 로 두 clock 을 잇는다는 것. 시나리오 목록과 확인 방법 자체는 리포트에 있다고 README 가 밝힌다.</p>
+<p lang="en"><strong>Codebase.</strong> One commit (<code>bb79e61</code>). The README grows from 1 line to 31: what the DUT is (a Cummings-style async FIFO), the five write-side signals (<code>wclk</code>, <code>wrst_n</code>, <code>winc</code>, <code>wdata</code>, <code>wfull</code>) and the five read-side ones, and that gray-code pointers and synchronizers bridge the two clocks. The README says the scenario list and checking plan themselves live in the report.</p>
+<p lang="ko"><strong>개념과 목적.</strong> 검증 계획은 "무엇을 돌리고, 무엇이 참이어야 하고, 무엇이 되면 끝인가" 를 코드 전에 적는 문서다(02 절). 그런데 커밋 순서로는 <strong>Part 2 코드가 먼저 들어오고 계획 README 가 뒤에 커졌다.</strong> 이 순서는 흔적을 남겼다. 계획의 시나리오 중 "가득 찼을 때 쓰기", "비었을 때 읽기" 는 Part 2 · 3 의 stimulus 가 실제로 돌리지 않았고, "무엇이 되면 끝인가"(sign-off 기준)는 라운드 9 의 검토가 빠졌다고 짚었다(14 절). 계획을 먼저 쓰고 그 목록대로 stimulus 를 짰으면 걸러졌을 것들이다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> A verification plan writes down, before the code, what to run, what must hold, and when you're done (section 02). But in commit order <strong>the Part 2 code landed first and the plan README grew afterwards.</strong> That order left traces: of the plan's scenarios, "write while full" and "read while empty" were never actually run by the Part 2 and 3 stimulus, and the review in round 9 pointed out that "when are we done" (the sign-off criteria) was missing (section 14). Writing the plan first and building the stimulus from its list would have caught both.</p>
+
+<!-- ── round 4 -->
+<h3 lang="ko">라운드 4 · 11/05 18:40 · 기준선: 주어진 것을 먼저 커밋</h3>
+<h3 lang="en">Round 4 · 11/05 18:40 · Baseline: commit what was given, first</h3>
+<pre class="code tree"><span class="fo">working repo: lab4/</span>
+├─ spec/<span class="fx">handout.txt</span>           101  +
+└─ given/
+   ├─ <span class="fv">dpi.c</span>                     5  +
+   ├─ <span class="fv">dpi_1.sv</span>                109  +
+   ├─ <span class="fv">dpi_2.sv</span>                127  +
+   ├─ <span class="fv">sv_style_1.sv</span>           159  +
+   ├─ <span class="fv">sv_style_2.sv</span>           196  +
+   ├─ <span class="fv">sv_style_3.sv</span>           209  +
+   └─ <span class="fv">sv_style_4.sv</span>           207  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 개인 작업 저장소의 커밋 하나(<code>86cf705</code>), 8 파일 1,113 줄. 설명서는 글자 그대로, 샘플 코드는 받은 그대로다. 이 저장소는 비공개이고 제출물에 들어가지 않는다.</p>
+<p lang="en"><strong>Codebase.</strong> One commit in the private working repo (<code>86cf705</code>), 8 files, 1,113 lines: the handout verbatim and the sample code as received. This repo is private and not part of the submission.</p>
+<p lang="ko"><strong>개념과 목적.</strong> <strong>우리가 얹은 것을 기억이 아니라 diff 로 세기 위해서다.</strong> 주어진 코드를 먼저 한 커밋으로 박아 두면, 나중에 "이건 샘플에 있던 것인가, 우리가 쓴 것인가" 를 <code>git diff</code> 가 답한다. 11 절의 "주어진 것과 우리가 얹은 것" 표가 이 기준선과 Lab 1 제출 파일을 놓고 줄 단위로 대조한 결과다. 그 대조에서 샘플의 덧셈기 코드는 Part 3 의 뼈대 노릇만 했고 그대로 옮긴 줄은 없다는 것이 드러났다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> <strong>To count what we added with a diff, not from memory.</strong> With the given code pinned in one commit first, "was this in the sample or did we write it?" becomes a <code>git diff</code>. Section 11's "what was given and what we added" table is a line-by-line comparison against this baseline and the Lab 1 submission, and that comparison showed the adder sample served only as Part 3's skeleton, with no line carried over as is.</p>
+
+<!-- ── round 5 -->
+<h3 lang="ko">라운드 5 · 11/05 18:43 · Part 3: 쪽지를 만드는 쪽과 판정하는 쪽을 나눈다</h3>
+<h3 lang="en">Round 5 · 11/05 18:43 · Part 3: split the note-takers from the judge</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ <span class="fo">part_1/ (1 file)            31</span>
+├─ <span class="fo">part_2/ (12 files)        1275</span>
+└─ part_3/
+   ├─ <span class="ft">Makefile</span>                 67  +
+   ├─ rtl/ <span class="fd">(7 files)</span>          371  +
+   └─ tb/
+      ├─ <span class="fv">fifo_wr_if.sv</span>         39  +
+      ├─ <span class="fv">fifo_rd_if.sv</span>         41  +
+      ├─ <span class="fv">fifo_tb_pkg.sv</span>       324  +
+      └─ <span class="fv">tb_fifo_sb.sv</span>        406  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 둘(<code>2631cc9</code>, <code>8e80f2d</code>). <code>rtl/</code> 은 Part 2 의 7 파일을 바이트 하나 안 바꾸고 복사했다(bug 주입도 같이 온다). 새로 짠 것은 <code>tb/</code> 의 네 파일이다.</p>
+<p lang="en"><strong>Codebase.</strong> Two commits (<code>2631cc9</code>, <code>8e80f2d</code>). <code>rtl/</code> is Part 2's 7 files copied byte for byte (bug injection included). What's new is the four files in <code>tb/</code>.</p>
+<ul>
+<li lang="ko"><strong>interface 둘.</strong> 쓰기 쪽(<code>wclk</code> 기준)과 읽기 쪽(<code>rclk</code> 기준). 각자 clocking block 이 있어 입력을 엣지 직전 값으로(<code>#1step</code>) 읽는다. 덧셈기 샘플은 clock 이 하나라 interface 도 하나였다.</li>
+<li lang="en"><strong>Two interfaces.</strong> Write side (on <code>wclk</code>) and read side (on <code>rclk</code>), each with a clocking block that samples inputs just before the edge (<code>#1step</code>). The adder sample had one clock, so one interface.</li>
+<li lang="ko"><strong><code>fifo_tb_pkg.sv</code> 324 줄.</strong> transaction class <code>fifo_txn</code>(id, op, data, timestamp), 공통 부모 monitor 의 <code>post()</code>(mailbox 에 넣고 <code>+LOG_LEVEL</code> 에 따라 한 줄 찍기), 쓰기 · 읽기 monitor, 그리고 <code>q[$]</code> 로 기댓값을 들고 있는 scoreboard.</li>
+<li lang="en"><strong><code>fifo_tb_pkg.sv</code>, 324 lines.</strong> The transaction class <code>fifo_txn</code> (id, op, data, timestamp), the shared base monitor's <code>post()</code> (put into the mailbox, print a line according to <code>+LOG_LEVEL</code>), the write and read monitors, and the scoreboard holding expected values in a <code>q[$]</code>.</li>
+<li lang="ko"><strong><code>tb_fifo_sb.sv</code> 406 줄.</strong> Part 2 와 같은 테스트를 interface 를 통해 넣고, 끝에서 scoreboard 의 <code>passed()</code> 로 판정한다.</li>
+<li lang="en"><strong><code>tb_fifo_sb.sv</code>, 406 lines.</strong> The same tests as Part 2, driven through the interfaces, with the scoreboard's <code>passed()</code> giving the verdict at the end.</li>
+</ul>
+<p lang="ko">두 번째 커밋은 한 줄짜리 수정이다. 처음에 <code>post()</code> 를 function 으로 짰는데, 안에서 부르는 mailbox 의 <code>put()</code> 은 task 다. 크기를 정한 mailbox 면 자리가 날 때까지 기다릴 수 있어서다. function 은 시간을 쓸 수 없으니 task 를 부를 수 없다. 그래서 <code>post()</code> 를 task 로 바꿨다(13 절 첫 줄).</p>
+<p lang="en">The second commit is a one-line fix. <code>post()</code> was first written as a function, but the mailbox <code>put()</code> it calls is a task, because a bounded mailbox may wait for room. A function can't consume time, so it can't call a task, and <code>post()</code> became a task (first row of section 13).</p>
+<pre class="code"><span class="c">// submitted · fifo_tb_pkg.sv · excerpt</span>
+<span class="k">task</span> post(fifo_txn txn);
+    txn_mail.put(txn);
+    <span class="k">if</span> (log_level == 1)      $display(<span class="s">"[%s] %s"</span>, name, txn.brief());
+    <span class="k">else if</span> (log_level &gt;= 2) $display(<span class="s">"[%s] %s"</span>, name, txn.detail());
+<span class="k">endtask</span></pre>
+<p lang="ko"><strong>개념과 목적.</strong> Part 2 의 checker 는 한 module 이 핀을 보고, 정답을 들고, 판정까지 다 했다. Part 3 은 그걸 <strong>세 역할로 쪼갠다.</strong> monitor 는 핀을 보고 "무슨 일이 있었나" 를 쪽지(transaction)로 적는다. mailbox 는 쪽지를 나르는 우편함이다. scoreboard 는 쪽지만 보고 판정한다. 쪼개 두면 DUT 가 바뀌어도 monitor 만 갈아 끼우고, 판정 규칙이 바뀌어도 scoreboard 만 고친다. 이 모양이 그대로 UVM 의 monitor → analysis port → scoreboard 가 된다(<a href="L17-uvm-2.html">Lecture 17</a>).</p>
+<p lang="en"><strong>Idea and purpose.</strong> Part 2's checker was one module that watched the pins, held the answer and judged. Part 3 <strong>splits that into three roles.</strong> The monitor watches the pins and writes "what happened" as a note (a transaction). The mailbox is the post box that carries notes. The scoreboard judges from notes alone. Split this way, a new DUT means swapping only the monitor, and a new rule means touching only the scoreboard. This shape becomes UVM's monitor → analysis port → scoreboard as is (<a href="L17-uvm-2.html">Lecture 17</a>).</p>
+<div class="callout">
+<p lang="ko"><strong>여기서 의문. RTL 을 왜 복사했나? Part 2 폴더를 가리키면 되지 않나.</strong> 그러면 <code>part_3/</code> 만 받은 사람은 컴파일을 못 한다. 설명서가 Part 마다 폴더를 따로 내라고 하고, 채점하는 사람은 폴더 하나에서 <code>make</code> 를 친다. 그래서 폴더마다 혼자 돌아가야 한다. 대가는 같은 371 줄이 두 군데 있다는 것이고, 한쪽만 고치면 갈라진다. 이 Lab 에서는 RTL 을 한 번도 안 고쳐서 마지막까지 두 폴더가 같았다.</p>
+<p lang="en"><strong>Question. Why copy the RTL? Why not point at the Part 2 folder?</strong> Then anyone given only <code>part_3/</code> couldn't compile. The handout wants a separate folder per part, and a grader types <code>make</code> inside one folder, so each folder has to run on its own. The cost is the same 371 lines in two places, which drift if only one side is edited. This lab never edited the RTL, so the two folders stayed identical to the end.</p>
+</div>
+
+<!-- ── round 6 -->
+<h3 lang="ko">라운드 6 · 11/05 18:48 · Part 4: 회로 안에 감시 카메라 여섯 대</h3>
+<h3 lang="en">Round 6 · 11/05 18:48 · Part 4: six cameras inside the circuit</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ <span class="fo">part_1/ part_2/ part_3/   (28 files)</span>
+└─ part_4/
+   ├─ <span class="ft">Makefile</span>                 65  +
+   ├─ <span class="ft">even_odd_good.rc</span>         29  +
+   ├─ <span class="ft">even_odd_bug.rc</span>          29  +
+   ├─ rtl/
+   │  ├─ <span class="fd">even_odd_top.sv</span>      167  +
+   │  └─ <span class="fd">fifo_q.sv</span>             79  +
+   └─ tb/
+      ├─ <span class="fv">even_odd_if.sv</span>       120  +
+      └─ <span class="fv">tb_even_odd.sv</span>       567  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 넷(<code>0e84cd7</code>, <code>fce8adb</code>, <code>4a56dae</code>, <code>87007ba</code>). 첫 커밋이 코드 전부이고 나머지 셋은 Verdi 설정이다.</p>
+<p lang="en"><strong>Codebase.</strong> Four commits (<code>0e84cd7</code>, <code>fce8adb</code>, <code>4a56dae</code>, <code>87007ba</code>). The first holds all the code; the other three are Verdi setup.</p>
+<ul>
+<li lang="ko"><strong><code>fifo_q.sv</code> 79 줄</strong>은 Lab 1 의 동기 FIFO(깊이 40)와 바뀐 줄이 없다. <strong><code>even_odd_top.sv</code></strong> 은 137 → 167 줄인데 늘어난 30 줄은 bug 주입뿐이다. <code>+INJECT_BUG</code> 면 꺼낸 개수를 세다가 <code>+BUG_N</code> 번째 꺼냄 뒤에 차례(<code>sel</code>)를 안 바꾼다(10 절).</li>
+<li lang="en"><strong><code>fifo_q.sv</code>, 79 lines,</strong> has no changed lines from Lab 1's synchronous FIFO (depth 40). <strong><code>even_odd_top.sv</code></strong> goes from 137 to 167 lines, and the 30 new lines are only bug injection: with <code>+INJECT_BUG</code> it counts pops and skips the turn flip (<code>sel</code>) after the <code>+BUG_N</code>-th one (section 10).</li>
+<li lang="ko"><strong><code>even_odd_if.sv</code> 120 줄</strong>이 새 파일이다. DUT 포트를 묶는 interface 안에 assertion 여섯 개가 산다. 포트 밖 신호(<code>sel</code>, 각 FIFO 의 포인터)는 계층 경로로 들여다본다(XMR). 각 assertion 의 조건이 몇 번 참이었는지 세는 <code>cover property</code> 도 여기 있다(09 절).</li>
+<li lang="en"><strong><code>even_odd_if.sv</code>, 120 lines,</strong> is new. Six assertions live inside the interface that bundles the DUT ports, reaching signals beyond the ports (<code>sel</code>, each FIFO's pointers) through hierarchical paths (XMR). The <code>cover property</code> counters for how often each assertion's condition held are here too (section 09).</li>
+<li lang="ko"><strong><code>tb_even_odd.sv</code></strong> 는 Lab 1 testbench 436 줄에서 567 줄. DUT 를 interface 로 잇고, <code>fill_even</code> 테스트를 더했다. Lab 1 테스트는 FIFO 를 끝까지 채우지 않아서 "가득 찼을 때" assertion 이 한 번도 검사를 안 했기 때문이다(13 절).</li>
+<li lang="en"><strong><code>tb_even_odd.sv</code></strong> goes from Lab 1's 436 lines to 567: the DUT is wired through the interface, and a <code>fill_even</code> test is added, because Lab 1's tests never fill a FIFO, so the "when full" assertion never checked anything (section 13).</li>
+<li lang="ko"><strong>Makefile 과 <code>.rc</code>.</strong> <code>+fsdb+sva_success</code> 를 붙여 assertion 의 <strong>성공</strong>도 파형 파일에 남긴다. 기본값은 실패만 남는다. <code>.rc</code> 는 Verdi 에 띄울 신호 목록과 확대 구간을 저장한 파일이다.</li>
+<li lang="en"><strong>Makefile and <code>.rc</code>.</strong> <code>+fsdb+sva_success</code> records assertion <strong>successes</strong> in the waveform file too; by default only failures are kept. An <code>.rc</code> stores the Verdi signal list and zoom range.</li>
+</ul>
+<p lang="ko"><strong>개념과 목적.</strong> Part 2 · 3 는 <strong>출력</strong>만 봤다. 잘못된 값이 나와야 안다. Part 4 는 <strong>회로 안의 규칙</strong>을 매 클럭 본다. "꺼낸 다음 클럭에는 차례가 바뀌어 있다" 같은 규칙이 깨지는 순간을 그 자리에서 잡는다. bug 실행에서 잘못된 출력은 180 ns 에 처음 나오는데, assertion 은 145 ns 에 이미 울렸다(R7). 그리고 이 라운드에서 <strong>빈 통과</strong>(vacuous pass)를 처음 만났다. 조건이 한 번도 참이 아니면 assertion 은 실패할 기회 자체가 없다. 그래서 개수를 세고, 0 이면 stimulus 를 더한다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> Parts 2 and 3 watched only <strong>outputs</strong>: you learn of a bug when a wrong value comes out. Part 4 watches <strong>rules inside the circuit</strong> every clock, catching the moment a rule like "the clock after a pop, the turn has changed" breaks. In the bug run the first wrong output appears at 180 ns, but the assertion had already fired at 145 ns (R7). This round also met the <strong>vacuous pass</strong> for the first time: if the condition is never true, an assertion never gets a chance to fail. So you count, and if the count is 0 you add stimulus.</p>
+
+<!-- ── round 7 -->
+<h3 lang="ko">라운드 7 · 11/05 18:53 · README 와 첫 실행 기록: 셋 다 깨어 있다</h3>
+<h3 lang="en">Round 7 · 11/05 18:53 · READMEs and the first run log: all three are awake</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ <span class="fo">part_1/ part_2/</span>
+├─ part_3/<span class="fx">README.md</span>            95  +
+└─ part_4/<span class="fx">README.md</span>            90  +
+<span class="fo">working repo: lab4/</span>
+└─ <span class="fx">RUNS.md</span>                     15  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 셋(<code>68deb8b</code>, <code>b966041</code>, <code>468490d</code>). README 는 폴더마다 무엇이 있고 어떻게 돌리는지다. 핵심은 실행 기록 <code>RUNS.md</code> 다. Apporto 에서 돌린 실행에 번호를 붙이고, 명령과 결과를 한 줄씩 적는다. 리포트와 이 페이지의 숫자는 전부 이 번호를 단다.</p>
+<p lang="en"><strong>Codebase.</strong> Three commits (<code>68deb8b</code>, <code>b966041</code>, <code>468490d</code>). The READMEs say what's in each folder and how to run it. The key file is the run log <code>RUNS.md</code>: every run on Apporto gets a number, with its command and result on one line. Every number in the report and on this page carries one of these labels.</p>
+<table class="tl"><thead><tr><th><span lang="ko">실행</span><span lang="en">Run</span></th><th>Part</th><th><span lang="ko">무엇을</span><span lang="en">What</span></th><th><span lang="ko">결과</span><span lang="en">Result</span></th></tr></thead><tbody>
+<tr><td>R1</td><td>2</td><td><code>make run_good</code></td><td><span lang="ko">쓰기 48, 읽기 48 확인, 오류 0, PASSED</span><span lang="en">48 writes, 48 reads checked, 0 errors, PASSED</span></td></tr>
+<tr><td>R2</td><td>2</td><td><code>make run_bug</code></td><td><span lang="ko">오류 9, FAILED. 첫 불일치 time=693, 기댓값 0x04, 읽은 값 xx</span><span lang="en">9 errors, FAILED; first mismatch at time=693, expected 0x04, read xx</span></td></tr>
+<tr><td>R3</td><td>3</td><td><code>make run</code></td><td><span lang="ko">비교 48, 남은 것 0, 오류 0, PASSED</span><span lang="en">48 comparisons, 0 left over, 0 errors, PASSED</span></td></tr>
+<tr><td>R4</td><td>3</td><td><code>+INJECT_BUG +BUG_N=5</code></td><td><span lang="ko">5, 10, 15 ... 번째 쓰기를 버림, 오류 9, FAILED</span><span lang="en">Writes #5, #10, #15 ... dropped, 9 errors, FAILED</span></td></tr>
+<tr><td>R5</td><td>3</td><td><code>+LOG_LEVEL=1</code>, <code>2</code></td><td><span lang="ko">monitor 줄 99 개씩(reset 3 + 쓰기 48 + 읽기 48), 0 단계는 0 줄</span><span lang="en">99 monitor lines each (3 resets + 48 writes + 48 reads), 0 at level 0</span></td></tr>
+<tr><td>R6</td><td>4</td><td><code>make run</code></td><td><span lang="ko">다섯 테스트 모두 ok, 검사 횟수 405 / 400 / 400 / 50 / 400 / 5, PASSED</span><span lang="en">All five tests ok, checks 405 / 400 / 400 / 50 / 400 / 5, PASSED</span></td></tr>
+<tr><td>R7</td><td>4</td><td><code>make run_bug</code></td><td><span lang="ko">135 ns 에 꺼낸 5 번째 뒤 a_turn_flips 가 145 ns 에 실패, 출력 79 / 80, 오류 2, FAILED</span><span lang="en">After the 5th pop at 135 ns, a_turn_flips fails at 145 ns; 79 / 80 outputs; 2 errors, FAILED</span></td></tr>
+<tr><td>R8</td><td>4</td><td><span lang="ko">Verdi 로 R7 파형</span><span lang="en">R7's waveform in Verdi</span></td><td><span lang="ko">성공마다 초록 화살표, 145 ns 에 빨간 실패 표시</span><span lang="en">A green arrow on every success, a red failure mark at 145 ns</span></td></tr>
+</tbody></table>
+<p lang="ko"><strong>개념과 목적.</strong> 좋은 실행의 PASS 만으로는 아무것도 증명이 안 된다. 검사기가 잠들어 있어도 PASS 는 나온다. <strong>일부러 고장 낸 회로에서 FAIL 이 나와야</strong> 검사기가 깨어 있다는 증거가 된다. 이 라운드가 끝나면 세 Part 모두 그 짝(좋은 실행 PASS, bug 실행 FAIL)이 기록으로 남는다. 설명서가 요구한 것은 이 시점에 전부 돈다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> A PASS on a good run proves nothing by itself; a sleeping checker passes too. <strong>A FAIL on a deliberately broken circuit</strong> is the evidence the checker is awake. After this round all three parts have that pair on record (good run PASS, bug run FAIL). Everything the handout asked for runs at this point.</p>
+
+<!-- ── round 8 -->
+<h3 lang="ko">라운드 8 · 11/05 19:22 · 파형에 보이게: class 는 파형에 안 찍힌다</h3>
+<h3 lang="en">Round 8 · 11/05 19:22 · Make it show in the waveform: classes don't get dumped</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ part_3/
+│  ├─ <span class="ft">Makefile</span>                 67  ~
+│  ├─ <span class="ft">fifo_sb.rc</span>               23  +
+│  ├─ <span class="ft">fifo_sb_bug.rc</span>           23  +
+│  └─ tb/<span class="fv">tb_fifo_sb.sv</span>        423  ~
+└─ part_4/
+   ├─ <span class="ft">even_odd_good.rc</span>         29  ~
+   └─ <span class="ft">even_odd_good_start.rc</span>   29  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 넷(<code>6c1f08f</code>, <code>09317c3</code>, <code>9a28f44</code>, <code>23d27fa</code>). 회로도 판정도 안 바뀌고, <strong>보이는 것</strong>만 바뀐다.</p>
+<p lang="en"><strong>Codebase.</strong> Four commits (<code>6c1f08f</code>, <code>09317c3</code>, <code>9a28f44</code>, <code>23d27fa</code>). Neither the circuit nor the verdict changes, only <strong>what's visible</strong>.</p>
+<ul>
+<li lang="ko"><strong><code>tb_fifo_sb.sv</code> +17 줄.</strong> scoreboard 는 class 라서 그 안의 카운터는 파형 파일에 안 들어간다. 그래서 1 ns 마다 module 변수 넷에 베껴 둔다.</li>
+<li lang="en"><strong><code>tb_fifo_sb.sv</code>, +17 lines.</strong> The scoreboard is a class, so its counters never reach the waveform file. They're copied into four module variables every 1 ns.</li>
+<li lang="ko"><strong>Makefile 한 줄.</strong> Part 3 에는 <code>`timescale</code> 이 없어서 <code>#5</code> 가 5 초로 읽혔다. 동작은 같지만 Verdi 축이 초 단위가 된다. <code>-timescale=1ns/1ns</code> 를 붙였다. Part 2 는 그대로 두어서 지금도 초 단위다(데모 때 손으로 확대한 이유).</li>
+<li lang="en"><strong>One Makefile line.</strong> Part 3 had no <code>`timescale</code>, so <code>#5</code> read as 5 seconds: same behavior, but a Verdi axis in seconds. <code>-timescale=1ns/1ns</code> was added. Part 2 was left alone and is still in seconds (which is why it was zoomed by hand at the demo).</li>
+<li lang="ko"><strong><code>.rc</code> 셋.</strong> 리포트에 실을 화면마다 신호 목록과 확대 구간을 저장했다.</li>
+<li lang="en"><strong>Three <code>.rc</code> files.</strong> A saved signal list and zoom range for each screen that goes into the report.</li>
+</ul>
+<pre class="code"><span class="c">// submitted · tb_fifo_sb.sv · excerpt</span>
+<span class="k">always</span> #1 <span class="k">begin</span>
+    <span class="k">if</span> (sb != <span class="k">null</span>) <span class="k">begin</span>
+        sb_compares   = sb.n_compares;
+        sb_errors     = sb.n_errors;
+        sb_model_size = sb.q.size();
+    <span class="k">end</span>
+<span class="k">end</span></pre>
+<p lang="ko"><strong>개념과 목적.</strong> 파형 파일(FSDB)은 module 에 붙은 신호와 변수를 시간마다 적는다. class 객체는 시뮬레이션 중에 <code>new</code> 로 생겼다 사라지는 것이라 그 틀에 안 맞는다. 설명서는 scoreboard 가 일하는 모습을 파형으로 보이라고 하니, 객체 안의 값을 module 쪽으로 끌어내는 다리가 필요했다. 이 다리는 판정에 아무 영향이 없다. 읽기만 한다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> A waveform file (FSDB) records module-level signals and variables over time. Class objects are created with <code>new</code> and go away during simulation, so they don't fit that frame. The handout wants the scoreboard's work shown in a waveform, which needed a bridge pulling values out of the object onto the module. The bridge has no effect on the verdict; it only reads.</p>
+
+<!-- ── round 9 -->
+<h3 lang="ko">라운드 9 · 11/05 19:39 ~ 11/06 · 리포트를 스크립트로, 그리고 남에게 읽힌다</h3>
+<h3 lang="en">Round 9 · 11/05 19:39 to 11/06 · The report by script, then someone else reads it</h3>
+<pre class="code tree"><span class="fo">working repo: lab4/</span>
+├─ report/
+│  ├─ <span class="ft">build_report.py</span>         393  +
+│  ├─ <span class="ft">code_image.py</span>           112  +
+│  ├─ <span class="ft">cap_*.rc</span>  (4 files)          +
+│  ├─ figs/  (17 png)              +
+│  └─ <span class="fx">Lab 4 report.docx</span>            +
+├─ <span class="fx">REVIEW.md</span>                   25  +
+└─ <span class="fx">CODEX_REVIEW.md</span>             38  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 여섯(<code>91b0696</code> ~ <code>53bb419</code>). 전부 작업 저장소이고 제출 폴더는 안 바뀐다.</p>
+<p lang="en"><strong>Codebase.</strong> Six commits (<code>91b0696</code> to <code>53bb419</code>), all in the working repo; the submission folders don't change.</p>
+<ul>
+<li lang="ko"><strong><code>build_report.py</code></strong> 가 리포트 docx 를 만든다. 문단, 그림, 표가 코드에 들어 있어서 숫자 하나를 고치면 리포트를 다시 뽑으면 된다.</li>
+<li lang="en"><strong><code>build_report.py</code></strong> builds the report docx. Paragraphs, figures and tables are in the code, so fixing one number means rebuilding the report.</li>
+<li lang="ko"><strong><code>code_image.py</code></strong> 는 리포트의 코드 그림 7 장을 제출 파일에서 직접 잘라 그린다. 시작 줄과 끝 줄을 문자열로 지정하므로 코드가 바뀌면 그림도 따라 바뀐다. 리포트 속 코드와 제출 코드가 어긋날 수 없다.</li>
+<li lang="en"><strong><code>code_image.py</code></strong> renders the report's 7 code figures straight from the submitted files, with start and end lines given as strings, so the figures follow the code when it changes. The code in the report can't drift from the code submitted.</li>
+<li lang="ko"><strong><code>cap_*.rc</code></strong> 넷은 파형 캡처 넷의 신호 목록과 확대 구간. 그림 10 장(터미널, 로그, 파형)은 Apporto 화면을 캡처했다.</li>
+<li lang="en"><strong>Four <code>cap_*.rc</code></strong> fix the signal lists and zoom of the four waveform captures. The 10 other figures (terminals, logs, waveforms) are screen captures from Apporto.</li>
+<li lang="ko"><strong>검토 둘.</strong> <code>REVIEW.md</code> 는 리포트를 같이 보는 사람에게 넘길 확인 목록이다. <code>CODEX_REVIEW.md</code> 는 코드와 리포트 문장을 설명서와 대조해 달라고 다른 도구에 <strong>읽기 전용으로</strong> 맡긴 독립 검토의 결과다.</li>
+<li lang="en"><strong>Two reviews.</strong> <code>REVIEW.md</code> is a checklist handed to whoever reads the report with you. <code>CODEX_REVIEW.md</code> is the result of an independent review, given <strong>read-only</strong> to a separate tool, comparing the code and the report text against the handout.</li>
+</ul>
+<p lang="ko"><strong>개념과 목적.</strong> 두 가지다. 하나는 <strong>리포트도 빌드 산출물</strong>이라는 것. 손으로 붙인 문서는 코드가 바뀌면 조용히 낡는다. 다른 하나는 <strong>내가 짠 검사를 내가 검사하면 같은 맹점이 남는다</strong>는 것. 독립 검토가 찾은 것이 13 절의 뒤쪽 네 줄이다. Part 4 의 최종 판정이 assertion 실패를 안 셌고, 두 assertion 이 반쪽만 봤고, transaction 에 늘 0 인 필드가 있었고, Part 3 은 flag 가 멈추면 영원히 멈췄다. 네 가지 모두 그때의 실행은 아무 불평 없이 PASS 였다. 그래서 주황이다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> Two ideas. One: <strong>the report is a build output too.</strong> A hand-assembled document quietly goes stale when the code changes. Two: <strong>checking your own checks leaves your own blind spots.</strong> What the independent review found is the last four rows of section 13: Part 4's final verdict didn't count assertion failures, two assertions checked only half of their rule, the transaction had a field that was always 0, and Part 3 hung forever if a flag got stuck. All four were silent PASSes in the runs at the time, hence amber.</p>
+
+<!-- ── round 10 -->
+<h3 lang="ko">라운드 10 · 11/06 21:29 ~ 11/07 · 구멍 넷을 막고 다시 돌린다</h3>
+<h3 lang="en">Round 10 · 11/06 21:29 to 11/07 · Plug the four holes and run again</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ part_3/
+│  ├─ <span class="fx">README.md</span>                94  ~
+│  └─ tb/
+│     ├─ <span class="fv">fifo_tb_pkg.sv</span>       321  ~
+│     └─ <span class="fv">tb_fifo_sb.sv</span>        441  ~
+└─ part_4/
+   ├─ <span class="fx">README.md</span>                92  ~
+   └─ tb/
+      ├─ <span class="fv">even_odd_if.sv</span>       149  ~
+      └─ <span class="fv">tb_even_odd.sv</span>       570  ~
+<span class="fo">working repo: lab4/</span>
+├─ <span class="fx">RUNS.md</span>                     24  ~
+└─ report/ (7 figures redone)      ~</pre>
+<p lang="ko"><strong>코드베이스.</strong> 작업 저장소 커밋 둘(<code>822296c</code>, <code>f0d2486</code>)과 같은 수정을 팀 저장소에 올린 커밋 하나(<code>54835b1</code>, 11/07). 코드는 6 파일, 75 줄 더하고 27 줄 뺐다.</p>
+<p lang="en"><strong>Codebase.</strong> Two working-repo commits (<code>822296c</code>, <code>f0d2486</code>) and one team-repo commit carrying the same change (<code>54835b1</code>, 11/07). The code change is 6 files, 75 lines added and 27 removed.</p>
+<table class="tl"><thead><tr><th><span lang="ko">구멍</span><span lang="en">Hole</span></th><th><span lang="ko">파일</span><span lang="en">File</span></th><th><span lang="ko">고친 것</span><span lang="en">Fix</span></th></tr></thead><tbody>
+<tr><td><span lang="ko">assertion 이 실패해도 PASS</span><span lang="en">PASS despite an assertion failure</span></td><td><code>even_odd_if.sv</code>, <code>tb_even_odd.sv</code></td><td><span lang="ko">여섯 assertion 의 실패 쪽마다 <code>n_fail++</code>, 최종 오류에 더함</span><span lang="en"><code>n_fail++</code> in each assertion's failure branch, added into the final error count</span></td></tr>
+<tr><td><span lang="ko">A6 은 포인터만, A4 는 출력만</span><span lang="en">A6 saw only the pointer, A4 only the output</span></td><td><code>even_odd_if.sv</code></td><td><span lang="ko">A6 에 "포인터 자리의 칸도 그대로", A4 에 "두 읽기 포인터도 그대로" 를 더함</span><span lang="en">A6 gains "the slot at the pointer is unchanged too", A4 "both read pointers are unchanged too"</span></td></tr>
+<tr><td><span lang="ko">늘 0 인 transaction 필드</span><span lang="en">An always-zero transaction field</span></td><td><code>fifo_tb_pkg.sv</code></td><td><span lang="ko"><code>flag</code> 필드와 로그 출력에서 그 칸을 뺌</span><span lang="en">Dropped the <code>flag</code> field and its column in the log</span></td></tr>
+<tr><td><span lang="ko">flag 가 멈추면 영원히 멈춤</span><span lang="en">A stuck flag hangs forever</span></td><td><code>tb_fifo_sb.sv</code></td><td><span lang="ko">100 µs watchdog</span><span lang="en">A 100 µs watchdog</span></td></tr>
+</tbody></table>
+<pre class="code"><span class="c">// submitted · even_odd_if.sv · A6 after the fix · excerpt</span>
+(`EO_DUT.fifo_even.full &amp;&amp; `EO_DUT.fifo_even.wr_en) |=&gt;
+    $stable(`EO_DUT.fifo_even.wptr) &amp;&amp;
+    $stable(`EO_DUT.fifo_even.mem[`EO_DUT.fifo_even.wptr])</pre>
+<p lang="ko">고친 뒤 다시 돌린 결과(R9~R12)는 숫자가 하나만 바뀌었다. Part 3 는 비교 48, 오류 0 으로 PASS(R9, 2885 ns 에 끝나 watchdog 은 안 울림), bug 실행은 오류 9(R10). Part 4 의 검사 횟수는 405 / 400 / 400 / 50 / 400 / 5 그대로이고 assertion 실패 0(R11). bug 실행은 여전히 145 ns 에 a_turn_flips 가 실패하는데, 최종 줄이 <code>TEST FAILED with 3 error(s)</code> 가 됐다(R12). 전에는 2 였다. 늘어난 1 이 바로 assertion 실패이고, 이제 판정에 들어간다는 증거다.</p>
+<p lang="en">After the fix, the reruns (R9 to R12) changed exactly one number. Part 3 passes with 48 comparisons and 0 errors (R9, finishing at 2885 ns, watchdog never reached), and the bug run has 9 errors (R10). Part 4's check counts stay 405 / 400 / 400 / 50 / 400 / 5 with 0 assertion failures (R11). The bug run still fails a_turn_flips at 145 ns, but the last line now reads <code>TEST FAILED with 3 error(s)</code> (R12), up from 2. The extra 1 is the assertion failure itself: proof that it now counts toward the verdict.</p>
+<p lang="ko"><strong>개념과 목적.</strong> <strong>PASS 의 뜻을 좁힌다.</strong> 고치기 전의 PASS 는 "아무도 불평하지 않았다" 였다. 고친 뒤의 PASS 는 "모든 검사기가 실제로 검사했고, 다 맞았고, 끝까지 갔다" 다. 검사기를 더 만든 것이 아니라 이미 있던 검사기를 최종 판정에 다 묶고, 반쪽 규칙을 온전하게 만든 라운드다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> <strong>Narrow what PASS means.</strong> Before the fix, PASS meant "nobody complained". After it, PASS means "every checker actually checked, all agreed, and the run reached the end". No new checkers: the existing ones were all tied into the final verdict and the half rules made whole.</p>
+
+<!-- ── round 11 -->
+<h3 lang="ko">라운드 11 · 11/13 · 데모: 요구된 셋을 한 화면에</h3>
+<h3 lang="en">Round 11 · 11/13 · Demo: the three required views on one screen</h3>
+<pre class="code tree"><span class="fo">working repo: lab4/</span>
+└─ demo/
+   ├─ <span class="ft">fifo_dpi_bug.rc</span>          26  +
+   └─ <span class="ft">layout.sh</span>                29  +</pre>
+<p lang="ko"><strong>코드베이스.</strong> 커밋 둘(<code>8374fb2</code>, <code>ffd5572</code>). <code>fifo_dpi_bug.rc</code> 는 Part 2 bug 실행의 신호를 쓰기 · 읽기 · checker 세 묶음으로 띄운다. checker 묶음에 기댓값과 오류 카운터가 있어서 다섯 번째 쓰기가 버려진 자리에서 <code>rdata</code> 가 xx 가 되고 오류가 0 → 1 로 오르는 것이 한 화면에 보인다. <code>layout.sh</code> 는 창 다섯 개(파형 둘, 터미널 셋)를 위 2 개, 아래 3 개로 자리 잡는다. Apporto 데스크톱에는 창 배치 도구가 없어서 GNOME Shell 에 직접 명령을 보냈다.</p>
+<p lang="en"><strong>Codebase.</strong> Two commits (<code>8374fb2</code>, <code>ffd5572</code>). <code>fifo_dpi_bug.rc</code> opens the Part 2 bug run's signals in three groups, write, read and checker. The checker group holds the expected value and the error counter, so one screen shows <code>rdata</code> going xx where the fifth write was dropped and the error count stepping from 0 to 1. <code>layout.sh</code> places five windows (two waveforms, three terminals) two on top, three below. The Apporto desktop has no window-placement tool, so it sends commands to GNOME Shell directly.</p>
+<p lang="ko"><strong>개념과 목적.</strong> 데모가 요구한 것은 셋이다. DPI checker 의 불일치 파형과 터미널(Part 2), scoreboard 터미널(Part 3), 직접 짠 assertion 의 실패 파형(Part 4). 이 라운드는 새 검사를 만들지 않는다. <strong>이미 증명한 것을 남이 몇 초 안에 볼 수 있게</strong> 배치한다. Part 2 의 <code>.rc</code> 에 적은 확대 구간은 시간 단위가 초라서 먹지 않았고(라운드 8 에서 Part 2 를 안 고친 대가), 데모 직전에 손으로 확대했다.</p>
+<p lang="en"><strong>Idea and purpose.</strong> The demo asked for three things: the DPI checker's mismatch waveform and terminal (Part 2), the scoreboard terminal (Part 3), and a waveform of our own assertion failing (Part 4). This round builds no new checks. It arranges <strong>what was already proven so someone else can see it in seconds</strong>. The zoom range in Part 2's <code>.rc</code> didn't apply because that part's time unit is seconds (the cost of leaving Part 2 alone in round 8), so it was zoomed by hand just before the demo.</p>
+
+<h3 lang="ko">끝난 상태 · 제출 폴더 37 파일, 3,935 줄</h3>
+<h3 lang="en">Final state · 37 submitted files, 3,935 lines</h3>
+<pre class="code tree"><span class="fo">lab4/</span>
+├─ part_1/    1 file      31
+├─ part_2/   12 files   1275
+├─ part_3/   15 files   1420
+└─ part_4/    9 files   1209</pre>
+<p lang="ko">3,935 줄 가운데 742 줄(Part 2 와 Part 3 의 RTL 371 줄씩)은 Lab 1 FIFO 에서 almost flag 를 걷고 bug 주입을 더한 같은 코드이고, Part 4 의 RTL 246 줄은 Lab 1 의 even-odd 회로에 bug 주입 30 줄을 더한 것이다. 나머지가 이 Lab 이 실제로 쌓은 것, 곧 <strong>회로를 의심하는 쪽의 코드</strong>다. 라운드로 다시 보면 흐름이 하나다. 재료를 고르고(0~1), 세 가지 검사기를 짓고(2~6), 셋 다 깨어 있음을 bug 로 증명하고(7), 보이게 만들고(8), 남에게 검사받고(9), PASS 의 뜻을 좁히고(10), 보여 줬다(11).</p>
+<p lang="en">Of the 3,935 lines, 742 (Part 2's and Part 3's RTL, 371 each) are the same code, Lab 1's FIFO with the almost flags removed and bug injection added, and Part 4's 246 RTL lines are Lab 1's even-odd circuit plus 30 lines of bug injection. The rest is what this lab actually built: <strong>the code that doubts the circuit</strong>. Seen as rounds, it's one arc: pick the materials (0 to 1), build three kinds of checker (2 to 6), prove all three awake with bugs (7), make it visible (8), get checked by someone else (9), narrow what PASS means (10), and show it (11).</p>
 </section>
 
 <footer>
